@@ -16,7 +16,7 @@ import bean.MyUser;
 public class AprobSefDao {
 
 	public int modif(int id) throws ClassNotFoundException, SQLException {
-	    String INSERT_USERS_SQL = "UPDATE concedii SET status = 1 WHERE id = ?";
+	    String INSERT_USERS_SQL = "UPDATE concedii SET status = 1 WHERE id = ? and id_ang != 0";
 
 	    int result = 0;
 

@@ -84,7 +84,7 @@
 
                     	out.println("<tr>");
                     	out.println("<td>Password</td>");
-                    	out.println("<td><input type='password' name='password' required/></td>");
+                    	out.println("<td><input type='text' name='password' required/></td>");
                     	out.println("</tr>");
 
                     	out.println("<tr>");

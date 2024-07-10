@@ -28,10 +28,9 @@
                         out.println("<h1>Vizualizarea tuturor concediilor din toata institutia per total</h1><br>");
                         out.println("<table border='1'><tr><th>Nr. crt</th><th>Departament</th><th>Nume</th><th>Prenume</th>" +
                         "<th>Functie</th><th>Inceput</th><th>Final</th><th>Motiv</th><th>Locatie</th><th>Status</th></tr>");
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT concedii.id as nr_crt, departament.nume_dep as departament," +
-                        "nume, prenume, tipuri.denumire as functie, start_c, end_c, motiv, locatie, statusuri.nume_status as status" +
-                        	"FROM useri NATURAL JOIN tipuri NATURAL JOIN departament JOIN concedii ON concedii.id_ang = useri.id" +
-                        "JOIN statusuri ON concedii.status = statusuri.status WHERE YEAR(start_c) = YEAR(CURDATE()) OR YEAR(start_c) = YEAR(CURDATE()) + 1;")) {
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT concedii.id as nr_crt, departament.nume_dep as departament, nume, prenume, " + 
+                            "tipuri.denumire as functie, start_c, end_c, motiv, locatie, statusuri.nume_status as status FROM useri " +
+                            "NATURAL JOIN tipuri NATURAL JOIN departament JOIN concedii ON concedii.id_ang = useri.id JOIN statusuri ON concedii.status = statusuri.status")) {
                             ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
                             while (rs1.next()) {

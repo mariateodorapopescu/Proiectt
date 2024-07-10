@@ -17,12 +17,13 @@
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip FROM useri WHERE username = ?")) {
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
                     int userId = rs.getInt("id");
                     int userType = rs.getInt("tip");
+                    int userdep = rs.getInt("id_dep");
                     if (userType == 0) {  // Assuming only type 4 users can approve
                         out.println("<div align='center'>");
                         out.println("<h1>Selectati concediul pe care doriti sa il respingeti</h1>");
@@ -34,9 +35,9 @@
 
                         String query = "SELECT concedii.id as nr_crt, departament.nume_dep as departament, nume, prenume, " + 
                                 "tipuri.denumire as functie, start_c, end_c, motiv, locatie, statusuri.nume_status as status FROM useri " +
-                                "NATURAL JOIN tipuri NATURAL JOIN departament JOIN concedii ON concedii.id_ang = useri.id JOIN statusuri ON concedii.status = statusuri.status where concedii.status = 1"; // Assuming status 0 is for pending approval
+                                "NATURAL JOIN tipuri NATURAL JOIN departament JOIN concedii ON concedii.id_ang = useri.id JOIN statusuri ON concedii.status = statusuri.status where concedii.status = 1 and useri.id_dep = ?"; // Assuming status 0 is for pending approval
                         try (PreparedStatement stm = connection.prepareStatement(query)) {
-                            //stm.setInt(1, userId);
+                            stm.setInt(1, userdep);
                             ResultSet rs1 = stm.executeQuery();
                             while (rs1.next()) {
                                 int id = rs1.getInt("nr_crt");
