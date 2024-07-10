@@ -7,21 +7,58 @@ import java.sql.SQLException;
 
 public class DelUsrDao {
 
-    public int deleteUser(String username) throws SQLException {
-        String DELETE_USER_SQL = "DELETE FROM useri WHERE username = ?";
+	public int deleteUser(String username, int id) throws SQLException {
+	    String DELETE_APPEARANCE_SQL = "DELETE FROM appearance WHERE id_usr = ?;";
+	    String DELETE_USER_SQL = "DELETE FROM useri WHERE username = ?;";
 
-        int result = 0;
+	    int result = 0;
+	    Connection con = null;
+	    PreparedStatement preparedStatement = null;
 
-        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = con.prepareStatement(DELETE_USER_SQL)) {
-            preparedStatement.setString(1, username);
-            result = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            printSQLException(e);
-            throw e;
-        }
-        return result;
-    }
+	    try {
+	        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+	        con.setAutoCommit(false); // Start transaction
+
+	        // Delete from appearance table first
+	        preparedStatement = con.prepareStatement(DELETE_APPEARANCE_SQL);
+	        preparedStatement.setInt(1, id);
+	        int appearanceResult = preparedStatement.executeUpdate();
+
+	        // Now delete from user table
+	        preparedStatement = con.prepareStatement(DELETE_USER_SQL);
+	        preparedStatement.setString(1, username);
+	        result = preparedStatement.executeUpdate();
+
+	        con.commit(); // Commit transaction if both deletions were successful
+	    } catch (SQLException e) {
+	        if (con != null) {
+	            try {
+	                con.rollback(); // Roll back transaction on error
+	            } catch (SQLException ex) {
+	                printSQLException(ex);
+	            }
+	        }
+	        printSQLException(e);
+	        throw e;
+	    } finally {
+	        if (preparedStatement != null) {
+	            try {
+	                preparedStatement.close();
+	            } catch (SQLException e) {
+	                printSQLException(e);
+	            }
+	        }
+	        if (con != null) {
+	            try {
+	                con.setAutoCommit(true);
+	                con.close();
+	            } catch (SQLException e) {
+	                printSQLException(e);
+	            }
+	        }
+	    }
+	    return result;
+	}
 
     private void printSQLException(SQLException ex) {
         for (Throwable e : ex) {

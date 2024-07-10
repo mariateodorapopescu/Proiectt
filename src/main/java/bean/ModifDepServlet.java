@@ -23,7 +23,8 @@ public class ModifDepServlet extends HttpServlet {
         String old = request.getParameter("password");
         
         if (departament == null) {
-            response.sendRedirect("login.jsp"); // Redirect or show error
+        	System.out.println("nu-mi ia departamentu tu!!");
+            //response.sendRedirect("login.jsp"); // Redirect or show error
             return;
         }
 

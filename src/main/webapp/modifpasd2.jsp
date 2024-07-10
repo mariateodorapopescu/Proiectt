@@ -25,7 +25,7 @@
                 if (rs.next() == false) {
                     out.println("No Records in the table");
                 } else {
-                    if (rs.getString("tip").compareTo("4") != 0) {
+                    if (rs.getString("tip").compareTo("5") == 0) {
                         //out.println("Nu ai ce cauta aici!");
                         if (rs.getString("tip").compareTo("1") == 0) {
                         	response.sendRedirect("tip1ok.jsp");
@@ -43,8 +43,8 @@
                     	
                     	out.println("<div align='center'>");
                     	out.println("<h1>Modificare parola</h1>");
-                    	out.println("<form action='" + request.getContextPath() + "/modifpasd' method='post'>");
-                    	out.println("<input type='hidden' name='username' value='" + request.getParameter("username") + "' />");
+                    	out.println("<form action='" + request.getContextPath() + "/ModifPasdServlet' method='post'>");
+                    	out.println("<input type='hidden' name='id' value='" + request.getParameter("id") + "' />");
                     	out.println("<table style='width: 80%'>");
                     	out.println("<tr>");
                     	out.println("<td>Parola noua</td>");
@@ -56,7 +56,7 @@
                     	out.println("</table>");
                     	out.println("</form>");
                     	out.println("</div>");
-                    	out.println("<a href ='modifpasd1.jsp'>Inapoi</a>");
+                    	out.println("<a href ='modifpasd.jsp'>Inapoi</a>");
                          
                     }
                 }

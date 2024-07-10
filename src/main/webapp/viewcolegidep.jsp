@@ -10,33 +10,37 @@
 </head>
 <body>
 <%
-    HttpSession sesi = request.getSession(false);
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                    out.println("<p>Nu exista date.</p>");
+HttpSession sesi = request.getSession(false);
+if (sesi != null) {
+    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+    if (currentUser != null) {
+        String username = currentUser.getUsername();
+        //int userdep = currentUser.getDepartament();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (!rs.next()) {
+                out.println("<p>Nu exista date.</p>");
+            } else {
+                int userType = rs.getInt("tip");
+                int userdep = rs.getInt("id_dep");
+                if (userType == 1 || userType == 2 || userType == 4) {
+                	 if (rs.getString("tip").compareTo("1") == 0) {
+                     	response.sendRedirect("tip1ok.jsp");
+                     }
+                     if (rs.getString("tip").compareTo("2") == 0) {
+                     	response.sendRedirect("tip2ok.jsp");
+                     }
+                     if (rs.getString("tip").compareTo("3") == 0) {
+                     	response.sendRedirect("sefok.jsp");
+                     }
+                     if (rs.getString("tip").compareTo("4") == 0) {
+                      	response.sendRedirect("adminok.jsp");
+                      }
                 } else {
-                    int userType = rs.getInt("tip");
-                    int userdep = rs.getInt("id_dep");
-                    if (userType != 0 || userType != 3) {
-                    	 if (rs.getString("tip").compareTo("1") == 0) {
-                         	response.sendRedirect("tip1ok.jsp");
-                         }
-                         if (rs.getString("tip").compareTo("2") == 0) {
-                         	response.sendRedirect("tip2ok.jsp");
-                         }
-                         if (rs.getString("tip").compareTo("4") == 0) {
-                          	response.sendRedirect("adminok.jsp");
-                          }
-                    } else {
-                        out.println("<h1>Vizualizare angajati din toata institutia</h1><br>");
+                        out.println("<h1>Vizualizare angajati din departamentul din care fac parte</h1><br>");
                         out.println("<table border='1'><tr><th>Nume</th><th>Prenume</th><th>Username</th><th>Tip</th><th>Departament</th></tr>");
                         try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri NATURAL JOIN tipuri NATURAL JOIN departament where useri.id_dep = ?")) {
                             stmt.setInt(1, userdep);

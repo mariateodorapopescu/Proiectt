@@ -10,38 +10,36 @@
 </head>
 <body>
 <%
-    HttpSession sesi = request.getSession(false);
-
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume from useri where username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
+HttpSession sesi = request.getSession(false);
+if (sesi != null) {
+    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+    if (currentUser != null) {
+        String username = currentUser.getUsername();
+        //int userdep = currentUser.getDepartament();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (!rs.next()) {
+                out.println("<p>Nu exista date.</p>");
+            } else {
                 int userType = rs.getInt("tip");
-                if (rs.next() == false) {
-                    out.println("No Records in the table");
+                int userdep = rs.getInt("id_dep");
+                if (userType != 4) {
+                	 if (rs.getString("tip").compareTo("1") == 0) {
+                     	response.sendRedirect("tip1ok.jsp");
+                     }
+                     if (rs.getString("tip").compareTo("2") == 0) {
+                     	response.sendRedirect("tip2ok.jsp");
+                     }
+                     if (rs.getString("tip").compareTo("3") == 0) {
+                     	response.sendRedirect("sefok.jsp");
+                     }
+                     if (rs.getString("tip").compareTo("4") == 0) {
+                      	response.sendRedirect("adminok.jsp");
+                      }
                 } else {
-                    if (rs.getString("tip").compareTo("4") != 0) {
-                        //out.println("Nu ai ce cauta aici!");
-                        if (rs.getString("tip").compareTo("1") == 0) {
-                        	response.sendRedirect("tip1ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("2") == 0) {
-                        	response.sendRedirect("tip2ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("3") == 0) {
-                        	response.sendRedirect("sefok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("0") == 0) {
-                        	response.sendRedirect("dashboard.jsp");
-                        }
-                    } else {
-                    	
                     	out.println("<h1>Modificare departament</h1>");
                     	out.println("<form action='");
                     	request.getContextPath();
@@ -49,8 +47,16 @@
                     	out.println("<table style='width: 100%'>");
                     	out.println("<tr>");
                     	out.println("<td>Nume departament</td>");
-                    	out.println("<td><input type='text' name='username' /></td>");
-                    	out.println("</tr>");
+                    	 out.println("<td><select name='username'>");
+                    	 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament")) {
+                             ResultSet rs1 = stm.executeQuery();
+                             while (rs1.next()) {
+                                 int id = rs1.getInt("id_dep");
+                                 String nume = rs1.getString("nume_dep");
+                                 out.println("<option value='" + nume + "'>" + nume + "</option>");
+                             }
+                         }
+                    	 out.println("</select></td></tr>");
                     	out.println("</table>");
                     	out.println("<input type='submit' value='Submit' />");
                     	out.println("</form>");             	

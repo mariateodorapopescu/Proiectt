@@ -35,30 +35,6 @@ public class ModifPasdDao {
 	    return result;
 	}
 
-	public List<String> getTipuri() throws SQLException {
-        List<String> tipuri = new ArrayList<>();
-
-	    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-	         PreparedStatement preparedStatement = connection.prepareStatement("SELECT denumire FROM tipuri")) {
-            ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next()) {
-                tipuri.add(rs.getString("denumire"));
-            }
-        }
-        return tipuri;
-    }
-
-    public List<String> getDepartamente() throws SQLException {
-        List<String> departamente = new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-   	         PreparedStatement preparedStatement = connection.prepareStatement("SELECT denumire FROM tipuri")) {
-               ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next()) {
-                departamente.add(rs.getString("nume_dep"));
-            }
-        }
-        return departamente;
-    }
     private void printSQLException(SQLException ex) {
         for (Throwable e: ex) {
             if (e instanceof SQLException) {

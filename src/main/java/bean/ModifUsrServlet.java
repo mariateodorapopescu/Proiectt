@@ -11,7 +11,8 @@ import java.io.IOException;
 
 public class ModifUsrServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String originalUsername = request.getParameter("originalUsername");
+        //String originalUsername = request.getParameter("originalUsername");
+    	int id = Integer.valueOf(request.getParameter("id"));
         String newUsername = request.getParameter("username");
         String nume = request.getParameter("nume");
         String prenume = request.getParameter("prenume");
@@ -48,7 +49,7 @@ public class ModifUsrServlet extends HttpServlet {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE useri SET nume =?, prenume = ?, data_nasterii = ?, adresa = ?, email = ?, telefon = ?, username = ?, id_dep = ?, tip = ? WHERE username = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE useri SET nume =?, prenume = ?, data_nasterii = ?, adresa = ?, email = ?, telefon = ?, username = ?, id_dep = ?, tip = ? WHERE id = ?");
             preparedStatement.setString(1, nume);
             preparedStatement.setString(2, prenume);
             preparedStatement.setString(3, data_nasterii);
@@ -58,7 +59,8 @@ public class ModifUsrServlet extends HttpServlet {
             preparedStatement.setString(7, newUsername);
             preparedStatement.setInt(8, departament);
             preparedStatement.setInt(9, tip);
-            preparedStatement.setString(10, originalUsername);
+            //preparedStatement.setString(10, originalUsername);
+            preparedStatement.setInt(10, id);
             preparedStatement.executeUpdate();
 
             preparedStatement.close();

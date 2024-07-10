@@ -56,7 +56,7 @@
                     	out.println("</table>");
                     	out.println("</form>");
                     	out.println("</div>");
-                    	out.println("<a href ='modifdep1.jsp'>Inapoi</a>");
+                    	out.println("<a href ='modifdep.jsp'>Inapoi</a>");
                          
                     }
                 }

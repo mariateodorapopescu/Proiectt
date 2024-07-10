@@ -47,10 +47,16 @@
                     	out.println("<table style='width: 100%'>");
                     	out.println("<tr>");
                     	out.println("<td>Nume departament</td>");
-                    	out.println("<td><input type='text' name='username' required /></td>");
-                    	out.println("</tr>");
-                    	out.println("<tr>");
-                    	out.println("<td></td>");
+                    	 out.println("<td><select name='username'>");
+                    	 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament")) {
+                             ResultSet rs1 = stm.executeQuery();
+                             while (rs1.next()) {
+                                 int id = rs1.getInt("id_dep");
+                                 String nume = rs1.getString("nume_dep");
+                                 out.println("<option value='" + nume + "'>" + nume + "</option>");
+                             }
+                         }
+                    	 out.println("</select></td></tr>");
                     	out.println("<td><input type='submit' value='Submit' /></td>");
                     	out.println("</tr>");
                     	out.println("</table>");

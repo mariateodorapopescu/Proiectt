@@ -24,7 +24,7 @@
                     out.println("<p>Nu exista date.</p>");
                 } else {
                     int userType = rs.getInt("tip");
-                    if (userType != 0) {
+                    if (userType == 1 || userType == 2 || userType == 3) {
                     	 if (rs.getString("tip").compareTo("1") == 0) {
                          	response.sendRedirect("tip1ok.jsp");
                          }
@@ -51,19 +51,9 @@
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
                             }
                             out.println("</table>");
+                            out.println(userType == 4 ? "<a href='adminok.jsp'>Inapoi</a>" : "<a href='dashboard.jsp'>Inapoi</a>");
                         }
-                        if (userType == 0) {
-                            out.println("<a href ='dashboard.jsp'>Inapoi</a>");
-                         }
-                         if (userType == 1) {
-                             out.println("<a href ='tip1ok.jsp'>Inapoi</a>");
-                          }
-                         if (userType == 2) {
-                             out.println("<a href ='tip2ok.jsp'>Inapoi</a>");
-                          }
-                         if (userType == 3) {
-                             out.println("<a href ='sefok.jsp'>Inapoi</a>");
-                          }
+                        
                     }
                 }
             } catch (Exception e) {
