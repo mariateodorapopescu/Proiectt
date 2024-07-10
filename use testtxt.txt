@@ -1,0 +1,226 @@
+use test;
+create table useri(id int, username varchar(25), password varchar(25), id_dep int, tip int);
+alter table useri add constraint primary key(id);
+alter table useri add constraint unique(id, username);
+alter table useri modify id int not null;
+alter table useri modify username varchar(25) not null;
+alter table useri modify password varchar(25) not null;
+alter table useri modify id_dep int not null;
+alter table useri modify tip int not null;
+insert into useri values (1, 'ceva', 'altceva', 2, 1);
+insert into useri values (2, 'cevaa', 'altceva', 1, 1);
+select * from useri;
+create table concedii(id int, id_ang int, start_c date, end_c date);
+alter table concedii add constraint primary key(id);
+alter table concedii add constraint unique(id);
+alter table concedii modify id int not null;
+alter table concedii modify id_ang int not null;
+alter table concedii modify start_c date not null;
+alter table concedii modify end_c date not null;
+insert into concedii values (1, 1, '2024-07-01', '2024-07-02');
+select * from concedii;
+create table plecati(zi date, nr int, id_dep int);
+alter table plecati modify zi date not null;
+alter table plecati modify id_dep int not null;
+insert into plecati values ('2024-07-01', 0, 1);
+select * from plecati;
+create table departament(id int, nume_dep varchar(25));
+alter table departament add constraint primary key(id);
+alter table departament add constraint unique(id);
+alter table departament add constraint unique(nume_dep);
+alter table departament modify id int not null;
+alter table departament modify nume_dep varchar(25) not null;
+insert into departament values (1, 'test');
+insert into departament values (2, 'testt');
+select * from departament;
+create table tipuri(tip int, denumire varchar(25));
+alter table tipuri add constraint primary key(tip);
+alter table tipuri add constraint unique(tip);
+alter table tipuri add constraint unique(denumire);
+alter table tipuri modify tip int not null;
+alter table tipuri modify denumire varchar(25) not null;
+insert into tipuri values (1, 'test');
+select * from tipuri;
+alter table departament rename column id to id_dep;
+alter table useri add constraint fk1 foreign key (id_dep) references departament(id_dep);
+alter table tipuri add constraint fk2 foreign key (tip) references tipuri(tip);
+alter table concedii add constraint fk3 foreign key (id_ang) references useri(id);
+alter table plecati add constraint fk4 foreign key (id_dep) references departament(id_dep);
+select * from useri;
+create table testt (id int not null, first_name varchar(25) default null, last_name varchar(25) default null, username varchar(25) default null, password varchar(25) default null, address varchar(45) default null, contact varchar(25) default null, primary key (id)) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
+select * from test.testt;
+CREATE TABLE `login` (
+  `username` varchar(45) NOT NULL,
+  `password` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+INSERT INTO `test`.`login` (`username`, `password`) VALUES ("Ramesh", "Ramesh");
+INSERT INTO `test`.`login` (`username`, `password`) VALUES ("bunaa", "tuuu");
+select * from test.testt;
+ALTER TABLE useri AUTO_INCREMENT = 1;
+DROP TABLE IF EXISTS useri;
+CREATE TABLE useri (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    id_dep INT NOT NULL,
+    tip INT NOT NULL
+);
+select * from useri;
+alter table useri modify password varchar(255) not null;
+SET SQL_SAFE_UPDATES = 0;
+DELETE FROM useri WHERE username="test";
+alter table useri add constraint unique(username);
+select * from departament;
+select * from tipuri;
+insert into departament values(3, 'ceva');
+insert into tipuri values(2, 'cevaa');
+select username, denumire as tip, nume_dep as departament from useri natural join departament natural join tipuri;
+alter table concedii drop constraint fk3;
+create table useri(id int auto_increment not null primary key, nume varchar(45) not null, prenume varchar(45) not null, data_nasterii date not null, adresa varchar(256) not null, email varchar(56) not null, telefon varchar(25) not null, username varchar(25) not null, password varchar(25) not null, id_dep int not null, tip int not null);
+alter table useri add constraint unique(id, username, email, telefon);
+insert into useri values (1, 'ceva', 'altceva', '2001-10-20', 'adresa','email@email.com', '+40700000000', 'username','parola',1,1);
+insert into useri (nume, prenume, data_nasterii, adresa, email, telefon, username, password, id_dep, tip) values ('ceva', 'altceva', '2001-10-20', 'adresa','email@example.com', '+40700000001', 'username1','parola',1,1);
+select * from useri;
+alter table concedii add constraint fk3 foreign key (id_ang) references useri(id);
+create table restrictii(tip int not null primary key, decl_dep int, modif_d int, del_d int, decl_usr int, modif_u int, del_u int, auth int, viz_d int, introd_c int, modif_c int, del_c int, viz_c_t_an int, viz_c_t_per int, viz_c_d_an int, viz_c_d_per int, viz_c_a_an int, viz_c_a_per int, viz_a_t int, viz_a_d int, raport int);
+alter table restrictii add constraint fk5 foreign key (tip) references tipuri(tip);
+DROP TABLE IF EXISTS restrictii;
+create table restrictii(tip int not null primary key, decl_dep int, modif_d int, del_d int, decl_usr int, modif_u int, del_u int, auth int, viz_d int, introd_c int, modif_c int, del_c int, viz_c_t_an int, viz_c_t_per int, viz_c_d_an int, viz_c_d_per int, viz_c_a_an int, viz_c_a_per int, viz_a_t int, viz_a_d int, raport int, asoc_tip int, asoc_dep int);
+DROP TABLE IF EXISTS restrictii;
+create table restrictii(tip int not null primary key, decl_dep int, modif_d int, del_d int, decl_usr int, modif_u int, del_u int, auth int, viz_d int, introd_c int, modif_c int, del_c int, viz_c_t_an int, viz_c_t_per int, viz_c_d_an int, viz_c_d_per int, viz_c_a_an int, viz_c_a_per int, viz_a_t int, viz_a_d int, raport int, asoc_tip int, asoc_dep int);
+alter table restrictii add constraint fk5 foreign key (tip) references tipuri(tip);
+alter table restrictii drop constraint fk5;
+delete from restrictii where tip=0;
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_d, viz_a_t, viz_c_t_an, viz_c_t_per, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per, raport) values (0,1,1,1,1,1,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, viz_d, viz_a_t, viz_a_d, decl_dep, decl_usr, modif_d, modif_u, del_d, del_u, auth, asoc_dep, asoc_tip) values (4,1,1,1,1,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_a_d, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per, raport) values (3,1,1,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per) values (2,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per) values (1,1,1,1,1,1,1,1,1);
+alter table tipuri drop constraint fk2;
+delete from tipuri where tip=1;
+delete from tipuri where tip=2;
+insert into tipuri values (0, 'Director');
+insert into tipuri values (1, 'Tip1');
+insert into tipuri values (2, 'Tip2');
+insert into tipuri values (3, 'Sef');
+insert into tipuri values (4, 'Administrator');
+alter table tipuri add constraint fk2 foreign key (tip) references restrictii(tip);
+select * from tipuri;
+select * from restrictii;
+select nume, prenume, denumire, nume_dep from useri natural join tipuri natural join departament;
+delete from useri where username='username';
+select * from useri;
+alter table useri modify password varchar(255) not null;
+describe concedii;
+select * from tipuri;
+ALTER TABLE concedii AUTO_INCREMENT = 1;
+ALTER TABLE concedii ADD COLUMN motiv varchar(256) not null;
+ALTER TABLE concedii ADD COLUMN locatie varchar(256) not null;
+create table appearance(accent_color varchar(25), body_color varchar(25));
+create table colors(red int, orange int, yellow int, green int, blue int, indigo int, violet int, pink int, teal int, brown int, grey int, black int, white int);
+DROP TABLE IF EXISTS appearance;
+DROP TABLE IF EXISTS colors;
+create table appearance(id_usr int primary key not null, accent_color varchar(25), body_color varchar(25));
+alter table appearance add constraint fk5 foreign key (id_usr) references useri(id);
+alter table appearance drop constraint fk5;
+DROP TABLE IF EXISTS appearance;
+create table appearance(id_usr int primary key not null, red int default 0, orange int default 0, yellow int default 0, green int default 0, blue int default 1, indigo int default 0, violet int default 0, pink int default 0, teal int default 0, brown int default 0, grey int default 0, black int default 0, white int default 0, body_color varchar(25) default 1);
+alter table appearance add constraint fk5 foreign key (id_usr) references useri(id);
+insert into appearance (id_usr) values(4);
+select * from appearance;
+select * from useri;
+DELETE FROM useri WHERE id=1;
+alter table useri add constraint unique(id, email, telefon, username);
+alter table useri add constraint unique(username);
+select * from departament;
+select * from concedii;
+select * from restrictii;
+select * from tipuri;
+select nume, prenume, denumire, nume_dep from useri natural join tipuri natural join departament where id_dep = (select id_dep from useri where username="test");
+select nume, prenume, denumire, nume_dep from useri natural join tipuri natural join departament;
+DROP TABLE IF EXISTS `myTable`;
+CREATE TABLE `myTable` (
+  `id` mediumint(8) unsigned NOT NULL auto_increment,
+  `nume` varchar(255) default NULL,
+  `telefon` varchar(100) default NULL,
+  `email` varchar(255) default NULL,
+  `adresa` varchar(255) default NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+INSERT INTO `myTable` (`nume`,`telefon`,`email`,`adresa`)
+VALUES
+  ("Jason Cotton","(553) 316-2792","elit.pellentesque@outlook.org","P.O. Box 543, 4585 Ac Av."),
+  ("Malcolm Reyes","1-514-484-1362","fermentum@google.net","8800 Turpis Street"),
+  ("Ian Frank","1-227-246-7729","dapibus.ligula@icloud.couk","903-5129 Condimentum. Street"),
+  ("Silas Cabrera","(774) 386-4678","parturient.montes.nascetur@hotmail.com","Ap #832-2337 Quam. Road"),
+  ("Fritz Sharp","(267) 874-2166","nec.urna@icloud.net","3984 Massa Rd.");
+UPDATE useri SET nume = "ala", prenume = "bala" WHERE username="oadresa";
+select * from departament;
+select * from useri;
+SELECT u.id_dep, d.nume_dep FROM useri u join departament d on u.id_dep = d.id_dep WHERE username = "test";
+CREATE TABLE `tichete` (
+  `id` mediumint(8) unsigned NOT NULL auto_increment,
+  `subiect` varchar(255) default NULL,
+  `continut` varchar(512) default NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+INSERT INTO `tichete` (`subiect`,`continut`) values ("test", "test");
+select * from tichete;
+ALTER TABLE departament MODIFY id_dep int AUTO_INCREMENT;
+delete from departament where id_dep = 19;
+UPDATE departament SET nume_dep = "brooo" WHERE nume_dep = "testt";
+-- ALTER TABLE table_name ADD COLUMN column_name data_type [constraint];
+ALTER TABLE concedii ADD COLUMN status int;
+select * from concedii;
+delete from concedii where id_ang = 1;
+ALTER TABLE concedii AUTO_INCREMENT = 1;
+-- ALTER TABLE your_table AUTO_INCREMENT = <initial_value>;
+CREATE TABLE statusuri (
+	status int not null unique,
+	nume_status varchar(56) not null unique,
+  PRIMARY KEY (status)
+);
+select * from departament;
+insert into statusuri values (-2, 'dezaprobat director');
+insert into statusuri values (-1, 'dezaprobat sef');
+insert into statusuri values (0, 'neaprobat');
+insert into statusuri values (1, 'aprobat sef');
+insert into statusuri values (2, 'aprobat director');
+alter table concedii add constraint fk6 foreign key (status) references statusuri(status);
+ALTER TABLE useri ADD COLUMN cnp int unique;
+select * from useri;
+-- ALTER TABLE {TABLENAME} ADD {COLUMNNAME} {TYPE} {NULL|NOT NULL} CONSTRAINT {CONSTRAINT_NAME} DEFAULT {DEFAULT_VALUE} WITH VALUES;
+-- ALTER TABLE Employee ADD CONSTRAINT DF_SomeName DEFAULT N'SANDNES' FOR CityBorn;
+ALTER TABLE concedii alter column status set default 0;
+insert into concedii values (1, 1, '2024-07-01', '2024-07-02');
+insert into concedii(id_ang, start_c, end_c, motiv, locatie) values (18, '2024-07-10', '2024-07-11','bla','bla');
+DESCRIBE concedii;
+-- ALTER TABLE table_name MODIFY COLUMN column_name new_data_type;
+ALTER TABLE concedii MODIFY COLUMN start_c date not null;
+ALTER TABLE concedii MODIFY COLUMN end_c date not null;
+ALTER TABLE concedii MODIFY COLUMN motiv varchar(255) not null;
+ALTER TABLE concedii MODIFY COLUMN locatie varchar(255) not null;
+ALTER TABLE concedii AUTO_INCREMENT = 1;
+ALTER TABLE concedii MODIFY id INT AUTO_INCREMENT;
+-- UPDATE useri SET nume = "ala", prenume = "bala" WHERE username="oadresa";
+delete from concedii where id = 4;
+select * from statusuri;
+select * from concedii join useri on id_ang = useri.id;
+SELECT concedii.id, nume_dep as departament, nume, prenume, denumire as functie, start_c, end_c, motiv, locatie, nume_status as status FROM useri NATURAL JOIN tipuri NATURAL JOIN departament join concedii on concedii.id_ang = useri.id join statusuri on concedii.status = statusuri.status;
+select count(*) from concedii join useri on concedii.id_ang = useri. id where username = "aaaa";
+-- SELECT DATEDIFF('2021-12-25', '2021-01-01') AS 'Days';
+SELECT count(*)
+FROM concedii
+JOIN useri ON concedii.id_ang = useri.id
+WHERE username = 'aaaa'
+  AND MONTH(start_c) >= 6
+  AND MONTH(start_c) <= 8;
+select count(*) from useri where tip = 0;
+select count(*) from concedii join useri on useri.id = concedii.id_ang group by tip having tip = 0;
+select count(*) as total from useri group by id_dep having id_dep = 3;
+select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= 1 and month(start_c) = 7 and day(start_c) <= 31 group by id_dep having id_dep = 3;
+select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= 1 and month(start_c) = 7 and day(start_c) <= 31 and month(start_c) <= 7 group by tip having tip = 0;
+select * from concedii;
+select * from useri;
+delete from concedii where motiv = "ce";
