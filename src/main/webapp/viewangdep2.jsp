@@ -21,7 +21,9 @@
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
-                    out.println("<p>Nu exista date.</p>");
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
                 } else {
                     int userType = rs.getInt("tip");
                     if (userType != 0) {
@@ -37,7 +39,7 @@
                         }
                         out.println("<h1>Vizualizare angajati din departamentul " + deptName + "</h1><br>");
 
-                        PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri NATURAL JOIN tipuri NATURAL JOIN departament WHERE id_dep = ?");
+                        PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on tipuri.tip = useri.tip left JOIN departament on departament.id_dep = useri.id_dep WHERE useri.id_dep = ?");
                         stmt.setInt(1, idDep);
                         ResultSet rs1 = stmt.executeQuery();
                         boolean found = false;
@@ -71,14 +73,24 @@
                 rs.close();
             } catch (Exception e) {
                 e.printStackTrace();
+                out.println("<script type='text/javascript'>");
+    	        out.println("alert('Eroare la baza de date!');");
+    	        out.println("</script>");
                 response.sendRedirect("login.jsp");
             }
         } else {
-           response.sendRedirect("login.jsp");
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
         response.sendRedirect("login.jsp");
     }
+
 %>
 </body>
 </html>

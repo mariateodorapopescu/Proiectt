@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class AddDepServlet extends HttpServlet {
 //    private static final long serialVersionUID = 1;
@@ -32,10 +33,22 @@ public class AddDepServlet extends HttpServlet {
         
         try {
             depDao.addDep(nume); // Ensure this method exists and works in DepDao
-            response.sendRedirect("adminok.jsp");
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Adaugare cu succes!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("err.jsp");
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare la adaugarea departamentului - motive necunoscute!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         }
     }
 }

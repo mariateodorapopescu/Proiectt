@@ -21,26 +21,35 @@
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
-                    out.println("<p>Nu exista date.</p>");
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
                 } else {
                     int userType = rs.getInt("tip");
                     int userdep = rs.getInt("id_dep");
                     if (userType != 4) {
-                        out.println("<h1>Vizualizarea tuturor concediilor personale APROBATE SEF</h1><br>");
+                    	out.println("<h1>Vizualizarea tuturor concediilor personale din anul curent</h1><br>");
                         out.println("<table border='1'><tr><th>Nr. crt</th><th>Departament</th><th>Nume</th><th>Prenume</th>" +
-                        "<th>Functie</th><th>Inceput</th><th>Final</th><th>Motiv</th><th>Locatie</th><th>Status</th></tr>");
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT concedii.id as nr_crt, departament.nume_dep as departament, nume, prenume, " + 
-                            "tipuri.denumire as functie, start_c, end_c, motiv, locatie, statusuri.nume_status as status FROM useri " +
-                            "NATURAL JOIN tipuri NATURAL JOIN departament JOIN concedii ON concedii.id_ang = useri.id JOIN statusuri ON concedii.status = statusuri.status where concedii.status = 1 and username = ?")) {
-                            stmt.setString(1, username);
+                        "<th>Functie</th><th>Inceput</th><th>Final</th><th>Motiv</th><th>Locatie</th><th>Tip concediu</th><th>Status</th></tr>");
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT " +
+                                "c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                                "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
+                                "FROM useri u " +
+                                "JOIN tipuri t ON u.tip = t.tip " +
+                                "JOIN departament d ON u.id_dep = d.id_dep " +
+                                "JOIN concedii c ON c.id_ang = u.id " +
+                                "JOIN statusuri s ON c.status = s.status " +
+                                "JOIN tipcon ct ON c.tip = ct.tip " +
+                                "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and username = ? and c.status = 1;")) {    
+                        	stmt.setString(1, username);
                         	ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
                             while (rs1.next()) {
                                 found = true;
                                 out.print("<tr><td>" + rs1.getInt("nr_crt") + "</td><td>" + rs1.getString("departament") + "</td><td>" + 
-                                    rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("functie") + "</td><td>" + 
-                                    rs1.getDate("start_c") + "</td><td>" + rs1.getDate("end_c") + "</td><td>" + rs1.getString("motiv") + "</td><td>" + 
-                                    rs1.getString("locatie") + "</td>");
+                                        rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("functie") + "</td><td>" + 
+                                        rs1.getDate("start_c") + "</td><td>" + rs1.getDate("end_c") + "</td><td>" + rs1.getString("motiv") + "</td><td>" + 
+                                        rs1.getString("locatie") + "</td>" + "<td>" + rs1.getString("tipcon") + "</td>");
                                 if (rs1.getString("status").compareTo("neaprobat") == 0) {
                                     out.println("<td style='background-color: rgb(136, 174, 219);'>" + rs1.getString("status") + "</td></tr>");
                                 }
@@ -75,22 +84,30 @@
                              out.println("<a href ='sefok.jsp'>Inapoi</a>");
                           }
                     } else {
-                        response.sendRedirect("dashboard.jsp");
+                        response.sendRedirect("adminok.jsp");
+                        // e admin
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                out.println("<script type='text/javascript'>");
+    	        out.println("alert('Eroare la baza de date!');");
+    	        out.println("</script>");
                 response.sendRedirect("login.jsp");
-                System.out.println("?????");
             }
         } else {
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
             response.sendRedirect("login.jsp");
-            System.out.println("lol ce");
         }
     } else {
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
         response.sendRedirect("login.jsp");
-    	System.out.println("lol ce x2");
     }
+
 %>
 </body>
 </html>

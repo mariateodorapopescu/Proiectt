@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import bean.ConcediuCon;
 import bean.ConcediuConDao;
@@ -60,11 +61,22 @@ public class DelConServlet extends HttpServlet {
         
         try {
             concediu.check(con);
-            response.sendRedirect("dashboard.jsp");
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Stergere cu succes!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            response.sendRedirect("err.jsp");
+        	response.setContentType("text/html;charset=UTF-8");
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu s-a putut sterge concediul din motive necunoscute.');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
+			e.printStackTrace();
         }
 	}
 

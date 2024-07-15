@@ -7,7 +7,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class ModifUsrServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -24,25 +27,63 @@ public class ModifUsrServlet extends HttpServlet {
         int tip = Integer.valueOf(request.getParameter("tip"));
         
         if (!NameValidator.validateName(nume)) {
-            response.sendRedirect("modifusr2.jsp?n=true");
+            response.sendRedirect("signin.jsp?n=true");
             return;
         }
         if (!NameValidator.validateName(prenume)) {
-            response.sendRedirect("modifusr2.jsp?pn=true");
+            response.sendRedirect("signin.jsp?pn=true");
             return;
         }
         if (!EmailValidator.validateEmail(email)) {
-            response.sendRedirect("modifusr2.jsp?e=true");
+            response.sendRedirect("signin.jsp?e=true");
             return;
         }
 
         if (!PhoneNumberValidator.validatePhoneNumber(telefon)) {
-            response.sendRedirect("modifusr2.jsp?t=true");
+            response.sendRedirect("signin.jsp?t=true");
             return;
         }
 
         if (!DateOfBirthValidator.validateDateOfBirth(data_nasterii)) {
-            response.sendRedirect("modifusr2.jsp?dn=true");
+            response.sendRedirect("signin.jsp?dn=true");
+            return;
+        }
+        
+        int nrsef = -1;
+        int nrdir = -1;
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+      	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 3 group by id_dep having id_dep = ?;");
+        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 0 group by id_dep having id_dep = ?;")) {
+        	preparedStatement.setInt(1, departament);
+        	stmt.setInt(1, departament);
+                  ResultSet rs = preparedStatement.executeQuery();
+                  ResultSet res = stmt.executeQuery();
+               while (rs.next()) {
+                  nrsef = rs.getInt("total");
+               }
+               while (res.next()) {
+                   nrdir = res.getInt("total");
+               }
+           } catch (SQLException e) {
+		        // printSQLException(e);
+		        response.setContentType("text/html;charset=UTF-8");
+				 PrintWriter out = response.getWriter();
+				    out.println("<script type='text/javascript'>");
+				    out.println("alert('Eroare la baza de date - debug only!');");
+				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("</script>");
+				    out.close();
+				    e.printStackTrace();
+		        throw new IOException("Eroare la baza de date =(", e);
+		    }
+        
+        if (tip == 3 && nrsef == 1) {
+            response.sendRedirect("signin.jsp?pms=true");
+            return;
+        }
+        
+        if (tip == 0 && nrdir == 1) {
+            response.sendRedirect("signin.jsp?pmd=true");
             return;
         }
 
@@ -65,10 +106,23 @@ public class ModifUsrServlet extends HttpServlet {
 
             preparedStatement.close();
             connection.close();
-            response.sendRedirect("adminok.jsp"); // Redirect to a confirmation page
+            response.setContentType("text/html;charset=UTF-8");
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Modificare cu succes!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("err.jsp"); // Redirect to an error page
+        	response.setContentType("text/html;charset=UTF-8");
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
+			e.printStackTrace();
         }
     }
 }

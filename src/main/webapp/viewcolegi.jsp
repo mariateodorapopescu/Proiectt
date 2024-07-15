@@ -21,7 +21,9 @@
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
-                    out.println("<p>Nu exista date.</p>");
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
                 } else {
                     int userType = rs.getInt("tip");
                     if (userType == 1 || userType == 2 || userType == 3) {
@@ -40,12 +42,12 @@
                     } else {
                         out.println("<h1>Vizualizare angajati din toata institutia</h1><br>");
                         out.println("<table border='1'><tr><th>Nume</th><th>Prenume</th><th>Username</th><th>Tip</th><th>Departament</th></tr>");
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri NATURAL JOIN tipuri NATURAL JOIN departament")) {
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM useri left join tipuri on useri.tip = tipuri.tip left join departament on departament.id_dep = useri.id_dep")) {
                             ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
                             while (rs1.next()) {
                                 found = true;
-                                out.println("<tr><td>" + rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("username") + "</td><td>" + rs1.getString("denumire") + "</td><td>" + rs1.getString("nume_dep") + "</td></tr>");
+                                out.println("<tr><td>" + rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("username") + "</td><td>" + rs1.getString("denumire") + "</td><td>" + rs1.getString("nume_dep") + "</td></tr>");   
                             }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
@@ -58,22 +60,24 @@
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                if (currentUser.getTip() == 1) {
-                	response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
-                	response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
-                	response.sendRedirect("sefok.jsp");
-                }
+                out.println("<script type='text/javascript'>");
+    	        out.println("alert('Eroare la baza de date!');");
+    	        out.println("</script>");
+                response.sendRedirect("login.jsp");
             }
         } else {
-           response.sendRedirect("login.jsp");   
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
         response.sendRedirect("login.jsp");
     }
+
 %>
 </body>
 </html>

@@ -6,11 +6,16 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import bean.ConcediuCon;
 import bean.ConcediuConDao;
@@ -75,74 +80,151 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
         
-        try {
+	    try {
 			if (!maimulteconcedii(request)) {
-				System.out.println("deja are prea multe concedii");
-				response.sendRedirect("err.jsp?dn=true");
+				 response.setContentType("text/html;charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.println("<script type='text/javascript'>");
+			    out.println("alert('Utilizatorul nu poate avea mai mult de 3 perioade diefrite de concediu!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
 				return;
 			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			 response.setContentType("text/html;charset=UTF-8");
+			    PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Nu a gasit clasa - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response.setContentType("text/html;charset=UTF-8");
+			 PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Eroare IO - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		}
         
         try {
 			if (!maimultezile(request)) {
-				System.out.println("deja are prea multe zile in total");
-				response.sendRedirect("err.jsp?dn=true");
+				 response.setContentType("text/html;charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.println("<script type='text/javascript'>");
+			    out.println("alert('Utilizatorul are deja prea multe zile de concediu!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
 				return;
 			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			 response.setContentType("text/html;charset=UTF-8");
+			    PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Nu a gasit clasa - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response.setContentType("text/html;charset=UTF-8");
+			 PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Eroare IO - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		}
         
         try {
 			if (!odatavara(request, con) && (toData(con.getStart()).getLuna() >= 6 && toData(con.getStart()).getLuna() <= 8)) {
-				System.out.println("deja are vara");
-				response.sendRedirect("err.jsp?dn=true");
+				 response.setContentType("text/html;charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.println("<script type='text/javascript'>");
+			    out.println("alert('Utilizatorul nu poate avea mai mult de un concediu pe timpul verii!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
 				return;
 			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			 response.setContentType("text/html;charset=UTF-8");
+			    PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Nu a gasit clasa - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response.setContentType("text/html;charset=UTF-8");
+			 PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Eroare IO - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		}
         
         if (!maimultezileodata(con)) {
-        	System.out.println("deja are prea multe zile deodata");
-			response.sendRedirect("err.jsp?dn=true");
+        	 response.setContentType("text/html;charset=UTF-8");
+        	PrintWriter out = response.getWriter();
+			out.println("<script type='text/javascript'>");
+		    out.println("alert('Utilizatorul nu poate avea mai mult de 21 de zile / concediu!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
 			return;
 		}
         
-        System.out.println("am ajuns dupa maimultezileodata");
-        
         try {
 			if (!preamulti(con, request)) {
-				response.sendRedirect("err.jsp?dn=true");
+				 response.setContentType("text/html;charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.println("<script type='text/javascript'>");
+			    out.println("alert('Au concediu prea multi utilizatori dintr-un singur departament!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
 				return;
 			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			 response.setContentType("text/html;charset=UTF-8");
+			    PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Nu a gasit clasa - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			response.setContentType("text/html;charset=UTF-8");
+			 PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Eroare IO - debug only!');");
+			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		}
-        
-        System.out.println("am ajuns dupa preamulti");
-	    
         
         String QUERY2 = "select * from useri where id = ?;";
 	    int userType = -1;
@@ -156,41 +238,75 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        response.setContentType("text/html;charset=UTF-8");
+				 PrintWriter out = response.getWriter();
+				    out.println("<script type='text/javascript'>");
+				    out.println("alert('Eroare la baza de date - debug only!');");
+				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("</script>");
+				    out.close();
+				    e.printStackTrace();
+		        throw new IOException("Eroare la baza de date =(", e);
 		    }
 	    
 	    if (userType == 0) {
 	    	 try {
 	 			if (!preamultid(con, request)) {
-	 				response.sendRedirect("err.jsp?dn=true");
-	 				return;
-	 			}
-	 		} catch (ClassNotFoundException e) {
-	 			// TODO Auto-generated catch block
-	 			e.printStackTrace();
-	 		} catch (IOException e) {
-	 			// TODO Auto-generated catch block
-	 			e.printStackTrace();
-	 		}
+	 				 response.setContentType("text/html;charset=UTF-8");
+	 				PrintWriter out = response.getWriter();
+					out.println("<script type='text/javascript'>");
+				    out.println("alert('Au concediu prea multi directori!');");
+				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("</script>");
+				    out.close();
+					return;
+				}
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				 response.setContentType("text/html;charset=UTF-8");
+				    PrintWriter out = response.getWriter();
+				    out.println("<script type='text/javascript'>");
+				    out.println("alert('Nu a gasit clasa - debug only!');");
+				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("</script>");
+				    out.close();
+				    e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				response.setContentType("text/html;charset=UTF-8");
+				 PrintWriter out = response.getWriter();
+				    out.println("<script type='text/javascript'>");
+				    out.println("alert('Eroare IO - debug only!');");
+				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("</script>");
+				    out.close();
+				    e.printStackTrace();
+			}
 	    }
-	    
-	    System.out.println(userType);
 	    
 	    if (userType == 0 || userType == 3) {
 	    	con.setStatus(1);
 	    } else {
 	    	con.setStatus(0);
 	    }
-       
-	    System.out.println("trimitere");
         
         try {
             concediu.check(con);
-            response.sendRedirect("dashboard.jsp");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Modificare cu succes!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            response.sendRedirect("err.jsp");
+        	response.setContentType("text/html;charset=UTF-8");
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
+			e.printStackTrace();
         }
 	}
 	
@@ -234,7 +350,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
 	    
 	    Class.forName("com.mysql.cj.jdbc.Driver");
@@ -251,33 +367,16 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Database error occurred", e);
+	        throw new IOException("Eroare la baza de date", e);
 	    }
 
 	    return nr < 3;
 	}
 
 	public static boolean maimultezile(HttpServletRequest request) throws ClassNotFoundException, IOException {
-		int nr = 0;
+	    int nr = 0;
 	    Class.forName("com.mysql.cj.jdbc.Driver");
-	    String QUERY = "select sum(datediff(end_c, start_c)) as total from concedii join useri on concedii.id_ang = useri.id where id_ang = ?;";
-	    
-	    int id = Integer.valueOf(request.getParameter("idcon"));
-	    int uid = -1;
-        String QUERY3 = "select id_ang from concedii where id = ?;";
-	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // aci crapa
-		         PreparedStatement stm = conn.prepareStatement(QUERY3)) {
-		        stm.setInt(1, id);
-		        try (ResultSet res = stm.executeQuery()) {
-		            if (res.next()) {
-		                uid = res.getInt("id_ang");
-		            }
-		        }
-		    } catch (SQLException e) {
-		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
-		    }
-	    
+	    int uid = Integer.valueOf(request.getParameter("userId"));
 	    String QUERY2 = "select * from useri where id = ?;";
 	    int userType = 0;
 	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -290,27 +389,56 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
+
+	    Set<LocalDate> holidays = getLegalHolidays();
+	    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and id != ?;";
 	    
+	    int aidi = Integer.valueOf(request.getParameter("idcon"));
+
 	    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 	         PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
 	        preparedStatement.setInt(1, uid);
+	        preparedStatement.setInt(2, aidi);
 	        try (ResultSet rs = preparedStatement.executeQuery()) {
-	            if (rs.next()) {
-	                nr = rs.getInt("total");
+	            while (rs.next()) {
+	                LocalDate start = rs.getDate("start_c").toLocalDate();
+	                LocalDate end = rs.getDate("end_c").toLocalDate();
+	                while (!start.isAfter(end)) {
+	                    if (!holidays.contains(start)) {
+	                        nr++;
+	                    }
+	                    start = start.plusDays(1);
+	                }
 	            }
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Database error occurred", e);
+	        throw new IOException("Eroare la baza de date", e);
 	    }
 	    if (userType == 2) {
-	    	return nr < 30;
+	        return nr < 30;
 	    }
 	    return nr < 40;
-}
+	}
 	
+	public static Set<LocalDate> getLegalHolidays() {
+	    return new HashSet<>(Arrays.asList(
+	        LocalDate.of(LocalDate.now().getYear(), 1, 1),
+	        LocalDate.of(LocalDate.now().getYear(), 1, 2),
+	        LocalDate.of(LocalDate.now().getYear(), 1, 6),
+	        LocalDate.of(LocalDate.now().getYear(), 1, 7),
+	        LocalDate.of(LocalDate.now().getYear(), 1, 24),
+	        LocalDate.of(LocalDate.now().getYear(), 5, 1),
+	        LocalDate.of(LocalDate.now().getYear(), 6, 1),
+	        LocalDate.of(LocalDate.now().getYear(), 8, 15),
+	        LocalDate.of(LocalDate.now().getYear(), 11, 30),
+	        LocalDate.of(LocalDate.now().getYear(), 12, 1),
+	        LocalDate.of(LocalDate.now().getYear(), 12, 25),
+	        LocalDate.of(LocalDate.now().getYear(), 12, 26)
+	    ));
+	}
 	public static boolean odatavara(HttpServletRequest request, ConcediuCon concediu) throws ClassNotFoundException, IOException{
 		 int nr = 0;
 		    Class.forName("com.mysql.cj.jdbc.Driver");
@@ -330,7 +458,7 @@ public class ModifConServlet extends HttpServlet {
 			        }
 			    } catch (SQLException e) {
 			        printSQLException(e);
-			        throw new IOException("Database error occurred", e);
+			        throw new IOException("Eroare la baza de date", e);
 			    }
 		    
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -344,7 +472,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
 
 		    return nr < 1;
@@ -411,7 +539,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
 	    
 	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -424,7 +552,7 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Database error occurred while fetching department ID", e);
+	        throw new IOException("Eroare la baza de date", e);
 	    }
 	    System.out.println(depid);
 	    // Check total users in department
@@ -439,7 +567,7 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Database error occurred while counting users in department", e);
+	        throw new IOException("Eroare la baza de date", e);
 	    }
 	    System.out.println(total);
 	    // Check total leaves in department within specific dates
@@ -460,7 +588,7 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Database error occurred while counting leaves", e);
+	        throw new IOException("Eroare la baza de date", e);
 	    }
 	    System.out.println(nr);
 	    return nr <= (total / 2);
@@ -486,7 +614,7 @@ public class ModifConServlet extends HttpServlet {
 			        }
 			    } catch (SQLException e) {
 			        printSQLException(e);
-			        throw new IOException("Database error occurred", e);
+			        throw new IOException("Eroare la baza de date", e);
 			    }
 
 			    return nr < 2;
@@ -508,7 +636,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
     	
     	String QUERY2 = "select * from useri where id = ?;";
@@ -523,7 +651,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Database error occurred", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
 	    
     	if (userType == 0) {

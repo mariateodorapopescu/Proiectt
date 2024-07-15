@@ -1,4 +1,5 @@
 package bean;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -8,7 +9,7 @@ public class DateOfBirthValidator {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static boolean validateDateOfBirth(String dob) {
+    public static boolean validateDateOfBirth(String dob) throws IOException {
         try {
             // Parse the date
             LocalDate birthDate = LocalDate.parse(dob, FORMATTER);
@@ -20,7 +21,8 @@ public class DateOfBirthValidator {
                 return true;
             }
         } catch (DateTimeParseException e) {
-            System.err.println("Invalid date format. Please use 'YYYY-MM-DD'.");
+        	throw new IOException("Format invalid, trebuie AAAA-LL-ZZ", e);
+            //System.err.println("Invalid date format. Please use 'YYYY-MM-DD'.");
         }
         return false;
     }

@@ -32,8 +32,8 @@ public class ConcediuConDao {
 	public int check(ConcediuCon concediu) throws ClassNotFoundException, SQLException {
 		// tre sa vad cum iau id_ul userului curent
 	    String INSERT_USERS_SQL = "INSERT INTO concedii" +
-	        "  (id_ang, start_c, end_c, motiv, locatie, status) VALUES " +
-	        " (?, ?, ?, ?, ?, ?);";
+	        "  (id_ang, start_c, end_c, motiv, locatie, status, concedii.tip, durata) VALUES " +
+	        " (?, ?, ?, ?, ?, ?, ?, ?);";
 
 	    int result = 0;
 
@@ -50,6 +50,8 @@ public class ConcediuConDao {
 	        preparedStatement.setString(4, concediu.getMotiv());
 	        preparedStatement.setString(5, concediu.getLocatie());
 	        preparedStatement.setInt(6, concediu.getStatus());
+	        preparedStatement.setInt(7, concediu.getTip());
+	        preparedStatement.setInt(8, concediu.getDurata());
 	        result = preparedStatement.executeUpdate();
 
 	    } catch (SQLException e) {

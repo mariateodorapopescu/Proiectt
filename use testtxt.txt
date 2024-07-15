@@ -207,7 +207,9 @@ ALTER TABLE concedii MODIFY id INT AUTO_INCREMENT;
 delete from concedii where id = 4;
 select * from statusuri;
 select * from concedii join useri on id_ang = useri.id;
-SELECT concedii.id, nume_dep as departament, nume, prenume, denumire as functie, start_c, end_c, motiv, locatie, nume_status as status FROM useri NATURAL JOIN tipuri NATURAL JOIN departament join concedii on concedii.id_ang = useri.id join statusuri on concedii.status = statusuri.status;
+SELECT concedii.id, nume_dep as departament, nume, prenume, denumire as functie, start_c, end_c, motiv, locatie, 
+	nume_status as status FROM useri NATURAL JOIN tipuri NATURAL JOIN departament join concedii 
+		on concedii.id_ang = useri.id join statusuri on concedii.status = statusuri.status;
 select count(*) from concedii join useri on concedii.id_ang = useri. id where username = "aaaa";
 -- SELECT DATEDIFF('2021-12-25', '2021-01-01') AS 'Days';
 SELECT count(*)
@@ -219,8 +221,248 @@ WHERE username = 'aaaa'
 select count(*) from useri where tip = 0;
 select count(*) from concedii join useri on useri.id = concedii.id_ang group by tip having tip = 0;
 select count(*) as total from useri group by id_dep having id_dep = 3;
-select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= 1 and month(start_c) = 7 and day(start_c) <= 31 group by id_dep having id_dep = 3;
+select count(*) as total from concedii join useri on useri.id = concedii.id_ang 
+	where day(start_c) >= 1 and month(start_c) = 7 and day(start_c) <= 31 group by id_dep having id_dep = 3;
 select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= 1 and month(start_c) = 7 and day(start_c) <= 31 and month(start_c) <= 7 group by tip having tip = 0;
 select * from concedii;
-select * from useri;
+select id, nume, prenume, data_nasterii, adresa, email, telefon, username, nume_dep, denumire, cnp from useri join departament on useri.id_dep = departament.id_dep join tipuri on useri.tip = tipuri.tip;
 delete from concedii where motiv = "ce";
+select * from appearance;
+select * from useri;
+ALTER TABLE concedii ADD COLUMN tip int not null;
+CREATE TABLE tipcon (
+  tip int unsigned NOT NULL auto_increment,
+  motiv varchar(255) default NULL,
+  PRIMARY KEY (tip)
+) AUTO_INCREMENT=1;
+select * from tipcon;
+insert into tipcon values (1, "concediu odihna");
+insert into tipcon(motiv) values ("concediu formare profesionala");
+alter table tipcon add constraint unique(tip, motiv);
+insert into tipcon(motiv) values ("concediu formare profesionala");
+insert into tipcon(motiv) values ("concediu fara plata");
+insert into tipcon(motiv) values ("concediu medical");
+insert into tipcon(motiv) values ("concediu risc maternal");
+insert into tipcon(motiv) values ("concediu maternal");
+insert into tipcon(motiv) values ("concediu paternal");
+insert into tipcon(motiv) values ("concediu crestere copil");
+insert into tipcon(motiv) values ("concediu ingrijire copil");
+insert into tipcon(motiv) values ("concediu casatorie");
+insert into tipcon(motiv) values ("concediu casatorie copil");
+insert into tipcon(motiv) values ("concediu deces grad I");
+insert into tipcon(motiv) values ("concediu deces grad II");
+insert into tipcon(motiv) values ("concediu donare sange");
+insert into tipcon(motiv) values ("concediu carantina");
+insert into tipcon(motiv) values ("concediu adoptie copil");
+insert into tipcon(motiv) values ("concediu ajutor ingrijitor");
+insert into tipcon(motiv) values ("concediu schimbare sediu munca alt oras");
+SELECT 
+    concedii.id as nr_crt, 
+    departament.nume_dep as departament, 
+    nume, 
+    prenume, 
+    tipuri.denumire as functie, 
+    start_c, 
+    end_c, 
+    motiv, 
+    locatie, 
+    statusuri.nume_status as status 
+FROM 
+    useri 
+NATURAL JOIN tipuri 
+NATURAL JOIN departament 
+JOIN concedii ON concedii.id_ang = useri.id
+JOIN statusuri ON concedii.status = statusuri.status
+WHERE 
+    YEAR(start_c) = YEAR(CURDATE()) OR 
+    YEAR(start_c) = YEAR(CURDATE()) + 1;
+UPDATE departament SET nume_dep = "brooo" WHERE nume_dep = "testt";
+select * from useri;
+update concedii set tip = 1 where id_ang = 3;
+update concedii set tip = 1 where id_ang = 4;
+update concedii set tip = 1 where id_ang = 13;
+update concedii set tip = 1 where id_ang = 14;
+update concedii set tip = 1 where id_ang = 15;
+update concedii set tip = 1 where id_ang = 18;
+update concedii set tip = 1 where id_ang = 22;
+update concedii set tip = 1 where id_ang = 24;
+-- ALTER TABLE <table_name> 2 DROP [COLUMN] <column_name>
+ALTER TABLE concedii ADD COLUMN durata int not null default 0;
+UPDATE concedii SET durata = DATEDIFF(end_c, start_c) + 1;
+ALTER TABLE useri ADD COLUMN zilecons int not null default 0;
+ALTER TABLE useri MODIFY COLUMN zileramase int DEFAULT 0;
+UPDATE useri u SET u.zilecons = (
+    SELECT SUM(c.durata)
+    FROM concedii c
+    WHERE c.id_ang = u.id
+);
+select * from concedii where id_ang = 22;
+select * from useri where id = 22;
+SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = 22 and concedii.status > 0;
+DROP TRIGGER IF EXISTS after_insert;
+DELIMITER $$
+CREATE TRIGGER after_insert
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    UPDATE useri u
+    SET u.zilecons = (SELECT SUM(c.durata) FROM concedii c WHERE c.id_ang = NEW.id_ang)
+    WHERE u.id = NEW.id_ang;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS afterinsert;
+DELIMITER $$
+CREATE TRIGGER afterinsert
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    SET NEW.durata = DATEDIFF(NEW.end_c, NEW.start_c);
+END$$
+DELIMITER ;
+DELIMITER $$
+DROP TRIGGER IF EXISTS after_insert2;
+CREATE TRIGGER after_insert2
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    SELECT tip INTO userType FROM useri WHERE id = NEW.id_ang;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS negativestatus;
+delimiter $$
+CREATE TRIGGER negativestatus
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+	DECLARE userType INT;
+    DECLARE newZilecons INT;
+    SELECT tip INTO userType FROM useri WHERE id = OLD.id_ang;
+    IF NEW.status < 0 THEN
+        SET NEW.durata = 0;
+        SELECT SUM(durata) INTO newZilecons FROM concedii WHERE id_ang = NEW.id_ang AND id != NEW.id;
+        UPDATE useri
+        SET zilecons = newZilecons
+        WHERE id = NEW.id_ang;
+        IF userType = 2 THEN
+            UPDATE useri
+            SET zileramase = 30 - newZilecons
+            WHERE id = NEW.id_ang;
+        ELSE
+            UPDATE useri
+            SET zileramase = 40 - newZilecons
+            WHERE id = NEW.id_ang;
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_delete;
+DELIMITER $$
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    UPDATE useri
+    SET zilecons = totalDuration - OLD.durata
+    WHERE id = OLD.id_ang;
+    IF old.status = 2 THEN
+        UPDATE useri
+        SET conluate = conluate - 1,
+            conramase = conramase + 1
+        WHERE id = old.id_ang;
+    END IF;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (totalDuration - OLD.durata)
+        WHERE id = OLD.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (totalDuration - OLD.durata)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+select id, status, durata from concedii where id_ang = 22;
+update useri set conluate = 0;
+update useri set conramase = 3;
+update useri set zileramase = 40 where id = 22;
+update useri set zilecons = 0;
+delete from concedii where id_ang = 22;
+set @concedii_luate = (select count(*) from concedii where id_ang = 22 and status = 2);
+set @concedii_ramase = (3 - (select @concedii_luate));
+select @concedii_luate;
+select @concedii_ramase;
+ALTER TABLE useri ADD COLUMN conluate int not null default 0;
+ALTER TABLE useri MODIFY COLUMN conluate int DEFAULT 0;
+ALTER TABLE useri ADD COLUMN conramase int not null default 3;
+ALTER TABLE useri MODIFY COLUMN conramase int DEFAULT 3;
+DROP TRIGGER IF EXISTS status2;
+DELIMITER $$
+CREATE TRIGGER status2
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 2 and new.status != old.status THEN
+        UPDATE useri
+        SET conluate = conluate + 1,
+            conramase = conramase - 1
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+-- ALTER TABLE <table_name> 2 DROP [COLUMN] <column_name>;
+describe useri;
+select * from useri;
+update useri set cnp = 92155969 where id = 3;
+update useri set cnp = 25274426 where id = 4;
+update useri set cnp = 15039590 where id = 13;
+update useri set cnp = 87491947 where id = 14;
+update useri set cnp = 15058158 where id = 15;
+update useri set cnp = 68736822 where id = 18;
+update useri set cnp = 81829942 where id = 22;
+update useri set cnp = 93668090 where id = 24;
+select count(*) from useri where tip = 2 group by id_dep;
+select count(*) from useri where tip = 0 group by id_dep;
+DROP TRIGGER IF EXISTS after_ins;
+DELIMITER $$
+CREATE TRIGGER after_ins
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    SET NEW.zilecons = 0;
+    SET NEW.conluate = 0;
+    SET NEW.conramase = 3;
+    IF NEW.tip = 2 THEN
+        SET NEW.zileramase = 30;
+    ELSE
+        SET NEW.zileramase = 40;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_mod;
+DELIMITER $$
+CREATE TRIGGER after_mod
+BEFORE UPDATE ON useri
+FOR EACH ROW
+BEGIN
+    IF NEW.tip = 2 and new.tip != old.tip THEN
+        SET NEW.zileramase = 30;
+    ELSE 
+		if new.tip != old.tip and new.tip != 2 then
+			SET NEW.zileramase = 40;
+		END IF;
+    END IF;
+END$$
+DELIMITER ;

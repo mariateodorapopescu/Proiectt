@@ -8,6 +8,8 @@ public class ConcediuCon {
 	private String motiv;
 	private String locatie;
 	private int status;
+	private int tip;
+	private int durata;
 	/**
 	 * @return the id
 	 */
@@ -91,5 +93,29 @@ public class ConcediuCon {
 	 */
 	public void setId_ang(int id_ang) {
 		this.id_ang = id_ang;
+	}
+	/**
+	 * @return the tip
+	 */
+	public int getTip() {
+		return tip;
+	}
+	/**
+	 * @param tip the tip to set
+	 */
+	public void setTip(int tip) {
+		this.tip = tip;
+	}
+	/**
+	 * @return the durata
+	 */
+	public int getDurata() {
+		return durata;
+	}
+	/**
+	 * @param durata the durata to set
+	 */
+	public void setDurata(int durata) {
+		this.durata = durata;
 	}
 }

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,17 +22,29 @@ public class ResSefServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession sesi = request.getSession(false); // This returns HttpSession directly
-        if (sesi == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+    	 HttpSession sesi = request.getSession(false); // This returns HttpSession directly
+         if (sesi == null) {
+        	 response.setContentType("text/html;charset=UTF-8");
+             PrintWriter out = response.getWriter();
+ 		    out.println("<script type='text/javascript'>");
+ 		    out.println("alert('Sesiune nula!');");
+ 		    out.println("window.location.href = 'login.jsp';");
+ 		    out.println("</script>");
+ 		    out.close();
+             return;
+         }
 
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+         MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+         if (currentUser == null) {
+        	 response.setContentType("text/html;charset=UTF-8");
+             PrintWriter out = response.getWriter();
+ 		    out.println("<script type='text/javascript'>");
+ 		    out.println("alert('Nu e conectat niciun utilizator!');");
+ 		    out.println("window.location.href = 'login.jsp';");
+ 		    out.println("</script>");
+ 		    out.close();
+             return;
+         }
 
         String username = currentUser.getUsername();
         int idcon = Integer.parseInt(request.getParameter("idcon"));
@@ -40,19 +53,39 @@ public class ResSefServlet extends HttpServlet {
             int uid = getEmployeeIdFromLeave(idcon, conn);
             int uidc = getUserIdByUsername(username, conn);
 
-            if (uid == uidc) {
-                response.sendRedirect("login.jsp"); // Cannot approve own leave
-                return;
-            }
+//            if (uid == uidc) {
+//                response.sendRedirect("login.jsp"); // Cannot approve own leave
+//                return;
+//            }
 
             dep.modif(idcon); // Assuming this method handles the modification of the leave status
-            response.sendRedirect("dashboard.jsp");
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Respingere cu succes!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (SQLException e) {
             printSQLException(e);
-            response.sendRedirect("err.jsp");
+            e.printStackTrace();
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare la respingere la baza de date!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	e.printStackTrace();
+        	 response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare la respingere - nu s-a gasit clasa, debug only!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
 		}
     }
 

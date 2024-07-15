@@ -23,7 +23,9 @@
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next() == false) {
-                    out.println("No Records in the table");
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
                 } else {
                     if (rs.getString("tip").compareTo("1") != 0) {
                     	if (currentUser.getTip() == 3) {
@@ -60,27 +62,35 @@
                 }
             } catch (Exception e) {
                 // out.println("Database connection or query error: " + e.getMessage());
-                if (currentUser.getTip() == 3) {
-                	response.sendRedirect("sefok.jsp");
+                out.println("<script type='text/javascript'>");
+                    out.println("alert('Eroare la baza de date!');");
+                    out.println("alert('" + e.getMessage() + "');");
+                    out.println("</script>");
+                if (currentUser.getTip() == 1) {
+                	response.sendRedirect("tip1ok.jsp");
                 }
                 if (currentUser.getTip() == 2) {
                 	response.sendRedirect("tip2ok.jsp");
                 }
+                if (currentUser.getTip() == 3) {
+                	response.sendRedirect("sefok.jsp");
+                }
                 if (currentUser.getTip() == 0) {
                 	response.sendRedirect("dashboard.jsp");
-                }
-                if (currentUser.getTip() == 4) {
-                	response.sendRedirect("adminok.jsp");
                 }
                 e.printStackTrace();
             }
         } else {
-            // out.print("Guest");
-        	response.sendRedirect("login.jsp");  
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
-        // out.print("Session not found");
-    	response.sendRedirect("login.jsp");   
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
     }
 %>
 </body>

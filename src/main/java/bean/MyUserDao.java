@@ -33,8 +33,8 @@ public class MyUserDao {
 
 	public int registerEmployee(MyUser employee) throws ClassNotFoundException, SQLException {
 	    String INSERT_USERS_SQL = "INSERT INTO useri" +
-	        "  (nume, prenume, data_nasterii, adresa, email, telefon, username, password, id_dep, tip) VALUES " +
-	        " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+	        "  (nume, prenume, data_nasterii, adresa, email, telefon, username, password, id_dep, tip, cnp) VALUES " +
+	        " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
 	    int result = 0;
 
@@ -56,7 +56,8 @@ public class MyUserDao {
 	        preparedStatement.setString(8, hashedPassword);
 	        preparedStatement.setInt(9, employee.getDepartament());
 	        preparedStatement.setInt(10, employee.getTip());
-	        System.err.println(employee.getNume() + " " + employee.getPrenume() + " " + employee.getData_nasterii() + " " + employee.getAdresa() + " " + employee.getEmail() + " " + employee.getTelefon() +" " + employee.getUsername() + " " + employee.getPassword() + " " + employee.getDepartament() + " " + employee.getTip());
+	        preparedStatement.setInt(11, employee.getCnp());
+	        //System.err.println(employee.getNume() + " " + employee.getPrenume() + " " + employee.getData_nasterii() + " " + employee.getAdresa() + " " + employee.getEmail() + " " + employee.getTelefon() +" " + employee.getUsername() + " " + employee.getPassword() + " " + employee.getDepartament() + " " + employee.getTip());
 	        result = preparedStatement.executeUpdate();
 
 	    } catch (SQLException e) {

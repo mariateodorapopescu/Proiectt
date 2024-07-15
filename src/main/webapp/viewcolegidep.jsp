@@ -22,7 +22,9 @@ if (sesi != null) {
             preparedStatement.setString(1, username);
             ResultSet rs = preparedStatement.executeQuery();
             if (!rs.next()) {
-                out.println("<p>Nu exista date.</p>");
+            	out.println("<script type='text/javascript'>");
+                out.println("alert('Date introduse incorect sau nu exista date!');");
+                out.println("</script>");
             } else {
                 int userType = rs.getInt("tip");
                 int userdep = rs.getInt("id_dep");
@@ -42,7 +44,7 @@ if (sesi != null) {
                 } else {
                         out.println("<h1>Vizualizare angajati din departamentul din care fac parte</h1><br>");
                         out.println("<table border='1'><tr><th>Nume</th><th>Prenume</th><th>Username</th><th>Tip</th><th>Departament</th></tr>");
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri NATURAL JOIN tipuri NATURAL JOIN departament where useri.id_dep = ?")) {
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on useri.tip = tipuri.tip left JOIN departament on departament.id_dep = useri.id_dep where useri.id_dep = ?")) {
                             stmt.setInt(1, userdep);
                         	ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
@@ -70,7 +72,11 @@ if (sesi != null) {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // out.println("Database connection or query error: " + e.getMessage());
+                out.println("<script type='text/javascript'>");
+                    out.println("alert('Eroare la baza de date!');");
+                    out.println("alert('" + e.getMessage() + "');");
+                    out.println("</script>");
                 if (currentUser.getTip() == 1) {
                 	response.sendRedirect("tip1ok.jsp");
                 }
@@ -80,11 +86,21 @@ if (sesi != null) {
                 if (currentUser.getTip() == 3) {
                 	response.sendRedirect("sefok.jsp");
                 }
+                if (currentUser.getTip() == 0) {
+                	response.sendRedirect("dashboard.jsp");
+                }
+                e.printStackTrace();
             }
         } else {
-           response.sendRedirect("login.jsp");   
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
         response.sendRedirect("login.jsp");
     }
 %>

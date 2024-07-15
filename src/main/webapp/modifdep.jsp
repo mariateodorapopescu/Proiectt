@@ -22,7 +22,9 @@ if (sesi != null) {
             preparedStatement.setString(1, username);
             ResultSet rs = preparedStatement.executeQuery();
             if (!rs.next()) {
-                out.println("<p>Nu exista date.</p>");
+            	out.println("<script type='text/javascript'>");
+                out.println("alert('Date introduse incorect sau nu exista date!');");
+                out.println("</script>");
             } else {
                 int userType = rs.getInt("tip");
                 int userdep = rs.getInt("id_dep");
@@ -86,6 +88,10 @@ if (sesi != null) {
                 }
             } catch (Exception e) {
                 // out.println("Database connection or query error: " + e.getMessage());
+                out.println("<script type='text/javascript'>");
+                    out.println("alert('Eroare la baza de date!');");
+                    out.println("alert('" + e.getMessage() + "');");
+                    out.println("</script>");
                 if (currentUser.getTip() == 1) {
                 	response.sendRedirect("tip1ok.jsp");
                 }
@@ -101,10 +107,16 @@ if (sesi != null) {
                 e.printStackTrace();
             }
         } else {
-           response.sendRedirect("login.jsp");   
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
-    	response.sendRedirect("login.jsp");
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
     }
 %>
 </body>

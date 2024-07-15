@@ -1,5 +1,6 @@
 package bean;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,9 +32,15 @@ public class UserViewServlet extends HttpServlet {
             request.setAttribute("products", products);
             request.getRequestDispatcher("/WEB-INF/products.jsp").forward(request, response);
         } catch (SQLException e) {
-            e.printStackTrace(); // Log the complete stack trace
-            request.setAttribute("error", "Database error: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/error.jsp").forward(request, response); // Forward to an error page
-        }
+            //printSQLException(e);
+            e.printStackTrace();
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare la baza de date!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
+        } 
     }
 }

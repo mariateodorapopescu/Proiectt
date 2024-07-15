@@ -62,16 +62,27 @@ if (sesi != null) {
                 rs1.close();
                 stm.close();
             } else {
-                out.println("Nu exista date.");
+            	out.println("<script type='text/javascript'>");
+                out.println("alert('Date introduse incorect sau nu exista date!');");
+                out.println("</script>");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // response.sendRedirect("login.jsp");
+            out.println("<script type='text/javascript'>");
+	        out.println("alert('Eroare la baza de date!');");
+	        out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Utilizator neconectat!');");
+        out.println("</script>");
         response.sendRedirect("login.jsp");
     }
 } else {
+	out.println("<script type='text/javascript'>");
+    out.println("alert('Nu e nicio sesiune activa!');");
+    out.println("</script>");
     response.sendRedirect("login.jsp");
 }
 %>

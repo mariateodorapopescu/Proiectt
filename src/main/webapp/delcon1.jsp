@@ -36,7 +36,7 @@
                         out.println("<table style='width: 80%'>");
                         out.println("<tr><td>Concediu (Motiv)</td><td><select name='idcon'>");
 
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, start_c, end_c, motiv, locatie FROM concedii WHERE id_ang = ?")) {
+                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, start_c, end_c, motiv, locatie FROM concedii WHERE id_ang = ? and status > 0")) {
                             stm.setInt(1, userId);
                             try (ResultSet rs1 = stm.executeQuery()) {
                                 if (rs1.next()) {
@@ -70,18 +70,31 @@
                          }
                     }
                 } else {
-                    out.println("Nu exista date.");
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                out.println("<script type='text/javascript'>");
+    	        out.println("alert('Eroare la baza de date!');");
+    	        out.println("alert('" + e.getMessage() + "');");
+    	        out.println("</script>");
                 response.sendRedirect("login.jsp");
             }
         } else {
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
             response.sendRedirect("login.jsp");
         }
     } else {
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
         response.sendRedirect("login.jsp");
     }
+
 %>
 </body>
 </html>

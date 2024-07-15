@@ -23,7 +23,9 @@
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next() == false) {
-                    out.println("No Records in the table");
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
                 } else {
                     if (rs.getString("tip").compareTo("4") != 0) {
                         //out.println("Nu ai ce cauta aici!");
@@ -109,8 +111,11 @@
                              stmt.close();
                              con.close();
                          } catch (Exception e) {
-                             out.println("Error: " + e.getMessage());
-                             e.printStackTrace();
+                        	 e.printStackTrace();
+                             out.println("<script type='text/javascript'>");
+                             out.println("alert('Date introduse incorect sau nu exista date!');");
+                             out.println("alert('" + e.getMessage() + "');");
+                             out.println("</script>");
                          }
                          out.println("</select>");
                          out.println("</td>");
@@ -140,8 +145,11 @@
                          }
                          catch(Exception e)
                          {
-                         System.out.println(e.getMessage());
-                         e.getStackTrace();
+                        	 e.printStackTrace();
+                             out.println("<script type='text/javascript'>");
+                             out.println("alert('Date introduse incorect sau nu exista date!');");
+                             out.println("alert('" + e.getMessage() + "');");
+                             out.println("</script>");
                          }
                          out.println("</select>");
                          out.println("</td>");
@@ -153,7 +161,10 @@
                          out.println("<a href ='adminok.jsp'>Inapoi</a>");
                          
                          if ("true".equals(request.getParameter("p"))) {
-                        	    out.println("Parola trebuie sa contina:<br>");
+                        	 out.println("<script type='text/javascript'>");
+                 	        out.println("alert('Trebuie sa alegeti o parola mai complexa!');");
+                 	        out.println("</script>");
+                        	    out.println("<br>Parola trebuie sa contina:<br>");
                         	    out.println("- minim 8 caractere<br>");
                         	    out.println("- un caracter special (!()?*\\[\\]{}:;_\\-\\\\/`~'<>@#$%^&+=])<br>");
                         	    out.println("- o litera mare<br>");
@@ -164,28 +175,52 @@
                         	}
                         
                         	if ("true".equals(request.getParameter("n"))) {
-                        	    out.println("Nume scris incorect");
+                        		out.println("<script type='text/javascript'>");
+                    	        out.println("alert('Nume scris incorect!');");
+                    	        out.println("</script>");
                         	}
                         	
                         	if ("true".equals(request.getParameter("pn"))) {
-                        	    out.println("Prenume scris incorect");
+                        		out.println("<script type='text/javascript'>");
+                    	        out.println("alert('Prenume scris incorect!');");
+                    	        out.println("</script>");
                         	}
                         	
                         	if ("true".equals(request.getParameter("t"))) {
-                        	    out.println("Telefon scris incorect");
+                        		out.println("<script type='text/javascript'>");
+                    	        out.println("alert('Telefon scris incorect!');");
+                    	        out.println("</script>");
                         	}
                         	
                         	if ("true".equals(request.getParameter("e"))) {
-                        	    out.println("e-mail scris incorect");
+                        		out.println("<script type='text/javascript'>");
+                    	        out.println("alert('E-mail scris incorect!');");
+                    	        out.println("</script>");
                         	}
                         	
                         	if ("true".equals(request.getParameter("dn"))) {
-                        	    out.println("Utilizatorul trebuie sa aiba minim 18 ani!");
+                        		out.println("<script type='text/javascript'>");
+                    	        out.println("alert('Utilizatorul trebuie sa aiba minim 18 ani!');");
+                    	        out.println("</script>");
+                        	}	
+                        	if ("true".equals(request.getParameter("pms"))) {
+                        		 out.println("<script type='text/javascript'>");
+                     	        out.println("alert('Poate fi maxim un sef / departament!');");
+                     	        out.println("</script>");
+                        	}	
+                        	if ("true".equals(request.getParameter("pmd"))) {
+                        		 out.println("<script type='text/javascript'>");
+                        	        out.println("alert('Poate fi maxim un director / departament!');");
+                        	        out.println("</script>");
                         	}	
                     }
                 }
             } catch (Exception e) {
                 // out.println("Database connection or query error: " + e.getMessage());
+                out.println("<script type='text/javascript'>");
+                    out.println("alert('Eroare la baza de date!');");
+                    out.println("alert('" + e.getMessage() + "');");
+                    out.println("</script>");
                 if (currentUser.getTip() == 1) {
                 	response.sendRedirect("tip1ok.jsp");
                 }
@@ -201,10 +236,16 @@
                 e.printStackTrace();
             }
         } else {
-           response.sendRedirect("login.jsp");   
+        	out.println("<script type='text/javascript'>");
+	        out.println("alert('Utilizator neconectat!');");
+	        out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
-    	response.sendRedirect("login.jsp");
+    	out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
     }
 %>
 </body>

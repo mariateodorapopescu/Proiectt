@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,30 +21,95 @@ public class ModifPasdServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
+    	int id = Integer.parseInt(request.getParameter("id"));
+    	String cod =  request.getParameter("cnp");
+    	if (cod != null) {
+    		 String cod2 = null;
+    	        try {
+    	            Class.forName("com.mysql.cj.jdbc.Driver");
+    	            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+    	                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT cnp FROM useri WHERE id = ?")) {
+    	                preparedStatement.setInt(1, id);
+    	                try (ResultSet rs = preparedStatement.executeQuery()) {
+    	                    if (rs.next()) {
+    	                        cod2 = rs.getString("cnp");
+    	                    }
+    	                }
+    	            }
+    	        } catch (ClassNotFoundException e) {
+    				// TODO Auto-generated catch block
+   				 response.setContentType("text/html;charset=UTF-8");
+   				    PrintWriter out = response.getWriter();
+   				    out.println("<script type='text/javascript'>");
+   				    out.println("alert('Nu a gasit clasa - debug only!');");
+   				    out.println("window.location.href = 'dashboard.jsp';");
+   				    out.println("</script>");
+   				    out.close();
+   				    e.printStackTrace();
+   			} catch (SQLException e) {
+   				// TODO Auto-generated catch block
+   				response.setContentType("text/html;charset=UTF-8");
+   				 PrintWriter out = response.getWriter();
+   				    out.println("<script type='text/javascript'>");
+   				    out.println("alert('Eroare la baza de date - debug only!');");
+   				    out.println("window.location.href = 'login.jsp';");
+   				    out.println("</script>");
+   				    out.close();
+   				    e.printStackTrace();
+   			}
+    	        if (cod2.compareTo(cod) != 0) {
+    	        	response.setContentType("text/html;charset=UTF-8");
+   				    PrintWriter out = response.getWriter();
+   				    out.println("<script type='text/javascript'>");
+   				    out.println("alert('Cod introdus gresit!');");
+   				    out.println("window.location.href = 'forgotpass.jsp';");
+   				    out.println("</script>");
+   				    out.close();
+    	        	return;
+    	        }
+    	}
+        
         String password = request.getParameter("password");
 
         // Validate password
         if (!PasswordValidator.validatePassword(password)) {
-            response.sendRedirect("modifpasd2.jsp?p=true");
-            return;
+        	 response.sendRedirect("modifpasd2.jsp?p=true");
+        	return;
         }
 
         // Fetch username from the database using the ID
         String username = fetchUsernameById(id);
         // System.out.println(username);
         if (username == null) {
-            response.sendRedirect("login.jsp");
-            return;
+        	response.setContentType("text/html;charset=UTF-8");
+			    PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Nume de utilizator introdus gresit!');");
+			    out.println("window.location.href = 'forgotpass.jsp';");
+			    out.println("</script>");
+			    out.close();
+        	return;
         }
 
         // Update password in database
         try {
             employeeDao.registerEmployee(password, username);
-            response.sendRedirect("adminok.jsp"); // Redirect to a confirmation page
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Modificare cu succes!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("err.jsp"); // Redirect to an error page
+        	response.setContentType("text/html;charset=UTF-8");
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
+			e.printStackTrace();
         }
     }
 

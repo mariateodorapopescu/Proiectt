@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 //@WebServlet("/delusr")
 public class DelDepServlet extends HttpServlet {
@@ -22,16 +23,33 @@ public class DelDepServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         if (username == null) {
-            response.sendRedirect("deldep.jsp");
-            return;
+        	 response.setContentType("text/html;charset=UTF-8");
+        	PrintWriter out = response.getWriter();
+ 		    out.println("<script type='text/javascript'>");
+ 		    out.println("alert('Nu e nimeni logat?!');");
+ 		    out.println("window.location.href = 'deldep.jsp';");
+ 		    out.println("</script>");
+ 		    out.close();
         }
 
         try {
             employeeDao.deleteUser(username);
-            response.sendRedirect("adminok.jsp");
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Stergere cu succes!');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("err.jsp");
+        	response.setContentType("text/html;charset=UTF-8");
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu s-a putut sterge departamentul din motive necunoscute.');");
+		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("</script>");
+		    out.close();
+			e.printStackTrace();
         }
     }
     
