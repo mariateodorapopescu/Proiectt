@@ -4,8 +4,17 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html>
+<html lang="ro">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    
     <title>Modificare parola</title>
 </head>
 <body>
@@ -24,13 +33,20 @@ if (sesi != null) {
                 if (userType != 4) {
                     response.sendRedirect(userType == 3 ? "sefok.jsp" : userType == 2 ? "tip2ok.jsp" : "tip1ok.jsp");
                 } else {
-                    out.println("<div align='center'>");
-                    out.println("<h1>Selectati utilizatorul pentru care doriti sa modificati parola</h1>");
-                    out.print("<form action='");
-                    out.print(request.getContextPath() + "/modifpasd2.jsp");
-                    out.println("' method='post'>");
-                    out.println("<table style='width: 80%'>");
-                    out.println("<tr><td>Utilizator (Nume, Prenume, Username)</td><td><select name='id'>");
+                    out.println("<div class=\"container\">");
+                    out.println("    <div class=\"login__content\">");
+                    out.println("        <img src=\"./responsive-login-form-main/assets/img/bg-login.jpg\" alt=\"login image\" class=\"login__img login__img-light\">");
+                    out.println("        <img src=\"./responsive-login-form-main/assets/img/bg-login-dark.jpg\" alt=\"login image\" class=\"login__img login__img-dark\">");
+                    out.println("        <form action='" + request.getContextPath() + "/modifpasd2.jsp' method='post' class='login__form'>");
+                    out.println("            <div>");
+                    out.println("                <h1 class=\"login__title\">");
+                    out.println("                    <span>Modificare parola</span>");
+                    out.println("                </h1>");
+                    out.println("            </div>");
+                    out.println("            <div class='login__inputs'>");
+                    out.println("                <div>");
+                    out.println("                    <label for='' class='login__label'>Utilizator (Nume, Prenume, Username)</label>");
+                    out.println("                    <select name='id' class='login__input'>");
 
                     try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri")) {
                         ResultSet rs1 = stm.executeQuery();
@@ -42,26 +58,31 @@ if (sesi != null) {
                             out.println("<option value='" + id + "'>" + nume + " " + prenume + " (" + username + ")</option>");
                         }
                     }
-                    out.println("</select></td></tr>");
-                    out.println("</table>");
-                    out.println("<input type='submit' value='Submit' />");
-                    out.println("</form>");
-                    out.println("</div>");
+                    out.println("                    </select>");
+                    out.println("                </div>");
+                    out.println("            </div>");
+                   
                     if (userType == 0) {
-                        out.println("<a href ='dashboard.jsp'>Inapoi</a>");
+                        out.println("<a href ='dashboard.jsp' class='login__forgot'>Inapoi</a>");
                      }
                      if (userType == 1) {
-                         out.println("<a href ='tip1ok.jsp'>Inapoi</a>");
+                         out.println("<a href ='tip1ok.jsp' class='login__forgot'>Inapoi</a>");
                       }
                      if (userType == 2) {
-                         out.println("<a href ='tip2ok.jsp'>Inapoi</a>");
+                         out.println("<a href ='tip2ok.jsp' class='login__forgot'>Inapoi</a>");
                       }
                      if (userType == 3) {
-                         out.println("<a href ='sefok.jsp'>Inapoi</a>");
+                         out.println("<a href ='sefok.jsp' class='login__forgot'>Inapoi</a>");
                       }
                      if (userType == 4) {
-                         out.println("<a href ='adminok.jsp'>Inapoi</a>");
+                         out.println("<a href ='adminok.jsp' class='login__forgot'>Inapoi</a>");
                       }
+                     out.println("            <div class='login__buttons'>");
+                     out.println("                <input type='submit' value='Submit' class='login__button login__button-ghost'>");
+                     out.println("            </div>");
+                     out.println("        </form>");
+                    out.println("    </div>");
+                    out.println("</div>");
                 }
             } else {
             	out.println("<script type='text/javascript'>");

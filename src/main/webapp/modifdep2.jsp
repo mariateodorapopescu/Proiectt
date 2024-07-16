@@ -4,8 +4,17 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html>
+<html lang="ro">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    
     <title>Modificare departament</title>
 </head>
 <body>
@@ -22,79 +31,81 @@
                  PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume from useri where username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next() == false) {
-                	out.println("<script type='text/javascript'>");
+                if (!rs.next()) {
+                    out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
                 } else {
                     if (rs.getString("tip").compareTo("4") != 0) {
-                        //out.println("Nu ai ce cauta aici!");
                         if (rs.getString("tip").compareTo("1") == 0) {
-                        	response.sendRedirect("tip1ok.jsp");
+                            response.sendRedirect("tip1ok.jsp");
                         }
                         if (rs.getString("tip").compareTo("2") == 0) {
-                        	response.sendRedirect("tip2ok.jsp");
+                            response.sendRedirect("tip2ok.jsp");
                         }
                         if (rs.getString("tip").compareTo("3") == 0) {
-                        	response.sendRedirect("sefok.jsp");
+                            response.sendRedirect("sefok.jsp");
                         }
                         if (rs.getString("tip").compareTo("0") == 0) {
-                        	response.sendRedirect("dashboard.jsp");
+                            response.sendRedirect("dashboard.jsp");
                         }
                     } else {
-                    	
-                    	out.println("<div align='center'>");
-                    	out.println("<h1>Modificare departament</h1>");
-                    	out.println("<form action='" + request.getContextPath() + "/ModifDepServlet' method='post'>");
-                    	out.println("<input type='hidden' name='username' value='" + request.getParameter("username") + "' />");
-                    	out.println("<table style='width: 80%'>");
-                    	out.println("<tr>");
-                    	out.println("<td>Nume nou</td>");
-                    	out.println("<td><input type='text' name='password' required /></td>");
-                    	out.println("</tr>");
-                    	out.println("<tr>");
-                    	out.println("<td><input type='submit' value='Submit' /></td>");
-                    	out.println("</tr>");
-                    	out.println("</table>");
-                    	out.println("</form>");
-                    	out.println("</div>");
-                    	if ("true".equals(request.getParameter("n"))) {
-                    		out.println("<script type='text/javascript'>");
-                	        out.println("alert('Nume scris incorect!');");
-                	        out.println("</script>");
-                    	}
-                    	out.println("<a href ='modifdep.jsp'>Inapoi</a>");
-                         
+                        out.println("<div class=\"container\">");
+                        out.println("<div class=\"login__content\">");
+                        out.println("<img src=\"./responsive-login-form-main/assets/img/bg-login.jpg\" alt=\"login image\" class=\"login__img login__img-light\">");
+                        out.println("<img src=\"./responsive-login-form-main/assets/img/bg-login-dark.jpg\" alt=\"login image\" class=\"login__img login__img-dark\">");
+                        out.println("<form action='" + request.getContextPath() + "/ModifDepServlet' method='post' class='login__form'>");
+                        out.println("<h1 class='login__title'>Modificare departament</h1>");
+                        out.println("<div class='login__inputs'>");
+                        out.println("<div>");
+                        out.println("<label for='' class='login__label'>Nume nou</label>");
+                        out.println("<input type='text' name='password' required class='login__input' />");
+                        out.println("</div>");
+                        out.println("</div>");
+                        out.println("<a href ='modifdep.jsp' class='login__forgot'>Inapoi</a>");
+                        out.println("<div class='login__buttons'>");
+                        out.println("<input type='submit' value='Submit' class='login__button login__button-ghost' />");
+                        out.println("</div>");
+                        out.println("<input type='hidden' name='username' value='" + request.getParameter("username") + "' />");
+                        
+                        out.println("</form>");
+                        if ("true".equals(request.getParameter("n"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('Nume scris incorect!');");
+                            out.println("</script>");
+                        }
+                       
+                        out.println("</div>");
+                        out.println("</div>");
                     }
                 }
             } catch (Exception e) {
-                // out.println("Database connection or query error: " + e.getMessage());
                 out.println("<script type='text/javascript'>");
-                    out.println("alert('Eroare la baza de date!');");
-                    out.println("alert('" + e.getMessage() + "');");
-                    out.println("</script>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("alert('" + e.getMessage() + "');");
+                out.println("</script>");
                 if (currentUser.getTip() == 1) {
-                	response.sendRedirect("tip1ok.jsp");
+                    response.sendRedirect("tip1ok.jsp");
                 }
                 if (currentUser.getTip() == 2) {
-                	response.sendRedirect("tip2ok.jsp");
+                    response.sendRedirect("tip2ok.jsp");
                 }
                 if (currentUser.getTip() == 3) {
-                	response.sendRedirect("sefok.jsp");
+                    response.sendRedirect("sefok.jsp");
                 }
                 if (currentUser.getTip() == 0) {
-                	response.sendRedirect("dashboard.jsp");
+                    response.sendRedirect("dashboard.jsp");
                 }
                 e.printStackTrace();
             }
         } else {
-        	out.println("<script type='text/javascript'>");
-	        out.println("alert('Utilizator neconectat!');");
-	        out.println("</script>");
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Utilizator neconectat!');");
+            out.println("</script>");
             response.sendRedirect("login.jsp");
         }
     } else {
-    	out.println("<script type='text/javascript'>");
+        out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
         response.sendRedirect("login.jsp");

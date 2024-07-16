@@ -57,122 +57,137 @@
             <img src="./responsive-login-form-main/assets/img/bg-login-dark.jpg" alt="login image" class="login__img login__img-dark">
 
             <form action="<%= request.getContextPath() %>/register" method="post" class="login__form">
-                <div>
-                    <h1 class="login__title">
-                        <span>Definire Utilizator</span>
-                    </h1>
+            <div>
+                        <h1 class="login__title" style="margin:0; top:-10px;">
+                            <span style="margin:0; top:-10px;">Definire utilizator nou</span>
+                        </h1>
+                        
+                    </div>
+                    <table width="100%" style="margin:0; top:-10px;"> <tr><td>
+                <div class="form__section" style="margin:0; top:-10px;">
+                    <div>
+                        <label for="" class="login__label">Nume</label>
+                        <input type="text" name="nume" placeholder="Introduceti numele" required class="login__input">
+                    </div>
+
+                    <div>
+                        <label for="" class="login__label">Prenume</label>
+                        <input type="text" name="prenume" placeholder="Introduceti prenumele" required class="login__input">
+                    </div>
+
+                    <div>
+                        <label for="" class="login__label">Data nasterii</label>
+                        <input type="date" name="data_nasterii" value="2001-07-22" min="1954-01-01" max="2036-12-31" required class="login__input">
+                    </div>
+
+                    <div>
+                        <label for="" class="login__label">Adresa</label>
+                        <input type="text" name="adresa" placeholder="Introduceti adresa" required class="login__input">
+                    </div>
+                    
+                    <div>
+                        <label for="" class="login__label">E-mail</label>
+                        <input type="text" name="email" placeholder="Introduceti e-mailul" required class="login__input">
+                    </div>
+
+                    
+                </div></td>
+                
+                <td><p>   </p></td>
+                <td><p>   </p></td>
+                <td><p>   </p></td>
+                <td><p>   </p></td>
+                <td><p>   </p></td>
+                <td><p>   </p></td>
+                
+                <td>
+                <div class="form__section" style="margin:0; top:-10px;">
+                    <div>
+                        <label for="" class="login__label">UserName</label>
+                        <input type="text" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
+                    </div>
+
+                    <div>
+                        <label for="" class="login__label">Password</label>
+                        <input type="password" name="password" placeholder="Introduceti parola" required class="login__input">
+                    </div>
+               
+                    <div>
+                        <label for="" class="login__label">Departament</label>
+                        <select name="departament" class="login__input">
+                            <%
+                            try {
+                                Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+                                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                String sql = "SELECT id_dep, nume_dep FROM departament;";
+                                PreparedStatement stmt = con.prepareStatement(sql);
+                                ResultSet rs1 = stmt.executeQuery();
+
+                                if (!rs1.next()) {
+                                    out.println("No Records in the table");
+                                } else {
+                                    do {
+                                        out.println("<option value='" + rs1.getString("id_dep") + "' required>" + rs1.getString("nume_dep") + "</option>");
+                                    } while (rs1.next());
+                                }
+                                rs1.close();
+                                stmt.close();
+                                con.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                out.println("<script type='text/javascript'>");
+                                out.println("alert('Date introduse incorect sau nu exista date!');");
+                                out.println("alert('" + e.getMessage() + "');");
+                                out.println("</script>");
+                            }
+                            %>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="" class="login__label">Tip/Ierarhie</label>
+                        <select name="tip" class="login__input">
+                            <%
+                            try {
+                                Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+                                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                String sql = "select tip, denumire from tipuri;";
+                                PreparedStatement stmt = con.prepareStatement(sql);
+                                ResultSet rs2 = stmt.executeQuery();
+                                if (rs2.next() == false) {
+                                    out.println("No Records in the table");
+                                } else {
+                                    do {
+                                        out.println("<option value='" + rs2.getString("tip") + "' required>" + rs2.getString("denumire") + "</option>");
+                                    } while (rs2.next());
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                out.println("<script type='text/javascript'>");
+                                out.println("alert('Date introduse incorect sau nu exista date!');");
+                                out.println("alert('" + e.getMessage() + "');");
+                                out.println("</script>");
+                            }
+                            %>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="" class="login__label">Telefon</label>
+                        <input type="text" name="telefon" placeholder="Introduceti telefonul" required class="login__input">
+                    </div>
+                    
+                </div>
+                </td></tr>
+</table>
+ <a href="adminok.jsp" class="login__forgot" style="margin:0; top:-10px;">Inapoi</a>
+                <div class="login__buttons">
+                    <input style="margin:0; top:-10px;"
+                    type="submit" value="Submit" class="login__button login__button-ghost">
                 </div>
                 
-                <div>
-                    <div class="login__inputs">
-                        <div>
-                            <label for="" class="login__label">Nume</label>
-                            <input type="text" name="nume" placeholder="Introduceti numele" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">Prenume</label>
-                            <input type="text" name="prenume" placeholder="Introduceti prenumele" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">Data nasterii</label>
-                            <input type="date" name="data_nasterii" value="2001-07-22" min="1954-01-01" max="2036-12-31" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">Adresa</label>
-                            <input type="text" name="adresa" placeholder="Introduceti adresa" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">E-mail</label>
-                            <input type="text" name="email" placeholder="Introduceti e-mailul" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">Telefon</label>
-                            <input type="text" name="telefon" placeholder="Introduceti telefonul" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">UserName</label>
-                            <input type="text" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">Password</label>
-                            <input type="password" name="password" placeholder="Introduceti parola" required class="login__input">
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">Departament</label>
-                            <select name="departament" class="login__input">
-                                <%
-                                try {
-                                    Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-                                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                                    String sql = "SELECT id_dep, nume_dep FROM departament;";
-                                    PreparedStatement stmt = con.prepareStatement(sql);
-                                    ResultSet rs1 = stmt.executeQuery();
-
-                                    if (!rs1.next()) {
-                                        out.println("No Records in the table");
-                                    } else {
-                                        do {
-                                            out.println("<option value='" + rs1.getString("id_dep") + "' required>" + rs1.getString("nume_dep") + "</option>");
-                                        } while (rs1.next());
-                                    }
-                                    rs1.close();
-                                    stmt.close();
-                                    con.close();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    out.println("<script type='text/javascript'>");
-                                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                                    out.println("alert('" + e.getMessage() + "');");
-                                    out.println("</script>");
-                                }
-                                %>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="" class="login__label">Tip/Ierarhie</label>
-                            <select name="tip" class="login__input">
-                                <%
-                                try {
-                                    Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-                                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                                    String sql = "select tip, denumire from tipuri;";
-                                    PreparedStatement stmt = con.prepareStatement(sql);
-                                    ResultSet rs2 = stmt.executeQuery();
-                                    if (rs2.next() == false) {
-                                        out.println("No Records in the table");
-                                    } else {
-                                        do {
-                                            out.println("<option value='" + rs2.getString("tip") + "' required>" + rs2.getString("denumire") + "</option>");
-                                        } while (rs2.next());
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    out.println("<script type='text/javascript'>");
-                                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                                    out.println("alert('" + e.getMessage() + "');");
-                                    out.println("</script>");
-                                }
-                                %>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="login__buttons">
-                    <input type="submit" value="Submit" class="login__button login__button-ghost">
-                </div>
             </form>
 
-            <a href="adminok.jsp" class="login__forgot">Inapoi</a>
+           
         </div>
     </div>
 
