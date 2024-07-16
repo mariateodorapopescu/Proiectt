@@ -45,7 +45,7 @@
                                 "JOIN statusuri s ON c.status = s.status " +
                                 "JOIN tipcon ct ON c.tip = ct.tip " +
                                 "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.status = ? " +
-                                ((startDate != null && endDate != null) ? " AND c.start_c >= ? AND c.end_c <= ?" : ""); // ca sa includ si perioada
+                                ((startDate != null && endDate != null) ? " AND c.start_c between ? AND ? AND c.end_c <= ?" : ""); // ca sa includ si perioada
                         
                         int ok = 0; // daca a trecut o data prin catch aka a avut eroare aka nu s-a ales perioada (nu a trecut prin pagina de ales perioada)
                   
@@ -59,6 +59,7 @@
                        if (startDate != null && endDate != null) {
                            stmtt.setString(3, startDate);
                            stmtt.setString(4, endDate);
+                           stmtt.setString(5, endDate);
                            out.println("<h1>Vizualizare concedii pentru perioada " + startDate + " - " + endDate +" </h1><br>");
                        }
                        

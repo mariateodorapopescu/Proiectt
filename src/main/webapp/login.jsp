@@ -1,8 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
-<html>
+<html lang="ro">
 <head>
 <meta charset="ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!--=============== REMIXICONS ===============-->
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+        <!--=============== CSS ===============-->
+        <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+        
 <title>Login</title>
 <script type="text/javascript">
     function submitForm() {
@@ -11,28 +19,56 @@
 </script>
 </head>
 <body>
-<div align="center">
-    <h1>Login</h1>
-    <form action="<%= request.getContextPath() %>/login" method="post">
-        <table style="width: 100%">
-            <tr>
-                <td>UserName</td>
-                <td><input type="text" name="username" required/></td>
-            </tr>
-            <tr>
-                <td>Password</td>
-                <td><input type="password" name="password" required/></td>
-            </tr>
-        </table>
-        <input type="submit" value="Submit" />
-    </form>
 
-    <% 
+ <div class="container">
+            <div class="login__content">
+                <img src="./responsive-login-form-main/assets/img/bg-login.jpg" alt="login image" class="login__img login__img-light">
+                <img src="./responsive-login-form-main/assets/img/bg-login-dark.jpg" alt="login image" class="login__img login__img-dark">
+    
+                <form action="<%= request.getContextPath() %>/login" method="post" class="login__form">
+                    <div>
+                        <h1 class="login__title">
+                            <span>Conectare</span>
+                        </h1>
+                        <p class="login__description">
+                            
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <div class="login__inputs">
+                            <div>
+                                <label for="" class="login__label">Nume de utilizator</label>
+                                <input type="text" placeholder="Introduceti numele de utilizator" required class="login__input" name="username">
+                            </div>
+    
+                            <div>
+                                <label for="" class="login__label">Parola</label>
+    
+                                <div class="login__box">
+                                    <input type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass" name="password">
+                                    <i class="ri-eye-off-line login__eye" id="input-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="login__buttons">
+                            <input type="submit" value="Conectare" class="login__button login__button-ghost">
+                        </div>
+  <% 
     String loginAttempts = request.getParameter("loginAttempts");
     if (loginAttempts != null && Integer.parseInt(loginAttempts) >= 1) {
-        out.println("<a href='forgotpass.jsp'>Am uitat parola</a>");
+        out.println("<a href='forgotpass.jsp' class='login__forgot'>Am uitat parola</a>");
     }
+%>
+                    </div>
+                </form>
+            </div>
+        </div>
 
+   <%
     String logout = request.getParameter("logout");
     if ("true".equals(logout)) {
     	out.println("<script type='text/javascript'>");
