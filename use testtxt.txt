@@ -331,10 +331,42 @@ BEGIN
         UPDATE useri
         SET zileramase = 30 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
         WHERE id = NEW.id_ang;
+        if zileramase < 0 then
+			UPDATE useri
+			SET zileramase = 0
+			WHERE id = NEW.id_ang;
+            UPDATE useri
+			SET zilecons = 30
+			WHERE id = NEW.id_ang;
+		end if;
+         if zilecons < 0 then
+			UPDATE useri
+			SET zilecons = 0
+			WHERE id = NEW.id_ang;
+            UPDATE useri
+			SET zileramase = 30
+			WHERE id = NEW.id_ang;
+		end if;
     ELSE
         UPDATE useri
         SET zileramase = 40 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
         WHERE id = NEW.id_ang;
+        if zileramase < 0 then
+			UPDATE useri
+			SET zileramase = 0
+			WHERE id = NEW.id_ang;
+            UPDATE useri
+			SET zilecons = 40
+			WHERE id = NEW.id_ang;
+		end if;
+         if zilecons < 0 then
+			UPDATE useri
+			SET zilecons = 0
+			WHERE id = NEW.id_ang;
+            UPDATE useri
+			SET zileramase = 40
+			WHERE id = NEW.id_ang;
+		end if;
     END IF;
 END$$
 DELIMITER ;
@@ -357,10 +389,42 @@ BEGIN
             UPDATE useri
             SET zileramase = 30 - newZilecons
             WHERE id = NEW.id_ang;
+            if zileramase < 0 then
+				UPDATE useri
+				SET zileramase = 0
+				WHERE id = NEW.id_ang;
+				UPDATE useri
+				SET zilecons = 30
+				WHERE id = NEW.id_ang;
+			end if;
+             if zilecons < 0 then
+				UPDATE useri
+				SET zilecons = 0
+				WHERE id = NEW.id_ang;
+				UPDATE useri
+				SET zileramase = 30
+				WHERE id = NEW.id_ang;
+			end if;
         ELSE
             UPDATE useri
             SET zileramase = 40 - newZilecons
             WHERE id = NEW.id_ang;
+            if zileramase < 0 then
+				UPDATE useri
+				SET zileramase = 0
+				WHERE id = NEW.id_ang;
+				UPDATE useri
+				SET zilecons = 40
+				WHERE id = NEW.id_ang;
+			end if;
+             if zilecons < 0 then
+				UPDATE useri
+				SET zilecons = 0
+				WHERE id = NEW.id_ang;
+				UPDATE useri
+				SET zileramase = 40
+				WHERE id = NEW.id_ang;
+			end if;
         END IF;
     END IF;
 END$$
@@ -382,15 +446,63 @@ BEGIN
         SET conluate = conluate - 1,
             conramase = conramase + 1
         WHERE id = old.id_ang;
+        if conluate < 0 then
+			UPDATE useri
+			SET conluate = 0
+			WHERE id = old.id_ang;
+            UPDATE useri
+			SET conramase = 3
+			WHERE id = old.id_ang;
+		end if;
+        if conramase < 0 then
+			UPDATE useri
+			SET conluate = 0
+			WHERE id = old.id_ang;
+            UPDATE useri
+			SET conluate = 3
+			WHERE id = old.id_ang;
+		end if;
     END IF;
     IF userType = 2 THEN
         UPDATE useri
         SET zileramase = 30 - (totalDuration - OLD.durata)
         WHERE id = OLD.id_ang;
+        if zileramase < 0 then
+			UPDATE useri
+			SET zileramase = 0
+			WHERE id = old.id_ang;
+            UPDATE useri
+			SET zilecons = 30
+			WHERE id = old.id_ang;
+		end if;
+         if zilecons < 0 then
+			UPDATE useri
+			SET zilecons = 0
+			WHERE id = old.id_ang;
+            UPDATE useri
+			SET zileramase = 30
+			WHERE id = old.id_ang;
+		end if;
     ELSE
         UPDATE useri
         SET zileramase = 40 - (totalDuration - OLD.durata)
         WHERE id = OLD.id_ang;
+        if zileramase < 0 then
+			UPDATE useri
+			SET zileramase = 0
+			WHERE id = old.id_ang;
+            UPDATE useri
+			SET zilecons = 40
+			WHERE id = old.id_ang;
+		end if;
+         if zilecons < 0 then
+			UPDATE useri
+			SET zilecons = 0
+			WHERE id = old.id_ang;
+            UPDATE useri
+			SET zileramase = 40
+			WHERE id = old.id_ang;
+		end if;
     END IF;
 END$$
 DELIMITER ;
@@ -419,6 +531,22 @@ BEGIN
         SET conluate = conluate + 1,
             conramase = conramase - 1
         WHERE id = NEW.id_ang;
+        if conluate < 0 then
+			UPDATE useri
+			SET conluate = 0
+			WHERE id = NEW.id_ang;
+            UPDATE useri
+			SET zconramase = 3
+			WHERE id = NEW.id_ang;
+		end if;
+        if conramase < 0 then
+			UPDATE useri
+			SET conluate = 0
+			WHERE id = NEW.id_ang;
+            UPDATE useri
+			SET conluate = 3
+			WHERE id = NEW.id_ang;
+		end if;
     END IF;
 END$$
 DELIMITER ;
@@ -433,8 +561,10 @@ update useri set cnp = 15058158 where id = 15;
 update useri set cnp = 68736822 where id = 18;
 update useri set cnp = 81829942 where id = 22;
 update useri set cnp = 93668090 where id = 24;
-select count(*) from useri where tip = 2 group by id_dep;
-select count(*) from useri where tip = 0 group by id_dep;
+select count(*) from useri where tip = 3 group by id_dep having id_dep = 1;
+select count(*) from useri where tip = 0 group by id_dep having id_dep = 3;
+select * from useri where id_dep = 3;
+update useri set tip = 3 where username = "username2";
 DROP TRIGGER IF EXISTS after_ins;
 DELIMITER $$
 CREATE TRIGGER after_ins
@@ -466,3 +596,11 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+select * from useri;
+select * from concedii;
+select id, status, durata from concedii where id_ang = 3;
+select id, zilecons, zileramase, conluate, conramase from useri where id = 3;
+delete from concedii;
+update useri set zilecons = 0, conluate = 0, conramase = 3;
+update useri set zileramase = 30 where tip = 2;
+update useri set zileramase = 40 where tip != 2;

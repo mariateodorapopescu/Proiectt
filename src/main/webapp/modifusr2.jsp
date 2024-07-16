@@ -14,7 +14,84 @@ HttpSession sesi = request.getSession(false);
 if (sesi != null) {
     MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
     if (currentUser != null) {
-        int userId = Integer.parseInt(request.getParameter("id")); // Assuming ID is passed correctly
+        int userId = -1;
+        if (request.getParameter("id") != null) {
+        	userId = Integer.parseInt(request.getParameter("id")); 
+        }
+        // Assuming ID is passed correctly
+        String cnpp = request.getParameter("cnp");
+        System.out.println(cnpp);
+        int cnp = Integer.valueOf(request.getParameter("cnp")); // The CNP should have been verified before reaching this page
+        System.out.println(cnp);
+        if (cnp != 0) {
+        	Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM useri WHERE cnp = ?")) {
+                preparedStatement.setInt(1, cnp);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	userId = rs.getInt("id");
+                }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    out.println("<script type='text/javascript'>");
+                    out.println("alert('Nu a extras tipul de la utilizatorul cu codul dat cred!');");
+                    out.println("</script>");
+                    response.sendRedirect("login.jsp");
+                }
+        }
+        if (cnpp != null) {
+        	Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM useri WHERE cnp = ?")) {
+                preparedStatement.setInt(1, cnp);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	userId = rs.getInt("id");
+                }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    out.println("<script type='text/javascript'>");
+                    out.println("alert('Nu a extras tipul de la utilizatorul cu codul dat cred!');");
+                    out.println("</script>");
+                    response.sendRedirect("login.jsp");
+                }
+        }
+        if (userId == 0) {
+        	Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM useri WHERE cnp = ?")) {
+                preparedStatement.setInt(1, cnp);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	userId = rs.getInt("id");
+                }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    out.println("<script type='text/javascript'>");
+                    out.println("alert('Nu a extras tipul de la utilizatorul cu codul dat cred!');");
+                    out.println("</script>");
+                    response.sendRedirect("login.jsp");
+                }
+        }
+        if (userId != -1) {
+        	Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM useri WHERE cnp = ?")) {
+                preparedStatement.setInt(1, cnp);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	userId = rs.getInt("id");
+                }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    out.println("<script type='text/javascript'>");
+                    out.println("alert('Nu a extras tipul de la utilizatorul cu codul dat cred!');");
+                    out.println("</script>");
+                    response.sendRedirect("login.jsp");
+                }
+        }
+        
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");

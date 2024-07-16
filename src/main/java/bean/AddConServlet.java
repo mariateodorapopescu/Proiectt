@@ -285,6 +285,17 @@ public class AddConServlet extends HttpServlet {
 	    	con.setStatus(0);
 	    }
 	    
+	    if (concediuExista(uid, start_c, end_c)) {
+	        response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Concediul specificat există deja!');");
+	        out.println("window.location.href = 'dashboard.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
+	    }
+	    
         try {
             concediu.check(con);
             response.setContentType("text/html;charset=UTF-8");
@@ -306,6 +317,23 @@ public class AddConServlet extends HttpServlet {
         }
 	}
 
+	private boolean concediuExista(int uid, LocalDate start, LocalDate end) throws ServletException {
+	    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+	         PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM concedii WHERE id_ang = ? AND start_c = ? AND end_c = ?")) {
+	        stmt.setInt(1, uid);
+	        stmt.setDate(2, java.sql.Date.valueOf(start));
+	        stmt.setDate(3, java.sql.Date.valueOf(end));
+	        ResultSet rs = stmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt(1) > 0;
+	        }
+	    } catch (SQLException e) {
+	        throw new ServletException("Database error checking for existing leave", e);
+	    }
+	    return false;
+	}
+
+	
 	private int calculateDurationExcludingHolidaysAndNegativeStatus(int userId, LocalDate start, LocalDate end) throws ServletException {
         Set<LocalDate> holidays = getLegalHolidays();
         Set<LocalDate> excludedDays = getDaysWithNegativeStatus(userId);
@@ -360,7 +388,7 @@ public class AddConServlet extends HttpServlet {
 		public static boolean maimulteconcedii(HttpServletRequest request) throws ClassNotFoundException, IOException {
 		    int nr = 0;
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-		    String QUERY = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = ? and concedii. > 0;";
+		    String QUERY = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = ? and useri.conramase > 0;";
 		    int uid = Integer.valueOf(request.getParameter("userId"));
 
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -399,7 +427,7 @@ public class AddConServlet extends HttpServlet {
 			    }
 
 		    Set<LocalDate> holidays = getLegalHolidays();
-		    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? where status > 0;";
+		    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and status > 0;";
 
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 		         PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {

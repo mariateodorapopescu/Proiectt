@@ -26,7 +26,7 @@
                     out.println("</script>");
                 } else {
                     int userType = rs.getInt("tip");
-                    if (userType != 0) {
+                    if (userType == 4) {
                     	 if (rs.getString("tip").compareTo("1") == 0) {
                          	response.sendRedirect("tip1ok.jsp");
                          }
@@ -67,7 +67,7 @@
                          if (userType == 3) {
                              out.println("<a href ='sefok.jsp'>Inapoi</a>");
                           }
-                        out.println("<a href='signin.jsp'>Vreau sa modific ceva - cnp - tobeto</a>");
+                        out.println("<br><a href='modifydata.jsp'>Modificare date</a>");
                     }
                 }
             } catch (Exception e) {

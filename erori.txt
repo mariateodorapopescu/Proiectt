@@ -118,6 +118,8 @@ else {
     response.sendRedirect("login.jsp");
 }
 
+
+
  e.printStackTrace();
                             out.println("<script type='text/javascript'>");
                             out.println("alert('Date introduse incorect sau nu exista date!');");
