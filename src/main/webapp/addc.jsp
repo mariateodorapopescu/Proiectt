@@ -17,19 +17,22 @@
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip FROM useri WHERE username = ?")) {
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip, zileramase, conramase FROM useri WHERE username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
                     int userId = rs.getInt("id");
                     int userType = rs.getInt("tip");
+                    String zile = rs.getString("zileramase");
+                    String con = rs.getString("conramase");
                     
                     // Allow only non-admin users to access this page
                     if (userType == 4) {
                         response.sendRedirect("adminok.jsp");
                         return;
                     }
-
+                    out.println("<p style='position:relative;left:10%;top:10%;padding:0;margin:0;'>Zile ramase: " + zile + "</p>");
+                    out.println("<p style='position:relative;left:10%;top:10%;padding:0;margin:0;'>Concedii ramase: " + con + "</p><br>");
                     out.println("<div align='center'>");
                     out.println("<h1>Adaugare concediu</h1>");
                     out.print("<form action='");
@@ -63,6 +66,32 @@
                     out.println("<td>Locatie</td>");
                     out.println("<td><input type='text' name='locatie' required/></td>");
                     out.println("</tr>");
+                    
+                    out.println("<script>");
+                    
+                    out.println("document.addEventListener('DOMContentLoaded', function() {");
+                    out.println("    var dp1 = document.getElementById('start');");
+                    out.println("    var dp2 = document.getElementById('end');");
+                    out.println("    if (dp1) {");
+                    out.println("        dp1.addEventListener('change', function() {");
+                    out.println("            dp2.min = dp1.value;");
+                    out.println("            if (dp2.value < dp1.value) {");
+                    out.println("                dp2.value = '';");
+                    out.println("            }");
+                    out.println("        });");
+                    out.println("    }");
+                    out.println("    if (dp2) {");
+                    out.println("        dp2.addEventListener('change', function() {");
+                    out.println("            if (dp2.value < dp1.value) {");
+                    out.println("                dp2.value = '';");
+                    out.println("                alert('Data de final nu poate fi mai mica decat cea de inceput!');");
+                    out.println("            }");
+                    out.println("        });");
+                    out.println("    }");
+                    out.println("});");
+                    
+                   	out.println("</script>");
+                    
                     // Hidden input to carry user ID forward
                     out.println("<input type='hidden' name='userId' value='" + userId + "'/>");
                     out.println("</table>");

@@ -33,7 +33,7 @@
                     if (userType == 4) {
                         response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
                     } else {             
-                        out.println("<h1>Vizualizare concedii</h1><br>");
+                        //out.println("<h1>Vizualizare concedii</h1><br>");
                         String startDate = request.getParameter("start");
             String endDate = request.getParameter("end");
                         String sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
@@ -59,6 +59,7 @@
                        if (startDate != null && endDate != null) {
                            stmtt.setString(3, startDate);
                            stmtt.setString(4, endDate);
+                           out.println("<h1>Vizualizare concedii pentru perioada " + startDate + " - " + endDate +" </h1><br>");
                        }
                        
                        ResultSet rss1 = stmtt.executeQuery();
@@ -100,6 +101,7 @@
                		catch (SQLException e){ // daca n a trecut prin pagina de ales perioada inseamna ca nu e o perioada
                			// daca ajunge in catch, e clar ca start si end sunt nule aka ""
                			ok = 1;
+               			out.println("<h1>Vizualizare concedii pe anul curent </h1><br>");
                		PreparedStatement stmtt2 = connection.prepareStatement("SELECT " +
                                "c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
@@ -146,7 +148,56 @@
                rss1.close();
                stmtt2.close();
                		}
-               
+                	   catch (NullPointerException e){ // daca n a trecut prin pagina de ales perioada inseamna ca nu e o perioada
+                  			// daca ajunge in catch, e clar ca start si end sunt nule aka ""
+                  			out.println("<h1>Vizualizare concedii pe anul curent </h1><br>");
+                  			ok = 1;
+                  		PreparedStatement stmtt2 = connection.prepareStatement("SELECT " +
+                                  "c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                                  "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
+                                  "FROM useri u " +
+                                  "JOIN tipuri t ON u.tip = t.tip " +
+                                  "JOIN departament d ON u.id_dep = d.id_dep " +
+                                  "JOIN concedii c ON c.id_ang = u.id " +
+                                  "JOIN statusuri s ON c.status = s.status " +
+                                  "JOIN tipcon ct ON c.tip = ct.tip " +
+                                  "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.status = ?;");
+                          stmtt2.setInt(1, idu);
+                          stmtt2.setInt(2, ide);
+                  ResultSet rss1 = stmtt2.executeQuery();
+                  boolean found = false;
+
+                  out.println("<table border='1'><tr><th>Nr. crt</th><th>Departament</th><th>Nume</th><th>Prenume</th>" +
+                          "<th>Functie</th><th>Inceput</th><th>Final</th><th>Motiv</th><th>Locatie</th><th>Tip concediu</th><th>Status</th></tr>");
+   				while (rss1.next()) {
+                      found = true;
+                      out.print("<tr><td>" + rss1.getInt("nr_crt") + "</td><td>" + rss1.getString("departament") + "</td><td>" + 
+                              rss1.getString("nume") + "</td><td>" + rss1.getString("prenume") + "</td><td>" + rss1.getString("functie") + "</td><td>" + 
+                              rss1.getDate("start_c") + "</td><td>" + rss1.getDate("end_c") + "</td><td>" + rss1.getString("motiv") + "</td><td>" + 
+                              rss1.getString("locatie") + "</td>" + "<td>" + rss1.getString("tipcon") + "</td>");
+                      
+                      if (rss1.getString("status").compareTo("neaprobat") == 0) {
+                          out.println("<td style='background-color: rgb(136, 174, 219);'>" + rss1.getString("status") + "</td></tr>");
+                      }
+                      if (rss1.getString("status").compareTo("dezaprobat sef") == 0) {
+                          out.println("<td style='background-color: rgb(179, 113, 66);'>" + rss1.getString("status") + "</td></tr>");
+                      }
+                      if (rss1.getString("status").compareTo("dezaprobat director") == 0) {
+                          out.println("<td style='background-color: rgb(135, 57, 49);'>" + rss1.getString("status") + "</td></tr>");
+                      }
+                      if (rss1.getString("status").compareTo("aprobat director") == 0) {
+                          out.println("<td style='background-color: rgb(64, 133, 74);'>" + rss1.getString("status") + "</td></tr>");
+                      }
+                      if (rss1.getString("status").compareTo("aprobat sef") == 0) {
+                          out.println("<td style='background-color: rgb(204, 197, 94);'>" + rss1.getString("status") + "</td></tr>");
+                      }    
+   				}
+                  if (!found) {
+                      out.println("<tr><td colspan='11'>Nu exista date.</td></tr>");
+                  }
+                  rss1.close();
+                  stmtt2.close();
+                  		}
                finally {
             	   // asta l am pus ca sa se faca daca nu s-a facut catch aka daca s-a trecut prin pagina de ales perioada
                	if (ok == 0) {

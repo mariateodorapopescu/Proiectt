@@ -36,7 +36,7 @@
                         out.println("<table style='width: 80%'>");
                         out.println("<tr><td>Concediu (Motiv)</td><td><select name='idcon'>");
 
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, start_c, end_c, motiv, locatie FROM concedii WHERE id_ang = ? and status > 0")) {
+                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, start_c, end_c, motiv, locatie FROM concedii WHERE id_ang = ? and status = 0")) {
                             stm.setInt(1, userId);
                             try (ResultSet rs1 = stm.executeQuery()) {
                                 if (rs1.next()) {

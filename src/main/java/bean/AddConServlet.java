@@ -51,6 +51,10 @@ public class AddConServlet extends HttpServlet {
     	int durata = 0;
     	 LocalDate start_c = LocalDate.parse(start);
 		    LocalDate end_c = LocalDate.parse(end);
+		    
+		    if (end_c.isBefore(start_c)) {
+		        throw new IOException("Data de final nu poate fi inaintea celei de inceput!");
+		    }
 
 		    Set<LocalDate> holidays = new HashSet<>();
 		    int year = start_c.getYear(); 
