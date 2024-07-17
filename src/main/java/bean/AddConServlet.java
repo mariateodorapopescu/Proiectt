@@ -13,6 +13,11 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.w3c.dom.Document;
+
+//import com.itextpdf.pdf2data
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 

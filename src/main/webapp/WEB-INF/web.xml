@@ -208,4 +208,14 @@
     <servlet-name>AprobSefServlet</servlet-name>
     <url-pattern>/aprobsef</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ServletPDF</display-name>
+    <servlet-name>ServletPDF</servlet-name>
+    <servlet-class>bean.ServletPDF</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletPDF</servlet-name>
+    <url-pattern>/ServletPDF</url-pattern>
+  </servlet-mapping>
 </web-app>
