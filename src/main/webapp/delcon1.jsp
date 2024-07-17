@@ -35,18 +35,34 @@
                         out.println("/delcon' method='post'>");
                         out.println("<table style='width: 80%'>");
                         out.println("<tr><td>Concediu (Motiv)</td><td><select name='idcon'>");
-
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, start_c, end_c, motiv, locatie FROM concedii WHERE id_ang = ? and status = 0")) {
-                            stm.setInt(1, userId);
-                            try (ResultSet rs1 = stm.executeQuery()) {
-                                if (rs1.next()) {
-                                    do {
-                                        int id = rs1.getInt("id");
-                                        String motiv = rs1.getString("motiv");
-                                        out.println("<option value='" + id + "'>" + motiv + " (" + rs1.getString("start_c") + " to " + rs1.getString("end_c") + ")</option>");
-                                    } while (rs1.next());
-                                } else {
-                                    out.println("<option value=''>No exista concedii disponibile.</option>");
+                        if (userType == 1 || userType == 2) {
+                        	try (PreparedStatement stm = connection.prepareStatement("SELECT id, start_c, end_c, motiv, locatie FROM concedii WHERE id_ang = ? and status = 0;")) {
+                                stm.setInt(1, userId);
+                                try (ResultSet rs1 = stm.executeQuery()) {
+                                    if (rs1.next()) {
+                                        do {
+                                            int id = rs1.getInt("id");
+                                            String motiv = rs1.getString("motiv");
+                                            out.println("<option value='" + id + "'>" + motiv + " (" + rs1.getString("start_c") + " to " + rs1.getString("end_c") + ")</option>");
+                                        } while (rs1.next());
+                                    } else {
+                                        out.println("<option value=''>Nu exista concedii didponibile.</option>");
+                                    }
+                                }
+                            }
+                        } else {
+                        	try (PreparedStatement stm = connection.prepareStatement("SELECT id, start_c, end_c, motiv, locatie FROM concedii WHERE id_ang = ? and status = 1;")) {
+                                stm.setInt(1, userId);
+                                try (ResultSet rs1 = stm.executeQuery()) {
+                                    if (rs1.next()) {
+                                        do {
+                                            int id = rs1.getInt("id");
+                                            String motiv = rs1.getString("motiv");
+                                            out.println("<option value='" + id + "'>" + motiv + " (" + rs1.getString("start_c") + " to " + rs1.getString("end_c") + ")</option>");
+                                        } while (rs1.next());
+                                    } else {
+                                        out.println("<option value=''>Nu exista concedii didponibile.</option>");
+                                    }
                                 }
                             }
                         }

@@ -218,4 +218,14 @@
     <servlet-name>ServletPDF</servlet-name>
     <url-pattern>/ServletPDF</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>MailServlet</display-name>
+    <servlet-name>MailServlet</servlet-name>
+    <servlet-class>bean.MailServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MailServlet</servlet-name>
+    <url-pattern>/MailServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

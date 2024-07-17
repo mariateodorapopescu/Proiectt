@@ -76,7 +76,7 @@ public class AddConServlet extends HttpServlet {
 		    holidays.add(LocalDate.of(year, 12, 25));
 		    holidays.add(LocalDate.of(year, 12, 26)); 
 		    
-		    int duration = calculateDurationExcludingHolidaysAndNegativeStatus(uid, start_c, end_c);
+		    //int duration = calculateDurationExcludingHolidaysAndNegativeStatus(uid, start_c, end_c);
 
         ConcediuCon con = new ConcediuCon();
         con.setId_ang(uid);
@@ -397,7 +397,7 @@ public class AddConServlet extends HttpServlet {
 		public static boolean maimulteconcedii(HttpServletRequest request) throws ClassNotFoundException, IOException {
 		    int nr = 0;
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-		    String QUERY = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = ? and useri.conramase > 0;";
+		    String QUERY = "SELECT conramase FROM useri WHERE useri.id = ?;";
 		    int uid = Integer.valueOf(request.getParameter("userId"));
 
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -405,7 +405,7 @@ public class AddConServlet extends HttpServlet {
 		        preparedStatement.setInt(1, uid);
 		        try (ResultSet rs = preparedStatement.executeQuery()) {
 		            if (rs.next()) {
-		                nr = rs.getInt("total");
+		                nr = rs.getInt("conramase");
 		            }
 		        }
 		    } catch (SQLException e) {
