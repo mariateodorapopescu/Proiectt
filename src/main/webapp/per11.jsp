@@ -34,7 +34,7 @@
                     out.println("<h1>Vizualizare concediu</h1>");
                     out.print("<form action='");
                     out.print(request.getContextPath());
-                    out.println("/viewconcoldt3.jsp' method='post'>");
+                    out.println("/viewconpt.jsp' method='post'>");
                     out.println("<table style='width: 80%'>");
                     out.println("<tr>");
                     out.println("<td>Inceput</td>");

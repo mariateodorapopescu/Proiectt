@@ -34,7 +34,7 @@
                     out.println("<h1>Vizualizare concediu</h1>");
                     out.print("<form action='");
                     out.print(request.getContextPath());
-                    out.println("/viewconcoldt3.jsp' method='post'>");
+                    out.println("/viewconcol.jsp' method='post'>");
                     out.println("<table style='width: 80%'>");
                     out.println("<tr>");
                     out.println("<td>Inceput</td>");
@@ -51,6 +51,12 @@
                    
                     // Hidden input to carry user ID forward
                     out.println("<input type='hidden' name='userId' value='" + userId + "'/>");
+                    
+                    String start = request.getParameter("start");
+                    String end = request.getParameter("end");
+                    out.println("<input type='hidden' name='start' value='" + start + "'/>");
+                    out.println("<input type='hidden' name='end' value='" + end + "'/>");
+                    
                     out.println("</table>");
                     out.println("<input type='submit' value='Submit' />");
                     out.println("</form>");

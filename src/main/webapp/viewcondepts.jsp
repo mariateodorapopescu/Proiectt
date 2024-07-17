@@ -86,6 +86,11 @@
                         }
                         out.println("</select></td></tr>");
                       
+                        String start = request.getParameter("start");
+                        String end = request.getParameter("end");
+                        out.println("<input type='hidden' name='start' value='" + start + "'/>");
+                        out.println("<input type='hidden' name='end' value='" + end + "'/>");
+                        
                         out.println("</table>");
                         out.println("<input type='submit' value='Submit' />");
                         out.println("</form>");
