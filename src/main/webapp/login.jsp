@@ -50,6 +50,8 @@
                                 <div class="login__box">
                                     <input type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass" name="password">
                                     <i class="ri-eye-off-line login__eye" id="input-icon"></i>
+                                    <input type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass">
+                                    
                                 </div>
                             </div>
                         </div>
@@ -98,5 +100,6 @@
         <input type="hidden" name="username" value="${param.username}">
     </form>
 </div>
+<script src="./responsive-login-form-main/assets/js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,60 @@
+ body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 90%;
+            max-width: 300px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 4px;
+            font-size: 0.8em;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .month-year {
+            font-size: 1.2em;
+        }
+        .navigation button {
+            font-size: 1em;
+            padding: 5px;
+        }
+        .date-picker {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .highlight {
+            background-color: green;
+            color: white;
+        }
+        #difference {
+            text-align: center;
+            font-size: 1em;
+            margin-top: 10px;
+        }

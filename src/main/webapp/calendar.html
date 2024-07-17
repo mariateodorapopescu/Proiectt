@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
+       
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <button onclick="previousMonth()">❮</button>
+            <div class="month-year" id="monthYear"></div>
+            <button onclick="nextMonth()">❯</button>
+        </div>
+        <div class="date-picker">
+            <input type="date" id="startDate" onchange="highlightDate()" />
+            <input type="date" id="endDate" onchange="highlightDate()" />
+        </div>
+        <table id="calendar">
+            <thead>
+                <tr>
+                    <th>Lu.</th>
+                    <th>Ma.</th>
+                    <th>Mi.</th>
+                    <th>Jo.</th>
+                    <th>Vi.</th>
+                    <th>Sâ.</th>
+                    <th>Du.</th>
+                </tr>
+            </thead>
+            <tbody id="calendar-body">
+                <!-- Calendar will be generated here -->
+            </tbody>
+        </table>
+        <div id="difference"></div>
+    </div>
+
+<script src="./responsive-login-form-main/assets/js/calendar.js"></script>
+</body>
+</html>
