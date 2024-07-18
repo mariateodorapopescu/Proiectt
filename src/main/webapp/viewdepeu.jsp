@@ -4,8 +4,17 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html>
+<html lang="ro">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+
     <title>Vizualizare concedii</title>
 </head>
 <body>
@@ -32,119 +41,133 @@
                             case 4: response.sendRedirect("adminok.jsp"); break;
                         }
                     } else {
-                        out.println("<div align='center'>");
-                        out.println("<h1>Vizualizare concedii din departamentul meu</h1>");
-                        out.print("<form action='");
-                        out.print(request.getContextPath());
-                        out.println("/masina1.jsp' method='post'>");
-                        out.println("<table style='width: 80%'>");
-                        
-                        out.println("<tr><td>Status</td><td><select name='status'>");
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
-                            try (ResultSet rs1 = stm.executeQuery()) {
-                            	out.println("<option value='" + 3 + "'>" + "Oricare" + "</option>");
-                                if (rs1.next()) {
-                                    do {
-                                        int id = rs1.getInt("status");
-                                        String nume = rs1.getString("nume_status");
-                                        out.println("<option value='" + id + "'>" + nume + "</option>");
-                                    } while (rs1.next());
-                                } else {
-                                    out.println("<option value=''>Nu exista statusuri didponibile.</option>");
-                                }
-                            }
-                        }
-                        out.println("</select></td></tr>");
-                        
-                        out.println("<tr><td>Tip</td><td><select name='tip'>");
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM tipcon;")) {
-                            try (ResultSet rs1 = stm.executeQuery()) {
-                            	out.println("<option value='" + -1 + "'>" + "Oricare" + "</option>");
-                                if (rs1.next()) {
-                                    do {
-                                        int id = rs1.getInt("tip");
-                                        String nume = rs1.getString("motiv");
-                                        out.println("<option value='" + id + "'>" + nume + "</option>");
-                                    } while (rs1.next());
-                                } else {
-                                    out.println("<option value=''>Nu exista tipuri didponibile.</option>");
-                                }
-                            }
-                        }
-                        out.println("</select></td></tr>");
-                        
                         %>
-                        <tr><td></td><td>
-						 
-						  <div>
-						    <input type="checkbox" id="an" name="an" />
-						    <label for="an">An</label>
-						  </div>
-						
-</td></tr>
-                      <script>
-        function toggleDateInputs() {
-            var radioPer = document.getElementById('an');
-            var startInput = document.getElementById('start');
-            var endInput = document.getElementById('end');
-            if (radioPer.checked) {
-                startInput.style.display = 'none';
-                endInput.style.display = 'none';
-            } else {
-                startInput.style.display = 'block';
-                endInput.style.display = 'block';
-            }
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            toggleDateInputs();  // Call on initial load
-            setInterval(toggleDateInputs, 100); // Call every 1000 milliseconds (1 second)
-        });
-    </script>
+                        <div class="container">
+                            <div class="login__content">
+                                <img src="./responsive-login-form-main/assets/img/bg-login.jpg" alt="login image" class="login__img login__img-light">
+                                <img src="./responsive-login-form-main/assets/img/bg-login-dark.jpg" alt="login image" class="login__img login__img-dark">
+
+                                <form action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
+                                    <div>
+                                        <h1 class="login__title"><span>Vizualizare concedii din departamentul meu</span></h1>
+                                    </div>
+                                    
+                                    <div class="login__inputs">
+                                        <div>
+                                            <label class="login__label">Status</label>
+                                            <select name="status" class="login__input">
+                                                <option value="3">Oricare</option>
+                                                <%
+                                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
+                                                    try (ResultSet rs1 = stm.executeQuery()) {
+                                                        if (rs1.next()) {
+                                                            do {
+                                                                int id = rs1.getInt("status");
+                                                                String nume = rs1.getString("nume_status");
+                                                                out.println("<option value='" + id + "'>" + nume + "</option>");
+                                                            } while (rs1.next());
+                                                        } else {
+                                                            out.println("<option value=''>Nu exista statusuri disponibile.</option>");
+                                                        }
+                                                    }
+                                                }
+                                                %>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="login__label">Tip</label>
+                                            <select name="tip" class="login__input">
+                                                <option value="-1">Oricare</option>
+                                                <%
+                                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM tipcon;")) {
+                                                    try (ResultSet rs1 = stm.executeQuery()) {
+                                                        if (rs1.next()) {
+                                                            do {
+                                                                int id = rs1.getInt("tip");
+                                                                String nume = rs1.getString("motiv");
+                                                                out.println("<option value='" + id + "'>" + nume + "</option>");
+                                                            } while (rs1.next());
+                                                        } else {
+                                                            out.println("<option value=''>Nu exista tipuri disponibile.</option>");
+                                                        }
+                                                    }
+                                                }
+                                                %>
+                                            </select>
+                                        </div>
+
+                                        <div class="login__check">
+                                            <input type="checkbox" id="an" name="an" class="login__check-input"/>
+                                            <label for="an" class="login__check-label">An</label>
+                                        </div>
+
+                                        <div>
+                                            <label class="login__label">Inceput</label>
+                                            <input type="date" id="start" name="start" min="1954-01-01" max="2036-12-31" class="login__input"/>
+                                        </div>
+
+                                        <div>
+                                            <label class="login__label">Final</label>
+                                            <input type="date" id="end" name="end" min="1954-01-01" max="2036-12-31" class="login__input"/>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="userId" value="<%= userId %>"/>
+                                    <input type="hidden" name="dep" value="<%= userdep %>"/>
+                                    <input type="hidden" name="pag" value="6"/>
+                                    <input type="hidden" name="id" value="-1"/>
+                                    
+                                    <div class="login__buttons">
+                                        <input type="submit" value="Submit" class="login__button login__button-ghost"/>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <script>
+                            function toggleDateInputs() {
+                                var radioPer = document.getElementById('an');
+                                var startInput = document.getElementById('start');
+                                var endInput = document.getElementById('end');
+                                if (radioPer.checked) {
+                                    startInput.style.display = 'none';
+                                    endInput.style.display = 'none';
+                                } else {
+                                    startInput.style.display = 'block';
+                                    endInput.style.display = 'block';
+                                }
+                            }
+                            document.addEventListener('DOMContentLoaded', function() {
+                                toggleDateInputs();  // Call on initial load
+                                setInterval(toggleDateInputs, 100); // Call every 100 milliseconds
+                            });
+                        </script>
                         <%
-                        out.println("<tr>");
-                        out.println("<td>Inceput</td>");
-                        out.println("<td><input type='date' id='start' name='start' min='1954-01-01' max='2036-12-31'/></td>");
-                        out.println("</tr>");
-                        out.println("<tr>");
-                        out.println("<td>Final</td>");
-                        out.println("<td><input type='date' id='end' name='end' min='1954-01-01' max='2036-12-31'/></td>");
-                        out.println("</tr>");
-                      
-                        out.println("<input type='hidden' name='userId' value='" + userId + "'/>");
-                        out.println("<input type='hidden' name='dep' value='" + userdep + "'/>");
-                        out.println("<input type='hidden' name='pag' value='" + 6 + "'/>");
-                        out.println("<input type='hidden' name='id' value='" + -1 + "'/>");
-                        
-                        out.println("</table>");
-                        out.println("<input type='submit' value='Submit' />");
-                        out.println("</form>");
-                        out.println("</div>");
                     }
                 } else {
-                	out.println("<script type='text/javascript'>");
+                    out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 out.println("<script type='text/javascript'>");
-    	        out.println("alert('Eroare la baza de date!');");
-    	        out.println("</script>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("</script>");
                 response.sendRedirect("login.jsp");
             }
         } else {
-        	out.println("<script type='text/javascript'>");
+            out.println("<script type='text/javascript'>");
             out.println("alert('Utilizator neconectat!');");
             out.println("</script>");
             response.sendRedirect("login.jsp");
         }
     } else {
-    	out.println("<script type='text/javascript'>");
+        out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
         response.sendRedirect("login.jsp");
     }
-
 %>
 </body>
 </html>

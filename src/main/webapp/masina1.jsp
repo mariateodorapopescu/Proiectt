@@ -5,10 +5,127 @@
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <html>
+
 <head>
     <title>Vizualizare concedii</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7fa;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #00796b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #00796b;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .status-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 14px;
+        }
+        .status-neaprobat { background-color: #88aedb; }
+        .status-dezaprobat-sef { background-color: #b37142; }
+        .status-dezaprobat-director { background-color: #873931; }
+        .status-aprobat-director { background-color: #40854a; }
+        .status-aprobat-sef { background-color: #ccc55e; }
+        .status-pending { background-color: #e0a800; }
+        @media (max-width: 600px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            th, td {
+                text-align: right;
+            }
+            th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 5px;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                text-align: left;
+            }
+            td:before {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                content: attr(data-label);
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
 </head>
+
 <body>
+  <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nr. crt</th>
+                    <th>Departament</th>
+                    <th>Nume</th>
+                    <th>Prenume</th>
+                    <th>Functie</th>
+                    <th>Inceput</th>
+                    <th>Final</th>
+                    <th>Motiv</th>
+                    <th>Locatie</th>
+                    <th>Tip concediu</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+
 <%
     HttpSession sesi = request.getSession(false);
     if (sesi != null) {
@@ -459,39 +576,37 @@
                     		}
                     	}
                     	
-                    	 ResultSet rss1 = stmtt2.executeQuery();
-                         boolean found = false;
+                    	  ResultSet rss1 = stmtt2.executeQuery();
+                          boolean found = false;
 
-                         out.println("<table border='1'><tr><th>Nr. crt</th><th>Departament</th><th>Nume</th><th>Prenume</th>" +
-                                 "<th>Functie</th><th>Inceput</th><th>Final</th><th>Motiv</th><th>Locatie</th><th>Tip concediu</th><th>Status</th></tr>");
-          				while (rss1.next()) {
-                             found = true;
-                             out.print("<tr><td>" + rss1.getInt("nr_crt") + "</td><td>" + rss1.getString("departament") + "</td><td>" + 
-                                     rss1.getString("nume") + "</td><td>" + rss1.getString("prenume") + "</td><td>" + rss1.getString("functie") + "</td><td>" + 
-                                     rss1.getDate("start_c") + "</td><td>" + rss1.getDate("end_c") + "</td><td>" + rss1.getString("motiv") + "</td><td>" + 
-                                     rss1.getString("locatie") + "</td>" + "<td>" + rss1.getString("tipcon") + "</td>");
-                             
-                             if (rss1.getString("status").compareTo("neaprobat") == 0) {
-                                 out.println("<td style='background-color: rgb(136, 174, 219);'>" + rss1.getString("status") + "</td></tr>");
-                             }
-                             if (rss1.getString("status").compareTo("dezaprobat sef") == 0) {
-                                 out.println("<td style='background-color: rgb(179, 113, 66);'>" + rss1.getString("status") + "</td></tr>");
-                             }
-                             if (rss1.getString("status").compareTo("dezaprobat director") == 0) {
-                                 out.println("<td style='background-color: rgb(135, 57, 49);'>" + rss1.getString("status") + "</td></tr>");
-                             }
-                             if (rss1.getString("status").compareTo("aprobat director") == 0) {
-                                 out.println("<td style='background-color: rgb(64, 133, 74);'>" + rss1.getString("status") + "</td></tr>");
-                             }
-                             if (rss1.getString("status").compareTo("aprobat sef") == 0) {
-                                 out.println("<td style='background-color: rgb(204, 197, 94);'>" + rss1.getString("status") + "</td></tr>");
-                             }    
-          				}
-                         if (!found) {
-                             out.println("<tr><td colspan='11'>Nu exista date.</td></tr>");
-                         }
-                         rss1.close();
-                         stmtt2.close();
+                          while (rss1.next()) {
+                              found = true;
+                              out.print("<tr><td data-label='Nr. crt'>" + rss1.getInt("nr_crt") + "</td><td data-label='Departament'>" + rss1.getString("departament") + "</td><td data-label='Nume'>" +
+                                        rss1.getString("nume") + "</td><td data-label='Prenume'>" + rss1.getString("prenume") + "</td><td data-label='Functie'>" + rss1.getString("functie") + "</td><td data-label='Inceput'>" +
+                                        rss1.getDate("start_c") + "</td><td data-label='Final'>" + rss1.getDate("end_c") + "</td><td data-label='Motiv'>" + rss1.getString("motiv") + "</td><td data-label='Locatie'>" +
+                                        rss1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rss1.getString("tipcon") + "</td>");
+
+                              if (rss1.getString("status").compareTo("neaprobat") == 0) {
+                                  out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><i class='ri-close-line'></i></span></td></tr>");
+                              }
+                              if (rss1.getString("status").compareTo("dezaprobat sef") == 0) {
+                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                              }
+                              if (rss1.getString("status").compareTo("dezaprobat director") == 0) {
+                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                              }
+                              if (rss1.getString("status").compareTo("aprobat director") == 0) {
+                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                              }
+                              if (rss1.getString("status").compareTo("aprobat sef") == 0) {
+                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                              }
+                          }
+                          if (!found) {
+                              out.println("<tr><td colspan='11'>Nu exista date.</td></tr>");
+                          }
+                          rss1.close();
+                          stmtt2.close();
                         
                     }
            
@@ -520,5 +635,8 @@
     }
 
 %>
+ </tbody>
+        </table>
+    </div>
 </body>
 </html>
