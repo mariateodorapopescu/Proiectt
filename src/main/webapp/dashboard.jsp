@@ -31,7 +31,7 @@
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume from useri where username = ?")) {
+                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume, id from useri where username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
@@ -53,6 +53,28 @@
                             response.sendRedirect("adminok.jsp");
                         }
                     } else {
+                    	int id = rs.getInt("id");
+                    	 int cate = -1;
+                    	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c <= DATE_ADD(CURDATE(), INTERVAL 3 DAY) AND id_ang = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next() && rs2.getInt("count") > 0) {
+                                        cate =  rs2.getInt("count");
+                                     }
+                                 }
+                             }
+                            
+                             // Display the user dashboard or related information
+                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                             // Add additional user-specific content here
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                    	
                         out.println("<div class='container'>");
                         out.println("<div class='login__content'>");
                         out.println("<img src='./responsive-login-form-main/assets/img/bg-login.jpg' alt='login image' class='login__img login__img-light'>");
@@ -62,6 +84,36 @@
                         out.println("<div class='login__inputs'>");
                         out.println("<h1>Bun venit, " + rs.getString("prenume") + "!</h1>");
                         //out.println("<label for='menu' class='login__label'>Meniu</label>");
+                        		// select date_checked from date_logs ORDER BY date_checked DESC LIMIT 1;
+                        		// select * from concedii where start_c + 3 <= (select date_checked from date_logs ORDER BY date_checked DESC LIMIT 1) and id_ang = ?;
+                        		
+                        		%>
+                        		<script>
+                        		const date = new Date();
+								
+								let day = date.getDate();
+								let month = date.getMonth() + 1;
+								let year = date.getFullYear();
+								
+								// This arrangement can be altered based on how we want the date's format to appear.
+								let currentDate = year + '-' + month + '-' + day;
+								console.log(currentDate); // "17-6-2022"
+								</script>
+                        		<%
+                        		int cate2 = -1;
+                             	if (cate == 1) {
+                             		 String query2 = "SELECT CASE WHEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) between 0 and 4 THEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) ELSE -1 END AS dif FROM concedii WHERE id_ang = ? order by dif desc limit 1";
+                                     try (PreparedStatement stmt = connection.prepareStatement(query2)) {
+                                         stmt.setInt(1, id);
+                                         try (ResultSet rs2 = stmt.executeQuery()) {
+                                             if (rs2.next() && rs2.getInt("dif") > 0) {
+                                                cate2 =  rs2.getInt("dif");
+                                             }
+                                         }
+                                     }
+                             		out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
+                             	}
+                        		out.println("<button id='menu'><a href = 'vizualizareconcedii.jsp'>Vizualizare concedii </a></button>");
                         out.println("<select name='menu' id='menu' class='login__input' onchange='location = this.value;'>");
                         out.println("<option value=''>Selecteaza o optiune</option>");
                         out.println("<option value='addc.jsp'>Adaugare concediu</option>");
@@ -73,8 +125,8 @@
                         out.println("<option value='viewcol.jsp'>Vizualizare concedii unui angajat</option>");
                         out.println("<option value='viewconcoldepeu.jsp'>Vizualizare concedii unui coleg</option>");
                         out.println("<option value='viewdepeu.jsp'>Vizualizare concedii din departamentul meu</option>");
-                        out.println("<option value='viewdep.jsp'>Vizualizare concedii dintr-un departament</option>");
-                        out.println("<option value='viewins.jsp'>Vizualizare concedii din toata institutia</option>");
+                        out.println("<option value='viewcondep.jsp'>Vizualizare concedii dintr-un departament</option>");
+                        out.println("<option value='viewtot.jsp'>Vizualizare concedii din toata institutia</option>");
                         out.println("<option value='viewcolegi.jsp'>Vizualizare angajati</option>");
                         out.println("<option value='viewcolegidep.jsp'>Vizualizare colegi de departament</option>");
                         out.println("<option value='viewangdep.jsp'>Vizualizarea angajatilor dintr-un departament/option>");
@@ -88,7 +140,6 @@
                        
                         out.println("</div>");
 
-                       
                         out.println("</div>");
                         out.println("</div>");
                     }

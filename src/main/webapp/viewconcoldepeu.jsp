@@ -8,6 +8,10 @@
 <head>
     <title>Vizualizare concedii</title>
 </head>
+<style>
+body{
+background-color:red;}
+</style>
 <body>
 <%
     HttpSession sesi = request.getSession(false);
