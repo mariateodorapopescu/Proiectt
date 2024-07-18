@@ -57,12 +57,10 @@
              				
                		}
                		if (pag == 4) {
-              			PreparedStatement stmtt1 = connection.prepareStatement("select nume_dep from departament where id_dep = ?");
-                      	 stmtt2.setInt(1, dep);
-                      	 ResultSet rss2 = stmtt1.executeQuery(); 
-                      	 String depart = rss2.getString("nume_dep");
-                      	out.println("<h1> Vizualizare concedii ale unui angajat din departamentul " + depart);
-              		}
+               		
+                    	 out.println("<h1> Vizualizare concedii ale unui angajat");
+
+                     }
                		
                		if (pag == 5) {
               			 out.println("<h1> Vizualizare concedii ale unui coleg din departamentul meu");
@@ -73,11 +71,7 @@
            				
              		}
                		if (pag == 7) {
-               			PreparedStatement stmtt1 = connection.prepareStatement("select nume_dep from departament where id_dep = ?");
-                     	 stmtt2.setInt(1, dep);
-                     	 ResultSet rss2 = stmtt1.executeQuery(); 
-                     	 String depart = rss2.getString("nume_dep");
-                     	out.println("<h1> Vizualizare concedii din departamentul " + depart);
+                     	out.println("<h1> Vizualizare concedii dintr-un departament ");
            				
              		}
                		if (pag == 8) {
