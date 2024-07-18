@@ -494,18 +494,7 @@
                          stmtt2.close();
                         
                     }
-                    if (userType == 0) {
-                        out.println("<a href ='dashboard.jsp'>Inapoi</a>");
-                     }
-                     if (userType == 1) {
-                         out.println("<a href ='tip1ok.jsp'>Inapoi</a>");
-                      }
-                     if (userType == 2) {
-                         out.println("<a href ='tip2ok.jsp'>Inapoi</a>");
-                      }
-                     if (userType == 3) {
-                         out.println("<a href ='sefok.jsp'>Inapoi</a>");
-                      }
+           
                 }
             
             } catch (Exception e) {

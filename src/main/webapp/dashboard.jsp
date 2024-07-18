@@ -113,7 +113,7 @@
                                      }
                              		out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
                              	}
-                        		out.println("<button id='menu'><a href = 'vizualizareconcedii.jsp'>Vizualizare concedii </a></button>");
+                        		// out.println("<button id='menu'><a href = 'vizualizareconcedii.jsp'>Vizualizare concedii </a></button>");
                         out.println("<select name='menu' id='menu' class='login__input' onchange='location = this.value;'>");
                         out.println("<option value=''>Selecteaza o optiune</option>");
                         out.println("<option value='addc.jsp'>Adaugare concediu</option>");
@@ -121,16 +121,7 @@
                         out.println("<option value='delcon1.jsp'>Stergere concediu</option>");
                         out.println("<option value='aprobdir.jsp'>Aprobare concediu</option>");
                         out.println("<option value='resdir.jsp'>Respingere concediu</option>");
-                        out.println("<option value='viewp.jsp'>Vizualizare concedii personale</option>");
-                        out.println("<option value='viewcol.jsp'>Vizualizare concedii unui angajat</option>");
-                        out.println("<option value='viewconcoldepeu.jsp'>Vizualizare concedii unui coleg</option>");
-                        out.println("<option value='viewdepeu.jsp'>Vizualizare concedii din departamentul meu</option>");
-                        out.println("<option value='viewcondep.jsp'>Vizualizare concedii dintr-un departament</option>");
-                        out.println("<option value='viewtot.jsp'>Vizualizare concedii din toata institutia</option>");
-                        out.println("<option value='viewcolegi.jsp'>Vizualizare angajati</option>");
-                        out.println("<option value='viewcolegidep.jsp'>Vizualizare colegi de departament</option>");
-                        out.println("<option value='viewangdep.jsp'>Vizualizarea angajatilor dintr-un departament/option>");
-                        out.println("<option value='viewdep.jsp'>Vizualizare departamente</option>");
+                        out.println("<option value='vizualizareconcedii.jsp'>Vizualizare concedii </option>");
                         out.println("<option value='viewdesp.jsp'>Profil</option>");
                         out.println("</select>");
                         out.println("</div>");

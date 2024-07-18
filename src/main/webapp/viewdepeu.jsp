@@ -33,7 +33,7 @@
                         }
                     } else {
                         out.println("<div align='center'>");
-                        out.println("<h1>Vizualizare concediu coleg de departament</h1>");
+                        out.println("<h1>Vizualizare concedii din departamentul meu</h1>");
                         out.print("<form action='");
                         out.print(request.getContextPath());
                         out.println("/masina1.jsp' method='post'>");
@@ -119,18 +119,6 @@
                         out.println("<input type='submit' value='Submit' />");
                         out.println("</form>");
                         out.println("</div>");
-                        if (userType == 0) {
-                            out.println("<a href ='dashboard.jsp'>Inapoi</a>");
-                         }
-                         if (userType == 1) {
-                             out.println("<a href ='tip1ok.jsp'>Inapoi</a>");
-                          }
-                         if (userType == 2) {
-                             out.println("<a href ='tip2ok.jsp'>Inapoi</a>");
-                          }
-                         if (userType == 3) {
-                             out.println("<a href ='sefok.jsp'>Inapoi</a>");
-                          }
                     }
                 } else {
                 	out.println("<script type='text/javascript'>");
