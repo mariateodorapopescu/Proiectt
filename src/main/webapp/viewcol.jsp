@@ -41,8 +41,7 @@
                          
                         out.println("<tr><td>Utilizator (Nume, Prenume, Username)</td><td><select name='id'>");
 
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri where id_dep = ?")) {
-                        	stm.setInt(1, userdep);
+                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri")) {
                             ResultSet rs1 = stm.executeQuery();
                             while (rs1.next()) {
                                 int id = rs1.getInt("id");
@@ -127,7 +126,7 @@
                       
                         out.println("<input type='hidden' name='userId' value='" + userId + "'/>");
                         out.println("<input type='hidden' name='dep' value='" + userdep + "'/>");
-                        out.println("<input type='hidden' name='pag' value='" + 5 + "'/>");
+                        out.println("<input type='hidden' name='pag' value='" + 4 + "'/>");
                         
                         out.println("</table>");
                         out.println("<input type='submit' value='Submit' />");

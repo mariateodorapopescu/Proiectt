@@ -38,21 +38,6 @@
                         out.print(request.getContextPath());
                         out.println("/masina1.jsp' method='post'>");
                         out.println("<table style='width: 80%'>");
-                         
-                        out.println("<tr><td>Utilizator (Nume, Prenume, Username)</td><td><select name='id'>");
-
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri where id_dep = ?")) {
-                        	stm.setInt(1, userdep);
-                            ResultSet rs1 = stm.executeQuery();
-                            while (rs1.next()) {
-                                int id = rs1.getInt("id");
-                                String nume = rs1.getString("nume");
-                                String prenume = rs1.getString("prenume");
-                                String username = rs1.getString("username");
-                                out.println("<option value='" + id + "'>" + nume + " " + prenume + " (" + username + ")</option>");
-                            }
-                        }
-                        out.println("</select></td></tr>");
                         
                         out.println("<tr><td>Status</td><td><select name='status'>");
                         try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
@@ -126,8 +111,9 @@
                         out.println("</tr>");
                       
                         out.println("<input type='hidden' name='userId' value='" + userId + "'/>");
-                        out.println("<input type='hidden' name='dep' value='" + userdep + "'/>");
-                        out.println("<input type='hidden' name='pag' value='" + 5 + "'/>");
+                        out.println("<input type='hidden' name='dep' value='" + -1 + "'/>");
+                        out.println("<input type='hidden' name='pag' value='" + 8 + "'/>");
+                        out.println("<input type='hidden' name='id' value='" + -1 + "'/>");
                         
                         out.println("</table>");
                         out.println("<input type='submit' value='Submit' />");
