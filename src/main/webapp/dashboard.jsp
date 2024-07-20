@@ -57,7 +57,7 @@
                     	 int cate = -1;
                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
                              // Check for upcoming leaves in 3 days
-                             String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c <= DATE_ADD(CURDATE(), INTERVAL 3 DAY) AND id_ang = ?";
+                             String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 <= CURDATE() AND id_ang = ?";
                              try (PreparedStatement stmt = connection.prepareStatement(query)) {
                                  stmt.setInt(1, id);
                                  try (ResultSet rs2 = stmt.executeQuery()) {
@@ -101,13 +101,14 @@
 								</script>
                         		<%
                         		int cate2 = -1;
-                             	if (cate == 1) {
+                             	if (cate >= 1) {
                              		 String query2 = "SELECT CASE WHEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) between 0 and 4 THEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) ELSE -1 END AS dif FROM concedii WHERE id_ang = ? order by dif desc limit 1";
                                      try (PreparedStatement stmt = connection.prepareStatement(query2)) {
                                          stmt.setInt(1, id);
                                          try (ResultSet rs2 = stmt.executeQuery()) {
                                              if (rs2.next() && rs2.getInt("dif") > 0) {
                                                 cate2 =  rs2.getInt("dif");
+                                                
                                              }
                                          }
                                      }
