@@ -119,24 +119,26 @@ if (sesi != null) {
                 out.print("</form>");
                 out.print("</div>");
                 
+                String statusParam = request.getParameter("status");
+                String depParam = request.getParameter("dep");
+
+                int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
+                int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
+                
                 %>
                 <div class="login__check">
                     <form id="statusForm" onsubmit="return false;">
                         <div>
                             <label class="login__label">Status</label>
                             <select name="status" class="login__input" onchange="submitForm()">
-                                <option value="3">Oricare</option>
+                                <option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
                                 <%
                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
                                     try (ResultSet rs1 = stm.executeQuery()) {
-                                        if (rs1.next()) {
-                                            do {
-                                                int id = rs1.getInt("status");
-                                                String nume = rs1.getString("nume_status");
-                                                out.println("<option value='" + id + "'>" + nume + "</option>");
-                                            } while (rs1.next());
-                                        } else {
-                                            out.println("<option value=''>Nu exista statusuri disponibile.</option>");
+                                        while (rs1.next()) {
+                                            int id = rs1.getInt("status");
+                                            String nume = rs1.getString("nume_status");
+                                            out.println("<option value='" + id + "' " + (status == id ? "selected" : "") + ">" + nume + "</option>");
                                         }
                                     }
                                 }
@@ -146,18 +148,14 @@ if (sesi != null) {
                         <div>
                             <label class="login__label">Departament</label>
                             <select name="dep" class="login__input" onchange="submitForm()">
-                                <option value="-1">Oricare</option>
+                                <option value="-1" <%= (dep == -1 ? "selected" : "") %>>Oricare</option>
                                 <%
                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
                                     try (ResultSet rs1 = stm.executeQuery()) {
-                                        if (rs1.next()) {
-                                            do {
-                                                int id = rs1.getInt("id_dep");
-                                                String nume = rs1.getString("nume_dep");
-                                                out.println("<option value='" + id + "'>" + nume + "</option>");
-                                            } while (rs1.next());
-                                        } else {
-                                            out.println("<option value=''>Nu exista departamente disponibile.</option>");
+                                        while (rs1.next()) {
+                                            int id = rs1.getInt("id_dep");
+                                            String nume = rs1.getString("nume_dep");
+                                            out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
                                         }
                                     }
                                 }
@@ -174,13 +172,13 @@ if (sesi != null) {
                 for (int i = 1; i <= daysInMonth; i++) {
                     leaveCountMap.put(i, 0);
                 }
-                
+/*
                 String statusParam = request.getParameter("status");
                 String depParam = request.getParameter("dep");
 
                 int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
                 int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
-
+*/
                 if (dep == -1 && status == 3) {
                     try (PreparedStatement stmt = connection.prepareStatement("SELECT day(leave_date) AS leave_day, COUNT(*) AS plecati FROM (SELECT start_c + INTERVAL n DAY AS leave_date FROM concedii JOIN numbers ON n <= DATEDIFF(end_c, start_c)) AS all_dates WHERE MONTH(leave_date) = ? AND YEAR(leave_date) = ? GROUP BY leave_date ORDER BY leave_date;")) {
                         stmt.setInt(1, currentMonth);
