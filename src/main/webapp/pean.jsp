@@ -1,42 +1,30 @@
-<%@ page import="java.io.*" %>  
-<%@ page import="java.util.*" %>  
+<%@ page import="java.io.*" %>
+<%@ page import="java.util.*" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 
-<%!  
-    // --- String Join Function converts from Java array to JavaScript string.  
-    public String join(ArrayList<?> arr, String del) {  
-        StringBuilder output = new StringBuilder();  
-        for (int i = 0; i < arr.size(); i++) {  
-            if (i > 0) output.append(del);  
-            // --- Quote strings, only, for JS syntax  
-            if (arr.get(i) instanceof String) output.append("\"");  
-            output.append(arr.get(i));  
-            if (arr.get(i) instanceof String) output.append("\"");  
-        }  
-        return output.toString();  
-    }  
-
-    public int getDaysInMonth(int month, int year) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MONTH, month - 1);
-        calendar.set(Calendar.YEAR, year);
-        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+<%!
+    // --- String Join Function converts from Java array to JavaScript string.
+    public String join(ArrayList<?> arr, String del) {
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < arr.size(); i++) {
+            if (i > 0) output.append(del);
+            // --- Quote strings, only, for JS syntax
+            if (arr.get(i) instanceof String) output.append("\"");
+            output.append(arr.get(i));
+            if (arr.get(i) instanceof String) output.append("\"");
+        }
+        return output.toString();
     }
+%>
 
-    public String getMonthName(int month) {
-        String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
-        return monthNames[month - 1];
-    }
-%>  
-
-<!DOCTYPE html>  
-<html>  
-<head>  
-    <title>Raport</title>  
-    <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>  
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raport</title>
+    <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <style>
         body {
@@ -65,27 +53,10 @@
             font-size: 16px;
             cursor: pointer;
         }
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
     </style>
-</head>  
-<body>  
+</head>
+<body>
 <%
-String lunaa = null;
-int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
-int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-
-String selectedMonthParam = request.getParameter("selectedMonth");
-String selectedYearParam = request.getParameter("selectedYear");
-
-if (selectedMonthParam != null && selectedYearParam != null) {
-    currentMonth = Integer.parseInt(selectedMonthParam);
-    currentYear = Integer.parseInt(selectedYearParam);
-}
-
 HttpSession sesi = request.getSession(false);
 if (sesi != null) {
     MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
@@ -104,15 +75,16 @@ if (sesi != null) {
                 if (userType == 4) {
                     response.sendRedirect("adminok.jsp");
                     return;
-                } 
-                
+                }
+
                 String statusParam = request.getParameter("status");
                 String depParam = request.getParameter("dep");
 
                 int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
                 int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
-                
-                %>
+                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
+%>
                 <div class="login__check">
                     <form id="statusForm" onsubmit="return false;">
                         <div>
@@ -152,167 +124,111 @@ if (sesi != null) {
                         <input type="submit" value="submit">
                     </form>
                 </div>
-                <%
-
-                int daysInMonth = getDaysInMonth(currentMonth, currentYear);
+<%
                 Map<Integer, Integer> leaveCountMap = new HashMap<>();
-                for (int i = 1; i <= daysInMonth; i++) {
+                for (int i = 1; i <= 12; i++) {
                     leaveCountMap.put(i, 0);
                 }
-                
-                if (dep == -1 && status != 3) {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT month_dates AS month, ceil(COUNT(*)/2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii where status = ? UNION ALL SELECT end_c FROM concedii where status = ? UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c)) AS combined_dates GROUP BY monthname(month_dates);")) {
-                    	stmt.setInt(1, status);
-                        stmt.setInt(2, status);
-                        
-                    	ResultSet rs1 = stmt.executeQuery();
-                        while (rs1.next()) {
-                            int day = rs1.getInt("leave_day");
-                            int count = rs1.getInt("plecati");
-                            leaveCountMap.put(day, count);
-                        }
 
-                        ArrayList<String> days = new ArrayList<>();
-                        ArrayList<Integer> counts = new ArrayList<>();
-                        for (int i = 1; i <= daysInMonth; i++) {
-                            days.add(String.valueOf(i));
-                            counts.add(leaveCountMap.get(i));
-                        }
-
-                        // Add data to JavaScript arrays for the chart
-                        out.println("<script>");
-                        out.println("var daysData = [" + join(days, ",") + "];");
-                        out.println("var countsData = [" + join(counts, ",") + "];");
-                        out.println("</script>");
-                    }
-                } else if (status == 3 && dep == -1) {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT month_dates AS month, ceil(COUNT(*)/2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii UNION ALL SELECT end_c FROM concedii UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c)) AS combined_dates GROUP BY monthname(month_dates);")) {
-                    	
-                        ResultSet rs1 = stmt.executeQuery();
-                        while (rs1.next()) {
-                            int day = rs1.getInt("leave_day");
-                            int count = rs1.getInt("plecati");
-                            leaveCountMap.put(day, count);
-                        }
-
-                        ArrayList<String> days = new ArrayList<>();
-                        ArrayList<Integer> counts = new ArrayList<>();
-                        for (int i = 1; i <= daysInMonth; i++) {
-                            days.add(String.valueOf(i));
-                            counts.add(leaveCountMap.get(i));
-                        }
-
-                        // Add data to JavaScript arrays for the chart
-                        out.println("<script>");
-                        out.println("var daysData = [" + join(days, ",") + "];");
-                        out.println("var countsData = [" + join(counts, ",") + "];");
-                        out.println("</script>");
-                    }
-                } else if (dep != -1 && status == 3) {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT day(leave_date) AS leave_day, COUNT(*) AS plecati FROM (SELECT start_c + INTERVAL n DAY AS leave_date FROM concedii JOIN numbers ON n <= DATEDIFF(end_c, start_c) JOIN useri ON concedii.id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE departament.id_dep = ?) AS all_dates WHERE MONTH(leave_date) = ? AND YEAR(leave_date) = ? GROUP BY leave_date ORDER BY leave_date;")) {
-                        stmt.setInt(1, dep);
-                        stmt.setInt(2, currentMonth);
-                        stmt.setInt(3, currentYear);
-                        ResultSet rs1 = stmt.executeQuery();
-                        while (rs1.next()) {
-                            int day = rs1.getInt("leave_day");
-                            int count = rs1.getInt("plecati");
-                            leaveCountMap.put(day, count);
-                        }
-
-                        ArrayList<String> days = new ArrayList<>();
-                        ArrayList<Integer> counts = new ArrayList<>();
-                        for (int i = 1; i <= daysInMonth; i++) {
-                            days.add(String.valueOf(i));
-                            counts.add(leaveCountMap.get(i));
-                        }
-
-                        // Add data to JavaScript arrays for the chart
-                        out.println("<script>");
-                        out.println("var daysData = [" + join(days, ",") + "];");
-                        out.println("var countsData = [" + join(counts, ",") + "];");
-                        out.println("</script>");
-                    }
-                } else {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT day(leave_date) AS leave_day, COUNT(*) AS plecati FROM (SELECT start_c + INTERVAL n DAY AS leave_date FROM concedii JOIN numbers ON n <= DATEDIFF(end_c, start_c) JOIN useri ON concedii.id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE departament.id_dep = ? AND concedii.status = ?) AS all_dates WHERE MONTH(leave_date) = ? AND YEAR(leave_date) = ? GROUP BY leave_date ORDER BY leave_date;")) {
-                        stmt.setInt(1, dep);
-                        stmt.setInt(2, status);
-                        stmt.setInt(3, currentMonth);
-                        stmt.setInt(4, currentYear);
-                        ResultSet rs1 = stmt.executeQuery();
-                        while (rs1.next()) {
-                            int day = rs1.getInt("leave_day");
-                            int count = rs1.getInt("plecati");
-                            leaveCountMap.put(day, count);
-                        }
-
-                        ArrayList<String> days = new ArrayList<>();
-                        ArrayList<Integer> counts = new ArrayList<>();
-                        for (int i = 1; i <= daysInMonth; i++) {
-                            days.add(String.valueOf(i));
-                            counts.add(leaveCountMap.get(i));
-                        }
-
-                        // Add data to JavaScript arrays for the chart
-                        out.println("<script>");
-                        out.println("var daysData = [" + join(days, ",") + "];");
-                        out.println("var countsData = [" + join(counts, ",") + "];");
-                        out.println("</script>");
-                    }
+                String query = "SELECT MONTH(month_dates) AS month, CEIL(COUNT(*) / 2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii";
+                if (status != 3 || dep != -1) {
+                    query += " JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE";
+                    if (status != 3) query += " status = ? AND";
+                    if (dep != -1) query += " departament.id_dep = ? AND";
+                    query = query.substring(0, query.length() - 4); // Remove the last " AND"
                 }
-                
-                %>
-<div class="container" id="content">
-    <div id="myChart"></div>  
-</div>
-<button onclick="generate()">Generate PDF</button>
+                query += " UNION ALL SELECT end_c FROM concedii";
+                if (status != 3 || dep != -1) {
+                    query += " JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE";
+                    if (status != 3) query += " status = ? AND";
+                    if (dep != -1) query += " departament.id_dep = ? AND";
+                    query = query.substring(0, query.length() - 4); // Remove the last " AND"
+                }
+                query += " UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c) AND YEAR(start_c) = ?) AS combined_dates GROUP BY MONTH(month_dates)";
 
-<script>
-window.onload = function() {
-    zingchart.render({
-        id: "myChart",
-        width: "100%",
-        height: 400,
-        data: {
-            "type": "bar",
-            "title": {
-                "text": "Numar angajati / zi"
-            },
-            "scale-x": {
-                "labels": daysData
-            },
-            "plot": {
-                "line-width": 1
-            },
-            "series": [{
-                "values": countsData
-            }]
-        }
-    });
-};
+                try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                    int paramIndex = 1;
+                    if (status != 3) {
+                        stmt.setInt(paramIndex++, status);
+                        stmt.setInt(paramIndex++, status);
+                    }
+                    if (dep != -1) {
+                        stmt.setInt(paramIndex++, dep);
+                        stmt.setInt(paramIndex++, dep);
+                    }
+                    stmt.setInt(paramIndex, currentYear);
 
-function generate() {
-    const element = document.getElementById("content");
-    html2pdf()
-    .from(element)
-    .save();
-}
+                    ResultSet rs1 = stmt.executeQuery();
+                    while (rs1.next()) {
+                        int month = rs1.getInt("month");
+                        int count = rs1.getInt("numar_concedii");
+                        leaveCountMap.put(month, count);
+                    }
 
-function submitForm() {
-    const form = document.getElementById("statusForm");
-    const data = new FormData(form);
-    const params = new URLSearchParams(data).toString();
-    fetch("sometest.jsp?" + params)
-        .then(response => response.text())
-        .then(html => {
-            document.open();
-            document.write(html);
-            document.close();
-        });
-}
-</script>
-                
-                <%
+                    ArrayList<Integer> months = new ArrayList<>();
+                    ArrayList<Integer> counts = new ArrayList<>();
+                    for (int i = 1; i <= 12; i++) {
+                        months.add(i);
+                        counts.add(leaveCountMap.get(i));
+                    }
+
+                    // Add data to JavaScript arrays for the chart
+                    out.println("<script>");
+                    out.println("var monthsData = [" + join(months, ",") + "];");
+                    out.println("var countsData = [" + join(counts, ",") + "];");
+                    out.println("</script>");
+                }
+%>
+                <div class="container" id="content">
+                    <div id="myChart"></div>
+                </div>
+                <button onclick="generate()">Generate PDF</button>
+
+                <script>
+                    window.onload = function() {
+                        zingchart.render({
+                            id: "myChart",
+                            width: "100%",
+                            height: 400,
+                            data: {
+                                "type": "bar",
+                                "title": {
+                                    "text": "Numar angajati / luna"
+                                },
+                                "scale-x": {
+                                    "labels": monthsData
+                                },
+                                "plot": {
+                                    "line-width": 1
+                                },
+                                "series": [{
+                                    "values": countsData
+                                }]
+                            }
+                        });
+                    };
+
+                    function generate() {
+                        const element = document.getElementById("content");
+                        html2pdf()
+                        .from(element)
+                        .save();
+                    }
+
+                    function submitForm() {
+                        const form = document.getElementById("statusForm");
+                        const data = new FormData(form);
+                        const params = new URLSearchParams(data).toString();
+                        fetch("pean.jsp?" + params)
+                            .then(response => response.text())
+                            .then(html => {
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            });
+                    }
+                </script>
+<%
             } else {
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Date introduse incorect sau nu exista date!');");
@@ -339,5 +255,5 @@ function submitForm() {
     response.sendRedirect("login.jsp");
 }
 %>
-</body>  
+</body>
 </html>
