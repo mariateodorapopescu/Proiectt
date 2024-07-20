@@ -112,24 +112,6 @@ if (sesi != null) {
                 int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
                 int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
                 
-                out.print("<div class='navigation'>");
-                out.print("<form action='" + request.getContextPath() + "/sometest.jsp' method='post' style='display: inline;'>");
-                out.print("<input type='hidden' name='selectedMonth' value='" + (currentMonth == 1 ? 12 : currentMonth - 1) + "'/>");
-                out.print("<input type='hidden' name='selectedYear' value='" + (currentMonth == 1 ? currentYear - 1 : currentYear) + "'/>");
-                out.print("<input type='hidden' name='status' value='" + status + "'/>");
-                out.print("<input type='hidden' name='dep' value='" + dep + "'/>");
-                out.print("<input type='submit' value='❮ Anterior' />");
-                out.print("</form>");
-                out.print("<h1>" + getMonthName(currentMonth) + " " + currentYear + "</h1>");
-                out.print("<form action='" + request.getContextPath() + "/sometest.jsp' method='post' style='display: inline;'>");
-                out.print("<input type='hidden' name='selectedMonth' value='" + (currentMonth == 12 ? 1 : currentMonth + 1) + "'/>");
-                out.print("<input type='hidden' name='selectedYear' value='" + (currentMonth == 12 ? currentYear + 1 : currentYear) + "'/>");
-                out.print("<input type='hidden' name='status' value='" + status + "'/>");
-                out.print("<input type='hidden' name='dep' value='" + dep + "'/>");
-                out.print("<input type='submit' value='Următor ❯' />");
-                out.print("</form>");
-                out.print("</div>");
-                
                 %>
                 <div class="login__check">
                     <form id="statusForm" onsubmit="return false;">
@@ -177,12 +159,13 @@ if (sesi != null) {
                 for (int i = 1; i <= daysInMonth; i++) {
                     leaveCountMap.put(i, 0);
                 }
-
-                if (dep == -1 && status == 3) {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT day(leave_date) AS leave_day, COUNT(*) AS plecati FROM (SELECT start_c + INTERVAL n DAY AS leave_date FROM concedii JOIN numbers ON n <= DATEDIFF(end_c, start_c)) AS all_dates WHERE MONTH(leave_date) = ? AND YEAR(leave_date) = ? GROUP BY leave_date ORDER BY leave_date;")) {
-                        stmt.setInt(1, currentMonth);
-                        stmt.setInt(2, currentYear);
-                        ResultSet rs1 = stmt.executeQuery();
+                
+                if (dep == -1 && status != 3) {
+                    try (PreparedStatement stmt = connection.prepareStatement("SELECT month_dates AS month, ceil(COUNT(*)/2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii where status = ? UNION ALL SELECT end_c FROM concedii where status = ? UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c)) AS combined_dates GROUP BY monthname(month_dates);")) {
+                    	stmt.setInt(1, status);
+                        stmt.setInt(2, status);
+                        
+                    	ResultSet rs1 = stmt.executeQuery();
                         while (rs1.next()) {
                             int day = rs1.getInt("leave_day");
                             int count = rs1.getInt("plecati");
@@ -202,11 +185,9 @@ if (sesi != null) {
                         out.println("var countsData = [" + join(counts, ",") + "];");
                         out.println("</script>");
                     }
-                } else if (status != 3 && dep == -1) {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT day(leave_date) AS leave_day, COUNT(*) AS plecati FROM (SELECT start_c + INTERVAL n DAY AS leave_date FROM concedii JOIN numbers ON n <= DATEDIFF(end_c, start_c) WHERE status = ?) AS all_dates WHERE MONTH(leave_date) = ? AND YEAR(leave_date) = ? GROUP BY leave_date ORDER BY leave_date;")) {
-                        stmt.setInt(1, status);
-                        stmt.setInt(2, currentMonth);
-                        stmt.setInt(3, currentYear);
+                } else if (status == 3 && dep == -1) {
+                    try (PreparedStatement stmt = connection.prepareStatement("SELECT month_dates AS month, ceil(COUNT(*)/2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii UNION ALL SELECT end_c FROM concedii UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c)) AS combined_dates GROUP BY monthname(month_dates);")) {
+                    	
                         ResultSet rs1 = stmt.executeQuery();
                         while (rs1.next()) {
                             int day = rs1.getInt("leave_day");
