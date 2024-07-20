@@ -180,6 +180,42 @@ if (sesi != null) {
                 }
 %>
                 <div class="container" id="content">
+                <h1> Vizualizare concedii
+                <%
+                if (status == 0) {
+                	out.println("neaprobate");
+                } 
+                if (status == 2) {
+                	out.println("aprobate director");
+                } 
+                if (status == 1) {
+                	out.println("aprobate sef");
+                } 
+                if (status == -1) {
+                	out.println("respinse sef");
+                }
+                if (status == 0) {
+                	out.println("respinse director");
+                }
+                if (status == 3) {
+                	out.println("cu orice status");
+                }
+                if (dep == -1) {
+                	out.println("pe toata institutia");
+                } else {
+                	  try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
+                          try (ResultSet rs1 = stm.executeQuery()) {
+                              while (rs1.next()) {
+                                  int id = rs1.getInt("id_dep");
+                                  String nume = rs1.getString("nume_dep");
+                                  if(dep == id)
+                                  out.println("din departamentul " + nume);
+                              }
+                          }
+                      }
+                }
+                %>
+                </h1>
                     <div id="myChart"></div>
                 </div>
                 <button onclick="generate()">Generate PDF</button>
