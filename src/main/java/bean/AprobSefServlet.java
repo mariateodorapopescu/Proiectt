@@ -20,7 +20,9 @@ public class AprobSefServlet extends HttpServlet {
     public void init() {
         dep = new AprobSefDao();
     }
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	doPost(request, response);
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	 HttpSession sesi = request.getSession(false); // This returns HttpSession directly
          if (sesi == null) {

@@ -20,22 +20,8 @@
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <title>Acasa</title>
     <style>
-        iframe {
-            width: 100%;
-            border: none;
-            transition: height 0.5s ease;
-            overflow: hidden; /* Hide scrollbars */
-            overflow-y: hidden; /* Hide vertical scrollbar */
-            /* Hide scrollbar for Chrome, Safari and Opera */
-             -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-height: 90%;
-border-radius: 2em;
-        }
-        iframe::-webkit-scrollbar {
-  display: none;
-}
         
+        a, a:visited, a:hover, a:active{color:#eaeaea !important}
     </style>
 </head>
 <body>
@@ -72,7 +58,6 @@ border-radius: 2em;
                         }
                     } else {
                     	int id = rs.getInt("id");
-                    	String nume = rs.getString("prenume");
                     	 int cate = -1;
                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
                              // Check for upcoming leaves in 3 days
@@ -95,104 +80,16 @@ border-radius: 2em;
                          }
                     	%>
                     	
-                    	<div class="sidebar">
-        <ul>
-            <li class="logo" style="--bg: #333;">
-                <a href="#">
-                    <div class="siicon">
-                        <ion-icon name="airplane"></ion-icon>
-                    </div>
-                    <div class="sitext">Concedii</div>
-                </a>
-            </li>
-            <div class="menuToggle"></div>
-            <div class="menulist">
-                <li style="--bg: #3F48CC;;"  class="active">
-                    <a href="#">
-                        <div class="siiconn">
-                            <ion-icon name="home"></ion-icon>
-                        </div>
-                        <div class="sitextt">Acasa</div>
-                    </a>
-                </li>
-                <li style="--bg: #3F48CC;;">
-                    <a href="viewang.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="people"></ion-icon>
-                        </div>
-                        <div class="sitextt">Angajati</div>
-                    </a>
-                </li>
-                <li style="--bg: #3F48CC;;">
-                     <a href="concediinoidir.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="today"></ion-icon>
-                        </div>
-                        <div class="sitextt">Notificari</div>
-                    </a>
-                </li>
-                <li style="--bg: #3F48CC;">
-                     <a href="vizualizareconcedii.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="stats"></ion-icon>
-                        </div>
-                        <div class="sitextt">Rapoarte</div>
-                    </a>
-                </li>
-                <li style="--bg: #3F48CC;;">
-                    <a href="#">
-                        <div class="siiconn">
-                            <ion-icon name="switch"></ion-icon>
-                        </div>
-                        <div class="sitextt">Configurari</div>
-                    </a>
-                </li>
-                <li style="--bg: #3F48CC;;">
-                    <a href="actiuni.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="apps"></ion-icon>
-                        </div>
-                        <div class="sitextt">Actiuni</div>
-                    </a>
-                </li>
-                <li style="--bg: #3F48CC;;">
-                    <a href="viewdep.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="briefcase"></ion-icon>
-                        </div>
-                        <div class="sitextt">Departamente</div>
-                    </a>
-                </li>
-            </div>
-            
-            <div class="sibottom">
-                <li style="--bg:#333;">
-                    <a href="despr.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <div class="imgbx">
-                                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
-                            </div>
-                        </div>
-                        <div class="sitextt"> <% out.println(nume);%></div>
-                    </a>
-                </li>
-                <li style="--bg: #333;">
-                   <a href="logout">
-                        <div class="siiconn">
-                            <ion-icon name="share-alt"></ion-icon>
-                        </div>
-                        
-                        
-                        <div class="sitextt">Deconectare</div>
-                    </a>
-                </li>
-                
-            </div>
-        </ul>
-    </div>
-    <div class="main-content">
-        <iframe name="iframe" id='iframe' src="about:blank"></iframe>
-    </div>
+                    	<div class="main-content">
+                    	<div class="intro">
+                <h3>Ce doriti sa faceti?</h3>
+                 <button style="--bg: #3F48CC;"> <a href = "viewcolegi.jsp" style="text-decoration:none;">Vizualizare angajati din toata institutia</a></button>
+       <button style="--bg: #3F48CC;"><a href = "viewangdep.jsp" style="text-decoration:none;">Vizualizare angajati dintr-un anumit departament</a></button>
+       <button style="--bg: #3F48CC;"><a href = "viewcolegidep.jsp" style="text-decoration:none;">Vizualizare angajati din departamentul meu</a></button>
+               
+               </div>
+               </div>
+   
     <script src="main.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
     <script>
