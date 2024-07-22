@@ -115,7 +115,7 @@
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
                             }
-                            out.println("</table>");
+                            // out.println("</table>");
                             //out.println(userType == 4 ? "<a href='adminok.jsp'>Inapoi</a>" : "<a href='dashboard.jsp'>Inapoi</a>");
                         }
                         %>

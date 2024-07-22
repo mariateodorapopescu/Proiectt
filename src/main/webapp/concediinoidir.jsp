@@ -6,17 +6,25 @@
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <html>
 <head>
-    <title>Aprobare concediu</title>
+    <title>Concedii noi</title>
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta charset="UTF-8">
+    
+    <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+   
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
      <style>
         
         a, a:visited, a:hover, a:active{text-decoration: none; color:#eaeaea !important}
-    </style>
-</head>
-<style>
         
         .status-icon {
             display: inline-block;
@@ -36,6 +44,7 @@
         .status-pending { background-color: #e0a800; }
         
     </style>
+    </head>
 <body>
 <%
     HttpSession sesi = request.getSession(false);
@@ -55,12 +64,39 @@
                     if (userType == 0) {  // Assuming only type 4 users can approve
                     	
                     	
-                    	out.println("<h1>Vizualizare angajati din toata institutia</h1><br>");
+                    	String today = null;
+                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            // Check for upcoming leaves in 3 days
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                // stmt.setInt(1, id);
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      today =  rs2.getString("today");
+                                    }
+                                }
+                            }
+                           
+                            // Display the user dashboard or related information
+                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                            // Add additional user-specific content here
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
                         %>
-                        <div class="container">
-                         <table>
-            <thead>
-                <tr>
+                        	<div class="main-content">
+        <div class="header">
+         </div>
+        <div class="content">
+            <div class="intro" id="content">
+            <h1>Cereri noi de concedii</h1>
+                <h3><%out.println(today); %></h3>
+                 <div class="events">
+                <table style="border-bottom: 1px solid #3F48CC;">
+                    <thead>
+                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
+                        
                     <th>Nr. crt</th>
                     <th>Departament</th>
                     <th>Nume</th>
@@ -73,10 +109,13 @@
                     <th>Tip concediu</th>
                     <th>Status</th>
                      <th>Aprobati</th>
-                      <th>Dezaprobati</th>
+                     <th>Respingeti</th>
                 </tr>
-            </thead>
-            <tbody><%
+                    </thead>
+                    <tbody>
+                    
+                    
+                    <%
                         try (PreparedStatement stmt = connection.prepareStatement("SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                 "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                 "FROM useri u " +
@@ -111,20 +150,16 @@
                     	
                          %>
                           </tbody>
-        </table>  </div><%
+                </table> 
+                              
+                </div>
+                <div class="into">
+                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
+                </div>
+                
+                <%
         
-        if (userType == 0) {
-            out.println("<a href ='dashboard.jsp'>Inapoi</a>");
-         }
-         if (userType == 1) {
-             out.println("<a href ='tip1ok.jsp'>Inapoi</a>");
-          }
-         if (userType == 2) {
-             out.println("<a href ='tip2ok.jsp'>Inapoi</a>");
-          }
-         if (userType == 3) {
-             out.println("<a href ='sefok.jsp'>Inapoi</a>");
-          }
+        
                     } else {
                     	switch (userType) {
                         case 1: response.sendRedirect("tip1ok.jsp"); break;
@@ -159,5 +194,17 @@
         response.sendRedirect("login.jsp");
     }
 %>
+<script>
+                   
+
+                    function generate() {
+                        const element = document.getElementById("content");
+                        html2pdf()
+                        .from(element)
+                        .save();
+                    }
+
+                   
+                </script>
 </body>
 </html>

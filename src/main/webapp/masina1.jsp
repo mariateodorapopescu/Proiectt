@@ -8,50 +8,23 @@
 
 <head>
     <title>Vizualizare concedii</title>
-    <meta charset="UTF-8">
+     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+   
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #e0f7fa;
-        }
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #00796b;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #00796b;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
+        
+        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+    
+    
         .status-icon {
             display: inline-block;
             width: 20px;
@@ -68,64 +41,11 @@
         .status-aprobat-director { background-color: #40854a; }
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
-        @media (max-width: 600px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            th, td {
-                text-align: right;
-            }
-            th {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            tr {
-                border: 1px solid #ccc;
-                margin-bottom: 5px;
-            }
-            td {
-                border: none;
-                border-bottom: 1px solid #eee;
-                position: relative;
-                padding-left: 50%;
-                text-align: left;
-            }
-            td:before {
-                position: absolute;
-                top: 6px;
-                left: 6px;
-                width: 45%;
-                padding-right: 10px;
-                white-space: nowrap;
-                content: attr(data-label);
-                font-weight: bold;
-                text-align: left;
-            }
-        }
+       
     </style>
 </head>
 
 <body>
-  <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Nr. crt</th>
-                    <th>Departament</th>
-                    <th>Nume</th>
-                    <th>Prenume</th>
-                    <th>Functie</th>
-                    <th>Inceput</th>
-                    <th>Final</th>
-                    <th>Motiv</th>
-                    <th>Locatie</th>
-                    <th>Tip concediu</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-
 <%
     HttpSession sesi = request.getSession(false);
     if (sesi != null) {
@@ -168,6 +88,14 @@
                     	
                     	String sql = null;
                     	PreparedStatement stmtt2 = null;
+                    	%>
+                    	
+                    	<div class="main-content">
+        <div class="header">
+         </div>
+        <div class="content">
+            <div class="intro" id="content">             	
+                    	<%
                     	
                     	if (pag == 3) {
                			 out.println("<h1> Vizualizare concedii personale");
@@ -203,6 +131,52 @@
                			out.println(" pe perioada " + start + " - " + end + ". </h1>");
                		}
                     	
+               		String today = null;
+                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                           // Check for upcoming leaves in 3 days
+                           String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                           try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                               // stmt.setInt(1, id);
+                               try (ResultSet rs2 = stmt.executeQuery()) {
+                                   if (rs2.next()) {
+                                     today =  rs2.getString("today");
+                                   }
+                               }
+                           }
+                          
+                           // Display the user dashboard or related information
+                           //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                           // Add additional user-specific content here
+                       } catch (SQLException e) {
+                           out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                           e.printStackTrace();
+                       }
+                    	
+                    	%>
+                    	
+                    	
+                    	
+                <h3><%out.println(today); %></h3>
+                 <div class="events">
+                <table style="border-bottom: 1px solid #3F48CC;">
+                    <thead>
+                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
+                        
+                    <th>Nr. crt</th>
+                    <th>Departament</th>
+                    <th>Nume</th>
+                    <th>Prenume</th>
+                    <th>Functie</th>
+                    <th>Inceput</th>
+                    <th>Final</th>
+                    <th>Motiv</th>
+                    <th>Locatie</th>
+                    <th>Tip concediu</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                   <% 	
                     	if (pag == 3 || pag == 4 || pag == 5) {
                     		
                     		if (status == 3 && tip == -1 && perioada == 0) {
@@ -609,7 +583,28 @@
                           stmtt2.close();
                         
                     }
+           %>
+            </tbody>
+                </table> 
+                              
+                </div>
+                <div class="into">
+                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
+                <button style="--bg:#3F48CC;"><a href='about:blank.jsp'>Inapoi</a></button></div>
+                <script>
+                   
+
+                    function generate() {
+                        const element = document.getElementById("content");
+                        html2pdf()
+                        .from(element)
+                        .save();
+                    }
+
+                   
+                </script>
            
+           <%
                 }
             
             } catch (Exception e) {
@@ -635,8 +630,6 @@
     }
 
 %>
- </tbody>
-        </table>
-    </div>
+ 
 </body>
 </html>

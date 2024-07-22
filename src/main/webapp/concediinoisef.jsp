@@ -10,52 +10,22 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta charset="UTF-8">
+    
+    <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+   
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
      <style>
         
         a, a:visited, a:hover, a:active{text-decoration: none; color:#eaeaea !important}
-    </style>
-</head>
-<style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #e0f7fa;
-        }
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #00796b;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #00796b;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
+        
         .status-icon {
             display: inline-block;
             width: 20px;
@@ -72,42 +42,9 @@
         .status-aprobat-director { background-color: #40854a; }
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
-        @media (max-width: 600px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            th, td {
-                text-align: right;
-            }
-            th {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            tr {
-                border: 1px solid #ccc;
-                margin-bottom: 5px;
-            }
-            td {
-                border: none;
-                border-bottom: 1px solid #eee;
-                position: relative;
-                padding-left: 50%;
-                text-align: left;
-            }
-            td:before {
-                position: absolute;
-                top: 6px;
-                left: 6px;
-                width: 45%;
-                padding-right: 10px;
-                white-space: nowrap;
-                content: attr(data-label);
-                font-weight: bold;
-                text-align: left;
-            }
-        }
+        
     </style>
+    </head>
 <body>
 <%
     HttpSession sesi = request.getSession(false);
@@ -127,12 +64,39 @@
                     if (userType == 3) {  // Assuming only type 4 users can approve
                     	
                     	
-                    	out.println("<h1>Vizualizare angajati din toata institutia</h1><br>");
+                    	String today = null;
+                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            // Check for upcoming leaves in 3 days
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                // stmt.setInt(1, id);
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      today =  rs2.getString("today");
+                                    }
+                                }
+                            }
+                           
+                            // Display the user dashboard or related information
+                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                            // Add additional user-specific content here
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
                         %>
-                        <div class="container">
-                         <table>
-            <thead>
-                <tr>
+                        	<div class="main-content">
+        <div class="header">
+         </div>
+        <div class="content">
+            <div class="intro" id="content">
+           <h1>Cereri noi de concedii</h1>
+                <h3><%out.println(today); %></h3>
+                 <div class="events">
+                <table style="border-bottom: 1px solid #3F48CC;">
+                    <thead>
+                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
+                        
                     <th>Nr. crt</th>
                     <th>Departament</th>
                     <th>Nume</th>
@@ -145,10 +109,13 @@
                     <th>Tip concediu</th>
                     <th>Status</th>
                      <th>Aprobati</th>
-                      <th>Dezaprobati</th>
+                     <th>Respingeti</th>
                 </tr>
-            </thead>
-            <tbody><%
+                    </thead>
+                    <tbody>
+                    
+                    
+                    <%
                         try (PreparedStatement stmt = connection.prepareStatement("SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                 "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                 "FROM useri u " +
@@ -170,10 +137,10 @@
                                         rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
 
                               
-                              if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
-                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobsef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
-                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='ressef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                              if (rs1.getString("status").compareTo("neaprobat") == 0) {
+                                  out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
+                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='aprobsef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='ressef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                               }}
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
@@ -183,20 +150,17 @@
                     	
                          %>
                           </tbody>
-        </table>  </div><%
+                </table> 
+                              
+                </div>
+                <div class="into">
+                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
+                
+                </div>
+                
+                <%
         
-        if (userType == 0) {
-            out.println("<a href ='dashboard.jsp'>Inapoi</a>");
-         }
-         if (userType == 1) {
-             out.println("<a href ='tip1ok.jsp'>Inapoi</a>");
-          }
-         if (userType == 2) {
-             out.println("<a href ='tip2ok.jsp'>Inapoi</a>");
-          }
-         if (userType == 3) {
-             out.println("<a href ='sefok.jsp'>Inapoi</a>");
-          }
+        
                     } else {
                     	switch (userType) {
                         case 1: response.sendRedirect("tip1ok.jsp"); break;
@@ -231,5 +195,17 @@
         response.sendRedirect("login.jsp");
     }
 %>
+<script>
+                   
+
+                    function generate() {
+                        const element = document.getElementById("content");
+                        html2pdf()
+                        .from(element)
+                        .save();
+                    }
+
+                   
+                </script>
 </body>
 </html>

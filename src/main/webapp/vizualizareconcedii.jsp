@@ -67,7 +67,7 @@
          <td><a href="pean.jsp" class="load-content" target="iframee">Raport pe an</a></td>
           <td><a href="sometest.jsp" class="load-content" target="iframee">Raport lunar</a></td>
           <td><a href="testviewpers.jsp" class="load-content" target="iframee">Calendar</a></td>
-        <td><a href="about:blank" class="load-content">Inapoi</a></td>
+        <!-- <td><a href="about:blank" class="load-content">Inapoi</a></td> -->
     </tr>
 </table>
 <iframe name="iframee" id='iframee' src="#"></iframe>
