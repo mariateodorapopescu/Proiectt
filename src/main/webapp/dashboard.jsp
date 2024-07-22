@@ -108,7 +108,7 @@ border-radius: 2em;
             <div class="menuToggle"></div>
             <div class="menulist">
                 <li style="--bg: #3F48CC;;"  class="active">
-                    <a href="#">
+                     <a href="homedir.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="home"></ion-icon>
                         </div>
@@ -139,14 +139,7 @@ border-radius: 2em;
                         <div class="sitextt">Rapoarte</div>
                     </a>
                 </li>
-                <li style="--bg: #3F48CC;;">
-                    <a href="#">
-                        <div class="siiconn">
-                            <ion-icon name="switch"></ion-icon>
-                        </div>
-                        <div class="sitextt">Configurari</div>
-                    </a>
-                </li>
+                
                 <li style="--bg: #3F48CC;;">
                     <a href="actiuni.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -161,6 +154,14 @@ border-radius: 2em;
                             <ion-icon name="briefcase"></ion-icon>
                         </div>
                         <div class="sitextt">Departamente</div>
+                    </a>
+                </li>
+                <li style="--bg: #3F48CC;;">
+                    <a href="#">
+                        <div class="siiconn">
+                            <ion-icon name="switch"></ion-icon>
+                        </div>
+                        <div class="sitextt">Configurari</div>
                     </a>
                 </li>
             </div>
@@ -191,7 +192,7 @@ border-radius: 2em;
         </ul>
     </div>
     <div class="main-content">
-        <iframe name="iframe" id='iframe' src="about:blank"></iframe>
+        <iframe name="iframe" id='iframe' src="homedir.jsp"></iframe>
     </div>
     <script src="main.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
