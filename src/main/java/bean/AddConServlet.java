@@ -86,7 +86,7 @@ public class AddConServlet extends HttpServlet {
         con.setLocatie(locatie);
         con.setTip(tip);
         con.setDurata(durata);
-        
+      
         try {
 			if (!maimulteconcedii(request)) {
 				 response.setContentType("text/html;charset=UTF-8");
@@ -397,7 +397,7 @@ public class AddConServlet extends HttpServlet {
 		public static boolean maimulteconcedii(HttpServletRequest request) throws ClassNotFoundException, IOException {
 		    int nr = 0;
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-		    String QUERY = "SELECT conramase FROM useri WHERE useri.id = ?;";
+		    String QUERY = "SELECT conluate FROM useri WHERE useri.id = ?;";
 		    int uid = Integer.valueOf(request.getParameter("userId"));
 
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -436,7 +436,7 @@ public class AddConServlet extends HttpServlet {
 			    }
 
 		    Set<LocalDate> holidays = getLegalHolidays();
-		    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and status > 0;";
+		    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and status >= 0;";
 
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 		         PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
@@ -458,9 +458,9 @@ public class AddConServlet extends HttpServlet {
 		        throw new IOException("Eroare la baza de date", e);
 		    }
 		    if (userType == 2) {
-		        return nr < 30;
+		        return nr <= 30;
 		    }
-		    return nr < 40;
+		    return nr <= 40;
 		}
 		
 		public static Set<LocalDate> getLegalHolidays() {
@@ -499,59 +499,26 @@ public class AddConServlet extends HttpServlet {
 			        throw new IOException("Eroare la baza de date", e);
 			    }
 
-			    return nr < 1;
+			    return nr <= 1;
 		}
-		
-		public static int contor(Data startt, Data endd) {
-			int contor = 0;
-	        if (startt.getLuna() == endd.getLuna()) {
-	            contor = endd.getZi() - startt.getZi() + 1;
-	        } else {
-	            if (startt.getLuna() == 1 || startt.getLuna() == 3 || startt.getLuna() == 5 || startt.getLuna() == 7
-	                    || startt.getLuna() == 8 || startt.getLuna() == 10 || startt.getLuna() == 12) {
-	                contor = 31 - startt.getZi() + endd.getZi() + 1;
-	            } else if (startt.getLuna() == 4 || startt.getLuna() == 6 || startt.getLuna() == 9 || startt.getLuna() == 11) {
-	                contor = 30 - startt.getZi() + endd.getZi() + 1;
-	            } else {
-	                if (startt.getAn() % 4 == 0) {
-	                    contor = 29 - startt.getZi() + endd.getZi() + 1;
-	                } else {
-	                    contor = 28 - startt.getZi() + endd.getZi() + 1;
-	                }
-	            }
-	        }
-	        return contor;
-	    }
 		
 		public static boolean maimultezileodata(ConcediuCon concediu) {
 		    LocalDate start_c = LocalDate.parse(concediu.getStart());
 		    LocalDate end_c = LocalDate.parse(concediu.getEnd());
 
-		    Set<LocalDate> holidays = new HashSet<>();
-		    int year = start_c.getYear(); 
-		    holidays.add(LocalDate.of(year, 1, 1)); 
-		    holidays.add(LocalDate.of(year, 1, 2)); 
-		    holidays.add(LocalDate.of(year, 1, 6)); 
-		    holidays.add(LocalDate.of(year, 1, 7));
-		    holidays.add(LocalDate.of(year, 1, 24)); 
-		    holidays.add(LocalDate.of(year, 5, 1)); 
-		    holidays.add(LocalDate.of(year, 6, 1)); 
-		    holidays.add(LocalDate.of(year, 8, 15));
-		    holidays.add(LocalDate.of(year, 11, 30)); 
-		    holidays.add(LocalDate.of(year, 12, 1));
-		    holidays.add(LocalDate.of(year, 12, 25));
-		    holidays.add(LocalDate.of(year, 12, 26)); 
+		    Set<LocalDate> holidays = getLegalHolidays();
 		    
 		    int countDays = 0;
 		    LocalDate current = start_c;
 		    while (!current.isAfter(end_c)) {
+		    	
 		        if (!holidays.contains(current)) {
 		            countDays++;
 		        }
 		        current = current.plusDays(1);
 		    }
 
-		    return countDays < 21;
+		    return countDays <= 21;
 		}
 		
 		public static Data stringToDate(String dateString) {

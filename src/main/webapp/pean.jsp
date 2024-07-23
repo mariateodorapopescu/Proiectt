@@ -85,45 +85,7 @@ if (sesi != null) {
                 int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 
 %>
-                <div class="login__check">
-                    <form id="statusForm" onsubmit="return false;">
-                        <div>
-                            <label class="login__label">Status</label>
-                            <select name="status" class="login__input" onchange="submitForm()">
-                                <option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("status");
-                                            String nume = rs1.getString("nume_status");
-                                            out.println("<option value='" + id + "' " + (status == id ? "selected" : "") + ">" + nume + "</option>");
-                                        }
-                                    }
-                                }
-                                %>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="login__label">Departament</label>
-                            <select name="dep" class="login__input" onchange="submitForm()">
-                                <option value="-1" <%= (dep == -1 ? "selected" : "") %>>Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("id_dep");
-                                            String nume = rs1.getString("nume_dep");
-                                            out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
-                                        }
-                                    }
-                                }
-                                %>
-                            </select>
-                        </div>
-                        <input type="submit" value="submit">
-                    </form>
-                </div>
+                
 <%
                 Map<Integer, Integer> leaveCountMap = new HashMap<>();
                 for (int i = 1; i <= 12; i++) {
@@ -180,8 +142,9 @@ if (sesi != null) {
                 }
 %>
                 <div class="container" id="content">
-                <h1> Vizualizare concedii
+                <h3 style="text-align: center;"> Vizualizare concedii
                 <%
+                // note to self -> ca sa apara tot graficul pe pagina, sa fie el vizibil mai intai pe pagina
                 if (status == 0) {
                 	out.println("neaprobate");
                 } 
@@ -215,11 +178,49 @@ if (sesi != null) {
                       }
                 }
                 %>
-                </h1>
+                </h3>
                     <div id="myChart"></div>
                 </div>
-                <button onclick="generate()">Generate PDF</button>
-
+                <button onclick="generatePDF()">Generate PDF</button>
+<div class="login__check">
+                    <form id="statusForm" onsubmit="return false;">
+                        <div>
+                            <label class="login__label">Status</label>
+                            <select name="status" class="login__input" onchange="submitForm()">
+                                <option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
+                                <%
+                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
+                                    try (ResultSet rs1 = stm.executeQuery()) {
+                                        while (rs1.next()) {
+                                            int id = rs1.getInt("status");
+                                            String nume = rs1.getString("nume_status");
+                                            out.println("<option value='" + id + "' " + (status == id ? "selected" : "") + ">" + nume + "</option>");
+                                        }
+                                    }
+                                }
+                                %>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="login__label">Departament</label>
+                            <select name="dep" class="login__input" onchange="submitForm()">
+                                <option value="-1" <%= (dep == -1 ? "selected" : "") %>>Oricare</option>
+                                <%
+                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
+                                    try (ResultSet rs1 = stm.executeQuery()) {
+                                        while (rs1.next()) {
+                                            int id = rs1.getInt("id_dep");
+                                            String nume = rs1.getString("nume_dep");
+                                            out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
+                                        }
+                                    }
+                                }
+                                %>
+                            </select>
+                        </div>
+                        <input type="submit" value="submit">
+                    </form>
+                </div>
                 <script>
                     window.onload = function() {
                         zingchart.render({
@@ -263,6 +264,26 @@ if (sesi != null) {
                                 document.close();
                             });
                     }
+                    
+                    function generatePDF() {
+                        const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
+                        html2pdf().set({
+                            pagebreak: { mode: ['css', 'avoid-all'] },
+                            html2canvas: {
+                                scale: 2, // Increase scale to enhance quality
+                                logging: true,
+                                dpi: 192,
+                                letterRendering: true,
+                                useCORS: true // Ensures external content is handled properly
+                            },
+                            jsPDF: {
+                                unit: 'pt',
+                                format: 'a4',
+                                orientation: 'landscape' // Adjusts orientation to landscape if the content is wide
+                            }
+                        }).from(element).save();
+                    }
+                   
                 </script>
 <%
             } else {

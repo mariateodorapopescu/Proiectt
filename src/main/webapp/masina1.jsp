@@ -17,7 +17,7 @@
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-   
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <style>
@@ -94,7 +94,7 @@
         <div class="header">
          </div>
         <div class="content">
-            <div class="intro" id="content">             	
+            <div class="intro">             	
                     	<%
                     	
                     	if (pag == 3) {
@@ -153,11 +153,9 @@
                        }
                     	
                     	%>
-                    	
-                    	
-                    	
+ 	
                 <h3><%out.println(today); %></h3>
-                 <div class="events">
+                 <div class="events"  id="content">
                 <table style="border-bottom: 1px solid #3F48CC;">
                     <thead>
                         <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
@@ -589,20 +587,33 @@
                               
                 </div>
                 <div class="into">
-                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
+                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Descarcati PDF</button>
                 <button style="--bg:#3F48CC;"><a href='about:blank.jsp'>Inapoi</a></button></div>
                 <script>
-                   
+              
+                function generate() {
+                    const element = document.getElementById('content'); // Ensure you target the specific div
+                    html2pdf().set({
+                        pagebreak: { mode: ['css', 'legacy'] },
+                        html2canvas: {
+                            scale: 1, // Adjust scale to manage the size and visibility of content
+                            logging: true,
+                            dpi: 192,
+                            letterRendering: true,
+                            useCORS: true // This helps handle external content like images
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'landscape' // Change to 'landscape' if the content is too wide
+                        }
+                    }).from(element).save();
+                }
 
-                    function generate() {
-                        const element = document.getElementById("content");
-                        html2pdf()
-                        .from(element)
-                        .save();
-                    }
+            </script>
 
                    
-                </script>
+                
            
            <%
                 }

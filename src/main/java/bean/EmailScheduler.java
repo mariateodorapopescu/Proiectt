@@ -17,7 +17,7 @@ public class EmailScheduler implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(new EmailTask(), 0, 1, TimeUnit.DAYS); // Runs once a day
+        scheduler.scheduleAtFixedRate((Runnable) new EmailUtil(), 0, 1, TimeUnit.DAYS); // Runs once a day
     }
 
     @Override
