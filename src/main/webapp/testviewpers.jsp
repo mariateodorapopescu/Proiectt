@@ -15,6 +15,13 @@
       <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <style>
+    .leave-1 { background-color: #90ee90; } /* Light green for 1 person */
+    .leave-2 { background-color: #ffff99; } /* Yellow for 2 people */
+    .leave-3 { background-color: #ffcc99; } /* Orange for 3 people */
+    .leave-more { background-color: #ff6666; } /* Red for more than 3 people */
+</style>
+    
 </head>
 <body>
 <div class="container calendar-container">
@@ -45,6 +52,8 @@
 </form>
 <script src="./responsive-login-form-main/assets/js/calendar3.js"></script>
 <script>
+
+
     document.addEventListener('DOMContentLoaded', (event) => {
         // Add event listener for all calendar cells
         document.getElementById('calendar-body').addEventListener('click', function(e) {
@@ -57,7 +66,22 @@
             }
         });
     });
+    
+    
+    
 </script>
+<%
+Map<String, ArrayList<String>> persoane = new HashMap<>();  
+
+%>
+<script>
+    var leaveData = {
+        <% for (Map.Entry<String, ArrayList<String>> entry : persoane.entrySet()) { %>
+            "<%= entry.getKey() %>": <%= entry.getValue().size() %>,
+        <% } %>
+    };
+</script>
+
 <%
 HttpSession sesi = request.getSession(false);
 if (sesi != null) {
@@ -76,6 +100,7 @@ if (sesi != null) {
                     response.sendRedirect("adminok.jsp");
                     return;
                 }
+                /*
                 String data = request.getParameter("selectedDate");
                 String nume = null, prenume = null, fullnume = null;
                 ArrayList<String> persoane = new ArrayList<String>();  
@@ -92,16 +117,48 @@ if (sesi != null) {
                         }
                     }
                 }
-                out.println("<h2>Persoane in concediu pe data de " + data + ":</h2>");
+                */
+                String data = null;
+                 data = request.getParameter("selectedDate");
+                String nume = null;
+                String prenume = null;
+                String fullnume = null;
+                int nr = 0;
+               
+                try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ?")) {
+                    stmt.setString(1, data);
+                    stmt.setString(2, data);
+                    ResultSet rs1 = stmt.executeQuery();
+                    while (rs1.next()) {
+                    	
+                        nume = rs1.getString("nume");
+                        prenume = rs1.getString("prenume");
+                        fullnume = nume + " " + prenume;
+                        if (persoane.get(data)==null) {
+                        	persoane.put(data, new ArrayList<>(Arrays.asList(fullnume)));
+                        } else {
+                        	persoane.get(data).add(fullnume);
+                        }
+                    }
+                }
+               
+                for (String date : persoane.keySet()) {
+                	
+                	nr = persoane.get(date).size();
+                	
+                }
+
+                out.println("<h2>Persoane (in numar de " + nr + ") in concediu pe data de " + data + ":</h2>");
                 if (persoane.isEmpty()) {
                     out.println("<p>Nu exista persoane in concediu pe aceasta data.</p>");
                 } else {
                     out.println("<ul>");
-                    for (String persoana : persoane) {
+                    for (String persoana : persoane.get(data)) {
                         out.println("<li>" + persoana + "</li>");
                     }
                     out.println("</ul>");
                 }
+                
             } else {
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Date introduse incorect sau nu exista date!');");

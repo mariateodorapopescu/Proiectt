@@ -13,27 +13,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	function renderCalendar(month, year) {
 	    const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+	    const calendarBody = document.getElementById('calendar-body');
 	    calendarBody.innerHTML = '';
-	    let firstDay = (new Date(year, month).getDay() + 6) % 7;  // Adjust to start week on Monday
-
+	    let firstDay = (new Date(year, month).getDay() + 6) % 7;
 	    const daysInMonth = 32 - new Date(year, month, 32).getDate();
 	    let date = 1;
-
-	    // Display the month and year
-	    monthYear.textContent = monthNames[month] + " " + year;
-
-	    for (let i = 0; i < 6; i++) {  // Enough rows for all possible days
+		monthYear.textContent = monthNames[month] + " " + year;
+	    for (let i = 0; i < 6; i++) {
 	        let row = document.createElement('tr');
 	        for (let j = 0; j < 7; j++) {
 	            let cell = document.createElement('td');
-				cell.setAttribute('data-date', `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`);
-	            if (i === 0 && j < firstDay) {
-	                cell.appendChild(document.createTextNode(''));  // Fill with empty text for days before the first day
-	            } else if (date > daysInMonth) {
-	                cell.appendChild(document.createTextNode(''));  // Fill remaining cells after the last day
+	            if (i === 0 && j < firstDay || date > daysInMonth) {
+	                cell.appendChild(document.createTextNode(''));
 	            } else {
-	                let cellText = document.createTextNode(date);
-	                cell.appendChild(cellText);
+	                let fullDate = `${year}-${(month+1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+	                cell.setAttribute('data-date', fullDate);
+	                cell.appendChild(document.createTextNode(date));
+	                cell.className += getLeaveClass(leaveData[fullDate]);
 	                date++;
 	            }
 	            row.appendChild(cell);
@@ -41,6 +37,16 @@ document.addEventListener("DOMContentLoaded", function() {
 	        calendarBody.appendChild(row);
 	    }
 	}
+
+	function getLeaveClass(count) {
+	    if (!count) return ''; // No leaves
+	    if (count === 1) return ' leave-1';
+	    if (count === 2) return ' leave-2';
+	    if (count === 3) return ' leave-3';
+	    if (count > 3) return ' leave-more';
+	    return '';
+	}
+
 
 
     function highlightDate() {
