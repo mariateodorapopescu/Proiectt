@@ -57,19 +57,9 @@ border-radius: 2em;
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
                 } else {
-                    if (rs.getString("tip").compareTo("0") != 0) {
-                        if (rs.getString("tip").compareTo("1") == 0) {
-                            response.sendRedirect("tip1ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("2") == 0) {
-                            response.sendRedirect("tip2ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("3") == 0) {
-                            response.sendRedirect("sefok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("4") == 0) {
+                    if (rs.getString("tip").compareTo("4") == 0) {
                             response.sendRedirect("adminok.jsp");
-                        }
+                        
                     } else {
                     	int id = rs.getInt("id");
                     	String nume = rs.getString("prenume");

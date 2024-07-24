@@ -89,15 +89,12 @@
                 if (rs.next()) {
                     int userId = rs.getInt("id");
                     int userType = rs.getInt("tip");
-                    String zile = rs.getString("zileramase");
-                    String con = rs.getString("conramase");
-                    if (userType != 0) {
-                        switch (userType) {
-                            case 1: response.sendRedirect("tip1ok.jsp"); break;
-                            case 2: response.sendRedirect("tip2ok.jsp"); break;
-                            case 3: response.sendRedirect("sefok.jsp"); break;
-                            case 4: response.sendRedirect("adminok.jsp"); break;
-                        }
+                   // String zile = rs.getString("zileramase");
+                    //System.out.println(zile);
+                   //  String con = rs.getString("conramase");
+                    if (userType == 4) {
+                        response.sendRedirect("adminok.jsp"); 
+                        
                     } else {
                         %>
                         <div class="flex-container">
@@ -123,13 +120,12 @@
                                         <!-- Calendar will be generated here -->
                                     </tbody>
                                 </table>
-                                <p>Zile selectate: <span id="selectedDays">0</span></p>
-                                <p>Zile ramase: <span id="remainingDays"><%= zile %></span></p>
+                                
                             </div>
                             <div class="form-container">
                          
     
-                                <form action="<%= request.getContextPath() %>/viewangdep2.jsp" method="post" class="login__form">
+                                <form action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
                                     <div>
                                         <h1 class="login__title"><span>Adaugare concediu</span></h1>
                                         <%
@@ -169,6 +165,7 @@
                                                 <input type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
                                             </div>
                                         </div>
+                                       <% out.println("<input type='hidden' name='userId' value='" + userId + "'/>"); %> 
                                         <div class="login__buttons">
                                             <input type="submit" value="Adaugare" class="login__button login__button-ghost">
                                         </div>

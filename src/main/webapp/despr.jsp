@@ -42,19 +42,9 @@
                     out.println("</script>");
                 } else {
                     int userType = rs.getInt("tip");
-                    if (userType == 1 || userType == 2 || userType == 3) {
-                    	 if (rs.getString("tip").compareTo("1") == 0) {
-                         	response.sendRedirect("tip1ok.jsp");
-                         }
-                         if (rs.getString("tip").compareTo("2") == 0) {
-                         	response.sendRedirect("tip2ok.jsp");
-                         }
-                         if (rs.getString("tip").compareTo("3") == 0) {
-                         	response.sendRedirect("sefok.jsp");
-                         }
-                         if (rs.getString("tip").compareTo("4") == 0) {
+                    if (rs.getString("tip").compareTo("4") == 0) {
                           	response.sendRedirect("adminok.jsp");
-                          }
+                          
                     } else {
                     	String today = null;
                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {

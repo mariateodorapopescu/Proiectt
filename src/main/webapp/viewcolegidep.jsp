@@ -43,7 +43,7 @@
                 } else {
                     int userType = rs.getInt("tip");
                     int userdep = rs.getInt("id_dep");
-                    if (userType == 1 || userType == 2 || userType == 3) {
+                    if (userType == 1 || userType == 2 || userType == 4) {
                     	 if (rs.getString("tip").compareTo("1") == 0) {
                          	response.sendRedirect("tip1ok.jsp");
                          }
@@ -90,7 +90,7 @@
             
                
                  <div class="events"  id="content">
-                 <h1>Angajati din toata institutia</h1>
+                 <h1>Angajati din departamentul meu</h1>
                 <h3><%out.println(today); %></h3>
                 <table style="border-bottom: 1px solid #3F48CC;">
                     <thead>

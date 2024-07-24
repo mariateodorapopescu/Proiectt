@@ -117,7 +117,7 @@ border-radius: 2em;
                 </li>
                
                 <li style="--bg: #3F48CC;;">
-                     <a href="concediinoidir.jsp" class="load-content" target="iframe">
+                     <a href="concediinoieu2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="today"></ion-icon>
                         </div>
@@ -125,7 +125,7 @@ border-radius: 2em;
                     </a>
                 </li>
                 <li style="--bg: #3F48CC;">
-                     <a href="vizualizareconcedii.jsp" class="load-content" target="iframe">
+                     <a href="viewang2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="stats"></ion-icon>
                         </div>

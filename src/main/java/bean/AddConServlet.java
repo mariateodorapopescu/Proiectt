@@ -397,7 +397,7 @@ public class AddConServlet extends HttpServlet {
 		public static boolean maimulteconcedii(HttpServletRequest request) throws ClassNotFoundException, IOException {
 		    int nr = 0;
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-		    String QUERY = "SELECT conluate FROM useri WHERE useri.id = ?;";
+		    String QUERY = "SELECT * FROM useri WHERE useri.id = ?;";
 		    int uid = Integer.valueOf(request.getParameter("userId"));
 
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
