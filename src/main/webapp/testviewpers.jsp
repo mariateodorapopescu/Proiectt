@@ -102,38 +102,16 @@ if (sesi != null) {
                     response.sendRedirect("adminok.jsp");
                     return;
                 }
-                /*
-                String data = request.getParameter("selectedDate");
-                String nume = null, prenume = null, fullnume = null;
-                ArrayList<String> persoane = new ArrayList<String>();  
-                if (data != null && !data.isEmpty()) {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ?")) {
-                        stmt.setString(1, data);
-                        stmt.setString(2, data);
-                        ResultSet rs1 = stmt.executeQuery();
-                        while (rs1.next()) {
-                            nume = rs1.getString("nume");
-                            prenume = rs1.getString("prenume");
-                            fullnume = nume + " " + prenume;
-                            persoane.add(fullnume);
-                        }
-                    }
-                }
-                */
+            
                 String data = null;
                 
                 data = request.getParameter("selectedDate");
-                String lunaa = null;
-                lunaa = request.getParameter("month");
-               // System.out.println(lunaa);
+               
                String nume = null;
                String prenume = null;
                String fullnume = null;
                int nr = 0;
-              if(lunaa == null) {
-           	   System.out.println("meh???");
-              }
-              //System.out.println(lunaa);
+            
                  int year = request.getParameter("year") != null ? Integer.parseInt(request.getParameter("year")) : Calendar.getInstance().get(Calendar.YEAR);
                int month = request.getParameter("month") != null ? Integer.parseInt(request.getParameter("month")) - 1 : Calendar.getInstance().get(Calendar.MONTH);
 				month++;
@@ -170,23 +148,26 @@ if (sesi != null) {
                        }
                    }
                }
-             
-               
-               
-                   out.println("<h2>Persoane în concediu în luna " + (month) + ":</h2>");
-	                if (leaveDataByDate.isEmpty()) {
-	                    out.println("<p>Nu există persoane în concediu în această lună.</p>");
-	                } else {
-	                    out.println("<ul>");
-	                    for (Map.Entry<String, List<String>> entry : leaveDataByDate.entrySet()) {
-	                        String date = entry.getKey();
-	                        List<String> names = entry.getValue();
-	                        out.println("<li>" + date + ": " + String.join(", ", names) + "</li>");
-	                    }
-	                    out.println("</ul>");
-	                }
-               
-               
+            // Serializarea datelor în JSON
+               StringBuilder jsonBuilder = new StringBuilder("{");
+               boolean firstEntry = true;
+               for (Map.Entry<String, List<String>> entry : leaveDataByDate.entrySet()) {
+                   if (!firstEntry) jsonBuilder.append(",");
+                   jsonBuilder.append("\"").append(entry.getKey()).append("\":").append(entry.getValue().size());
+                   firstEntry = false;
+               }
+               jsonBuilder.append("}");
+               String jsonData = jsonBuilder.toString();
+%>
+<script>
+    var jsonData = <%= jsonData %>;
+    console.log(jsonData); // Verifică în consola browserului
+</script>
+<%
+               // Afișare date în format JSON pentru debug
+               // System.out.println("JSON Data: " + jsonData);
+            
+                 
                try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ?")) {
                    stmt.setString(1, data);
                    stmt.setString(2, data);

@@ -75,12 +75,14 @@ document.addEventListener("DOMContentLoaded", function() {
         currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
         currentYear = (currentMonth === 11) ? currentYear - 1 : currentYear;
         renderCalendar(currentMonth, currentYear);
+		updateCalendarDisplay();
     }
 
     function nextMonth() {
         currentMonth = (currentMonth + 1) % 12;
         currentYear = (currentMonth === 0) ? currentYear + 1 : currentYear;
         renderCalendar(currentMonth, currentYear);
+		updateCalendarDisplay();
     }
 
     document.querySelector('.navigation button:first-child').addEventListener('click', previousMonth);
@@ -99,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	            .then(response => response.text())
 	            .then(html => {
 	                document.innerHTML = html;
+					updateCalendar();
 	            })
 	            .catch(error => console.error('Error fetching data:', error));
 	    }
@@ -106,5 +109,77 @@ document.addEventListener("DOMContentLoaded", function() {
 	    // Inițializare cu luna și anul curent
 	    let today = new Date();
 	    updateCalendarDisplay(today.getFullYear(), today.getMonth());
-	
+		
+		function updateCalendar() {
+		        const cells = document.querySelectorAll('#calendar-body td[data-date]');
+		        cells.forEach(cell => {
+		            const date = cell.getAttribute('data-date');
+		            const leaveCount = leaveDataByDate[date] || 0;
+		            // Aplicarea stilului pe baza numărului de concedii
+		            cell.className = getLeaveClass(leaveCount);
+		            cell.title = leaveCount + " persoane în concediu"; // Tooltip informativ
+		        });
+		    }
+
+		    function getLeaveClass(count) {
+		        if (count === 0) return '';
+		        if (count === 1) return 'leave-1';
+		        if (count === 2) return 'leave-2';
+		        if (count === 3) return 'leave-3';
+		        if (count > 3) return 'leave-more';
+		    }
+
+		    // Așteaptă să se încarce datele înainte de a actualiza calendarul
+		    if (typeof leaveDataByDate !== 'undefined') {
+		        updateCalendar();
+		    }
+			
+
+			   // Actualizează display-ul calendarului
+			   function updateCalendarDisplay() {
+			       monthYear.textContent = `${getMonthName(currentMonth)} ${currentYear}`;
+			       fetchCalendarData(currentMonth, currentYear).then(() => {
+			           updateCalendar(); // Actualizează calendarul după ce datele sunt încărcate
+			       });
+			   }
+
+			   // Obține numele lunii
+			   function getMonthName(month) {
+			       const monthNames = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
+			                           "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
+			       return monthNames[month];
+			   }
+
+			   // Solicită datele pentru calendar de la server
+			   function fetchCalendarData(month, year) {
+			       return fetch(`testviewpers.jsp?year=${year}&month=${month + 1}`)
+			           .then(response => response.json())
+			           .then(data => {
+			               window.leaveDataByDate = data; // Salvează datele într-o variabilă globală
+			           })
+			           .catch(error => console.error('Error fetching data:', error));
+			   }
+
+			   // Actualizează calendarul cu datele încărcate
+			   function updateCalendar() {
+			       const cells = document.querySelectorAll('#calendar-body td[data-date]');
+			       cells.forEach(cell => {
+			           const date = cell.getAttribute('data-date');
+			           const leaveCount = jsonData[date] || 0;
+					   console.log(leaveCount);
+			           cell.className = getLeaveClass(leaveCount); // Aplică clasa corespunzătoare
+			       });
+			   }
+
+			   // Determină clasa pe baza numărului de persoane în concediu
+			   function getLeaveClass(count) {
+			       if (count === 0) return '';
+			       if (count === 1) return 'leave-1';
+			       if (count === 2) return 'leave-2';
+			       if (count === 3) return 'leave-3';
+			       return 'leave-more'; // Pentru 4 sau mai multe persoane
+			   }
+
+			   // Încarcă inițial datele pentru luna curentă
+			   updateCalendarDisplay();
 });
