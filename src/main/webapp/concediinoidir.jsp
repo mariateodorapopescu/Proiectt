@@ -22,10 +22,11 @@
    
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
-     <style>
+      <style>
         
-        a, a:visited, a:hover, a:active{text-decoration: none; color:#eaeaea !important}
-        
+        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+    
+    
         .status-icon {
             display: inline-block;
             width: 20px;
@@ -42,7 +43,33 @@
         .status-aprobat-director { background-color: #40854a; }
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
-        
+       
+       .tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+       
     </style>
     </head>
 <body>
@@ -89,10 +116,11 @@
         <div class="header">
          </div>
         <div class="content">
-            <div class="intro" id="content">
-            <h1>Cereri noi de concedii</h1>
+            <div class="intro" >
+           
+                 <div class="events" id="content">
+                  <h1>Cereri noi de concedii</h1>
                 <h3><%out.println(today); %></h3>
-                 <div class="events">
                 <table style="border-bottom: 1px solid #3F48CC;">
                     <thead>
                         <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
@@ -135,13 +163,34 @@
                                         rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Inceput'>" +
                                         rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
                                         rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
-
+                                if (rs1.getString("status").compareTo("neaprobat") == 0) {
+                                    out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
+                                    out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+                                    out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                                
+                                }
+                                if (rs1.getString("status").compareTo("dezaprobat sef") == 0) {
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                              	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                            }
+                                if (rs1.getString("status").compareTo("dezaprobat director") == 0) {
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                              	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                            }
+                                if (rs1.getString("status").compareTo("aprobat director") == 0) {
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                              	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                            }
+                                if (rs1.getString("status").compareTo("aprobat sef") == 0) {
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                              	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                            }
                               
-                              if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
-                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
-                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
-                              }}
+                             }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
                             }
@@ -195,16 +244,27 @@
     }
 %>
 <script>
-                   
+              
+                function generate() {
+                    const element = document.getElementById('content'); // Ensure you target the specific div
+                    html2pdf().set({
+                        pagebreak: { mode: ['css', 'legacy'] },
+                        html2canvas: {
+                            scale: 1, // Adjust scale to manage the size and visibility of content
+                            logging: true,
+                            dpi: 192,
+                            letterRendering: true,
+                            useCORS: true // This helps handle external content like images
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'landscape' // Change to 'landscape' if the content is too wide
+                        }
+                    }).from(element).save();
+                }
 
-                    function generate() {
-                        const element = document.getElementById("content");
-                        html2pdf()
-                        .from(element)
-                        .save();
-                    }
+            </script>
 
-                   
-                </script>
 </body>
 </html>

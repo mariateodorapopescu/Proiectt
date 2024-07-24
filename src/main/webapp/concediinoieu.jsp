@@ -24,8 +24,9 @@
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
      <style>
         
-        a, a:visited, a:hover, a:active{text-decoration: none; color:#eaeaea !important}
-        
+        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+    
+    
         .status-icon {
             display: inline-block;
             width: 20px;
@@ -42,7 +43,33 @@
         .status-aprobat-director { background-color: #40854a; }
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
-        
+       
+       .tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+       
     </style>
     </head>
 <body>
@@ -89,10 +116,12 @@
         <div class="header">
          </div>
         <div class="content">
-            <div class="intro" id="content">
-            <h1>Concedii personale</h1>
-                <h3><%out.println(today); %></h3>
-                 <div class="events">
+            <div class="intro" >
+            
+                
+                 <div class="events" id="content">
+                 <h1>Concedii personale</h1>
+                 <h3><%out.println(today); %></h3>
                 <table style="border-bottom: 1px solid #3F48CC;">
                     <thead>
                         <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
@@ -137,7 +166,7 @@
 
                               
                               if (rs1.getString("status").compareTo("neaprobat") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
                                   out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                                   out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                               }}
@@ -168,8 +197,8 @@
                                 rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
 
                       
-                      if (rs1.getString("status").compareTo("neaprobat") == 0) {
-                          out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-focus-line'></i></span></td>");
+                      if (rs1.getString("status").compareTo("aprobat sef") == 0) {
+                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
                           out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                           out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                       }}
@@ -228,16 +257,27 @@
     }
 %>
 <script>
-                   
+              
+                function generate() {
+                    const element = document.getElementById('content'); // Ensure you target the specific div
+                    html2pdf().set({
+                        pagebreak: { mode: ['css', 'legacy'] },
+                        html2canvas: {
+                            scale: 1, // Adjust scale to manage the size and visibility of content
+                            logging: true,
+                            dpi: 192,
+                            letterRendering: true,
+                            useCORS: true // This helps handle external content like images
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'landscape' // Change to 'landscape' if the content is too wide
+                        }
+                    }).from(element).save();
+                }
 
-                    function generate() {
-                        const element = document.getElementById("content");
-                        html2pdf()
-                        .from(element)
-                        .save();
-                    }
+            </script>
 
-                   
-                </script>
 </body>
 </html>

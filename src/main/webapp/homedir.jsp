@@ -93,6 +93,28 @@ border-radius: 2em;
                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                              e.printStackTrace();
                          }
+                    	 
+                    		String today = null;
+                          	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                                   // Check for upcoming leaves in 3 days
+                                   String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                                   try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                       // stmt.setInt(1, id);
+                                       try (ResultSet rs2 = stmt.executeQuery()) {
+                                           if (rs2.next()) {
+                                             today =  rs2.getString("today");
+                                           }
+                                       }
+                                   }
+                                  
+                                   // Display the user dashboard or related information
+                                   //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                                   // Add additional user-specific content here
+                               } catch (SQLException e) {
+                                   out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                                   e.printStackTrace();
+                               }
+                    	 
                     	%>
                     	
                     	<div class="main-content">
@@ -102,8 +124,9 @@ border-radius: 2em;
         <div class="content">
             <div class="intro">
                 <h1>Bun venit, <% out.println(nume); %>!</h1>
-                <h3>Statistici</h3>
+                
                  <div class="events">
+                  <h3>Statistici la data de <%out.println(today); %></h3>
                 <table style="border-bottom: 1px solid #3F48CC;">
                     <thead>
                         <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
@@ -188,7 +211,31 @@ border-radius: 2em;
                     </tbody>
                 </table> 
                 </div>
-                
+                 <div class="into">
+                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
+                </div>
+                <script>
+              
+                function generate() {
+                    const element = document.getElementById('content'); // Ensure you target the specific div
+                    html2pdf().set({
+                        pagebreak: { mode: ['css', 'legacy'] },
+                        html2canvas: {
+                            scale: 1, // Adjust scale to manage the size and visibility of content
+                            logging: true,
+                            dpi: 192,
+                            letterRendering: true,
+                            useCORS: true // This helps handle external content like images
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'landscape' // Change to 'landscape' if the content is too wide
+                        }
+                    }).from(element).save();
+                }
+
+            </script>
                 
                 <%
                int cate2 = -1;

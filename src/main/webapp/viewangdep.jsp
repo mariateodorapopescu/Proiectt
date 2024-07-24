@@ -88,18 +88,6 @@
                         out.println("</form>");
                         out.println("</div>");
                         out.println("</div>");
-                        if (userType == 0) {
-                            out.println("<a class='login__forgot' href ='dashboard.jsp'>Inapoi</a>");
-                        }
-                        if (userType == 1) {
-                            out.println("<a class='login__forgot' href ='tip1ok.jsp'>Inapoi</a>");
-                        }
-                        if (userType == 2) {
-                            out.println("<a class='login__forgot' href ='tip2ok.jsp'>Inapoi</a>");
-                        }
-                        if (userType == 3) {
-                            out.println("<a class='login__forgot' href ='sefok.jsp'>Inapoi</a>");
-                        }
                     }
                 } else {
                     out.println("<script type='text/javascript'>");

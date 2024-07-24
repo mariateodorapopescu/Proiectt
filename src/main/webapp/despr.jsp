@@ -85,11 +85,9 @@
             
         </div>
         <div class="content">
-            <div class="intro" id="content">
-            <h1>Date personale</h1>
-                
-               
-                 <div class="events">
+            <div class="intro" >
+                 <div class="events" id="content">
+                  <h1>Date personale</h1>
                 <table style="border-bottom: 1px solid #3F48CC;">
                     <thead>
                         <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
@@ -169,16 +167,27 @@
     }
 %>
 <script>
-                   
+              
+                function generate() {
+                    const element = document.getElementById('content'); // Ensure you target the specific div
+                    html2pdf().set({
+                        pagebreak: { mode: ['css', 'legacy'] },
+                        html2canvas: {
+                            scale: 1, // Adjust scale to manage the size and visibility of content
+                            logging: true,
+                            dpi: 192,
+                            letterRendering: true,
+                            useCORS: true // This helps handle external content like images
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'landscape' // Change to 'landscape' if the content is too wide
+                        }
+                    }).from(element).save();
+                }
 
-                    function generate() {
-                        const element = document.getElementById("content");
-                        html2pdf()
-                        .from(element)
-                        .save();
-                    }
+            </script>
 
-                   
-                </script>
 </body>
 </html>

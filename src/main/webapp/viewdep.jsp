@@ -85,11 +85,12 @@
             
         </div>
         <div class="content">
-            <div class="intro" id="content">
-            <h1>Departamente din toata institutia</h1>
+            <div class="intro" >
+                <div class="events" id="content">
+                 <h1>Departamente din toata institutia</h1>
                 <h3><%out.println(today); %></h3>
                
-                 <div class="events">
+            
                 <table style="border-bottom: 1px solid #3F48CC;">
                     <thead>
                         <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">

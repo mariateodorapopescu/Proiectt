@@ -85,9 +85,9 @@
                     
 <div class="container calendar-container">
     <div class="navigation">
-        <button onclick="previousMonth()">❮</button>
+        <button class='prev' onclick="previousMonth()">❮</button>
         <div class="month-year" id="monthYear"></div>
-        <button onclick="nextMonth()">❯</button>
+        <button class='next' onclick="nextMonth()">❯</button>
     </div>
     <table class="calendar" id="calendar">
         <thead>
@@ -142,6 +142,6 @@
 %>
 
 <script src="./responsive-login-form-main/assets/js/main.js"></script>
-<script src="./responsive-login-form-main/assets/js/calendar.js"></script>
+<script src="./responsive-login-form-main/assets/js/calendar4.js"></script>
 </body>
 </html>
