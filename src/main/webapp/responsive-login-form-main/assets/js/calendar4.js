@@ -1,9 +1,12 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const dp1 = document.getElementById("start");
+const dp1 = document.getElementById("start");
     const dp2 = document.getElementById("end");
     const monthYear = document.getElementById('monthYear');
     const calendarBody = document.getElementById('calendar-body');
-
+    const selectedDaysSpan = document.getElementById('selectedDays');
+    const remainingDaysSpan = document.getElementById('remainingDays');
+    const initialRemainingDays = parseInt(remainingDaysSpan.textContent);
+	const color =  "#3F48CC";
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let selectedStartDate = null;
@@ -53,13 +56,17 @@ document.addEventListener("DOMContentLoaded", function() {
                     cell.textContent = date;
                     if (selectedStartDate && selectedEndDate && isDateInRange(date, month, year)) {
                         cell.classList.add('highlight');
+						cell.style.background =color;
                     }
+					
+					//cell.style.background = "#3F48CC";
                     date++;
                 }
                 row.appendChild(cell);
             }
             calendarBody.appendChild(row);
         }
+        updateSelectedDays();
     }
 
     function isDateInRange(date, month, year) {
@@ -91,6 +98,18 @@ document.addEventListener("DOMContentLoaded", function() {
         renderCalendar(currentMonth, currentYear);
     }
 
+    function updateSelectedDays() {
+        if (selectedStartDate && selectedEndDate) {
+            const diffTime = Math.abs(selectedEndDate - selectedStartDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Include both start and end date
+            selectedDaysSpan.textContent = diffDays;
+            remainingDaysSpan.textContent = initialRemainingDays - diffDays;
+        } else {
+            selectedDaysSpan.textContent = 0;
+            remainingDaysSpan.textContent = initialRemainingDays;
+        }
+    }
+
     function previousMonth() {
         if (currentMonth === 0) {
             currentMonth = 11;
@@ -115,6 +134,5 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector('.next').addEventListener('click', nextMonth);
     document.getElementById('start').addEventListener('change', highlightDate);
     document.getElementById('end').addEventListener('change', highlightDate);
-
     renderCalendar(currentMonth, currentYear);
 });

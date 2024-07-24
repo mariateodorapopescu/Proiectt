@@ -27,7 +27,7 @@
         }
         
         .calendar-container, .form-container {
-            background-color: #1a1a1a;
+            background-color: #2a2a2a;
             padding: 1rem;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -37,7 +37,7 @@
             max-width: 300px;
         }
          th.calendar, td.calendar {
-            border: 1px solid black;
+            border: 1px solid #1a1a1a;
             text-align: center;
             padding: 8px;
             font-size: 12px;
@@ -46,9 +46,32 @@
             background-color: #333;
         }
         .highlight {
-            background-color: green;
+            background-color: var(--bg);
             color: white;
         }
+        :root{
+          --first-color: #2a2a2a;
+  --second-color: hsl(249, 64%, 47%);
+  --title-color-light: hsl(244, 12%, 12%);
+  --text-color-light: hsl(244, 4%, 36%);
+  --body-color-light: hsl(208, 97%, 85%);
+  --title-color-dark: hsl(0, 0%, 95%);
+  --text-color-dark: hsl(0, 0%, 80%);
+  --body-color-dark: #1a1a1a;
+  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
+  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
+  --form-bg-color-dark: #333;
+  --form-border-color-dark: #3a3a3a;
+  /*========== Font and typography ==========*/
+  --body-font: "Poppins", sans-serif;
+  --h2-font-size: 1.25rem;
+  --small-font-size: .813rem;
+  --smaller-font-size: .75rem;
+  /*========== Font weight ==========*/
+  --font-medium: 500;
+  --font-semi-bold: 600;
+        }
+        
     </style>
 </head>
 <body>
@@ -100,6 +123,8 @@
                                         <!-- Calendar will be generated here -->
                                     </tbody>
                                 </table>
+                                <p>Zile selectate: <span id="selectedDays">0</span></p>
+                                <p>Zile ramase: <span id="remainingDays"><%= zile %></span></p>
                             </div>
                             <div class="form-container">
                          
@@ -108,7 +133,7 @@
                                     <div>
                                         <h1 class="login__title"><span>Adaugare concediu</span></h1>
                                         <%
-                                        out.println("<p style='margin:0; padding:0; position:relative; top:0;'>Zile ramase: " + zile + "; Concedii ramase: " + con + "</p>");
+                                        //out.println("<p style='margin:0; padding:0; position:relative; top:0;'>Zile ramase: " + zile + "; Concedii ramase: " + con + "</p>");
                                         %>
                                     </div>
                                     
