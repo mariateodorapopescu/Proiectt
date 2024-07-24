@@ -52,6 +52,7 @@
                     let cell = document.createElement("td");
                     let cellText = document.createTextNode("");
                     cell.appendChild(cellText);
+					cell.setAttribute('data-date', `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`);
                     row.appendChild(cell);
                 } else if (date > daysInMonth) {
                     break;
@@ -59,6 +60,7 @@
                     let cell = document.createElement("td");
                     let cellText = document.createTextNode(date);
                     cell.appendChild(cellText);
+					cell.setAttribute('data-date', `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`);
                     if (selectedStartDate && selectedEndDate && isDateInRange(date, month, year)) {
                         cell.classList.add('highlight');
                     }

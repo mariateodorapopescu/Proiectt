@@ -48,28 +48,36 @@
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0;
         }
-        h1 {
+        h1, h3 {
             text-align: center;
             margin-bottom: 20px;
         }
         #myChart {
-            width: 100%;
+            width: 90%;
             height: 400px;
+             font-size: 13px;
+             left: 50%;
+             padding: 0;
+             margin: 0;
+        }
+       
+        .navigation, .login__check {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
         }
         button {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+        display: flex;
+        	 justify-content: center;
+            align-items: center;
+            margin: auto;
+            padding: 0;
         }
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
+        
     </style>
 </head>  
 <body>  
@@ -120,7 +128,7 @@ if (sesi != null) {
                 out.print("<input type='hidden' name='dep' value='" + dep + "'/>");
                 out.print("<input type='submit' value='❮ Anterior' />");
                 out.print("</form>");
-                out.print("<h1>" + getMonthName(currentMonth) + " " + currentYear + "</h1>");
+                out.print("<h3>" + getMonthName(currentMonth) + " " + currentYear + "</h3>");
                 out.print("<form action='" + request.getContextPath() + "/sometest.jsp' method='post' style='display: inline;'>");
                 out.print("<input type='hidden' name='selectedMonth' value='" + (currentMonth == 12 ? 1 : currentMonth + 1) + "'/>");
                 out.print("<input type='hidden' name='selectedYear' value='" + (currentMonth == 12 ? currentYear + 1 : currentYear) + "'/>");
@@ -130,47 +138,7 @@ if (sesi != null) {
                 out.print("</form>");
                 out.print("</div>");
                 
-                %>
-                <div class="login__check">
-                    <form id="statusForm" onsubmit="return false;">
-                        <div>
-                            <label class="login__label">Status</label>
-                            <select name="status" class="login__input" onchange="submitForm()">
-                                <option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("status");
-                                            String nume = rs1.getString("nume_status");
-                                            out.println("<option value='" + id + "' " + (status == id ? "selected" : "") + ">" + nume + "</option>");
-                                        }
-                                    }
-                                }
-                                %>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="login__label">Departament</label>
-                            <select name="dep" class="login__input" onchange="submitForm()">
-                                <option value="-1" <%= (dep == -1 ? "selected" : "") %>>Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("id_dep");
-                                            String nume = rs1.getString("nume_dep");
-                                            out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
-                                        }
-                                    }
-                                }
-                                %>
-                            </select>
-                        </div>
-                        <input type="submit" value="submit">
-                    </form>
-                </div>
-                <%
+              
 
                 int daysInMonth = getDaysInMonth(currentMonth, currentYear);
                 Map<Integer, Integer> leaveCountMap = new HashMap<>();
@@ -282,7 +250,7 @@ if (sesi != null) {
                 
                 %>
 <div class="container" id="content">
-<h1> Vizualizare concedii
+<h3> Vizualizare concedii
                 <%
                 if (status == 0) {
                 	out.println("neaprobate");
@@ -316,11 +284,54 @@ if (sesi != null) {
                           }
                       }
                 }
+                out.println(" pe luna " + getMonthName(currentMonth));
                 %>
-                </h1>
+                </h3>
     <div id="myChart"></div>  
 </div>
-<button onclick="generate()">Generate PDF</button>
+  
+                <div class="login__check">
+                    <form id="statusForm" onsubmit="return false;">
+                        <div>
+                            <label class="login__label">Status</label>
+                            <select name="status" class="login__input" onchange="submitForm()">
+                                <option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
+                                <%
+                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
+                                    try (ResultSet rs1 = stm.executeQuery()) {
+                                        while (rs1.next()) {
+                                            int id = rs1.getInt("status");
+                                            String nume = rs1.getString("nume_status");
+                                            out.println("<option value='" + id + "' " + (status == id ? "selected" : "") + ">" + nume + "</option>");
+                                        }
+                                    }
+                                }
+                                %>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="login__label">Departament</label>
+                            <select name="dep" class="login__input" onchange="submitForm()">
+                                <option value="-1" <%= (dep == -1 ? "selected" : "") %>>Oricare</option>
+                                <%
+                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
+                                    try (ResultSet rs1 = stm.executeQuery()) {
+                                        while (rs1.next()) {
+                                            int id = rs1.getInt("id_dep");
+                                            String nume = rs1.getString("nume_dep");
+                                            out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
+                                        }
+                                    }
+                                }
+                                %>
+                            </select>
+                        </div>
+                        <input type="submit" value="submit">
+                    </form>
+                   
+                </div>
+                 <button onclick="generate()">Generate PDF</button>
+                
 
 <script>
 window.onload = function() {

@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar2.css">
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
 </head>
 <body>
@@ -43,7 +43,7 @@
 <form id="dateForm" action="testviewpers.jsp" method="post" style="display:none;">
     <input type="date" name="selectedDate" id="selectedDate">
 </form>
-<script src="./responsive-login-form-main/assets/js/calendar2.js"></script>
+<script src="./responsive-login-form-main/assets/js/calendar3.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
         // Add event listener for all calendar cells

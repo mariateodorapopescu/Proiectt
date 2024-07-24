@@ -27,7 +27,7 @@
     <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <style>
-        body {
+       body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
@@ -36,23 +36,36 @@
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0;
         }
-        h1 {
+        h1, h3 {
             text-align: center;
             margin-bottom: 20px;
         }
         #myChart {
-            width: 100%;
+            width: 90%;
             height: 400px;
+             font-size: 13px;
+             left: 50%;
+             padding: 0;
+             margin: 0;
+        }
+       
+        .navigation, .login__check {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
         }
         button {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+        display: flex;
+        	 justify-content: center;
+            align-items: center;
+            margin: auto;
+            padding: 0;
         }
+        
     </style>
 </head>
 <body>
@@ -181,7 +194,7 @@ if (sesi != null) {
                 </h3>
                     <div id="myChart"></div>
                 </div>
-                <button onclick="generatePDF()">Generate PDF</button>
+                
 <div class="login__check">
                     <form id="statusForm" onsubmit="return false;">
                         <div>
@@ -221,6 +234,7 @@ if (sesi != null) {
                         <input type="submit" value="submit">
                     </form>
                 </div>
+                <button onclick="generatePDF()">Generate PDF</button>
                 <script>
                     window.onload = function() {
                         zingchart.render({
@@ -279,7 +293,7 @@ if (sesi != null) {
                             jsPDF: {
                                 unit: 'pt',
                                 format: 'a4',
-                                orientation: 'landscape' // Adjusts orientation to landscape if the content is wide
+                                orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
                             }
                         }).from(element).save();
                     }
