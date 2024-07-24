@@ -7,6 +7,24 @@
 <html>
 <head>
     <title>Vizualizare angajati dintr-un departament</title>
+    
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <style>
+        <!-- Include aici CSS-ul dat -->
+        @charset "UTF-8";
+        /*=============== GOOGLE FONTS ===============*/
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+        /* restul CSS-ului pe care l-ai furnizat */
+        /* Copiază CSS-ul furnizat aici */
+    </style>
+    
 </head>
 <body>
 <%
@@ -31,13 +49,25 @@
                             case 4: response.sendRedirect("adminok.jsp"); break;
                         }
                     } else {
-                        out.println("<div align='center'>");
-                        out.println("<h1>Selectati departamentul pe care doriti sa il vizualizati</h1>");
-                        out.print("<form action='");
-                        out.print(request.getContextPath());
-                        out.println("/viewangdep2.jsp' method='post'>");
-                        out.println("<table style='width: 80%'>");
-                        out.println("<tr><td>Departament</td><td><select name='iddep'>");
+                       %>
+                       
+                       <div class="container">
+                            <div class="login__content">
+                                <img src="./responsive-login-form-main/assets/img/bg-login.jpg" alt="login image" class="login__img login__img-light">
+                                <img src="./responsive-login-form-main/assets/img/bg-login-dark.jpg" alt="login image" class="login__img login__img-dark">
+                                
+                                <form action="<%= request.getContextPath() %>/viewangdep2.jsp" method="post" class="login__form">
+                                    <div>
+                                        <h1 class="login__title"><span>Selectati departamentul pe care doriti sa il vizualizati</span></h1>
+                                    </div>
+                                    
+                                    <div class="login__inputs">
+                                        <div>
+                                            <label class="login__label">Status</label>
+                                            <select name="iddep" class="login__input">
+                                                <option value="3">Oricare</option>
+                                                <%
+                                               
 
                         try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
                             try (ResultSet rs1 = stm.executeQuery()) {
@@ -48,54 +78,54 @@
                                         out.println("<option value='" + id + "'>" + nume + "</option>");
                                     } while (rs1.next());
                                 } else {
-                                    out.println("<option value=''>Nu exista departamente didponibile.</option>");
+                                    out.println("<option value=''>Nu exista departamente disponibile.</option>");
                                 }
                             }
                         }
 
-                        out.println("</select></td></tr>");
-                        out.println("</table>");
-                        out.println("<input type='submit' value='Submit' />");
+                        out.println("</select></div></div>");
+                        out.println("<div class='login__buttons'><input class='login__button' type='submit' value='Submit' /></div>");
                         out.println("</form>");
                         out.println("</div>");
+                        out.println("</div>");
                         if (userType == 0) {
-                            out.println("<a href ='dashboard.jsp'>Inapoi</a>");
-                         }
-                         if (userType == 1) {
-                             out.println("<a href ='tip1ok.jsp'>Inapoi</a>");
-                          }
-                         if (userType == 2) {
-                             out.println("<a href ='tip2ok.jsp'>Inapoi</a>");
-                          }
-                         if (userType == 3) {
-                             out.println("<a href ='sefok.jsp'>Inapoi</a>");
-                          }
+                            out.println("<a class='login__forgot' href ='dashboard.jsp'>Inapoi</a>");
+                        }
+                        if (userType == 1) {
+                            out.println("<a class='login__forgot' href ='tip1ok.jsp'>Inapoi</a>");
+                        }
+                        if (userType == 2) {
+                            out.println("<a class='login__forgot' href ='tip2ok.jsp'>Inapoi</a>");
+                        }
+                        if (userType == 3) {
+                            out.println("<a class='login__forgot' href ='sefok.jsp'>Inapoi</a>");
+                        }
                     }
                 } else {
-                	out.println("<script type='text/javascript'>");
+                    out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 out.println("<script type='text/javascript'>");
-    	        out.println("alert('Eroare la baza de date!');");
-    	        out.println("</script>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("</script>");
                 response.sendRedirect("login.jsp");
             }
         } else {
-        	out.println("<script type='text/javascript'>");
+            out.println("<script type='text/javascript'>");
             out.println("alert('Utilizator neconectat!');");
             out.println("</script>");
             response.sendRedirect("login.jsp");
         }
     } else {
-    	out.println("<script type='text/javascript'>");
+        out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
         response.sendRedirect("login.jsp");
     }
-
 %>
+
 </body>
 </html>

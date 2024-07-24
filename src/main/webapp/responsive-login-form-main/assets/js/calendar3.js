@@ -12,24 +12,30 @@ document.addEventListener("DOMContentLoaded", function() {
     const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 
 	function renderCalendar(month, year) {
-	    const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 	    const calendarBody = document.getElementById('calendar-body');
-	    calendarBody.innerHTML = '';
+	    calendarBody.innerHTML = ''; // Clear existing entries
 	    let firstDay = (new Date(year, month).getDay() + 6) % 7;
-	    const daysInMonth = 32 - new Date(year, month, 32).getDate();
+	    let daysInMonth = 32 - new Date(year, month, 32).getDate();
 	    let date = 1;
-		monthYear.textContent = monthNames[month] + " " + year;
+
+	    monthYear.textContent = monthNames[month] + " " + year;
+
 	    for (let i = 0; i < 6; i++) {
 	        let row = document.createElement('tr');
 	        for (let j = 0; j < 7; j++) {
 	            let cell = document.createElement('td');
+				
 	            if (i === 0 && j < firstDay || date > daysInMonth) {
-	                cell.appendChild(document.createTextNode(''));
+	                cell.textContent = '';
 	            } else {
-	                let fullDate = `${year}-${(month+1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+	                let fullDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
 	                cell.setAttribute('data-date', fullDate);
-	                cell.appendChild(document.createTextNode(date));
-	                cell.className += getLeaveClass(leaveData[fullDate]);
+	                cell.textContent = date;
+	                
+	                // Apply classes and tooltips
+	                let leaveClass = getLeaveClass(leaveData[fullDate] ? leaveData[fullDate].length : 0);
+	                cell.className += leaveClass; // This ensures only the leave class is applied directly
+	                
 	                date++;
 	            }
 	            row.appendChild(cell);
@@ -40,14 +46,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	function getLeaveClass(count) {
 	    if (!count) return ''; // No leaves
-	    if (count === 1) return ' leave-1';
-	    if (count === 2) return ' leave-2';
-	    if (count === 3) return ' leave-3';
-	    if (count > 3) return ' leave-more';
+	    if (count === 1) return 'leave-1';
+	    if (count === 2) return 'leave-2';
+	    if (count === 3) return 'leave-3';
+	    if (count > 3) return 'leave-more';
 	    return '';
 	}
-
-
 
     function highlightDate() {
         selectedStartDate = dp1.value ? new Date(dp1.value) : null;

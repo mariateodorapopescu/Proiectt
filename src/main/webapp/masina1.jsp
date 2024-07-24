@@ -42,12 +42,39 @@
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
        
+       .tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+       
     </style>
 </head>
 
 <body>
 <%
     HttpSession sesi = request.getSession(false);
+int pag = -1;
     if (sesi != null) {
         MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
         if (currentUser != null) {
@@ -84,7 +111,7 @@
                     		end = request.getParameter("end");
                     	}
                     	
-                    	int pag = Integer.valueOf(request.getParameter("pag"));
+                    	 pag = Integer.valueOf(request.getParameter("pag"));
                     	
                     	String sql = null;
                     	PreparedStatement stmtt2 = null;
@@ -559,19 +586,23 @@
                                         rss1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rss1.getString("tipcon") + "</td>");
 
                               if (rss1.getString("status").compareTo("neaprobat") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><i class='ri-close-line'></i></span></td></tr>");
+                                  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-close-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("dezaprobat sef") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                                  //out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("dezaprobat director") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                                  //out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("aprobat director") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                                  //out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("aprobat sef") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                                  //out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
                               }
                           }
                           if (!found) {
@@ -588,7 +619,28 @@
                 </div>
                 <div class="into">
                   <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Descarcati PDF</button>
-                <button style="--bg:#3F48CC;"><a href='about:blank.jsp'>Inapoi</a></button></div>
+                  <%
+                  if (pag == 3) {
+            			 out.println("<button style='--bg:#3F48CC;'><a href='viewp.jsp'>Inapoi</a></button></div>");
+            		}
+            		if (pag == 4) {
+            			out.println("<button style='--bg:#3F48CC;'><a href='viewcol.jsp'>Inapoi</a></button></div>");
+                 	  }
+            		if (pag == 5) {
+            			out.println("<button style='--bg:#3F48CC;'><a href='viewconcoldepeu.jsp'>Inapoi</a></button></div>");
+           			 }
+            		if (pag == 6) {
+            			out.println("<button style='--bg:#3F48CC;'><a href='viewdepeu.jsp'>Inapoi</a></button></div>");
+          			 }
+            		if (pag == 7) {
+            			out.println("<button style='--bg:#3F48CC;'><a href='viewcondep.jsp'>Inapoi</a></button></div>");
+                  		}
+            		if (pag == 8) {
+            			out.println("<button style='--bg:#3F48CC;'><a href='viewtot.jsp'>Inapoi</a></button></div>");
+         			}
+                  
+                  %>
+               
                 <script>
               
                 function generate() {

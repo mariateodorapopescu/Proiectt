@@ -22,14 +22,47 @@
     .leave-2 { background-color: #ffff99; } /* Yellow for 2 people */
     .leave-3 { background-color: #ffcc99; } /* Orange for 3 people */
     .leave-more { background-color: #ff6666; } /* Red for more than 3 people */
+    /* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+</style>
 </style>
     
 </head>
 <body>
+
 <div class="container calendar-container">
+<div class="ceva tooltip">Legenda
+  <span class="ceva tooltiptext">transparent = 0;<br> verde = 1; <br>galben = 2; <br>portocaliu = 3; <br>rosu = >3 </span>
+</div>
     <div class="navigation">
+    
         <button onclick="previousMonth()">❮</button>
         <div class="month-year" id="monthYear"></div>
+        
         <button onclick="nextMonth()">❯</button>
     </div>
     <table class="calendar" id="calendar">
