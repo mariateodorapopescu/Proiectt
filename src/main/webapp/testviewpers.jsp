@@ -131,12 +131,13 @@ if (sesi != null) {
                String fullnume = null;
                int nr = 0;
               if(lunaa == null) {
-           	   System.out.println("meh");
+           	   System.out.println("meh???");
               }
               //System.out.println(lunaa);
-               int month = -1;
-               if(lunaa != null)
-               month = Integer.parseInt(lunaa);
+                 int year = request.getParameter("year") != null ? Integer.parseInt(request.getParameter("year")) : Calendar.getInstance().get(Calendar.YEAR);
+               int month = request.getParameter("month") != null ? Integer.parseInt(request.getParameter("month")) - 1 : Calendar.getInstance().get(Calendar.MONTH);
+				month++;
+              
                Calendar calendar = Calendar.getInstance();
                calendar.set(Calendar.MONTH, month);
                calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
@@ -144,12 +145,11 @@ if (sesi != null) {
 
                Map<String, List<String>> leaveDataByDate = new TreeMap<>();
              
-               if (request.getParameter("month") != null && request.getParameter("year") != null) {
-                   month = Integer.parseInt(request.getParameter("month"));
+              
                try (PreparedStatement stmt = connection.prepareStatement(
                        "SELECT nume, prenume, start_c, end_c FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE (MONTH(start_c) = ? OR MONTH(end_c) = ?) AND YEAR(start_c) = ?")) {
-                   stmt.setInt(1, month + 1);
-                   stmt.setInt(2, month + 1);
+                   stmt.setInt(1, month);
+                   stmt.setInt(2, month);
                    stmt.setInt(3, calendar.get(Calendar.YEAR));
                    ResultSet rs1 = stmt.executeQuery();
                    
@@ -171,10 +171,9 @@ if (sesi != null) {
                    }
                }
              
-               }
-               if (month != -1) {
-                   // Generate and output the HTML for calendar body
-                   out.println("<h2>Persoane în concediu în luna " + (month + 1) + ":</h2>");
+               
+               
+                   out.println("<h2>Persoane în concediu în luna " + (month) + ":</h2>");
 	                if (leaveDataByDate.isEmpty()) {
 	                    out.println("<p>Nu există persoane în concediu în această lună.</p>");
 	                } else {
@@ -186,7 +185,7 @@ if (sesi != null) {
 	                    }
 	                    out.println("</ul>");
 	                }
-               }
+               
                
                try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ?")) {
                    stmt.setString(1, data);
@@ -221,6 +220,7 @@ if (sesi != null) {
                    }
                    out.println("</ul>");
                }
+               
                 
             } else {
                 out.println("<script type='text/javascript'>");

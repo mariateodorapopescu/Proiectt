@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentYear = new Date().getFullYear();
     let selectedStartDate = null;
     let selectedEndDate = null;
-
+	
     const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 
 	function renderCalendar(month, year) {
@@ -87,4 +87,24 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector('.navigation button:last-child').addEventListener('click', nextMonth);
 
     renderCalendar(currentMonth, currentYear);
+	
+	function updateCalendarDisplay(year, month) {
+	        const monthNames = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
+	        document.getElementById('monthYear').textContent = `${monthNames[month]} ${year}`;
+	        fetchCalendarData(year, month);
+	    }
+
+	    function fetchCalendarData(year, month) {
+	        fetch(`testviewpers.jsp?year=${year}&month=${month+1}`)
+	            .then(response => response.text())
+	            .then(html => {
+	                document.innerHTML = html;
+	            })
+	            .catch(error => console.error('Error fetching data:', error));
+	    }
+
+	    // Inițializare cu luna și anul curent
+	    let today = new Date();
+	    updateCalendarDisplay(today.getFullYear(), today.getMonth());
+	
 });
