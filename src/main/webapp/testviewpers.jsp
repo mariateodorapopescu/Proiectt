@@ -5,6 +5,8 @@
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <%@ page import="java.io.*" %>  
 <%@ page import="java.util.*" %>  
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,7 +51,9 @@
 </div>
 <form id="dateForm" action="testviewpers.jsp" method="post" style="display:none;">
     <input type="date" name="selectedDate" id="selectedDate">
+    
 </form>
+
 <script src="./responsive-login-form-main/assets/js/calendar3.js"></script>
 <script>
 
@@ -100,31 +104,75 @@ if (sesi != null) {
                     response.sendRedirect("adminok.jsp");
                     return;
                 }
-                /*
-                String data = request.getParameter("selectedDate");
-                String nume = null, prenume = null, fullnume = null;
-                ArrayList<String> persoane = new ArrayList<String>();  
-                if (data != null && !data.isEmpty()) {
-                    try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ?")) {
-                        stmt.setString(1, data);
-                        stmt.setString(2, data);
-                        ResultSet rs1 = stmt.executeQuery();
-                        while (rs1.next()) {
-                            nume = rs1.getString("nume");
-                            prenume = rs1.getString("prenume");
-                            fullnume = nume + " " + prenume;
-                            persoane.add(fullnume);
-                        }
-                    }
-                }
-                */
+               
                 String data = null;
+                
                  data = request.getParameter("selectedDate");
+                 String lunaa = null;
+                 lunaa = request.getParameter("month");
+                // System.out.println(lunaa);
                 String nume = null;
                 String prenume = null;
                 String fullnume = null;
                 int nr = 0;
-               
+               while(lunaa == null) {
+            	   System.out.println("meh");
+               }
+               //System.out.println(lunaa);
+                int month = -1;
+                if(lunaa != null)
+                month = Integer.parseInt(lunaa);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+                calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+                Map<String, List<String>> leaveDataByDate = new TreeMap<>();
+              
+                if (request.getParameter("month") != null && request.getParameter("year") != null) {
+                    month = Integer.parseInt(request.getParameter("month"));
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "SELECT nume, prenume, start_c, end_c FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE (MONTH(start_c) = ? OR MONTH(end_c) = ?) AND YEAR(start_c) = ?")) {
+                    stmt.setInt(1, month + 1);
+                    stmt.setInt(2, month + 1);
+                    stmt.setInt(3, calendar.get(Calendar.YEAR));
+                    ResultSet rs1 = stmt.executeQuery();
+                    
+                    while (rs1.next()) {
+                        nume = rs1.getString("nume");
+                        prenume = rs1.getString("prenume");
+                        fullnume = nume + " " + prenume;
+
+                        LocalDate startDate = rs1.getDate("start_c").toLocalDate();
+                        LocalDate endDate = rs1.getDate("end_c").toLocalDate();
+
+                        LocalDate currentDate = startDate;
+
+                        while (!currentDate.isAfter(endDate)) {
+                            String dateKey = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                            leaveDataByDate.computeIfAbsent(dateKey, k -> new ArrayList<>()).add(fullnume);
+                            currentDate = currentDate.plusDays(1);
+                        }
+                    }
+                }
+              
+                }
+                if (month != -1) {
+                    // Generate and output the HTML for calendar body
+                    out.println("<h2>Persoane în concediu în luna " + (month + 1) + ":</h2>");
+	                if (leaveDataByDate.isEmpty()) {
+	                    out.println("<p>Nu există persoane în concediu în această lună.</p>");
+	                } else {
+	                    out.println("<ul>");
+	                    for (Map.Entry<String, List<String>> entry : leaveDataByDate.entrySet()) {
+	                        String date = entry.getKey();
+	                        List<String> names = entry.getValue();
+	                        out.println("<li>" + date + ": " + String.join(", ", names) + "</li>");
+	                    }
+	                    out.println("</ul>");
+	                }
+                }
+                
                 try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ?")) {
                     stmt.setString(1, data);
                     stmt.setString(2, data);
@@ -158,6 +206,7 @@ if (sesi != null) {
                     }
                     out.println("</ul>");
                 }
+               
                 
             } else {
                 out.println("<script type='text/javascript'>");
@@ -185,5 +234,6 @@ if (sesi != null) {
     response.sendRedirect("login.jsp");
 }
 %>
+
 </body>
 </html>

@@ -8,17 +8,17 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentYear = new Date().getFullYear();
     let selectedStartDate = null;
     let selectedEndDate = null;
-
+	
     const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 
 	function renderCalendar(month, year) {
-	    const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 	    const calendarBody = document.getElementById('calendar-body');
 	    calendarBody.innerHTML = '';
 	    let firstDay = (new Date(year, month).getDay() + 6) % 7;
 	    const daysInMonth = 32 - new Date(year, month, 32).getDate();
 	    let date = 1;
-		monthYear.textContent = monthNames[month] + " " + year;
+	    monthYear.textContent = monthNames[month] + " " + year;
+		
 	    for (let i = 0; i < 6; i++) {
 	        let row = document.createElement('tr');
 	        for (let j = 0; j < 7; j++) {
@@ -28,8 +28,11 @@ document.addEventListener("DOMContentLoaded", function() {
 	            } else {
 	                let fullDate = `${year}-${(month+1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
 	                cell.setAttribute('data-date', fullDate);
+					cell.setAttribute('data-date', `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`);
 	                cell.appendChild(document.createTextNode(date));
-	                cell.className += getLeaveClass(leaveData[fullDate]);
+	                if (leaveData[fullDate]) {
+	                    cell.className += getLeaveClass(leaveData[fullDate]);
+	                }
 	                date++;
 	            }
 	            row.appendChild(cell);
@@ -46,8 +49,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	    if (count > 3) return ' leave-more';
 	    return '';
 	}
-
-
 
     function highlightDate() {
         selectedStartDate = dp1.value ? new Date(dp1.value) : null;
@@ -75,16 +76,47 @@ document.addEventListener("DOMContentLoaded", function() {
         currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
         currentYear = (currentMonth === 11) ? currentYear - 1 : currentYear;
         renderCalendar(currentMonth, currentYear);
+		//updateMonthInURL();
+		let ceva = currentMonth + 1;
+		sendMonthToServer(ceva);
     }
 
     function nextMonth() {
         currentMonth = (currentMonth + 1) % 12;
         currentYear = (currentMonth === 0) ? currentYear + 1 : currentYear;
         renderCalendar(currentMonth, currentYear);
+		//updateMonthInURL();
+		let ceva = currentMonth + 1;
+				sendMonthToServer(ceva);
     }
 
     document.querySelector('.navigation button:first-child').addEventListener('click', previousMonth);
     document.querySelector('.navigation button:last-child').addEventListener('click', nextMonth);
 
     renderCalendar(currentMonth, currentYear);
+	function updateMonthInURL() {
+	       var url = 'testviewpers.jsp?month=' + encodeURIComponent(currentMonth);
+	       window.location.href = url;
+	   }
+
+	   // Call this function when you want to update the month in the URL
+	  // updateMonthInURL();
+	  function sendMonthToServer(month) {
+	      fetch('testviewpers.jsp', {
+	          method: 'POST',
+	          headers: {
+	              'Content-Type': 'application/x-www-form-urlencoded'
+	          },
+	          body: `month=${encodeURIComponent(month)}`
+	      })
+	      .then(response => response.text())
+	      .then(data => console.log(data))
+	      .catch(error => console.error('Error:', error));
+	  }
+
+	  // Call this function to send the currentMonth
+	  let ceva = currentMonth + 1;
+	  		sendMonthToServer(ceva);
+			
+	
 });
