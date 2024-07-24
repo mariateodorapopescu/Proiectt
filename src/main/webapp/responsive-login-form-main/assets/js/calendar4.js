@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
+    let selectedStartDate = null;
+    let selectedEndDate = null;
 
     const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 
@@ -49,6 +51,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     let fullDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
                     cell.setAttribute('data-date', fullDate);
                     cell.textContent = date;
+                    if (selectedStartDate && selectedEndDate && isDateInRange(date, month, year)) {
+                        cell.classList.add('highlight');
+                    }
                     date++;
                 }
                 row.appendChild(cell);
@@ -57,7 +62,32 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    function isDateInRange(date, month, year) {
+        const currentDate = new Date(year, month, date);
+        return currentDate >= selectedStartDate && currentDate <= selectedEndDate;
+    }
+
     function highlightDate() {
+        const startDatePicker = document.getElementById('start');
+        const endDatePicker = document.getElementById('end');
+        selectedStartDate = startDatePicker.value ? new Date(startDatePicker.value) : null;
+        selectedEndDate = endDatePicker.value ? new Date(endDatePicker.value) : null;
+
+        if (selectedStartDate) {
+            selectedStartDate.setHours(0, 0, 0, 0);
+            currentMonth = selectedStartDate.getMonth();  // Update current month to selected start date's month
+            currentYear = selectedStartDate.getFullYear(); // Update current year
+        }
+
+        if (selectedEndDate) {
+            selectedEndDate.setHours(23, 59, 59, 999);
+            if (selectedEndDate < selectedStartDate) {
+                endDatePicker.value = startDatePicker.value;
+                selectedEndDate = new Date(selectedStartDate);
+                selectedEndDate.setHours(23, 59, 59, 999);
+            }
+        }
+
         renderCalendar(currentMonth, currentYear);
     }
 
@@ -83,8 +113,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelector('.prev').addEventListener('click', previousMonth);
     document.querySelector('.next').addEventListener('click', nextMonth);
-	document.getElementById('start').addEventListener('change', highlightDate);
-	        document.getElementById('end').addEventListener('change', highlightDate);
+    document.getElementById('start').addEventListener('change', highlightDate);
+    document.getElementById('end').addEventListener('change', highlightDate);
 
     renderCalendar(currentMonth, currentYear);
 });
