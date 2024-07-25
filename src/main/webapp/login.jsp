@@ -19,6 +19,12 @@
         document.getElementById("postLogin").submit();
     }
 </script>
+<style>
+      input::-ms-reveal,
+      input::-ms-clear {
+        display: none;
+      }
+    </style>
 </head>
 <body>
 

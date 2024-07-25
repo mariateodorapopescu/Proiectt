@@ -180,6 +180,7 @@ if (sesi != null) {
                                     </div>
                                 </div>
                                <% out.println("<input type='hidden' name='userId' value='" + userId + "'/>"); %> 
+                                <% out.println("<input type='hidden' name='idcon' value='" + id + "'/>"); %> 
                                 <div class="login__buttons">
                                     <input type="submit" value="Adaugare" class="login__button login__button-ghost">
                                 </div>

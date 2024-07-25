@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const dp2 = document.getElementById("end");
     const monthYear = document.getElementById('monthYear');
     const calendarBody = document.getElementById('calendar-body');
-
+	const bg = "#32a852";
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let selectedStartDate = null;
@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     cell.textContent = date;
                     if (selectedStartDate && selectedEndDate && isDateInRange(date, month, year)) {
                         cell.classList.add('highlight');
+						cell.style.backgroundColor = bg;
                     }
                     date++;
                 }
@@ -117,4 +118,22 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('end').addEventListener('change', highlightDate);
 
     renderCalendar(currentMonth, currentYear);
+	//if (dp1 && dp2) {
+	    dp1.addEventListener("change", updateEndDate);
+	    dp2.addEventListener("change", validateDates);
+	    dp1.addEventListener("change", function() {
+	        dp2.min = dp1.value;
+	        if (dp2.value < dp1.value) {
+	            dp2.value = ''; // Reset dp2 if it's less than dp1
+	        }
+	    });
+//	}
+
+	// Ensures that the end date is not before the start date
+	function updateEndDate() {
+	    if (dp2.value < dp1.value) {
+	        dp2.value = dp1.value;
+	    }
+	    highlightDate();
+	}
 });

@@ -166,7 +166,7 @@
 
                               
                               if (rs1.getString("status").compareTo("neaprobat") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
                                   out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                                   out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                               }}
@@ -198,7 +198,7 @@
 
                       
                       if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
                           out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                           out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                       }}

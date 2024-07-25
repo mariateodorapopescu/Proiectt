@@ -405,7 +405,7 @@ public class AddConServlet extends HttpServlet {
 		        preparedStatement.setInt(1, uid);
 		        try (ResultSet rs = preparedStatement.executeQuery()) {
 		            if (rs.next()) {
-		                nr = rs.getInt("conramase");
+		                nr = rs.getInt("conramase"); // aici da, le ia pe alea cu status pozitiv sau 0
 		            }
 		        }
 		    } catch (SQLException e) {
@@ -458,9 +458,9 @@ public class AddConServlet extends HttpServlet {
 		        throw new IOException("Eroare la baza de date", e);
 		    }
 		    if (userType == 2) {
-		        return nr <= 30;
+		        return nr < 30;
 		    }
-		    return nr <= 40;
+		    return nr < 40;
 		}
 		
 		public static Set<LocalDate> getLegalHolidays() {
@@ -483,7 +483,7 @@ public class AddConServlet extends HttpServlet {
 		public static boolean odatavara(HttpServletRequest request) throws ClassNotFoundException, IOException{
 			 int nr = 0;
 			    Class.forName("com.mysql.cj.jdbc.Driver");
-			    String QUERY = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and concedii.status > 0;";
+			    String QUERY = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and concedii.status >= 0;";
 			    int uid = Integer.valueOf(request.getParameter("userId"));
 
 			    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -499,7 +499,7 @@ public class AddConServlet extends HttpServlet {
 			        throw new IOException("Eroare la baza de date", e);
 			    }
 
-			    return nr <= 1;
+			    return nr < 1;
 		}
 		
 		public static boolean maimultezileodata(ConcediuCon concediu) {
@@ -518,7 +518,7 @@ public class AddConServlet extends HttpServlet {
 		        current = current.plusDays(1);
 		    }
 
-		    return countDays <= 21;
+		    return countDays < 21;
 		}
 		
 		public static Data stringToDate(String dateString) {
@@ -587,7 +587,7 @@ public class AddConServlet extends HttpServlet {
 		        printSQLException(e);
 		        throw new IOException("Eroare la baza de date", e);
 		    }
-		    return nr <= (total / 2);
+		    return nr < (total / 2);
 		}
 		
 		public static boolean preamultid(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException{

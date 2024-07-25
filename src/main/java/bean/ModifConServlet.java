@@ -354,12 +354,13 @@ public class ModifConServlet extends HttpServlet {
 		    }
 	    
 	    Class.forName("com.mysql.cj.jdbc.Driver");
-	    String QUERY = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = ?;";
+	    String QUERY = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = ? and concedii.id <> ? and concedii.status >= 0;";
 	    //int uid = Integer.valueOf(request.getParameter("userId"));
 
 	    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 	         PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
 	        preparedStatement.setInt(1, uid);
+	        preparedStatement.setInt(2, id);
 	        try (ResultSet rs = preparedStatement.executeQuery()) {
 	            if (rs.next()) {
 	                nr = rs.getInt("total");
@@ -393,7 +394,7 @@ public class ModifConServlet extends HttpServlet {
 		    }
 
 	    Set<LocalDate> holidays = getLegalHolidays();
-	    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and id != ?;";
+	    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and concedii.id <> ? and concedii.status >= 0;";
 	    
 	    int aidi = Integer.valueOf(request.getParameter("idcon"));
 
@@ -442,7 +443,7 @@ public class ModifConServlet extends HttpServlet {
 	public static boolean odatavara(HttpServletRequest request, ConcediuCon concediu) throws ClassNotFoundException, IOException{
 		 int nr = 0;
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-		    String QUERY = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and id != ?;";
+		    String QUERY = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and concedii.id <> ? and concedii.status >= 0;";
 //		    int uid = Integer.valueOf(request.getParameter("userId"));
 
 		    int id = Integer.valueOf(request.getParameter("idcon"));
@@ -572,7 +573,7 @@ public class ModifConServlet extends HttpServlet {
 	    System.out.println(total);
 	    // Check total leaves in department within specific dates
 	    String queryTotalLeaves = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON useri.id = concedii.id_ang " +
-	        "WHERE useri.id_dep = ? AND start_c >= ? AND end_c <= ?";
+	        "WHERE useri.id_dep = ? AND start_c >= ? AND end_c <= ? and concedii.id <> ? and concedii.status >= 0;";
 	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 	         PreparedStatement stmtTotalLeaves = conn.prepareStatement(queryTotalLeaves)) {
 	        Data start_c = stringToDate(concediu.getStart());
@@ -581,6 +582,7 @@ public class ModifConServlet extends HttpServlet {
 	        stmtTotalLeaves.setInt(1, depid);
 	        stmtTotalLeaves.setDate(2, java.sql.Date.valueOf(start_c.getAn() + "-" + start_c.getLuna() + "-" + start_c.getZi()));
 	        stmtTotalLeaves.setDate(3, java.sql.Date.valueOf(end_c.getAn() + "-" + end_c.getLuna() + "-" + end_c.getZi()));
+	        stmtTotalLeaves.setInt(4, id);
 	        try (ResultSet rsTotalLeaves = stmtTotalLeaves.executeQuery()) {
 	            if (rsTotalLeaves.next()) {
 	                nr = rsTotalLeaves.getInt("total");
@@ -596,8 +598,9 @@ public class ModifConServlet extends HttpServlet {
 	
 	public static boolean preamultid(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException{
 			 int nr = 0;
+			    int id = Integer.valueOf(request.getParameter("idcon"));
 			    Class.forName("com.mysql.cj.jdbc.Driver");
-			    String QUERY = "select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= ? and month(start_c) = ? and day(start_c) <= ? and month(start_c) <= ? group by tip having tip = 0;";
+			    String QUERY = "select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= ? and month(start_c) = ? and day(start_c) <= ? and month(start_c) <= ? group by tip having tip = 0 and concedii.id <> ? and concedii.status >= 0;";
 			  
 			    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 			         PreparedStatement stm = con.prepareStatement(QUERY)) {
@@ -607,6 +610,7 @@ public class ModifConServlet extends HttpServlet {
 			        stm.setInt(2, start_c.getLuna());
 			        stm.setInt(3, end_c.getZi());
 			        stm.setInt(4, end_c.getLuna());
+			        stm.setInt(5, id);
 			        try (ResultSet rs = stm.executeQuery() ) {
 			            if (rs.next()) {
 			                nr = rs.getInt("total");

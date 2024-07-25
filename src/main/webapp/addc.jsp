@@ -46,7 +46,7 @@
             background-color: #333;
         }
         .highlight {
-            background-color: var(--bg);
+            /*background-color: #32a852;*/
             color: white;
         }
         :root{
@@ -166,6 +166,7 @@
                                             </div>
                                         </div>
                                        <% out.println("<input type='hidden' name='userId' value='" + userId + "'/>"); %> 
+                                        <%  out.println("            <a href=\"actiuni.jsp\" class=\"login__forgot\">Inapoi</a>"); %>
                                         <div class="login__buttons">
                                             <input type="submit" value="Adaugare" class="login__button login__button-ghost">
                                         </div>

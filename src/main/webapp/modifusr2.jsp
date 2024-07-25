@@ -282,7 +282,10 @@ if (sesi != null) {
                 out.println("                    </div>");
                 out.println("                </div>");
                 out.println("</td></tr></table>");
+                if (userType == 4)
                 out.println("            <a href=\"modifusr1.jsp\" class=\"login__forgot\">Inapoi</a>");
+                if (userType != 4)
+                    out.println("            <a href=\"modifydata.jsp\" class=\"login__forgot\">Inapoi</a>");
                 out.println("                <div class=\"login__buttons\">");
                 out.println("                    <input type=\"submit\" value=\"Submit\" class=\"login__button login__button-ghost\">");
                 out.println("                </div>");
