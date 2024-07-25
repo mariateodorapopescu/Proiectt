@@ -65,7 +65,7 @@ public class AprobSefServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Aprobare cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'vizualizareconcedii.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (SQLException e) {
@@ -75,7 +75,7 @@ public class AprobSefServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Eroare la aprobare la baza de date!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'concediinoisef.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (ClassNotFoundException e) {
@@ -85,7 +85,7 @@ public class AprobSefServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Eroare la aprobare - nu s-a gasit clasa, debug only!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'concediinoisef.jsp';");
 		    out.println("</script>");
 		    out.close();
 		}

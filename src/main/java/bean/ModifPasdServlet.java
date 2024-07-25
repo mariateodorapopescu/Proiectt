@@ -42,7 +42,7 @@ public class ModifPasdServlet extends HttpServlet {
    				    PrintWriter out = response.getWriter();
    				    out.println("<script type='text/javascript'>");
    				    out.println("alert('Nu a gasit clasa - debug only!');");
-   				    out.println("window.location.href = 'dashboard.jsp';");
+   				    out.println("window.location.href = 'err.jsp';");
    				    out.println("</script>");
    				    out.close();
    				    e.printStackTrace();
@@ -52,7 +52,7 @@ public class ModifPasdServlet extends HttpServlet {
    				 PrintWriter out = response.getWriter();
    				    out.println("<script type='text/javascript'>");
    				    out.println("alert('Eroare la baza de date - debug only!');");
-   				    out.println("window.location.href = 'login.jsp';");
+   				    out.println("window.location.href = 'err.jsp';");
    				    out.println("</script>");
    				    out.close();
    				    e.printStackTrace();
@@ -73,7 +73,13 @@ public class ModifPasdServlet extends HttpServlet {
 
         // Validate password
         if (!PasswordValidator.validatePassword(password)) {
-        	 response.sendRedirect("modifpasd2.jsp?p=true");
+        	PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nume de utilizator introdus gresit!');");
+		    out.println("window.location.href = 'modifpasd2.jsp?p=true';");
+		    out.println("</script>");
+		    out.close();
+        	// response.sendRedirect("modifpasd2.jsp?p=true");
         	return;
         }
 
@@ -98,7 +104,7 @@ public class ModifPasdServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'homedir.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -106,7 +112,7 @@ public class ModifPasdServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'forgotpass.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

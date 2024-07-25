@@ -43,8 +43,26 @@
         font-size: 14px; /* Adjust font size for smaller screens */
         transition: color 0.3s;
     }
-    a:hover {
+     a:hover {
         color: #000;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 30px;
+        padding-bottom: 25px;
+        margin: 0;
+    }
+    a:active {
+        color: #000;
+        background-color: rgba(255, 255, 255, 0.2);
+         padding: 30px;
+        padding-bottom: 25px;
+        margin: 0;
+    }
+    a:focus {
+        color: #000;
+        background-color: rgba(255, 255, 255, 0.2);
+         padding: 30px;
+        padding-bottom: 25px;
+        margin: 0;
     }
     iframe {
         width: 100%;

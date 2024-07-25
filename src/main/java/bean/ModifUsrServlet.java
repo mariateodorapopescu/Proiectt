@@ -70,7 +70,7 @@ public class ModifUsrServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'despr.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -111,7 +111,7 @@ public class ModifUsrServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'despr.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class ModifUsrServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'despr.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

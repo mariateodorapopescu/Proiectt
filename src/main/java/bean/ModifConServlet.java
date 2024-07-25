@@ -89,7 +89,7 @@ public class ModifConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul nu poate avea mai mult de 3 perioade diefrite de concediu!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -100,7 +100,7 @@ public class ModifConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -110,7 +110,7 @@ public class ModifConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -122,7 +122,7 @@ public class ModifConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul are deja prea multe zile de concediu!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -133,7 +133,7 @@ public class ModifConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -143,7 +143,7 @@ public class ModifConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -155,7 +155,7 @@ public class ModifConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul nu poate avea mai mult de un concediu pe timpul verii!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -166,7 +166,7 @@ public class ModifConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -176,7 +176,7 @@ public class ModifConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -187,7 +187,7 @@ public class ModifConServlet extends HttpServlet {
         	PrintWriter out = response.getWriter();
 			out.println("<script type='text/javascript'>");
 		    out.println("alert('Utilizatorul nu poate avea mai mult de 21 de zile / concediu!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
 			return;
@@ -199,7 +199,7 @@ public class ModifConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Au concediu prea multi utilizatori dintr-un singur departament!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -210,7 +210,7 @@ public class ModifConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -220,7 +220,7 @@ public class ModifConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -242,7 +242,7 @@ public class ModifConServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -256,7 +256,7 @@ public class ModifConServlet extends HttpServlet {
 	 				PrintWriter out = response.getWriter();
 					out.println("<script type='text/javascript'>");
 				    out.println("alert('Au concediu prea multi directori!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 					return;
@@ -267,7 +267,7 @@ public class ModifConServlet extends HttpServlet {
 				    PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Nu a gasit clasa - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -277,7 +277,7 @@ public class ModifConServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare IO - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -295,7 +295,7 @@ public class ModifConServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'concediinoieu.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -303,7 +303,7 @@ public class ModifConServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'concediinoieu.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

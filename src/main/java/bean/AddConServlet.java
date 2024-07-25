@@ -93,7 +93,7 @@ public class AddConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul nu poate avea mai mult de 3 perioade diefrite de concediu!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -104,7 +104,7 @@ public class AddConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -114,7 +114,7 @@ public class AddConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -126,7 +126,7 @@ public class AddConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul are deja prea multe zile de concediu!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -137,7 +137,7 @@ public class AddConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -147,7 +147,7 @@ public class AddConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -159,7 +159,7 @@ public class AddConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul nu poate avea mai mult de un concediu pe timpul verii!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -170,7 +170,7 @@ public class AddConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -180,7 +180,7 @@ public class AddConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -191,7 +191,7 @@ public class AddConServlet extends HttpServlet {
         	PrintWriter out = response.getWriter();
 			out.println("<script type='text/javascript'>");
 		    out.println("alert('Utilizatorul nu poate avea mai mult de 21 de zile / concediu!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
 			return;
@@ -203,7 +203,7 @@ public class AddConServlet extends HttpServlet {
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Au concediu prea multi utilizatori dintr-un singur departament!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 				return;
@@ -214,7 +214,7 @@ public class AddConServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -224,7 +224,7 @@ public class AddConServlet extends HttpServlet {
 			 PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'dashboard.jsp';");
+			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
 			    e.printStackTrace();
@@ -246,7 +246,7 @@ public class AddConServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -260,7 +260,7 @@ public class AddConServlet extends HttpServlet {
 	 				PrintWriter out = response.getWriter();
 					out.println("<script type='text/javascript'>");
 				    out.println("alert('Au concediu prea multi directori!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 					return;
@@ -271,7 +271,7 @@ public class AddConServlet extends HttpServlet {
 				    PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Nu a gasit clasa - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -281,7 +281,7 @@ public class AddConServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare IO - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'actiuni.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -299,7 +299,7 @@ public class AddConServlet extends HttpServlet {
 	        PrintWriter out = response.getWriter();
 	        out.println("<script type='text/javascript'>");
 	        out.println("alert('Concediul specificat există deja!');");
-	        out.println("window.location.href = 'dashboard.jsp';");
+	        out.println("window.location.href = 'actiuni.jsp';");
 	        out.println("</script>");
 	        out.close();
 	        return; 
@@ -311,7 +311,7 @@ public class AddConServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Adaugare cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'concediinoieu.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -319,7 +319,7 @@ public class AddConServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut adauga concediul din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

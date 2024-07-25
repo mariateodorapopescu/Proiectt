@@ -36,7 +36,7 @@
         text-align: center;
         transition: background-color 0.3s;
         height:10vh;
-    }
+    }
     a {
         color: #fff;
         text-decoration: none;
@@ -45,6 +45,24 @@
     }
     a:hover {
         color: #000;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 30px;
+        padding-bottom: 25px;
+        margin: 0;
+    }
+    a:active {
+        color: #000;
+        background-color: rgba(255, 255, 255, 0.2);
+         padding: 30px;
+        padding-bottom: 25px;
+        margin: 0;
+    }
+    a:focus {
+        color: #000;
+        background-color: rgba(255, 255, 255, 0.2);
+         padding: 30px;
+        padding-bottom: 25px;
+        margin: 0;
     }
     iframe {
         width: 100%;

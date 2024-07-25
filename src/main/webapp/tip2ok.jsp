@@ -196,7 +196,7 @@ border-radius: 2em;
 
             iframe.onload = function() {
                 const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                iframe.style.height = iframeDocument.documentElement.scrollHeight + 'px';
+                iframe.style.height = iframeDocument.documentElement.scrollHeight * 1.07 + 'px';
             };
         });
     </script>

@@ -65,7 +65,7 @@ public class DelConServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Stergere cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'vizualizareconcedii.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class DelConServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut sterge concediul din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();
