@@ -4,48 +4,6 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html>
-<head>
-    <title>Aprobare concediu</title>
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <meta charset="UTF-8">
-    
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-   
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
-     <style>
-        
-        a, a:visited, a:hover, a:active{text-decoration: none; color:#eaeaea !important}
-        
-        .status-icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 20px;
-            color: white;
-            font-size: 14px;
-        }
-        .status-neaprobat { background-color: #88aedb; }
-        .status-dezaprobat-sef { background-color: #b37142; }
-        .status-dezaprobat-director { background-color: #873931; }
-        .status-aprobat-director { background-color: #40854a; }
-        .status-aprobat-sef { background-color: #ccc55e; }
-        .status-pending { background-color: #e0a800; }
-        
-    </style>
-    </head>
-<body>
 <%
     HttpSession sesi = request.getSession(false);
     if (sesi != null) {
@@ -58,7 +16,7 @@
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
-                    int userId = rs.getInt("id");
+                    int id = rs.getInt("id");
                     int userType = rs.getInt("tip");
                     int userdep = rs.getInt("id_dep");
                     if (userType == 3) {  // Assuming only type 4 users can approve
@@ -84,18 +42,118 @@
                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                             e.printStackTrace();
                         }
+                   	 String accent = null;
+                  	 String clr = null;
+                  	 String sidebar = null;
+                  	 String text = null;
+                  	 String card = null;
+                  	 String hover = null;
+                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                         // Check for upcoming leaves in 3 days
+                         String query = "SELECT * from teme where id_usr = ?";
+                         try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                             stmt.setInt(1, id);
+                             try (ResultSet rs2 = stmt.executeQuery()) {
+                                 if (rs2.next()) {
+                                   accent =  rs2.getString("accent");
+                                   clr =  rs2.getString("clr");
+                                   sidebar =  rs2.getString("sidebar");
+                                   text = rs2.getString("text");
+                                   card =  rs2.getString("card");
+                                   hover = rs2.getString("hover");
+                                 }
+                             }
+                         }
+                         // Display the user dashboard or related information
+                         //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                         // Add additional user-specific content here
+                     } catch (SQLException e) {
+                         out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                         e.printStackTrace();
+                     }
                         %>
+<html>
+<head>
+    <title>Concedii noi</title>
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta charset="UTF-8">
+    
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+   
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+      <style>
+        
+        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+    
+    
+        .status-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 14px;
+        }
+        .status-neaprobat { background-color: #88aedb; }
+        .status-dezaprobat-sef { background-color: #b37142; }
+        .status-dezaprobat-director { background-color: #873931; }
+        .status-aprobat-director { background-color: #40854a; }
+        .status-aprobat-sef { background-color: #ccc55e; }
+        .status-pending { background-color: #e0a800; }
+       
+       .tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+       
+    </style>
+    </head>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+
                         	<div class="main-content">
         <div class="header">
          </div>
         <div class="content">
-            <div class="intro" id="content">
-           <h1>Cereri noi de concedii</h1>
+            <div class="intro" style="background:<%out.println(sidebar);%>;">
+           
+                 <div class="events" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                  <h1>Cereri noi de concedii</h1>
                 <h3><%out.println(today); %></h3>
-                 <div class="events">
-                <table style="border-bottom: 1px solid #3F48CC;">
+                <table>
                     <thead>
-                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
+                        <tr >
                         
                     <th>Nr. crt</th>
                     <th>Departament</th>
@@ -112,7 +170,7 @@
                      <th>Respingeti</th>
                 </tr>
                     </thead>
-                    <tbody>
+                   <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                     
                     
                     <%
@@ -154,7 +212,7 @@
                               
                 </div>
                 <div class="into">
-                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
+                  <button id="generate" onclick="generate()">Generate PDF</button>
                 
                 </div>
                 

@@ -12,11 +12,11 @@
   --body-color-light: hsl(208, 97%, 85%);
   --title-color-dark: hsl(0, 0%, 95%);
   --text-color-dark: hsl(0, 0%, 80%);
-  --body-color-dark: #2a2a2a;
+  --body-color-dark: hsl(244, 75%, 10%);
   --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
   --form-border-color-light: hsla(244, 16%, 92%, 0.75);
-  --form-bg-color-dark: #333;
-  --form-border-color-dark: #3a3a3a;
+  --form-bg-color-dark: hsla(244, 16%, 20%, 0.6);
+  --form-border-color-dark: hsla(244, 16%, 20%, 0.75);
   /*========== Font and typography ==========*/
   --body-font: "Poppins", sans-serif;
   --h2-font-size: 1.25rem;
@@ -128,9 +128,6 @@ img {
   position: relative;
   height: 100vh;
   align-items: center;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
 }
 
 .login__form {
@@ -1024,5 +1021,4 @@ img {
     }
   
 }
-
 

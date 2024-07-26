@@ -26,7 +26,7 @@
             background-color: #2a2a2a;
             padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+           
         }
         
         .calendar-container {
@@ -45,7 +45,7 @@
             background-color: var(--bg);
             color: white;
         }
-        :root{
+         :root{
           --first-color: #2a2a2a;
   --second-color: hsl(249, 64%, 47%);
   --title-color-light: hsl(244, 12%, 12%);
@@ -68,9 +68,23 @@
   --font-semi-bold: 600;
         }
         
+        ::placeholder {
+  color: var(--text);
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder { /* Edge 12-18 */
+  color: var(--text);
+}
+         @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
     </style>
 </head>
-<body>
 <%
     HttpSession sess = request.getSession(false); // Make sure you have the correct import for HttpSession
     if (sess != null) {
@@ -78,28 +92,73 @@
         
         // Check if the username is actually retrieved from the session
         if (username != null && !username.isEmpty()) {
+        	  Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+              try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                   PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume, id from useri where username = ?")) {
+                  preparedStatement.setString(1, username);
+                  ResultSet rs = preparedStatement.executeQuery();
+                  if (!rs.next()) {
+                      out.println("<script type='text/javascript'>");
+                      out.println("alert('Date duse incorect sau nu exista date!');");
+                      out.println("</script>");
+                  } else {
+                      
+                      	int id = rs.getInt("id");
+                      	String accent = null;
+                     	 String clr = null;
+                     	 String sidebar = null;
+                     	 String text = null;
+                     	 String card = null;
+                     	 String hover = null;
+                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            // Check for upcoming leaves in 3 days
+                            String query = "SELECT * from teme where id_usr = ?";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                stmt.setInt(1, id);
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      accent =  rs2.getString("accent");
+                                      clr =  rs2.getString("clr");
+                                      sidebar =  rs2.getString("sidebar");
+                                      text = rs2.getString("text");
+                                      card =  rs2.getString("card");
+                                      hover = rs2.getString("hover");
+                                    }
+                                }
+                            }
+                            
+                           
+                            // Display the user dashboard or related information
+                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                            // Add additional user-specific content here
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
         	%>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
         	 <div class="flex-container">
              
-             <div class="form-container">
+             <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
           
 
-                 <form action="<%= request.getContextPath() %>/modifusr2.jsp" method="post" class="login__form">
+                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifusr2.jsp" method="post" class="login__form">
                      <div>
-                         <h1 class="login__title"><span>Modificare date personale</span></h1>
+                         <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Modificare date personale</span></h1>
                          
                      </div>
                      
-                     <div class="login__inputs">
+                     <div style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>" class="login__inputs">
                         
                          <div>
-                             <label class="login__label">Cod</label>
-                             <input type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
+                             <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Cod</label>
+                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
                          </div>
                         
                        
                          <div class="login__buttons">
-                             <input type="submit" value="Modificare" class="login__button login__button-ghost">
+                             <input style="backgroundColor:<%out.println(sidebar);%>; color:<%out.println(accent);%>; border-color:<%out.println(accent);%>" type="submit" value="Modificare" class="login__button login__button-ghost">
                          </div>
                      </form>
                      <%
@@ -107,40 +166,52 @@
                      %>
                  </div>
              </div>
+             </body>
+</html>
         	<%
-           
+                  }
+                  }
         } else {
             // If username is not in session, redirect to login
+            String accent = "#03346E";
+                     	 String clr = "#d8d9e1";
+                     	 String sidebar = "#ECEDFA";
+                     	 String text = "#333";
+                     	 String card = "#ECEDFA";
+                     	 String hover = "#ECEDFA";
             %>
-            
-       	 <div class="flex-container">
-            
-            <div class="form-container">
+           <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-                <form action="<%= request.getContextPath() %>/modifusr2.jsp" method="post" class="login__form">
-                    <div>
-                        <h1 class="login__title"><span>Modificare date personale</span></h1>
+        	 <div style=" background:<%out.println(clr);%>" class="flex-container">
+             
+             <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+          
+
+                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifusr2.jsp" method="post" class="login__form">
+                     <div>
+                         <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Modificare date personale</span></h1>
+                         
+                     </div>
+                     
+                     <div style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>" class="login__inputs">
                         
-                    </div>
-                    
-                    <div class="login__inputs">
+                         <div>
+                             <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Cod</label>
+                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
+                         </div>
+                        
                        
-                        <div>
-                            <label class="login__label">Cod</label>
-                            <input type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
-                        </div>
-                       
-                      <%  out.println("            <a href=\"despr.jsp\" class=\"login__forgot\">Inapoi</a>"); %>
-                        <div class="login__buttons">
-                            <input type="submit" value="Modificare" class="login__button login__button-ghost">
-                        </div>
-                    </form>
-                    <%
-                    out.println("</div>");
-                    %>
-                </div>
-            </div>
-            
+                         <div class="login__buttons">
+                             <input style="backgroundColor:<%out.println(sidebar);%>; color:<%out.println(accent);%>; border-color:<%out.println(accent);%>" type="submit" value="Modificare" class="login__button login__button-ghost">
+                         </div>
+                     </form>
+                     <%
+                     out.println("</div>");
+                     %>
+                 </div>
+             </div>
+             </body>
+</html>
             <%
 
         }
@@ -149,7 +220,7 @@
     	out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 %>
 </body>

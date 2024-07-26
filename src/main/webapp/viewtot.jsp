@@ -16,6 +16,17 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
 
     <title>Vizualizare concedii</title>
+     <style>
+       body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    padding-top: 60px; /* Adjust as needed */
+     
+}
+    </style>
 </head>
 <body>
 <%

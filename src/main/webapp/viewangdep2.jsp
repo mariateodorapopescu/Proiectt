@@ -4,6 +4,82 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+    HttpSession sesi = request.getSession(false);
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        if (currentUser != null) {
+            String username = currentUser.getUsername();
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id FROM useri WHERE username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (!rs.next()) {
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
+                } else {
+                    int userType = rs.getInt("tip");
+                    int id = rs.getInt("id");
+                    if (userType != 0) {
+                        response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
+                    } else {
+                        int idDep = Integer.valueOf(request.getParameter("iddep"));
+                        
+                        String today = null;
+                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                              // Check for upcoming leaves in 3 days
+                              String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                              try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                  // stmt.setInt(1, id);
+                                  try (ResultSet rs2 = stmt.executeQuery()) {
+                                      if (rs2.next()) {
+                                        today =  rs2.getString("today");
+                                      }
+                                  }
+                              }
+                             
+                              // Display the user dashboard or related information
+                              //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                              // Add additional user-specific content here
+                          } catch (SQLException e) {
+                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                              e.printStackTrace();
+                          }
+                        
+                        String accent = null;
+                     	 String clr = null;
+                     	 String sidebar = null;
+                     	 String text = null;
+                     	 String card = null;
+                     	 String hover = null;
+                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            // Check for upcoming leaves in 3 days
+                            String query = "SELECT * from teme where id_usr = ?";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                stmt.setInt(1, id);
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      accent =  rs2.getString("accent");
+                                      clr =  rs2.getString("clr");
+                                      sidebar =  rs2.getString("sidebar");
+                                      text = rs2.getString("text");
+                                      card =  rs2.getString("card");
+                                      hover = rs2.getString("hover");
+                                    }
+                                }
+                            }
+                            
+                           
+                            // Display the user dashboard or related information
+                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                            // Add additional user-specific content here
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
+                    	%>
 <html>
 <head>
     <title>Vizualizare angajati</title>
@@ -25,35 +101,13 @@
     
     </style>
 </head>
-<body>
-<%
-    HttpSession sesi = request.getSession(false);
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                	out.println("<script type='text/javascript'>");
-                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                    out.println("</script>");
-                } else {
-                    int userType = rs.getInt("tip");
-                    if (userType != 0) {
-                        response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
-                    } else {
-                        int idDep = Integer.valueOf(request.getParameter("iddep"));
-                        
-                    	%>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+
                     	<div class="main-content">
         <div class="header">
          </div>
         <div class="content">
-            <div class="intro">             	
+             <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">       	
                     	<%
                         
                         PreparedStatement stm = connection.prepareStatement("SELECT nume_dep from departament WHERE id_dep = ?");
@@ -63,13 +117,17 @@
                         if (rs2.next()) {
                             deptName = rs2.getString("nume_dep");
                         }
-                        out.println("<h1>Vizualizare angajati din departamentul " + deptName + "</h1><br>");
+                       
 %>              	
                     	
-                 <div class="events"  id="content">
-                <table style="border-bottom: 1px solid #3F48CC;">
+                 <div class="events" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                  <% out.println("<h1>Vizualizare angajati din departamentul " + deptName + "</h1>"); 
+                  out.println("<h3>" + today + "</h3>"); 
+                  
+                  %>
+                <table >
                     <thead>
-                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
+                        <tr >
                         
                     <th>Nume</th>
                     <th>Prenume</th>
@@ -79,7 +137,7 @@
                     
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                         
 
 <%
@@ -101,11 +159,11 @@
                               
                 </div>
                  <div class="into">
-                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Descarcati PDF</button>
+                  <button id="generate" onclick="generate()">Descarcati PDF</button>
                   <%
                  
             		
-            			out.println("<button style='--bg:#3F48CC;'><a href='viewangdep.jsp'>Inapoi</a></button></div>");
+            			out.println("<button><a href='viewangdep.jsp'>Inapoi</a></button></div>");
          		
                   
                   %>

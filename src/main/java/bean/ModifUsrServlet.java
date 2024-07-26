@@ -70,11 +70,12 @@ public class ModifUsrServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'despr.jsp';");
+				    out.println("window.location.href = 'logout';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
 		        throw new IOException("Eroare la baza de date =(", e);
+		       
 		    }
         
         if (tip == 3 && nrsef == 1) {

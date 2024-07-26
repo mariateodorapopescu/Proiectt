@@ -4,9 +4,77 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+    HttpSession sesi = request.getSession(false);
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        if (currentUser != null) {
+            String username = currentUser.getUsername();
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+                    int userType = rs.getInt("tip");
+                    int userdep = rs.getInt("id_dep");
+                    if (userType != 4) {  // Assuming only type 4 users can approve
+                    	
+                    	
+                    	String today = null;
+                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            // Check for upcoming leaves in 3 days
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                // stmt.setInt(1, id);
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      today =  rs2.getString("today");
+                                    }
+                                }
+                            }
+                           
+                            // Display the user dashboard or related information
+                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                            // Add additional user-specific content here
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
+                   	 String accent = null;
+                  	 String clr = null;
+                  	 String sidebar = null;
+                  	 String text = null;
+                  	 String card = null;
+                  	 String hover = null;
+                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                         // Check for upcoming leaves in 3 days
+                         String query = "SELECT * from teme where id_usr = ?";
+                         try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                             stmt.setInt(1, id);
+                             try (ResultSet rs2 = stmt.executeQuery()) {
+                                 if (rs2.next()) {
+                                   accent =  rs2.getString("accent");
+                                   clr =  rs2.getString("clr");
+                                   sidebar =  rs2.getString("sidebar");
+                                   text = rs2.getString("text");
+                                   card =  rs2.getString("card");
+                                   hover = rs2.getString("hover");
+                                 }
+                             }
+                         }
+                         // Display the user dashboard or related information
+                         //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                         // Add additional user-specific content here
+                     } catch (SQLException e) {
+                         out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                         e.printStackTrace();
+                     }
+                        %>
 <html>
 <head>
-    <title>Aprobare concediu</title>
+    <title>Concedii noi</title>
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +90,7 @@
    
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
-     <style>
+      <style>
         
         a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
     
@@ -72,59 +140,20 @@
        
     </style>
     </head>
-<body>
-<%
-    HttpSession sesi = request.getSession(false);
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                    int userId = rs.getInt("id");
-                    int userType = rs.getInt("tip");
-                    int userdep = rs.getInt("id_dep");
-                    if (userType != 4) {  // Assuming only type 4 users can approve
-                    	
-                    	
-                    	String today = null;
-                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                            // Check for upcoming leaves in 3 days
-                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
-                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                // stmt.setInt(1, id);
-                                try (ResultSet rs2 = stmt.executeQuery()) {
-                                    if (rs2.next()) {
-                                      today =  rs2.getString("today");
-                                    }
-                                }
-                            }
-                           
-                            // Display the user dashboard or related information
-                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                            // Add additional user-specific content here
-                        } catch (SQLException e) {
-                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                            e.printStackTrace();
-                        }
-                        %>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+
                         	<div class="main-content">
         <div class="header">
          </div>
         <div class="content">
-            <div class="intro" >
-            
-                
-                 <div class="events" id="content">
-                 <h1>Concedii personale</h1>
-                 <h3><%out.println(today); %></h3>
-                <table style="border-bottom: 1px solid #3F48CC;">
+            <div class="intro" style="background:<%out.println(sidebar);%>;">
+           
+                 <div class="events" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                  <h1>Cereri noi de concedii</h1>
+                <h3><%out.println(today); %></h3>
+                <table>
                     <thead>
-                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
+                        <tr >
                         
                     <th>Nr. crt</th>
                     <th>Departament</th>
@@ -141,7 +170,9 @@
                      <th>Stergeti</th>
                 </tr>
                     </thead>
-                    <tbody><%
+                   <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                   
+                   <%
             if (userType != 3 || userType != 0) {
             	
                         try (PreparedStatement stmt = connection.prepareStatement("SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
@@ -154,7 +185,7 @@
                                 "JOIN tipcon ct ON c.tip = ct.tip " +
                                 "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ? and c.status = 0")) {
                             
-                        	stmt.setInt(1, userId);
+                        	stmt.setInt(1, id);
                         	ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
                             while (rs1.next()) {
@@ -186,7 +217,7 @@
                         "JOIN tipcon ct ON c.tip = ct.tip " +
                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ? and c.status = 1")) {
                     
-                	stmt.setInt(1, userId);
+                	stmt.setInt(1, id);
                 	ResultSet rs1 = stmt.executeQuery();
                     boolean found = false;
                     while (rs1.next()) {
@@ -215,13 +246,12 @@
                               
                 </div>
                 <div class="into">
-                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
-                    <button style="--bg:#3F48CC;"><a href='actiuni.jsp'>Inapoi</a></button></div>
+                  <button id="generate" onclick="generate()" >Generate PDF</button>
+                    <button ><a href='actiuni.jsp'>Inapoi</a></button></div>
                 </div>
                 
                 <%
-        
-        
+
                     } else {
                     	switch (userType) {
                         case 1: response.sendRedirect("tip1ok.jsp"); break;

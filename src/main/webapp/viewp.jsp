@@ -7,7 +7,7 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
 
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -16,6 +16,19 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
 
     <title>Vizualizare concedii</title>
+    <style>
+       body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    padding-top: 60px; /* Adjust as needed */
+     
+}
+    </style>
+ 
+    
 </head>
 <body>
 <%

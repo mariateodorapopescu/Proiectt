@@ -4,6 +4,60 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+    HttpSession sesi = request.getSession(false);
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        if (currentUser != null) {
+            String username = currentUser.getUsername();
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("select * from useri where username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+                    int userType = rs.getInt("tip");
+                   // String zile = rs.getString("zileramase");
+                    //System.out.println(zile);
+                   //  String con = rs.getString("conramase");
+                    if (userType == 4) {
+                        response.sendRedirect("adminok.jsp"); 
+                        
+                    } else {
+                    	 String accent = null;
+                      	 String clr = null;
+                      	 String sidebar = null;
+                      	 String text = null;
+                      	 String card = null;
+                      	 String hover = null;
+                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                             
+                            
+                             // Display the user dashboard or related information
+                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                             // Add additional user-specific content here
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                      	 
+                        %>
 <html>
 <head>
     <title>Adaugare concediu</title>
@@ -30,7 +84,7 @@
             background-color: #2a2a2a;
             padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+           
         }
         
         .calendar-container {
@@ -72,83 +126,78 @@
   --font-semi-bold: 600;
         }
         
+        ::placeholder {
+  color: var(--text);
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder { /* Edge 12-18 */
+  color: var(--text);
+}
+        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
     </style>
 </head>
-<body>
-<%
-    HttpSession sesi = request.getSession(false);
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select * from useri where username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                    int userId = rs.getInt("id");
-                    int userType = rs.getInt("tip");
-                   // String zile = rs.getString("zileramase");
-                    //System.out.println(zile);
-                   //  String con = rs.getString("conramase");
-                    if (userType == 4) {
-                        response.sendRedirect("adminok.jsp"); 
-                        
-                    } else {
-                        %>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
+
                         <div class="flex-container">
-                            <div class="calendar-container">
+                            <div class="calendar-container" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="calendar">
                                 <div class="navigation">
                                     <button class='prev' onclick="previousMonth()">❮</button>
                                     <div class="month-year" id="monthYear"></div>
                                     <button class='next' onclick="nextMonth()">❯</button>
                                 </div>
                                 <table class="calendar" id="calendar">
-                                    <thead>
-                                        <tr>
-                                            <th class="calendar">Lu.</th>
-                                            <th class="calendar">Ma.</th>
-                                            <th class="calendar">Mi.</th>
-                                            <th class="calendar">Jo.</th>
-                                            <th class="calendar">Vi.</th>
-                                            <th class="calendar">Sâ.</th>
-                                            <th class="calendar">Du.</th>
+                                    <thead >
+                                        <tr >
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar">Lu.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Ma.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Mi.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Jo.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Vi.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Sâ.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Du.</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="calendar" id="calendar-body">
+                                    <tbody class="calendar" id="calendar-body" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
                                         <!-- Calendar will be generated here -->
                                     </tbody>
                                 </table>
                                 
                             </div>
-                            <div class="form-container">
+                            <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                          
     
-                                <form action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
+                                <form style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
                                     <div>
-                                        <h1 class="login__title"><span>Adaugare concediu</span></h1>
+                                        <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Adaugare concediu</span></h1>
                                         <%
                                         //out.println("<p style='margin:0; padding:0; position:relative; top:0;'>Zile ramase: " + zile + "; Concedii ramase: " + con + "</p>");
                                         %>
                                     </div>
                                     
-                                    <div class="login__inputs">
+                                    <div class="login__inputs" style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>">
                                         <div>
-                                            <label class="login__label">Data plecare</label>
-                                            <input class="login__input" type='date' id='start' name='start' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Data plecare</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="login__input" type='date' id='start' name='start' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
                                         </div>
                                         <div>
-                                            <label class="login__label">Data sosire</label>
-                                            <input class="login__input" type='date' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Data sosire</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="login__input" type='date' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
                                         </div>
                                         <div>
-                                            <label class="login__label">Motiv</label>
-                                            <input type="text" placeholder="Introduceti motivul" required class="login__input" name='motiv'/>
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Motiv</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti motivul" required class="login__input" name='motiv'/>
                                         </div>
                                         <div>
-                                            <label class="login__label">Tip concediu</label>
-                                            <select name='tip' class="login__input">
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Tip concediu</label>
+                                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name='tip' class="login__input">
                                             <%
                                             try (PreparedStatement stmt = connection.prepareStatement("SELECT tip, motiv FROM tipcon")) {
                                                 ResultSet rs1 = stmt.executeQuery();
@@ -161,14 +210,14 @@
                                             out.println("</select></div>");
                                             %>
                                             <div>
-                                                <label class="login__label">Locatie</label>
-                                                <input type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
+                                                <label style=" color:<%out.println(text);%>" class="login__label">Locatie</label>
+                                                <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
                                             </div>
                                         </div>
-                                       <% out.println("<input type='hidden' name='userId' value='" + userId + "'/>"); %> 
-                                        <%  out.println("            <a href=\"actiuni.jsp\" class=\"login__forgot\">Inapoi</a>"); %>
+                                       <% out.println("<input type='hidden' name='userId' value='" + id + "'/>"); %> 
+                                        <%  out.println("            <a href=\"actiuni.jsp\" style=\"color:" + accent + "\" class=\"login__forgot\">Inapoi</a>"); %>
                                         <div class="login__buttons">
-                                            <input type="submit" value="Adaugare" class="login__button login__button-ghost">
+                                            <input style="backgroundColor:<%out.println(sidebar);%>; color:<%out.println(accent);%>; border-color:<%out.println(accent);%>" type="submit" value="Adaugare" class="login__button login__button-ghost">
                                         </div>
                                     </form>
                                     <%

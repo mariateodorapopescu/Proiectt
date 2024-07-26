@@ -78,14 +78,46 @@
                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                              e.printStackTrace();
                          }
+                    	 
+                    	 String accent = null;
+                      	 String clr = null;
+                      	 String sidebar = null;
+                      	 String text = null;
+                      	 String card = null;
+                      	 String hover = null;
+                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                             
+                            
+                             // Display the user dashboard or related information
+                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                             // Add additional user-specific content here
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
                     	%>
                     	
-                    	<div class="main-content">
-                    	<div class="intro">
-                <h3>Ce doriti sa faceti?</h3>
-                 <button style="--bg: #3F48CC;"> <a href = "viewcolegi.jsp" style="text-decoration:none;">Vizualizare angajati din toata institutia</a></button>
-       <button style="--bg: #3F48CC;"><a href = "viewangdep.jsp" style="text-decoration:none;">Vizualizare angajati dintr-un anumit departament</a></button>
-       <button style="--bg: #3F48CC;"><a href = "viewcolegidep.jsp" style="text-decoration:none;">Vizualizare angajati din departamentul meu</a></button>
+                    	<div class="main-content" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
+                    	<div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                <h3 style="color:<%out.println(text);%>">Ce doriti sa faceti?</h3>
+                 <button style="--bg:<%out.println(accent);%> ;"> <a href = "viewcolegi.jsp" style="text-decoration:none;">Vizualizare angajati din toata institutia</a></button>
+       <button style="--bg:<%out.println(accent);%> ;"><a href = "viewangdep.jsp" style="text-decoration:none;">Vizualizare angajati dintr-un anumit departament</a></button>
+       <button style="--bg:<%out.println(accent);%> ;"><a href = "viewcolegidep.jsp" style="text-decoration:none;">Vizualizare angajati din departamentul meu</a></button>
                
                </div>
                </div>

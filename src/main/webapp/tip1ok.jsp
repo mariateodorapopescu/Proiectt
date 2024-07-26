@@ -4,41 +4,6 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    
-   
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
-    <title>Acasa</title>
-    <style>
-        iframe {
-            width: 100%;
-            border: none;
-            transition: height 0.5s ease;
-            overflow: hidden; /* Hide scrollbars */
-            overflow-y: hidden; /* Hide vertical scrollbar */
-            /* Hide scrollbar for Chrome, Safari and Opera */
-             -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-height: 90%;
-border-radius: 2em;
-        }
-        iframe::-webkit-scrollbar {
-  display: none;
-}
-        
-    </style>
-</head>
-<body>
 <%
     HttpSession sesi = request.getSession(false);
 
@@ -59,7 +24,7 @@ border-radius: 2em;
                 } else {
                     if (rs.getString("tip").compareTo("1") != 0) {
                         if (rs.getString("tip").compareTo("0") == 0) {
-                            response.sendRedirect("tip1ok.jsp");
+                            response.sendRedirect("dashboard.jsp");
                         }
                         if (rs.getString("tip").compareTo("2") == 0) {
                             response.sendRedirect("tip2ok.jsp");
@@ -93,30 +58,529 @@ border-radius: 2em;
                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                              e.printStackTrace();
                          }
+                    	 String accent = null;
+                      	 String clr = null;
+                      	 String sidebar = null;
+                      	 String text = null;
+                      	 String card = null;
+                      	 String hover = null;
+                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                             
+                            
+                             // Display the user dashboard or related information
+                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                             // Add additional user-specific content here
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                      	 
+                    	 
                     	%>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    
+   
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+      <title>Concedii</title>
+    <style>
+        iframe {
+            width: 100%;
+            border: none;
+            transition: height 0.5s ease;
+            overflow: hidden; /* Hide scrollbars */
+            overflow-y: hidden; /* Hide vertical scrollbar */
+            /* Hide scrollbar for Chrome, Safari and Opera */
+             -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+height: 90%;
+border-radius: 2em;
+        }
+        iframe::-webkit-scrollbar {
+  display: none;
+}
+        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--clr);
+    display: flex;
+}
+
+.sidebar {
+    width: 4rem;
+    background: var(--sd);
+    transition: 0.5s;
+    padding-left: 1rem;
+    overflow: hidden;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+.sidebar.active {
+    width: 20rem;
+}
+
+.sidebar ul {
+    flex-grow: 1;
+}
+
+.sidebar ul li {
+    list-style: none;
+    position: relative;
+}
+
+.sidebar ul li.active {
+    background: var(--clr);
+    border-top-left-radius: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
+}
+
+.sidebar ul li.active::before{
+    content: '';
+    position: absolute;
+    background: transparent;
+    width: 1rem;
+    height: 2rem;
+    border-bottom-right-radius: 2rem;
+    top: -1.93rem;
+    right: 0;
+    box-shadow: 1rem 1rem 0 1rem var(--clr);
+}
+
+.sidebar ul li.active::after {
+    content: '';
+    position: absolute;
+    background: transparent;
+    width: 1rem;
+    height: 2rem;
+    border-top-right-radius: 2rem;
+    top: -1.93rem;
+    right: 0;
+    box-shadow: 1rem -1rem 0 1rem var(--clr);
+    z-index: 20;
+}
+
+.sidebar ul li.active::after {
+    bottom: -1.93rem;
+    right: 0;
+    box-shadow: 1rem -1rem 0 1rem var(--sd);
+    z-index: 20;
+}
+
+.sidebar ul li.logo {
+    margin-bottom: 4rem;
+}
+
+.sidebar ul li.logo a .siicon {
+    font-size: 2em;
+    color: var(--clr);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 2rem;
+    height: 3rem;
+    font-size: 1.5em;
+    color: var(--text);
+    transition: 0.5s;
+    padding-left: 0.3rem;
+}
+
+.sidebar ul li.logo a .sitext {
+    font-size: 1.2em;
+    font-weight: 500;
+    color: var(--clr);
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    color: var(--text);
+    padding-left: 1.5rem;
+    letter-spacing: 0.05em;
+    transition: 0.5s;
+}
+
+.sidebar ul li a,
+.sidebar ul li .logo a {
+    display: flex;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.sidebar ul li a .siiconn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 2rem;
+    height: 3rem;
+    font-size: 1.5em;
+    color: var(--text);
+    transition: 0.5s;
+    z-index: 22;
+}
+
+.sidebar ul li.active a .siiconn {
+    color: #fff;
+    padding-left: 0.7rem;
+}
+
+.sidebar ul li.active a .sitextt {
+    margin-left: 1rem;
+}
+
+.sidebar ul li.active a .siiconn::before {
+    content: '';
+    position: absolute;
+    background: var(--bg);
+    inset: 0.2rem;
+    width: 2.7rem;
+    border-radius: 50%;
+    transition: 0.5s;
+}
+
+.sidebar ul li.active:hover a .siiconn::before {
+    background: #fff;
+}
+
+.sidebar ul li.active a .sitextt {
+    color: var(--active-bg);
+    padding-left: 0.5rem;
+}
+
+.sidebar ul li:hover a .sitextt,
+.sidebar ul li:hover a .siiconn {
+    color: var(--bg);
+}
+
+.sidebar ul li a .sitextt {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    color: #333;
+    padding-left: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: 0.5s;
+    font-weight: 80;
+}
+
+.sidebar ul li:hover a .siiconn,
+.sidebar ul li:hover a .sitextt {
+    color: var(--bg);
+}
+
+.sibottom {
+    width: 100%;
+}
+
+.sidebar ul li.sibottom a .sitextt {
+    display: none;
+}
+
+.sidebar.active ul li.sibottom a .sitextt {
+    display: inline;
+}
+
+.imgbx {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.imgbx img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.menuToggle {
+    /* position: absolute; */
+    left: 0%;
+    top: 10%;
+    width: 30px;
+    height: 30px;
+    background-color: var(--bg);
+    z-index: 80;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.dark-mode .menuToggle {
+    background-color:  var(--text);
+}
+
+.menuToggle::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 1.5px;
+    background: var(--text);
+    transform: translate(5px, 7px);
+    transition: 0.5s;
+    box-shadow: 0 8px 0 var(--text);
+}
+
+.menuToggle.active::before {
+    transform: translate(5px, 15px) rotate(45deg);
+    box-shadow: 0 0 0 var(--text);
+}
+
+.menuToggle.active::after {
+    transform: translate(5px, 15px) rotate(-45deg);
+}
+
+.menuToggle::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 1.5px;
+    background:  var(--text);
+    transform: translate(5px, 23px);
+    transition: 0.5s;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    position: relative;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    margin-right: 10px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--bg);
+    color: #eaeaea;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: black;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+     background: var(--sd);
+}
+
+.intro {
+    background: var(--sd);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+   
+}
+
+.chart {
+    background: var(--sd);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+   
+}
+
+.events {
+    background: var(--sd);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+   
+}
+.intro h2 {
+    margin-top: 0;
+    color: var(--text);
+}
+
+.intro button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--bg);
+    color: white;
+    cursor: pointer;
+}
+
+.intro button:hover {
+    background-color: black;
+}
+
+.chart h3 {
+    margin-top: 0;
+}
+
+.chart canvas {
+    width: 100%;
+    height: 200px;
+    background-color: var(--bg);
+}
+
+.timeframe button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--sd);
+    color: var(--text);
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.timeframe button:hover {
+    background-color: black;
+    color: white;
+}
+
+.events table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.events th,
+.events td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--bg);
+}
+
+.events th {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.toggle-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.toggle-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--bg);
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.toggle-buttons button:hover {
+    background-color: black;
+}
+.menu {
+	display: flex;
+	 flex-direction: row;
+     flex-wrap: wrap;
+     justify-content: space-evenly;
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     padding: 10%;
+	
+}
+.menu button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    border-color: rgba(0,0,0,0);
+    width: 20%;
+    height: 20%;
+}
+
+.menu button:hover {
+    background-color: black;
+}
+        
+    </style>
+</head>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
                     	
-                    	<div class="sidebar">
+                    	<div class="sidebar" style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>">
         <ul>
-            <li class="logo" style="--bg: #333;">
+            <li class="logo" style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>">
                 <a href="#">
-                    <div class="siicon">
+                    <div class="siicon" style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>">
                         <ion-icon name="airplane"></ion-icon>
                     </div>
-                    <div class="sitext">Concedii</div>
+                    <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="sitext">Concedii</div>
                 </a>
             </li>
-            <div class="menuToggle"></div>
-            <div class="menulist">
-                <li style="--bg: #3F48CC;;"  class="active">
-                     <a href="homedir.jsp" class="load-content" target="iframe">
+            <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="menuToggle"></div>
+            <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="menulist">
+                <li style="--bg:<%out.println(accent); %>"  class="active">
+                     <a style=" color: <%out.println(text); %>" href="homedir.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="home"></ion-icon>
                         </div>
-                        <div class="sitextt">Acasa</div>
+                        <div style="color: <%out.println(text); %>" class="sitextt">Acasa</div>
                     </a>
                 </li>
                
-                <li style="--bg: #3F48CC;;">
+                <li style="--bg: <%out.println(accent); %>">
                      <a href="concediinoieu2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="today"></ion-icon>
@@ -124,7 +588,7 @@ border-radius: 2em;
                         <div class="sitextt">Notificari</div>
                     </a>
                 </li>
-                <li style="--bg: #3F48CC;">
+                <li style="--bg: <%out.println(accent); %>">
                      <a href="viewang2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="stats"></ion-icon>
@@ -133,7 +597,7 @@ border-radius: 2em;
                     </a>
                 </li>
                 
-                <li style="--bg: #3F48CC;;">
+                <li style="--bg: <%out.println(accent); %>">
                     <a href="actiuni.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="apps"></ion-icon>
@@ -142,7 +606,7 @@ border-radius: 2em;
                     </a>
                 </li>
                 
-                <li style="--bg: #3F48CC;;">
+                <li style="--bg: <%out.println(accent); %>">
                     <a href="#">
                         <div class="siiconn">
                             <ion-icon name="switch"></ion-icon>
@@ -152,8 +616,8 @@ border-radius: 2em;
                 </li>
             </div>
             
-            <div class="sibottom">
-                <li style="--bg:#333;">
+             <div class="sibottom">
+                <li style="--bg:<%out.println(text); %>;">
                     <a href="despr.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <div class="imgbx">
@@ -163,7 +627,7 @@ border-radius: 2em;
                         <div class="sitextt"> <% out.println(nume);%></div>
                     </a>
                 </li>
-                <li style="--bg: #333;">
+                <li style="--bg: <%out.println(text); %>;">
                    <a href="logout">
                         <div class="siiconn">
                             <ion-icon name="share-alt"></ion-icon>

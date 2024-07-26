@@ -5,26 +5,15 @@
 :root{
     /*========== Colors ==========*/
     /*Color mode HSL(hue, saturation, lightness)*/
-	--first-color: hsl(244, 75%, 57%);
-	--second-color: hsl(249, 64%, 47%);
-	--title-color-light: hsl(244, 12%, 12%);
-	--text-color-light: hsl(244, 4%, 36%);
-	--body-color-light: hsl(208, 97%, 85%);
-	--title-color-dark: hsl(0, 0%, 95%);
-	--text-color-dark: hsl(0, 0%, 80%);
-	--body-color-dark: #2a2a2a;
-	--form-bg-color-light: hsla(244, 16%, 92%, 0.6);
-	--form-border-color-light: hsla(244, 16%, 92%, 0.75);
-	--form-bg-color-dark: #333;
-	--form-border-color-dark: #3a3a3a;
-	/*========== Font and typography ==========*/
-	--body-font: "Poppins", sans-serif;
-	--h2-font-size: 1.25rem;
-	--small-font-size: .813rem;
-	--smaller-font-size: .75rem;
-	/*========== Font weight ==========*/
-	--font-medium: 500;
-	--font-semi-bold: 600;
+    --first-color: hsl(244, 75%, 57%);
+    --second-color: hsl(249, 64%, 47%);
+    --title-color: hsl(244, 12%, 12%);
+    --text-color: hsl(244, 4%, 36%);
+    --body-color: hsl(208, 97%, 85%);
+
+    /*========== Font and typography ==========*/
+    /*.5rem = 8px | 1rem = 16px ...*/
+    --body-font: 'Poppins', sans-serif;
 
     --h2-font-size: 1.25rem;
     --small-font-size: .813rem;

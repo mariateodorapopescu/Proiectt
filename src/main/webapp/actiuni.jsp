@@ -4,27 +4,6 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    
-   
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
-    <title>Acasa</title>
-    <style>
-        
-        a, a:visited, a:hover, a:active{color:#eaeaea !important}
-    </style>
-</head>
-<body>
 <%
     HttpSession sesi = request.getSession(false);
 
@@ -60,6 +39,35 @@
                                      }
                                  }
                              }
+                           
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+
+                      	 String accent = null;
+                      	 String clr = null;
+                      	 String sidebar = null;
+                      	 String text = null;
+                      	 String card = null;
+                      	 String hover = null;
+                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                             
                             
                              // Display the user dashboard or related information
                              //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
@@ -69,12 +77,34 @@
                              e.printStackTrace();
                          }
                     	%>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    
+   
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <title>Acasa</title>
+    <style>
+        
+        a, a:visited, a:hover, a:active{color:#eaeaea !important}
+    </style>
+</head>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+
                     	
                     	<div class="main-content">
-                    	<div class="intro">
+                    	 <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                 <h3>Ce doriti sa faceti?</h3>
-                 <button style="--bg: #3F48CC;"> <a href = "addc.jsp" style="text-decoration:none;">Adaugare concediu</a></button>
-       <button style="--bg: #3F48CC;"><a href = "concediinoieu.jsp" style="text-decoration:none;">Modificare si stergere concedii</a></button>
+                 <button > <a href = "addc.jsp" style="text-decoration:none;">Adaugare concediu</a></button>
+       <button ><a href = "concediinoieu.jsp" style="text-decoration:none;">Modificare si stergere concedii</a></button>
               </div>
                </div>
    

@@ -4,52 +4,15 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    
-   
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
-    <title>Acasa</title>
-    <style>
-        iframe {
-            width: 100%;
-            border: none;
-            transition: height 0.5s ease;
-            overflow: hidden; /* Hide scrollbars */
-            overflow-y: hidden; /* Hide vertical scrollbar */
-            /* Hide scrollbar for Chrome, Safari and Opera */
-             -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-height: 90%;
-border-radius: 2em;
-        }
-        iframe::-webkit-scrollbar {
-  display: none;
-}
-        
-    </style>
-</head>
-<body>
 <%
     HttpSession sesi = request.getSession(false);
-
     if (sesi != null) {
         MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-
         if (currentUser != null) {
             String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume, id from useri where username = ?")) {
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri natural join departament natural join tipuri WHERE username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
@@ -57,215 +20,253 @@ border-radius: 2em;
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
                 } else {
-                    if (rs.getString("tip").compareTo("4") == 0) {
-                            response.sendRedirect("adminok.jsp");
+                    int userType = rs.getInt("tip");
+                    int id = rs.getInt("id");
+                    
+                    String prenume = rs.getString("prenume");
+                    String functie = rs.getString("denumire");
+                    String accent = null;
+                 	 String clr = null;
+                 	 String sidebar = null;
+                 	 String text = null;
+                 	 String card = null;
+                 	 String hover = null;
+                 	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                        // Check for upcoming leaves in 3 days
+                        String query = "SELECT * from teme where id_usr = ?";
+                        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                            stmt.setInt(1, id);
+                            try (ResultSet rs2 = stmt.executeQuery()) {
+                                if (rs2.next()) {
+                                  accent =  rs2.getString("accent");
+                                  clr =  rs2.getString("clr");
+                                  sidebar =  rs2.getString("sidebar");
+                                  text = rs2.getString("text");
+                                  card =  rs2.getString("card");
+                                  hover = rs2.getString("hover");
+                                }
+                            }
+                        }
                         
+                    } catch (SQLException e) {
+                        out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                        e.printStackTrace();
+                    }
+                    if (rs.getString("tip").compareTo("5") == 0) {
+                        response.sendRedirect("adminok.jsp");
                     } else {
-                    	int id = rs.getInt("id");
-                    	String nume = rs.getString("prenume");
-                    	 int cate = -1;
-                    	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             // Check for upcoming leaves in 3 days
-                             String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 <= date(NOW()) AND id_ang = ?";
-                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                 stmt.setInt(1, id);
-                                 try (ResultSet rs2 = stmt.executeQuery()) {
-                                     if (rs2.next() && rs2.getInt("count") > 0) {
-                                        cate =  rs2.getInt("count");
-                                     }
-                                 }
-                             }
-                            
-                             // Display the user dashboard or related information
-                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                             // Add additional user-specific content here
-                         } catch (SQLException e) {
-                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                             e.printStackTrace();
-                         }
-                    	 
-                    		String today = null;
-                          	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                                   // Check for upcoming leaves in 3 days
-                                   String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
-                                   try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                       // stmt.setInt(1, id);
-                                       try (ResultSet rs2 = stmt.executeQuery()) {
-                                           if (rs2.next()) {
-                                             today =  rs2.getString("today");
-                                           }
-                                       }
-                                   }
-                                  
-                                   // Display the user dashboard or related information
-                                   //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                                   // Add additional user-specific content here
-                               } catch (SQLException e) {
-                                   out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                                   e.printStackTrace();
-                               }
-                    	 
-                    	%>
-                    	
-                    	<div class="main-content">
-        <div class="header">
-            <h1>Pagina principala</h1>
-        </div>
-        <div class="content">
-            <div class="intro">
-                <h1>Bun venit, <% out.println(nume); %>!</h1>
-                
-                 <div class="events">
-                  <h3>Statistici la data de <%out.println(today); %></h3>
-                <table style="border-bottom: 1px solid #3F48CC;">
-                    <thead>
-                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
-                            <th>Concedii luate</th>
-                            <th>Concedii ramase</th>
-                            <th>Zile luate</th>
-                            <th>Zile ramase</th>
-                            <th>Respinse director</th>
-                            <th>Respinse sef</th>
-                            <th>Aprobate director</th>
-                            <th>Aprobate sef</th>
-                            <th>In asteptare</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <%
-                        
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, data_nasterii, adresa, email, telefon, username, denumire, nume_dep, zilecons, zileramase, conluate, conramase FROM useri NATURAL JOIN tipuri NATURAL JOIN departament where username = ?")) {
-                        	stmt.setString(1, username);
-                        	ResultSet rs1 = stmt.executeQuery();
-                            boolean found = false;
-                            while (rs1.next()) {
-                                found = true;
-                                out.println("<tr><td>" + rs1.getString("conluate") + "</td><td>" + rs1.getString("conramase") + "</td><td>" + rs1.getString("zilecons") + "</td><td>" + rs1.getString("zileramase") + "</td>");
+                        String today = null;
+                        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                        today = rs2.getString("today");
+                                    }
+                                }
                             }
-                            if (!found) {
-                                out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
-                            }
-                            
-                        }
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total from concedii where status = -2")) {
-                        	//stmt.setString(1, username);
-                        	ResultSet rs1 = stmt.executeQuery();
-                            boolean found = false;
-                            while (rs1.next()) {
-                                found = true;
-                                out.println("<td>" + rs1.getString("total") + "</td>");
-                            }
-                                                       
-                        }
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total from concedii where status = -1")) {
-                        	//stmt.setString(1, username);
-                        	ResultSet rs1 = stmt.executeQuery();
-                            boolean found = false;
-                            while (rs1.next()) {
-                                found = true;
-                                out.println("<td>" + rs1.getString("total") + "</td>");
-                            }
-                           
-                        }
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total from concedii where status = 2")) {
-                        	//stmt.setString(1, username);
-                        	ResultSet rs1 = stmt.executeQuery();
-                            boolean found = false;
-                            while (rs1.next()) {
-                                found = true;
-                                out.println("<td>" + rs1.getString("total") + "</td>");
-                            }
-                           
-                        }
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total from concedii where status = 1")) {
-                        	//stmt.setString(1, username);
-                        	ResultSet rs1 = stmt.executeQuery();
-                            boolean found = false;
-                            while (rs1.next()) {
-                                found = true;
-                                out.println("<td>" + rs1.getString("total") + "</td>");
-                            }
-                           
-                        }
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total from concedii where status = 0")) {
-                        	//stmt.setString(1, username);
-                        	ResultSet rs1 = stmt.executeQuery();
-                            boolean found = false;
-                            while (rs1.next()) {
-                                found = true;
-                                out.println("<td>" + rs1.getString("total") + "</td></tr>");
-                            }
-                           
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
                         }
                         %>
-                    </tbody>
-                </table> 
-                </div>
-                 <div class="into">
-                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Generate PDF</button>
-                </div>
-                <script>
-              
-                function generate() {
-                    const element = document.getElementById('content'); // Ensure you target the specific div
-                    html2pdf().set({
-                        pagebreak: { mode: ['css', 'legacy'] },
-                        html2canvas: {
-                            scale: 1, // Adjust scale to manage the size and visibility of content
-                            logging: true,
-                            dpi: 192,
-                            letterRendering: true,
-                            useCORS: true // This helps handle external content like images
-                        },
-                        jsPDF: {
-                            unit: 'in',
-                            format: 'a4',
-                            orientation: 'landscape' // Change to 'landscape' if the content is too wide
-                        }
-                    }).from(element).save();
-                }
-
-            </script>
-                
-                <%
-               int cate2 = -1;
-                             	if (cate >= 1) {
-                             		 String query2 = "SELECT CASE WHEN DATEDIFF(start_c, date(NOW())) between 0 and 4 THEN DATEDIFF(start_c, date(NOW())) ELSE -1 END AS dif FROM concedii WHERE id_ang = ? order by dif desc limit 1;";
-                                     try (PreparedStatement stmt = connection.prepareStatement(query2)) {
-                                         stmt.setInt(1, id);
-                                         try (ResultSet rs2 = stmt.executeQuery()) {
-                                             if (rs2.next() && rs2.getInt("dif") > 0) {
-                                                cate2 =  rs2.getInt("dif");
-                                                
-                                             }
-                                         }
-                                     }
-                                     if (cate2 > 0)
-                             		out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
-                             	}
-               %>
-               </div>
+<html>
+<head>
+    <title>Profil utilizator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <style>
+        body {
+            background-color: var(--clr);
            
-        
+        }
+       @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+        .main-content {
+            
+            padding: 20px;
+        }
+        .header {
+            background-color: var(--sd);
+            padding: 20px;
+            border-radius: 10px;
+            
+            margin-bottom: 20px;
+        }
+        .card {
+            
+            padding: 20px;
+            border-radius: 10px;
+             background-color: var(--sd);
+            margin-bottom: 20px;
+        }
+        .card h3 {
+            margin-bottom: 20px;
+        }
+        .card .info div {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+        .card .info div span {
+            font-weight: bold;
+            color: var(--text);
+        }
+        .btn-primary {
+            background-color: var(--bg);
+            
+        }
+        .btn-primary:hover {
+            background-color: black;
+           
+        }
+    </style>
+</head>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
+<div class="main-content">
+    
+    <div class="card">
+        <h3>Statistici personale la data de <% 
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today")) {
+                ResultSet rs2 = preparedStatement2.executeQuery();
+                if (rs2.next()) {
+                    out.println(rs2.getString("today"));
+                }
+            } catch (SQLException e) {
+                out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                e.printStackTrace();
+            }
+        %></h3>
+        <div class="info">
+            <%
+                
+                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                     PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, data_nasterii, adresa, email, telefon, username, denumire, nume_dep, zilecons, zileramase, conluate, conramase FROM useri NATURAL JOIN tipuri NATURAL JOIN departament WHERE username = ?")) {
+                    stmt.setString(1, username);
+                    ResultSet rs1 = stmt.executeQuery();
+                    if (rs1.next()) {
+                        
+                        out.println("<div><span>Concedii luate:</span> " + rs1.getString("conluate") + "</div>");
+                        out.println("<div><span>Concedii ramase:</span> " + rs1.getString("conramase") + "</div>");
+                        out.println("<div><span>Zile luate:</span> " + rs1.getString("zilecons") + "</div>");
+                        out.println("<div><span>Zile ramase:</span> " + rs1.getString("zileramase") + "</div>");
+                    } else {
+                        out.println("<div>Nu exista date.</div>");
+                    }
+                } catch (SQLException e) {
+                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                    e.printStackTrace();
+                }
+            %>
+        </div>
+        <%
+        int cate = -1;
+   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+            // Check for upcoming leaves in 3 days
+            String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 <= date(NOW()) AND id_ang = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, id);
+                try (ResultSet rs2 = stmt.executeQuery()) {
+                    if (rs2.next() && rs2.getInt("count") > 0) {
+                       cate =  rs2.getInt("count");
+                    }
+                }
+            }
+           
+            // Display the user dashboard or related information
+            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+            // Add additional user-specific content here
+        } catch (SQLException e) {
+            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+            e.printStackTrace();
+        }
+   	 
+   		
+         
+        int cate2 = -1;
+     	if (cate >= 1) {
+     		 String query2 = "SELECT CASE WHEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) between 0 and 4 THEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) ELSE -1 END AS dif FROM concedii WHERE id_ang = ? order by dif desc limit 1";
+             try (PreparedStatement stmt = connection.prepareStatement(query2)) {
+                 stmt.setInt(1, id);
+                 try (ResultSet rs2 = stmt.executeQuery()) {
+                     if (rs2.next() && rs2.getInt("dif") > 0) {
+                        cate2 =  rs2.getInt("dif");
+                        
+                     }
+                 }
+             }
+             if (cate2 > 0)
+     		out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
+     	}
+        %>
     </div>
-                       <%
+    <div class="card">
+        <h3>Statistici concedii la data de <% 
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today")) {
+                ResultSet rs2 = preparedStatement2.executeQuery();
+                if (rs2.next()) {
+                    out.println(rs2.getString("today"));
+                }
+            } catch (SQLException e) {
+                out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                e.printStackTrace();
+            }
+        %></h3>
+        <div class="info">
+            <%
+                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                    PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total FROM concedii WHERE status = ?");
+                    int[] statuses = {-2, -1, 2, 1, 0};
+                    String[] labels = {"Respinse director", "Respinse sef", "Aprobate director", "Aprobate sef", "In asteptare"};
+                    for (int i = 0; i < statuses.length; i++) {
+                        stmt.setInt(1, statuses[i]);
+                        ResultSet rs2 = stmt.executeQuery();
+                        if (rs2.next()) {
+                            out.println("<div><span>" + labels[i] + ":</span> " + rs2.getString("total") + "</div>");
+                        }
+                    }
+                } catch (SQLException e) {
+                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                    e.printStackTrace();
+                }
+            %>
+        </div>
+    </div>
+    
+</div>
+
+        <button id="generate" class="btn btn-primary" onclick="generate()">Generate PDF</button>
+
+ <%
                     }
                 }
             } catch (Exception e) {
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Eroare la baza de date!');");
-                out.println("alert('" + e.getMessage() + "');");
+               
                 out.println("</script>");
                 if (currentUser.getTip() == 1) {
                     response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
+                } else if (currentUser.getTip() == 2) {
                     response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
+                } else if (currentUser.getTip() == 3) {
                     response.sendRedirect("sefok.jsp");
-                }
-                if (currentUser.getTip() == 0) {
+                } else if (currentUser.getTip() == 0) {
                     response.sendRedirect("dashboard.jsp");
                 }
                 e.printStackTrace();
@@ -274,14 +275,34 @@ border-radius: 2em;
             out.println("<script type='text/javascript'>");
             out.println("alert('Utilizator neconectat!');");
             out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
         out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 %>
+<script>
+function generate() {
+    const element = document.querySelector('.main-content');
+    html2pdf().set({
+        pagebreak: { mode: ['css', 'legacy'] },
+        html2canvas: {
+            scale: 1,
+            logging: true,
+            dpi: 192,
+            letterRendering: true,
+            useCORS: true
+        },
+        jsPDF: {
+            unit: 'in',
+            format: 'a4',
+            orientation: 'portrait'
+        }
+    }).from(element).save();
+}
+</script>
 </body>
 </html>
