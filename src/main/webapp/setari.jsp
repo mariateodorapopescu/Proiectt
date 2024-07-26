@@ -19,7 +19,7 @@
                     int id = rs.getInt("id");
                     int userType = rs.getInt("tip");
                     if (userType == 4) {
-                        response.sendRedirect("adminok.jsp"); 
+                        response.sendRedirect("adminok.jsp");
                     } else {
                         String accent = null;
                         String clr = null;
@@ -27,29 +27,67 @@
                         String text = null;
                         String card = null;
                         String hover = null;
-                        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                            String query = "SELECT * from teme where id_usr = ?";
-                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                stmt.setInt(1, id);
-                                try (ResultSet rs2 = stmt.executeQuery()) {
-                                    if (rs2.next()) {
-                                        accent = rs2.getString("accent");
-                                        clr = rs2.getString("clr");
-                                        sidebar = rs2.getString("sidebar");
-                                        text = rs2.getString("text");
-                                        card = rs2.getString("card");
-                                        hover = rs2.getString("hover");
+
+                        // Handle form submission to update the theme
+                        if ("POST".equalsIgnoreCase(request.getMethod())) {
+                            String accent2 = request.getParameter("accent");
+                            String cul = request.getParameter("corp");
+                            String clr2, sidebar2, text2;
+                            if ("1".equals(cul)) {
+                                clr2 = "#d8d9e1";
+                                sidebar2 = "#ECEDFA";
+                                text2 = "#333";
+                            } else {
+                                clr2 = "#1a1a1a";
+                                sidebar2 = "#2a2a2a";
+                                text2 = "#ececec";
+                            }
+
+                            try (PreparedStatement stmt = connection.prepareStatement("update teme set accent = ?, clr = ?, sidebar = ?, card = ?, text = ?, hover = ? where id_usr = ?")) {
+                                stmt.setString(1, accent2);
+                                stmt.setString(2, clr2);
+                                stmt.setString(3, sidebar2);
+                                stmt.setString(4, sidebar2);
+                                stmt.setString(5, text2);
+                                stmt.setString(6, sidebar2);
+                                stmt.setInt(7, id);
+                                stmt.executeUpdate();
+                            } catch (SQLException e) {
+                                out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                                e.printStackTrace();
+                            }
+
+                            // Set updated values for display
+                            accent = accent2;
+                            clr = clr2;
+                            sidebar = sidebar2;
+                            text = text2;
+                        } else {
+                            // Fetch current theme settings from the database
+                            try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                                String query = "SELECT * from teme where id_usr = ?";
+                                try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                    stmt.setInt(1, id);
+                                    try (ResultSet rs2 = stmt.executeQuery()) {
+                                        if (rs2.next()) {
+                                            accent = rs2.getString("accent");
+                                            clr = rs2.getString("clr");
+                                            sidebar = rs2.getString("sidebar");
+                                            text = rs2.getString("text");
+                                            card = rs2.getString("card");
+                                            hover = rs2.getString("hover");
+                                        }
                                     }
                                 }
+                            } catch (SQLException e) {
+                                out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                                e.printStackTrace();
                             }
-                        } catch (SQLException e) {
-                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                            e.printStackTrace();
                         }
 %>
 <html>
 <head>
-    <title>Setari</title>
+    <title>Adaugare concediu</title>
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <!--=============== CSS ===============-->
@@ -122,30 +160,30 @@
 <body style="--bg:<%= accent %>; --clr:<%= clr %>; --sd:<%= sidebar %>; --text:<%= text %>; background:<%= clr %>">
 <%
 int light = -1;
-if (clr == "#d8d9e1") {
-	light = 1;
+if ("#d8d9e1".equals(clr)) {
+    light = 1;
 } else {
-	light = 0;
+    light = 0;
 }
 %>
     <div class="flex-container">
         <div class="form-container" style="border-color:<%= clr %>; background:<%= sidebar %>; color:<%= text %>">
-            <form style="border-color:<%= clr %>; background:<%= clr %>; color:<%= text %>" action="<%= request.getContextPath() %>/setari.jsp" method="post" class="login__form">
+            <form style="border-color:<%= clr %>; background:<%= clr %>; color:<%= text %>" action="" method="post" class="login__form">
                 <div>
-                    <h1 style="color:<%= accent %>" class="login__title"><span style="color:<%= accent %>">Setari</span></h1>
+                    <h1 style="color:<%= accent %>" class="login__title"><span style="color:<%= accent %>">Adaugare concediu</span></h1>
                 </div>
                 <div class="login__inputs" style="border-color:<%= accent %>; color:<%= text %>">
                     <div>
                         <label style="color:<%= light %>" class="login__label">Tematica</label>
-                         <select style="border-color:<%= accent %>; background:<%= sidebar %>; color:<%= text %>" name='corp' class="login__input">
-                            <option value='1' <%= light == 0 ? "selected" : "" %>>Luminoasa</option>
-                            <option value='0' <%= light == 1 ? "selected" : "" %>>Intunecata</option>
+                        <select style="border-color:<%= accent %>; background:<%= sidebar %>; color:<%= text %>" name='corp' class="login__input">
+                            <option value='1' <%= (light == 1) ? "selected" : "" %>>Luminoasa</option>
+                            <option value='0' <%= (light == 0) ? "selected" : "" %>>Intunecata</option>
                         </select>
                     </div>
                     <div>
                         <label style="color:<%= text %>" class="login__label">Accent</label>
-                        <select value = <%= accent %> style="border-color:<%= accent %>; background:<%= sidebar %>; color:<%= text %>" name='accent' class="login__input">
-                             <option value='#C63C51' <%= "#C63C51".equals(accent) ? "selected" : "" %>>Rosu</option>
+                        <select style="border-color:<%= accent %>; background:<%= sidebar %>; color:<%= text %>" name='accent' class="login__input">
+                            <option value='#C63C51' <%= "#C63C51".equals(accent) ? "selected" : "" %>>Rosu</option>
                             <option value='#FF8225' <%= "#FF8225".equals(accent) ? "selected" : "" %>>Oranj</option>
                             <option value='#FFDE4D' <%= "#FFDE4D".equals(accent) ? "selected" : "" %>>Galben</option>
                             <option value='#88D66C' <%= "#88D66C".equals(accent) ? "selected" : "" %>>Verde</option>
@@ -164,43 +202,10 @@ if (clr == "#d8d9e1") {
                     </div>
                     <input type='hidden' name='userId' value='<%= id %>'/>
                     <div class="login__buttons">
-                        <input style="backgroundColor:<%= sidebar %>; color:<%= accent %>; border-color:<%= accent %>" type="submit" value="Modificare" class="login__button login__button-ghost">
+                        <input style="background-color:<%= sidebar %>; color:<%= accent %>; border-color:<%= accent %>" type="submit" value="Adaugare" class="login__button login__button-ghost">
                     </div>
                 </div>
             </form>
-            <%
-                String accent2 = "#10439F";
-                accent2 = request.getParameter("accent");
-                String clr2 = "#d8d9e1";
-                String sidebar2 = "#ECEDFA";
-                String text2 = "#333";
-                String cul = null;
-                cul = request.getParameter("corp");
-                if (cul != null) {
-                    int culoare = Integer.valueOf(cul);
-                    if (culoare == 1) {
-                        clr2 = "#d8d9e1";
-                        sidebar2 = "#ECEDFA";
-                        text2 = "#333";
-                    } else {
-                        clr2 = "#1a1a1a";
-                        sidebar2 = "#2a2a2a";
-                        text2 = "#ececec";
-                    }
-                }
-                try (PreparedStatement stmt = connection.prepareStatement("update teme set accent = ?, clr = ?, sidebar = ?, card = ?, text = ?, hover = ? where id_usr = ?")) {
-                    stmt.setString(1, accent2);
-                    stmt.setString(2, clr2);
-                    stmt.setString(3, sidebar2);
-                    stmt.setString(4, sidebar2);
-                    stmt.setString(5, text2);
-                    stmt.setString(6, sidebar2);
-                    stmt.setInt(7, id);
-                    int result = stmt.executeUpdate();
-                } catch (SQLException e) {
-                    System.out.println("meh");
-                }
-            %>
         </div>
     </div>
 </body>
