@@ -4,6 +4,59 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+    HttpSession sesi = request.getSession(false);
+int pag = -1;
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        if (currentUser != null) {
+            String username = currentUser.getUsername();
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (!rs.next()) {
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
+                } else {
+                    int userType = rs.getInt("tip");
+                    int userId = rs.getInt("id");
+                    int userDep = rs.getInt("id_dep");
+                    if (userType == 4) {
+                        response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
+                    } else {
+                    	 String accent = null;
+                      	 String clr = null;
+                      	 String sidebar = null;
+                      	 String text = null;
+                      	 String card = null;
+                      	 String hover = null;
+                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, userId);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                             // Display the user dashboard or related information
+                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                             // Add additional user-specific content here
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                      	 %> 
 <html>
 
 <head>
@@ -71,31 +124,9 @@
     </style>
 </head>
 
-<body>
-<%
-    HttpSession sesi = request.getSession(false);
-int pag = -1;
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                	out.println("<script type='text/javascript'>");
-                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                    out.println("</script>");
-                } else {
-                    int userType = rs.getInt("tip");
-                    int userId = rs.getInt("id");
-                    int userDep = rs.getInt("id_dep");
-                    if (userType == 4) {
-                        response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
-                    } else {
-                    	
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
+                      	 <%
                     	 int id = Integer.valueOf(request.getParameter("id"));
                     	 int status = Integer.valueOf(request.getParameter("status"));
                     	 int tip = Integer.valueOf(request.getParameter("tip"));
@@ -121,8 +152,10 @@ int pag = -1;
         <div class="header">
          </div>
         <div class="content">
-            <div class="intro">             	
-                    	<%
+            <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%> ">             	
+                    	
+                 <div class="events"  style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                 <%
                     	
                     	if (pag == 3) {
                			 out.println("<h1> Vizualizare concedii personale");
@@ -182,12 +215,10 @@ int pag = -1;
                     	%>
  	
                 <h3><%out.println(today); %></h3>
-                 <div class="events"  id="content">
-                <table style="border-bottom: 1px solid #3F48CC;">
+                <table >
                     <thead>
-                        <tr style="background-color: #3F48CC; border-bottom: 1px solid #3F48CC;">
-                        
-                    <th>Nr. crt</th>
+                        <tr>
+                   
                     <th>Departament</th>
                     <th>Nume</th>
                     <th>Prenume</th>
@@ -200,7 +231,7 @@ int pag = -1;
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
+             <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                    <% 	
                     	if (pag == 3 || pag == 4 || pag == 5) {
                     		
@@ -580,7 +611,7 @@ int pag = -1;
 
                           while (rss1.next()) {
                               found = true;
-                              out.print("<tr><td data-label='Nr. crt'>" + rss1.getInt("nr_crt") + "</td><td data-label='Departament'>" + rss1.getString("departament") + "</td><td data-label='Nume'>" +
+                              out.print("<tr><td data-label='Departament'>" + rss1.getString("departament") + "</td><td data-label='Nume'>" +
                                         rss1.getString("nume") + "</td><td data-label='Prenume'>" + rss1.getString("prenume") + "</td><td data-label='Functie'>" + rss1.getString("functie") + "</td><td data-label='Inceput'>" +
                                         rss1.getDate("start_c") + "</td><td data-label='Final'>" + rss1.getDate("end_c") + "</td><td data-label='Motiv'>" + rss1.getString("motiv") + "</td><td data-label='Locatie'>" +
                                         rss1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rss1.getString("tipcon") + "</td>");
@@ -617,26 +648,26 @@ int pag = -1;
                 </table> 
                               
                 </div>
-                <div class="into">
-                  <button id="generate" onclick="generate()" style="--bg:#3F48CC;">Descarcati PDF</button>
+                
+                  <button id="generate" onclick="generate()">Descarcati PDF</button>
                   <%
                   if (pag == 3) {
-            			 out.println("<button style='--bg:#3F48CC;'><a href='viewp.jsp'>Inapoi</a></button></div>");
+            			 out.println("<button ><a href='viewp.jsp'>Inapoi</a></button></div>");
             		}
             		if (pag == 4) {
-            			out.println("<button style='--bg:#3F48CC;'><a href='viewcol.jsp'>Inapoi</a></button></div>");
+            			out.println("<button ><a href='viewcol.jsp'>Inapoi</a></button></div>");
                  	  }
             		if (pag == 5) {
-            			out.println("<button style='--bg:#3F48CC;'><a href='viewconcoldepeu.jsp'>Inapoi</a></button></div>");
+            			out.println("<button ><a href='viewconcoldepeu.jsp'>Inapoi</a></button></div>");
            			 }
             		if (pag == 6) {
-            			out.println("<button style='--bg:#3F48CC;'><a href='viewdepeu.jsp'>Inapoi</a></button></div>");
+            			out.println("<button ><a href='viewdepeu.jsp'>Inapoi</a></button></div>");
           			 }
             		if (pag == 7) {
-            			out.println("<button style='--bg:#3F48CC;'><a href='viewcondep.jsp'>Inapoi</a></button></div>");
+            			out.println("<button ><a href='viewcondep.jsp'>Inapoi</a></button></div>");
                   		}
             		if (pag == 8) {
-            			out.println("<button style='--bg:#3F48CC;'><a href='viewtot.jsp'>Inapoi</a></button></div>");
+            			out.println("<button ><a href='viewtot.jsp'>Inapoi</a></button></div>");
          			}
                   
                   %>

@@ -149,13 +149,13 @@
             <div class="intro" style="background:<%out.println(sidebar);%>;">
            
                  <div class="events" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
-                  <h1>Cereri noi de concedii</h1>
+                  <h1>Modificare concedii</h1>
                 <h3><%out.println(today); %></h3>
                 <table>
                     <thead>
                         <tr >
                         
-                    <th>Nr. crt</th>
+                    
                     <th>Departament</th>
                     <th>Nume</th>
                     <th>Prenume</th>
@@ -190,7 +190,7 @@
                             boolean found = false;
                             while (rs1.next()) {
                                 found = true;
-                                out.print("<tr><td data-label='Nr. crt'>" + rs1.getInt("nr_crt") + "</td><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
+                                out.print("<tr><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
                                         rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Inceput'>" +
                                         rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
                                         rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
@@ -222,7 +222,7 @@
                     boolean found = false;
                     while (rs1.next()) {
                         found = true;
-                        out.print("<tr><td data-label='Nr. crt'>" + rs1.getInt("nr_crt") + "</td><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
+                        out.print("<tr><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
                                 rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Inceput'>" +
                                 rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
                                 rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");

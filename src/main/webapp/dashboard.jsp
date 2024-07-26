@@ -621,7 +621,7 @@ body {
                     </a>
                 </li>
                 <li style="--bg: <%out.println(accent); %>;">
-                    <a href="#">
+                     <a href="setari.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="switch"></ion-icon>
                         </div>

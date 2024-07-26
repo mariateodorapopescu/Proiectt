@@ -98,12 +98,13 @@
         .main-content {
             
             padding: 20px;
+            color: var(--text);
         }
         .header {
             background-color: var(--sd);
             padding: 20px;
             border-radius: 10px;
-            
+            color: var(--text);
             margin-bottom: 20px;
         }
         .card {
@@ -112,14 +113,17 @@
             border-radius: 10px;
              background-color: var(--sd);
             margin-bottom: 20px;
+            color: var(--text);
         }
         .card h3 {
             margin-bottom: 20px;
+            color: var(--text);
         }
         .card .info div {
             margin-bottom: 10px;
             font-size: 16px;
             color: #555;
+            
         }
         .card .info div span {
             font-weight: bold;
@@ -135,7 +139,7 @@
         }
     </style>
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 <div class="main-content">
     
     <div class="card">
