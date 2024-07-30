@@ -4,22 +4,6 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    
-      <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    
-    <title>Definire Utilizator</title>
-</head>
-<body>
 <%
     HttpSession sesi = request.getSession(false);
 
@@ -30,7 +14,7 @@
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume from useri where username = ?")) {
+                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, id, prenume from useri where username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next() == false) {
@@ -52,44 +36,90 @@
                             response.sendRedirect("dashboard.jsp");
                         }
                     } else {
+                    	int id = rs.getInt("id");
+                    	  String prenume = rs.getString("prenume");
+                          // String functie = rs.getString("denumire");
+                          String accent = null;
+                       	 String clr = null;
+                       	 String sidebar = null;
+                       	 String text = null;
+                       	 String card = null;
+                       	 String hover = null;
+                       	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                              // Check for upcoming leaves in 3 days
+                              String query = "SELECT * from teme where id_usr = ?";
+                              try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                  stmt.setInt(1, id);
+                                  try (ResultSet rs2 = stmt.executeQuery()) {
+                                      if (rs2.next()) {
+                                        accent =  rs2.getString("accent");
+                                        clr =  rs2.getString("clr");
+                                        sidebar =  rs2.getString("sidebar");
+                                        text = rs2.getString("text");
+                                        card =  rs2.getString("card");
+                                        hover = rs2.getString("hover");
+                                      }
+                                  }
+                              }
+                              
+                          } catch (SQLException e) {
+                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                              e.printStackTrace();
+                          }
 %>
-    <div class="container">
-        <div class="login__content">
-            <img src="./responsive-login-form-main/assets/img/bg-login.jpg" alt="login image" class="login__img login__img-light">
-            <img src="./responsive-login-form-main/assets/img/bg-login-dark.jpg" alt="login image" class="login__img login__img-dark">
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-            <form action="<%= request.getContextPath() %>/register" method="post" class="login__form">
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    
+      <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <title>Definire Utilizator</title>
+</head>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
+
+    <div class="container" >
+        <div class="login__content" style="border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+            
+            <form style="border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/register" method="post" class="login__form">
             <div>
                         <h1 class="login__title" style="margin:0; top:-10px;">
-                            <span style="margin:0; top:-10px;">Definire utilizator nou</span>
+                            <span style="margin:0; top:-10px; color: <% out.println(accent);%>">Definire utilizator nou</span>
                         </h1>
                         
                     </div>
                     <table width="100%" style="margin:0; top:-10px;"> <tr><td>
                 <div class="form__section" style="margin:0; top:-10px;">
                     <div>
-                        <label for="" class="login__label">Nume</label>
-                        <input type="text" name="nume" placeholder="Introduceti numele" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Nume</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="nume" placeholder="Introduceti numele" required class="login__input">
                     </div>
 
                     <div>
-                        <label for="" class="login__label">Prenume</label>
-                        <input type="text" name="prenume" placeholder="Introduceti prenumele" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Prenume</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="prenume" placeholder="Introduceti prenumele" required class="login__input">
                     </div>
 
                     <div>
-                        <label for="" class="login__label">Data nasterii</label>
-                        <input type="date" name="data_nasterii" value="2001-07-22" min="1954-01-01" max="2036-12-31" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Data nasterii</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="date" name="data_nasterii" value="2001-07-22" min="1954-01-01" max="2036-12-31" required class="login__input">
                     </div>
 
                     <div>
-                        <label for="" class="login__label">Adresa</label>
-                        <input type="text" name="adresa" placeholder="Introduceti adresa" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Adresa</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="adresa" placeholder="Introduceti adresa" required class="login__input">
                     </div>
                     
                     <div>
-                        <label for="" class="login__label">E-mail</label>
-                        <input type="text" name="email" placeholder="Introduceti e-mailul" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">E-mail</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="email" placeholder="Introduceti e-mailul" required class="login__input">
                     </div>
 
                     
@@ -105,18 +135,18 @@
                 <td>
                 <div class="form__section" style="margin:0; top:-10px;">
                     <div>
-                        <label for="" class="login__label">UserName</label>
-                        <input type="text" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">UserName</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
                     </div>
 
                     <div>
-                        <label for="" class="login__label">Password</label>
-                        <input type="password" name="password" placeholder="Introduceti parola" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Password</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="password" name="password" placeholder="Introduceti parola" required class="login__input">
                     </div>
                
                     <div>
-                        <label for="" class="login__label">Departament</label>
-                        <select name="departament" class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Departament</label>
+                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="departament" class="login__input">
                             <%
                             try {
                                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
@@ -126,7 +156,7 @@
                                 ResultSet rs1 = stmt.executeQuery();
 
                                 if (!rs1.next()) {
-                                    out.println("No Records in the table");
+                                    out.println("Nu exista date sau date incorecte");
                                 } else {
                                     do {
                                         out.println("<option value='" + rs1.getString("id_dep") + "' required>" + rs1.getString("nume_dep") + "</option>");
@@ -139,7 +169,7 @@
                                 e.printStackTrace();
                                 out.println("<script type='text/javascript'>");
                                 out.println("alert('Date introduse incorect sau nu exista date!');");
-                                out.println("alert('" + e.getMessage() + "');");
+                               
                                 out.println("</script>");
                             }
                             %>
@@ -147,8 +177,8 @@
                     </div>
 
                     <div>
-                        <label for="" class="login__label">Tip/Ierarhie</label>
-                        <select name="tip" class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Tip/Ierarhie</label>
+                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="tip" class="login__input">
                             <%
                             try {
                                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
@@ -174,17 +204,17 @@
                         </select>
                     </div>
                     <div>
-                        <label for="" class="login__label">Telefon</label>
-                        <input type="text" name="telefon" placeholder="Introduceti telefonul" required class="login__input">
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Telefon</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="telefon" placeholder="Introduceti telefonul" required class="login__input">
                     </div>
                     
                 </div>
                 </td></tr>
 </table>
- <a href="adminok.jsp" class="login__forgot" style="margin:0; top:-10px;">Inapoi</a>
+ <a href="viewang3.jsp" class="login__forgot" style="margin:0; top:-10px; color:<%out.println(accent);%> ">Inapoi</a>
                 <div class="login__buttons">
-                    <input style="margin:0; top:-10px;"
-                    type="submit" value="Submit" class="login__button login__button-ghost">
+                    <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    type="submit" value="Submit" class="login__button">
                 </div>
                 
             </form>

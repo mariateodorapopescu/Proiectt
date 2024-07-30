@@ -53,7 +53,7 @@ public class ModifUsrServlet extends HttpServlet {
         int nrdir = -1;
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
       	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 3 group by id_dep having id_dep = ?;");
-        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 0 group by id_dep having id_dep = ?;")) {
+        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 0 group by id_dep having id_dep = ? and id <> ?;")) {
         	preparedStatement.setInt(1, departament);
         	stmt.setInt(1, departament);
                   ResultSet rs = preparedStatement.executeQuery();
@@ -70,7 +70,7 @@ public class ModifUsrServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'logout';");
+				    out.println("window.location.href = 'modifdel.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -79,12 +79,12 @@ public class ModifUsrServlet extends HttpServlet {
 		    }
         
         if (tip == 3 && nrsef == 1) {
-            response.sendRedirect("signin.jsp?pms=true");
+            response.sendRedirect("modifdel.jsp?pms=true");
             return;
         }
         
         if (tip == 0 && nrdir == 1) {
-            response.sendRedirect("signin.jsp?pmd=true");
+            response.sendRedirect("modifdel.jsp?pmd=true");
             return;
         }
 
@@ -112,7 +112,7 @@ public class ModifUsrServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
-		    out.println("window.location.href = 'despr.jsp';");
+		    out.println("window.location.href = 'modifdel.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -120,7 +120,7 @@ public class ModifUsrServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
-		    out.println("window.location.href = 'despr.jsp';");
+		    out.println("window.location.href = 'modifdel.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

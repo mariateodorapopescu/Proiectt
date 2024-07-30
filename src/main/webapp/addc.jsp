@@ -171,10 +171,10 @@
                                 </table>
                                 
                             </div>
-                            <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                            <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
                          
     
-                                <form style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
+                                <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
                                     <div>
                                         <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Adaugare concediu</span></h1>
                                         <%
@@ -185,19 +185,19 @@
                                     <div class="login__inputs" style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>">
                                         <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Data plecare</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="login__input" type='date' id='start' name='start' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='date' id='start' name='start' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
                                         </div>
                                         <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Data sosire</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="login__input" type='date' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='date' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
                                         </div>
                                         <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Motiv</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti motivul" required class="login__input" name='motiv'/>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti motivul" required class="login__input" name='motiv'/>
                                         </div>
                                         <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Tip concediu</label>
-                                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name='tip' class="login__input">
+                                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name='tip' class="login__input">
                                             <%
                                             try (PreparedStatement stmt = connection.prepareStatement("SELECT tip, motiv FROM tipcon")) {
                                                 ResultSet rs1 = stmt.executeQuery();
@@ -211,13 +211,13 @@
                                             %>
                                             <div>
                                                 <label style=" color:<%out.println(text);%>" class="login__label">Locatie</label>
-                                                <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
+                                                <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
                                             </div>
                                         </div>
                                        <% out.println("<input type='hidden' name='userId' value='" + id + "'/>"); %> 
                                         <%  out.println("            <a href=\"actiuni.jsp\" style=\"color:" + accent + "\" class=\"login__forgot\">Inapoi</a>"); %>
                                         <div class="login__buttons">
-                                            <input style="backgroundColor:<%out.println(sidebar);%>; color:<%out.println(accent);%>; border-color:<%out.println(accent);%>" type="submit" value="Adaugare" class="login__button login__button-ghost">
+                                            <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Adaugare" class="login__button">
                                         </div>
                                     </form>
                                     <%
@@ -234,25 +234,26 @@
                     out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
+                    response.sendRedirect("addc.jsp");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Eroare la baza de date!');");
                 out.println("</script>");
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("addc.jsp");
             }
         } else {
             out.println("<script type='text/javascript'>");
             out.println("alert('Utilizator neconectat!');");
             out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
         out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 %>
 <script src="./responsive-login-form-main/assets/js/main.js"></script>

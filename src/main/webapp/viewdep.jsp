@@ -128,7 +128,7 @@
             
                 <table>
                     <thead>
-                        <tr >
+                         <tr style="color:<%out.println("white");%>">
                          <th>Nume departament</th>
                             <th>Cod de identificare</th>
                         </tr>
@@ -154,16 +154,14 @@
                             
               </div>
               <div class="into">
-                <button id="generate" onclick="generate()">Generate PDF</button>
-             
-                      <%
+               <button id="generate" onclick="generate()" >Descarcati PDF</button>      <%
                     }
                 }
             } catch (Exception e) {
                 // out.println("Database connection or query error: " + e.getMessage());
                 out.println("<script type='text/javascript'>");
                     out.println("alert('Eroare la baza de date!');");
-                    out.println("alert('" + e.getMessage() + "');");
+                    
                     out.println("</script>");
                 if (currentUser.getTip() == 1) {
                 	response.sendRedirect("tip1ok.jsp");
@@ -183,13 +181,13 @@
         	out.println("<script type='text/javascript'>");
 	        out.println("alert('Utilizator neconectat!');");
 	        out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
     	out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 
 %>

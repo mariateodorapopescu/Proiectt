@@ -127,7 +127,7 @@
                 <h3><%out.println(today); %></h3>
                 <table style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                     <thead>
-                        <tr>
+                        <tr style="color:<%out.println("white");%>">
                             <th>Nume</th>
                             <th>Prenume</th>
                             <th>Nume utilizator</th>
@@ -159,8 +159,11 @@
                               
                 </div>
                 <div class="into">
-                  <button id="generate" onclick="generate()">Generate PDF</button>
-                <button><a href='viewang.jsp'>Inapoi</a></button></div>
+                  <button id="generate" onclick="generate()">Descarcati PDF</button>
+                  <% if(userType == 0)  out.println("<button><a href='viewang.jsp'>Inapoi</a></button></div>"); %>
+                
+                <% if(userType == 4)  out.println("<button><a href='viewang3.jsp'>Inapoi</a></button></div>"); %>
+               
                         <%
                         
                     }
@@ -170,19 +173,19 @@
                 out.println("<script type='text/javascript'>");
     	        out.println("alert('Eroare la baza de date!');");
     	        out.println("</script>");
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("viewcolegi.jsp");
             }
         } else {
         	out.println("<script type='text/javascript'>");
 	        out.println("alert('Utilizator neconectat!');");
 	        out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
     	out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 
 %>

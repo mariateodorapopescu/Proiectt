@@ -28,7 +28,7 @@ public class ModifDepServlet extends HttpServlet {
         	PrintWriter out = response.getWriter();
  		    out.println("<script type='text/javascript'>");
  		    out.println("alert('Nu a incarcat departamentul!');");
- 		    out.println("window.location.href = 'modifdep.jsp';");
+ 		    out.println("window.location.href = 'modifdeldep.jsp';");
  		    out.println("</script>");
  		    out.close();
             return;
@@ -45,7 +45,7 @@ public class ModifDepServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'modifdeldep.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -53,7 +53,7 @@ public class ModifDepServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'modifdeldep.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

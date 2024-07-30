@@ -202,8 +202,8 @@
                         
                        
                          <div class="login__buttons">
-                             <input style="backgroundColor:<%out.println(sidebar);%>; color:<%out.println(accent);%>; border-color:<%out.println(accent);%>" type="submit" value="Modificare" class="login__button login__button-ghost">
-                         </div>
+                         <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Inainte" class="login__button">
+                                        </div>
                      </form>
                      <%
                      out.println("</div>");

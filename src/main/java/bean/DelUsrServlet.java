@@ -24,7 +24,9 @@ public class DelUsrServlet extends HttpServlet {
             throw new ServletException("Failed to initialize DeldDao", e);
         }
     }
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	doPost(request, response);
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	int id = Integer.parseInt(request.getParameter("id"));
     	String username = fetchUsernameById(id);
@@ -33,7 +35,7 @@ public class DelUsrServlet extends HttpServlet {
         	PrintWriter out = response.getWriter();
  		    out.println("<script type='text/javascript'>");
  		    out.println("alert('Nu se stie cine sa fie sters');");
- 		    out.println("window.location.href = 'delusr1.jsp';");
+ 		    out.println("window.location.href = 'modifdel.jsp';");
  		    out.println("</script>");
  		    out.close();
         }
@@ -44,7 +46,7 @@ public class DelUsrServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Stergere cu succes!');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'modifdel.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -52,7 +54,7 @@ public class DelUsrServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut sterge utilizatorul din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'modifdel.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

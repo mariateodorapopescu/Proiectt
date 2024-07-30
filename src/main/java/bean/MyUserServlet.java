@@ -101,7 +101,7 @@ public class MyUserServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'dashboard.jsp';");
+				    out.println("window.location.href = 'modifdel.jsp';");
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
@@ -124,7 +124,7 @@ public class MyUserServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Adaugare cu succes!');");
-		    out.println("window.location.href = 'adminok.jsp';");
+		    out.println("window.location.href = 'modifdel.jsp';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -132,7 +132,7 @@ public class MyUserServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut adauga din motive necunoscute.');");
-		    out.println("window.location.href = 'dashboard.jsp';");
+		    out.println("window.location.href = 'modifdel.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

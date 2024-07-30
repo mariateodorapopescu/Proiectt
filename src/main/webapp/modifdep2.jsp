@@ -4,22 +4,6 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    
-      <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    
-    <title>Modificare departament</title>
-</head>
-<body>
 <%
     HttpSession sesi = request.getSession(false);
 
@@ -28,12 +12,13 @@
 
         if (currentUser != null) {
             String username = currentUser.getUsername();
+            int id = -1;
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume from useri where username = ?")) {
+                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume, id from useri where username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
+                if (rs.next() == false) {
                     out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
@@ -52,31 +37,93 @@
                             response.sendRedirect("dashboard.jsp");
                         }
                     } else {
-                        out.println("<div class=\"container\">");
-                        out.println("<div class=\"login__content\">");
-                        out.println("<img src=\"./responsive-login-form-main/assets/img/bg-login.jpg\" alt=\"login image\" class=\"login__img login__img-light\">");
-                        out.println("<img src=\"./responsive-login-form-main/assets/img/bg-login-dark.jpg\" alt=\"login image\" class=\"login__img login__img-dark\">");
-                        out.println("<form action='" + request.getContextPath() + "/ModifDepServlet' method='post' class='login__form'>");
-                        out.println("<h1 class='login__title'>Modificare departament</h1>");
-                        out.println("<div class='login__inputs'>");
-                        out.println("<div>");
-                        out.println("<label for='' class='login__label'>Nume nou</label>");
-                        out.println("<input type='text' name='password' required class='login__input' />");
-                        out.println("</div>");
-                        out.println("</div>");
-                        out.println("<a href ='modifdep.jsp' class='login__forgot'>Inapoi</a>");
-                        out.println("<div class='login__buttons'>");
-                        out.println("<input type='submit' value='Submit' class='login__button login__button-ghost' />");
-                        out.println("</div>");
-                        out.println("<input type='hidden' name='username' value='" + request.getParameter("username") + "' />");
-                        
-                        out.println("</form>");
-                        if ("true".equals(request.getParameter("n"))) {
-                            out.println("<script type='text/javascript'>");
-                            out.println("alert('Nume scris incorect!');");
-                            out.println("</script>");
+                    	id = rs.getInt("id");
+                    	String accent = null;
+                     	 String clr = null;
+                     	 String sidebar = null;
+                     	 String text = null;
+                     	 String card = null;
+                     	 String hover = null;
+                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            // Check for upcoming leaves in 3 days
+                            String query = "SELECT * from teme where id_usr = ?";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                stmt.setInt(1, id);
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      accent =  rs2.getString("accent");
+                                      clr =  rs2.getString("clr");
+                                      sidebar =  rs2.getString("sidebar");
+                                      text = rs2.getString("text");
+                                      card =  rs2.getString("card");
+                                      hover = rs2.getString("hover");
+                                    }
+                                }
+                            }
+                            
+                           
+                            // Display the user dashboard or related information
+                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                            // Add additional user-specific content here
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
                         }
-                       
+                    	%>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+      <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <title>Modificare departament</title>
+</head>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
+<div class="container" >
+        <div class="login__content" style="border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+    <%
+                        out.print("<form style=\"border-radius: 2rem; border-color: " + sidebar + "; background: " + sidebar + "; color: " + text + "\" class=\"login__form\" action=\"");
+                        request.getContextPath();
+                        out.println("ModifDepServlet\" method=\"post\" class=\"login__form\">");
+                        %>
+                         <div>
+                        <h1 class="login__title" style="margin:0; top:-10px;">
+                            <span style="margin:0; top:-10px; color: <% out.println(accent);%>">Modificare departament</span>
+                        </h1>
+                        
+                    </div>
+                        <%
+                        out.println("<table style=\"with: 80%\"><tr><td>");
+                        %>
+                         <div class="form__section" style="margin:0; top:-10px;">
+                    <div>
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Nume departament</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="password" placeholder="Introduceti numele" required class="login__input">
+                    </div>
+                        <%
+                        
+                        out.println("</div></td>");
+                        out.println("</tr>");
+                        out.println("</table>");
+                        out.println("<a style=\"color: " + accent + "\" href ='viewdep2.jsp' class='login__forgot''>Inapoi</a>");
+                        // out.println("<input type='submit' value='Submit' class='login_button login_button-ghost' />");
+                        // out.println("<button class='login_forgot'><a href ='adminok.jsp' class='login_forgot'>Inapoi</a></button>");
+                        out.println("<input type='hidden' name='username' value='" + request.getParameter("username") + "' />");
+                       %>
+                        <div class="login__buttons">
+                    <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    type="submit" value="Submit" class="login__button">
+                </div>
+                       <%
+                        out.println("</form>");
+                        out.println("</div>");                      
                         out.println("</div>");
                         out.println("</div>");
                     }
@@ -84,8 +131,13 @@
             } catch (Exception e) {
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Eroare la baza de date!');");
-                out.println("alert('" + e.getMessage() + "');");
+                
                 out.println("</script>");
+                if ("true".equals(request.getParameter("n"))) {
+                    out.println("<script type='text/javascript'>");
+                    out.println("alert('Nume scris incorect!');");
+                    out.println("</script>");
+                }
                 if (currentUser.getTip() == 1) {
                     response.sendRedirect("tip1ok.jsp");
                 }
@@ -104,14 +156,24 @@
             out.println("<script type='text/javascript'>");
             out.println("alert('Utilizator neconectat!');");
             out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
         out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
+%>
+<% 
+   
+    if ("true".equals(request.getParameter("n"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Nume scris incorect!');");
+        out.println("</script>");
+    }
+
+  
 %>
 </body>
 </html>

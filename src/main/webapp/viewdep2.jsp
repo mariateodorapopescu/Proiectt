@@ -43,7 +43,7 @@
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
                 } else {
-                    if (rs.getString("tip").compareTo("0") != 0) {
+                    if (rs.getString("tip").compareTo("4") != 0) {
                         if (rs.getString("tip").compareTo("1") == 0) {
                             response.sendRedirect("tip1ok.jsp");
                         }
@@ -53,8 +53,8 @@
                         if (rs.getString("tip").compareTo("3") == 0) {
                             response.sendRedirect("sefok.jsp");
                         }
-                        if (rs.getString("tip").compareTo("4") == 0) {
-                            response.sendRedirect("adminok.jsp");
+                        if (rs.getString("tip").compareTo("0") == 0) {
+                            response.sendRedirect("dashboard.jsp");
                         }
                     } else {
                     	int id = rs.getInt("id");
@@ -115,11 +115,9 @@
                     	<div class="main-content" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
                     	<div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                 <h3 style="color:<%out.println(text);%>">Ce doriti sa faceti?</h3>
-                 <button style="--bg:<%out.println(accent);%>"> <a href = "viewcolegi.jsp" style="text-decoration:none;">Vizualizare angajati din toata institutia</a></button>
-       <button style="--bg:<%out.println(accent);%> ;"><a href = "viewangdep.jsp" style="text-decoration:none;">Vizualizare angajati dintr-un anumit departament</a></button>
-       <button style="--bg:<%out.println(accent);%> ;"><a href = "viewcolegidep.jsp" style="text-decoration:none;">Vizualizare angajati din departamentul meu</a></button>
-               
-               </div>
+                  <button style="--bg:<%out.println(accent);%> ;"><a href = "adddep.jsp" style="text-decoration:none;">Adaugare departament</a></button>
+       <button style="--bg:<%out.println(accent);%> ;"><a href = "modifdeldep.jsp" style="text-decoration:none;">Modificare departament</a></button>
+              </div>
                </div>
    
     <script src="main.js"></script>

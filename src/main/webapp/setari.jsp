@@ -167,22 +167,22 @@ if ("#d8d9e1".equals(clr)) {
 }
 %>
     <div class="flex-container">
-        <div class="form-container" style="border-color:<%= clr %>; background:<%= sidebar %>; color:<%= text %>">
-            <form style="border-color:<%= clr %>; background:<%= clr %>; color:<%= text %>" action="" method="post" class="login__form">
+        <div class="form-container" style="border-color:<%= clr %>; background:<%= clr %>; color:<%= text %>">
+            <form style="border-color:<%= clr %>; background:<%= sidebar %>; color:<%= text %>" action="" method="post" class="login__form">
                 <div>
-                    <h1 style="color:<%= accent %>" class="login__title"><span style="color:<%= accent %>">Adaugare concediu</span></h1>
+                    <h1 style="color:<%= accent %>" class="login__title"><span style="color:<%= accent %>">Schimbare tema</span></h1>
                 </div>
                 <div class="login__inputs" style="border-color:<%= accent %>; color:<%= text %>">
                     <div>
                         <label style="color:<%= light %>" class="login__label">Tematica</label>
-                        <select style="border-color:<%= accent %>; background:<%= sidebar %>; color:<%= text %>" name='corp' class="login__input">
+                        <select style="border-color:<%= accent %>; background:<%= clr %>; color:<%= text %>" name='corp' class="login__input">
                             <option value='1' <%= (light == 1) ? "selected" : "" %>>Luminoasa</option>
                             <option value='0' <%= (light == 0) ? "selected" : "" %>>Intunecata</option>
                         </select>
                     </div>
                     <div>
                         <label style="color:<%= text %>" class="login__label">Accent</label>
-                        <select style="border-color:<%= accent %>; background:<%= sidebar %>; color:<%= text %>" name='accent' class="login__input">
+                        <select style="border-color:<%= accent %>; background:<%= clr %>; color:<%= text %>" name='accent' class="login__input">
                             <option value='#C63C51' <%= "#C63C51".equals(accent) ? "selected" : "" %>>Rosu</option>
                             <option value='#FF8225' <%= "#FF8225".equals(accent) ? "selected" : "" %>>Oranj</option>
                             <option value='#FFDE4D' <%= "#FFDE4D".equals(accent) ? "selected" : "" %>>Galben</option>
@@ -202,8 +202,8 @@ if ("#d8d9e1".equals(clr)) {
                     </div>
                     <input type='hidden' name='userId' value='<%= id %>'/>
                     <div class="login__buttons">
-                        <input style="background-color:<%= sidebar %>; color:<%= accent %>; border-color:<%= accent %>" type="submit" value="Adaugare" class="login__button login__button-ghost">
-                    </div>
+                        <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Schimbati" class="login__button">
+                                         </div>
                 </div>
             </form>
         </div>
@@ -216,25 +216,36 @@ if ("#d8d9e1".equals(clr)) {
                     out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
+                    response.sendRedirect("setari.jsp");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Eroare la baza de date!');");
                 out.println("</script>");
-                response.sendRedirect("login.jsp");
+                
+                if (currentUser.getTip() == 1) {
+                    response.sendRedirect("tip1ok.jsp");
+                } else if (currentUser.getTip() == 2) {
+                    response.sendRedirect("tip2ok.jsp");
+                } else if (currentUser.getTip() == 3) {
+                    response.sendRedirect("sefok.jsp");
+                } else if (currentUser.getTip() == 0) {
+                    response.sendRedirect("dashboard.jsp");
+                }
+                e.printStackTrace();
             }
         } else {
             out.println("<script type='text/javascript'>");
             out.println("alert('Utilizator neconectat!');");
             out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
         out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 %>
 <script src="./responsive-login-form-main/assets/js/main.js"></script>

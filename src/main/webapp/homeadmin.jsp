@@ -22,6 +22,7 @@
                 } else {
                     int userType = rs.getInt("tip");
                     int id = rs.getInt("id");
+                    
                     String prenume = rs.getString("prenume");
                     String functie = rs.getString("denumire");
                     String accent = null;
@@ -77,127 +78,124 @@
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            
             background-color: var(--clr);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+           
         }
-        .profile-card {
-            background-color: var(--sd);
-            border-radius: 2rem;
-            /*box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);*/
-            padding: 30px;
-            width: 400px;
-            max-width: 90%;
-            text-align: center;
-        }
-        .profile-card img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--bg);
-            margin-bottom: 15px;
-            box-shadow: 0 6px 24px <%out.println(accent); %>;
-        }
-        .profile-card h1 {
-            font-size: 26px;
-            margin: 10px 0;
-            color: var(--text);
-        }
-        .profile-card h2 {
-            font-size: 20px;
-            margin: 5px 0;
-            color: #999;
-            font-weight: normal;
-        }
-        .profile-card .info {
-            margin: 20px 0;
-            text-align: left;
-        }
-        .profile-card .info div {
-            margin: 10px 0;
-            font-size: 16px;
-            color: #999;
-        }
-        .profile-card .info div span {
-            font-weight: bold;
-            color: var(--text);
-        }
-        .profile-card .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .profile-card .buttons button {
-            background-color: var(--bg);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .profile-card .buttons button a {
-            color: white;
-            text-decoration: none;
-        }
-        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+       @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
+        .main-content {
+            
+            padding: 20px;
+            color: var(--text);
+        }
+        .header {
+            background-color: var(--sd);
+            padding: 20px;
+            border-radius: 10px;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+        .card {
+            
+            padding: 20px;
+            border-radius: 10px;
+             background-color: var(--sd);
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        .card h3 {
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        .card .info div {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+            
+        }
+        .card .info div span {
+            font-weight: bold;
+            color: var(--text);
+        }
+        .btn-primary {
+            background-color: var(--bg);
+            
+        }
+        .btn-primary:hover {
+            background-color: black;
+           
+        }
     </style>
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+<div class="main-content">
+    
+    <div class="card">
+        <h3>Statistici la data de <% 
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today")) {
+                ResultSet rs2 = preparedStatement2.executeQuery();
+                if (rs2.next()) {
+                    out.println(rs2.getString("today"));
+                }
+            } catch (SQLException e) {
+                out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                e.printStackTrace();
+            }
+        %></h3>
+        <div class="info">
+            <%
+                
+                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                     PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total from departament")) {
+                    
+                    ResultSet rs1 = stmt.executeQuery();
+                    if (rs1.next()) {
+                        
+                        out.println("<div><span>Total departamente:</span> " + rs1.getString("total") + "</div>");
+                       
+                    } else {
+                        out.println("<div>Nu exista date.</div>");
+                    }
+                } catch (SQLException e) {
+                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                    e.printStackTrace();
+                }
+          
+          
+                try (Connection connn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                    PreparedStatement stmt2 = connection.prepareStatement("SELECT count(*) as total FROM useri");
+                   
+                        ResultSet rs2 = stmt2.executeQuery();
+                        if (rs2.next()) {
+                        	 out.println("<div><span>Total angajati:</span> " + rs2.getString("total") + "</div>");
+                        }
+                   
+                } catch (SQLException e) {
+                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                    e.printStackTrace();
+                }
+            %>
+        </div>
+    </div>
+    
+</div>
 
-                        <div class="profile-card">
-                            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="imagine profil">
-                            <h1><%= prenume %></h1>
-                            <h2><%= functie %></h2>
-                            <div class="info">
-                            <%
-                                try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, data_nasterii, adresa, email, telefon, username, denumire, nume_dep FROM useri NATURAL JOIN tipuri NATURAL JOIN departament WHERE username = ?")) {
-                                    stmt.setString(1, username);
-                                    ResultSet rs1 = stmt.executeQuery();
-                                    boolean found = false;
-                                    while (rs1.next()) {
-                                        found = true;
-                                        out.println("<div><span>Nume:</span> " + rs1.getString("nume") + "</div>");
-                                        out.println("<div><span>Prenume:</span> " + rs1.getString("prenume") + "</div>");
-                                        out.println("<div><span>Data nasterii:</span> " + rs1.getString("data_nasterii") + "</div>");
-                                        out.println("<div><span>Adresa/Domiciliul:</span> " + rs1.getString("adresa") + "</div>");
-                                        out.println("<div><span>e-mail:</span> " + rs1.getString("email") + "</div>");
-                                        out.println("<div><span>Nr. de telefon:</span> " + rs1.getString("telefon") + "</div>");
-                                        out.println("<div><span>Nume de utilizator:</span> " + rs1.getString("username") + "</div>");
-                                        out.println("<div><span>Functie:</span> " + rs1.getString("denumire") + "</div>");
-                                        out.println("<div><span>Departament:</span> " + rs1.getString("nume_dep") + "</div>");
-                                    }
-                                    if (!found) {
-                                        out.println("<div>Nu exista date.</div>");
-                                    }
-                                }
-                            %>
-                            </div>
-                            <div class="buttons">
-                                         
-                                <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"><a href='modifydata.jsp'>Modificati</a></button>
-                            </div>
-                        </div>
-                        <%
+        <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="generate" class="btn btn-primary" onclick="generate()">Descarcati PDF</button>
+
+ <%
                     }
                 }
             } catch (Exception e) {
@@ -229,5 +227,25 @@
         response.sendRedirect("logout");
     }
 %>
+<script>
+function generate() {
+    const element = document.querySelector('.main-content');
+    html2pdf().set({
+        pagebreak: { mode: ['css', 'legacy'] },
+        html2canvas: {
+            scale: 1,
+            logging: true,
+            dpi: 192,
+            letterRendering: true,
+            useCORS: true
+        },
+        jsPDF: {
+            unit: 'in',
+            format: 'a4',
+            orientation: 'portrait'
+        }
+    }).from(element).save();
+}
+</script>
 </body>
 </html>

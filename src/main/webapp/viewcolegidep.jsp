@@ -125,7 +125,7 @@
                 <h3><%out.println(today); %></h3>
                 <table >
                     <thead>
-                        <tr >
+                         <tr style="color:<%out.println("white");%>">
                             <th>Nume</th>
                             <th>Prenume</th>
                             <th>Nume utilizator</th>
@@ -158,8 +158,8 @@
                               
                 </div>
                 <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
-                  <button id="generate" onclick="generate()" >Generate PDF</button>
-                <button ><a href='viewang.jsp'>Inapoi</a></button></div>
+                 <button id="generate" onclick="generate()" >Descarcati PDF</button>
+                 <button ><a href='viewang.jsp'>Inapoi</a></button></div>
                         <%
                         
                     }
@@ -169,19 +169,19 @@
                 out.println("<script type='text/javascript'>");
     	        out.println("alert('Eroare la baza de date!');");
     	        out.println("</script>");
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("viewcolegidep.jsp");
             }
         } else {
         	out.println("<script type='text/javascript'>");
 	        out.println("alert('Utilizator neconectat!');");
 	        out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
     	out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 
 %>

@@ -127,7 +127,7 @@
                   %>
                 <table >
                     <thead>
-                        <tr >
+                        <tr style="color:<%out.println("white");%>">
                         
                     <th>Nume</th>
                     <th>Prenume</th>
@@ -159,8 +159,8 @@
                               
                 </div>
                  <div class="into">
-                  <button id="generate" onclick="generate()">Descarcati PDF</button>
-                  <%
+                  <button id="generate" onclick="generate()" >Descarcati PDF</button> </div>
+                <%
                  
             		
             			out.println("<button><a href='viewangdep.jsp'>Inapoi</a></button></div>");

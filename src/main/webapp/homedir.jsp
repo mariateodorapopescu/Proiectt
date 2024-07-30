@@ -254,7 +254,7 @@
     
 </div>
 
-        <button id="generate" class="btn btn-primary" onclick="generate()">Generate PDF</button>
+        <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="generate" class="btn btn-primary" onclick="generate()">Descarcati PDF</button>
 
  <%
                     }

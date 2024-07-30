@@ -4,6 +4,8 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+
+
 <%
     HttpSession sesi = request.getSession(false);
     if (sesi != null) {
@@ -19,7 +21,7 @@
                     int id = rs.getInt("id");
                     int userType = rs.getInt("tip");
                     int userdep = rs.getInt("id_dep");
-                    if (userType != 4 && userType != 0) { // Assuming only type 4 users can approve
+                    if (userType == 4) {  // Assuming only type 4 users can approve
                     	
                     	
                     	String today = null;
@@ -74,7 +76,7 @@
                         %>
 <html>
 <head>
-    <title>Concedii noi</title>
+    <title>Angajati</title>
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -143,111 +145,55 @@
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
                         	<div class="main-content">
-        <div class="header">
+        <div class="header" style="border-radius: 2rem;">
          </div>
-        <div class="content">
-            <div class="intro" style="background:<%out.println(sidebar);%>;">
+        <div class="content" style="border-radius: 2rem;">
+            <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>;">
            
-                 <div class="events" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
-                  <h1>Toate concediile personale din acest an</h1>
+                 <div class="events" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                  <h1>Vizaulizare si modificare angajati din toata institutia</h1>
                 <h3><%out.println(today); %></h3>
                 <table>
                     <thead>
-                        <tr >
-                    
-                    <th>Departament</th>
-                    <th>Nume</th>
+                        <tr style="color:<%out.println("white");%>">
+                	<th>Nume</th>
                     <th>Prenume</th>
+                    <th>Nume de utilizator</th>
                     <th>Functie</th>
-                    <th>Inceput</th>
-                    <th>Final</th>
-                    <th>Motiv</th>
-                    <th>Locatie</th>
-                    <th>Tip concediu</th>
-                    <th>Status</th>
-                    
+                     <th>Departament</th>
+                     <th>Modificati</th>
+                     <th>Modificati parola</th>
+                     <th>Stergeti</th>
                 </tr>
                     </thead>
                    <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
-                    
-                    <%
-            if (userType != 3 || userType != 0) {
-            	
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                "FROM useri u " +
-                                "JOIN tipuri t ON u.tip = t.tip " +
-                                "JOIN departament d ON u.id_dep = d.id_dep " +
-                                "JOIN concedii c ON c.id_ang = u.id " +
-                                "JOIN statusuri s ON c.status = s.status " +
-                                "JOIN tipcon ct ON c.tip = ct.tip " +
-                                "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ?")) {
+                   
+                   <%
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT u.id AS nr_crt, d.nume_dep AS departament, u.nume as nume, u.prenume as prenume, u.username as usernamee, " +
+                        		"t.denumire AS functie " +
+                        		"FROM useri u " +
+                        		"JOIN tipuri t ON u.tip = t.tip " +
+                        		"JOIN departament d ON u.id_dep = d.id_dep;")) {
                             
-                        	stmt.setInt(1, id);
+                        	
                         	ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
                             while (rs1.next()) {
                                 found = true;
-                                out.print("<tr><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
-                                        rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Inceput'>" +
-                                        rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                        rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
-
+                                out.print("<tr>" + "<td data-label='Nume'>" +
+                                        rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Nume de utilizator'>" + rs1.getString("usernamee") + "</td><td data-label='Functie'>" + rs1.getString("functie")  + "<td data-label='Departament'>" + rs1.getString("departament") + "</td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='modifusr2.jsp?id=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifpasd2.jsp?idd=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delusr?id=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                            	// System.out.println(rs1.getInt("nr_crt"));
                               
-                              if (rs1.getString("status").compareTo("neaprobat") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
-                                  }
-                              if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
-                                  }
-                              if (rs1.getString("status").compareTo("aprobat director") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
-                                  }
-                              if (rs1.getString("status").compareTo("dezaprobat sef") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Respins sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
-                                  }
-                              if (rs1.getString("status").compareTo("dezaprobat director") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Respins director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
-                                  }
-                            }
+                              }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
                             }
                             
                         }
-            } else {
-            	try (PreparedStatement stmt = connection.prepareStatement("SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                        "FROM useri u " +
-                        "JOIN tipuri t ON u.tip = t.tip " +
-                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                        "JOIN concedii c ON c.id_ang = u.id " +
-                        "JOIN statusuri s ON c.status = s.status " +
-                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ?")) {
-                    
-                	stmt.setInt(1, id);
-                	ResultSet rs1 = stmt.executeQuery();
-                    boolean found = false;
-                    while (rs1.next()) {
-                        found = true;
-                        out.print("<tr><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
-                                rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Inceput'>" +
-                                rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
-
-                      
-                      if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
-                          out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
-                          out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
-                      }}
-                    if (!found) {
-                        out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
-                    }
-                    
-                }
-            }
+            
                     	
                          %>
                           </tbody>
@@ -255,12 +201,12 @@
                               
                 </div>
                 <div class="into">
-                  <button id="generate" onclick="generate()" >Descarcati PDF</button>
+                 
+                    <button ><a href='viewang3.jsp'>Inapoi</a></button></div>
                 </div>
                 
                 <%
-        
-        
+
                     } else {
                     	switch (userType) {
                         case 1: response.sendRedirect("tip1ok.jsp"); break;
@@ -273,27 +219,86 @@
                 	out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
+                    response.sendRedirect("modifdel.jsp");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 out.println("<script type='text/javascript'>");
     	        out.println("alert('Eroare la baza de date!');");
-    	        out.println("alert('" + e.getMessage() + "');");
+    	       
     	        out.println("</script>");
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("modifdel.jsp");
             }
         } else {
         	out.println("<script type='text/javascript'>");
 	        out.println("alert('Utilizator neconectat!');");
 	        out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("logout");
         }
     } else {
     	out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
+%>
+<% 
+    if ("true".equals(request.getParameter("p"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Trebuie sa alegeti o parola mai complexa!');");
+        out.println("</script>");
+        out.println("<br>Parola trebuie sa contina:<br>");
+        out.println("- minim 8 caractere<br>");
+        out.println("- un caracter special (!()?*\\[\\]{}:;_\\-\\\\/`~'<>@#$%^&+=])<br>");
+        out.println("- o litera mare<br>");
+        out.println("- o litera mica<br>");
+        out.println("- o cifra<br>");
+        out.println("- cifrele alaturate sa nu fie egale sau consecutive<br>");
+        out.println("- literele alaturate sa nu fie egale sau una dupa <br>cealalta, inclusiv diacriticele");
+    }
+
+    if ("true".equals(request.getParameter("n"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Nume scris incorect!');");
+        out.println("</script>");
+    }
+
+    if ("true".equals(request.getParameter("pn"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Prenume scris incorect!');");
+        out.println("</script>");
+    }
+
+    if ("true".equals(request.getParameter("t"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Telefon scris incorect!');");
+        out.println("</script>");
+    }
+
+    if ("true".equals(request.getParameter("e"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('E-mail scris incorect!');");
+        out.println("</script>");
+    }
+
+    if ("true".equals(request.getParameter("dn"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Utilizatorul trebuie sa aiba minim 18 ani!');");
+        out.println("</script>");
+    }   
+
+    if ("true".equals(request.getParameter("pms"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Poate fi maxim un sef / departament!');");
+        out.println("</script>");
+    }   
+
+    if ("true".equals(request.getParameter("pmd"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Poate fi maxim un director / departament!');");
+        out.println("</script>");
+    }   
+           
 %>
 <script>
               
