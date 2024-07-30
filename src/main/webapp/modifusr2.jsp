@@ -91,7 +91,7 @@ if (sesi != null) {
                 
                out.println("        <form style=\"background:" +  sidebar + "; border-color: " + sidebar + "; color: " + accent + "; \" action=" +  request.getContextPath() + "/modifusr" +" method=\"post\" class=\"login__form\">");
             	out.println("            <div>");
-            	out.println("                <h1 class=\"login__title\">");
+            	out.println("                <h1 style=\"color: " + accent + "; class=\"login__title\">");
             	out.println("                    <span>Modificare Utilizator</span>");
             	out.println("                </h1>");
             	out.println("            </div>");
@@ -105,37 +105,37 @@ if (sesi != null) {
             	        	out.println("<table width=\"100%\" style=\"margin:0; top:-10px;\"> <tr><td>");
                         	out.println("            <div class=\"form__section\" style=\"margin:0; top:-10px;\">");
                         	out.println("                <div>");
-                        	out.println("                    <label for=\"\" class=\"login__label\">Nume</label>");		
-			            	out.println("                    <input type=\"text\" name=\"nume\" placeholder=\"Introduceti numele\" value=\"" +  rs2.getString("nume") + "\" required class=\"login__input\">");
+                        	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Nume</label>");		
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent + ";\" type=\"text\" name=\"nume\" placeholder=\"Introduceti numele\" value=\"" +  rs2.getString("nume") + "\" required class=\"login__input\">");
 			            	out.println("                </div>");
 			            	out.println("                <div>");
-			            	out.println("                    <label for=\"\" class=\"login__label\">Prenume</label>");
-			            	out.println("                    <input type=\"text\" name=\"prenume\" placeholder=\"Introduceti prenumele\" value=\"" +  rs2.getString("prenume") + "\" required class=\"login__input\">");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Prenume</label>");
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent + ";\" type=\"text\" name=\"prenume\" placeholder=\"Introduceti prenumele\" value=\"" +  rs2.getString("prenume") + "\" required class=\"login__input\">");
 			            	out.println("                </div>");
 			            	out.println("                <div>");
-			            	out.println("                    <label for=\"\" class=\"login__label\">Data nasterii</label>");
-			            	out.println("                    <input type=\"date\" name=\"data_nasterii\" value=\""+ rs2.getDate("data_nasterii") + "\" min=\"1954-01-01\" max=\"2036-12-31\" required class=\"login__input\">");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Data nasterii</label>");
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent + ";\" type=\"date\" name=\"data_nasterii\" value=\""+ rs2.getDate("data_nasterii") + "\" min=\"1954-01-01\" max=\"2036-12-31\" required class=\"login__input\">");
 			            	out.println("                </div>");
 			            	out.println("                <div>");
-			            	out.println("                    <label for=\"\" class=\"login__label\">Adresa</label>");
-			            	out.println("                    <input type=\"text\" name=\"adresa\" placeholder=\"Introduceti adresa\" value=\""+ rs2.getString("adresa") + "\" required class=\"login__input\">");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Adresa</label>");
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent + ";\" type=\"text\" name=\"adresa\" placeholder=\"Introduceti adresa\" value=\""+ rs2.getString("adresa") + "\" required class=\"login__input\">");
 			            	out.println("                </div>");
 			            	out.println("                <div>");
-			            	out.println("                    <label for=\"\" class=\"login__label\">E-mail</label>");
-			            	out.println("                    <input type=\"email\" name=\"email\" placeholder=\"Introduceti e-mailul\" value=\" "+ rs2.getString("email") +"\" required class=\"login__input\">");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">E-mail</label>");
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent + ";\" type=\"email\" name=\"email\" placeholder=\"Introduceti e-mailul\" value=\" "+ rs2.getString("email") +"\" required class=\"login__input\">");
 			            	out.println("                </div>");
 			            	out.println(" </div></td> <td><p>   </p></td><td><p>   </p></td><td><p>   </p></td><td><p>   </p></td><td><p>   </p></td><td><p>   </p></td><td><div class=\"form__section\" style=\"margin:0; top:-10px;\">");
 			            	out.println("                <div>");
-			            	out.println("                    <label for=\"\" class=\"login__label\">Telefon</label>");
-			            	out.println("                    <input type=\"text\" name=\"telefon\" placeholder=\"Introduceti telefonul\" value=\""+ rs2.getString("telefon") +"\" required class=\"login__input\">");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Telefon</label>");
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent + ";\" type=\"text\" name=\"telefon\" placeholder=\"Introduceti telefonul\" value=\""+ rs2.getString("telefon") +"\" required class=\"login__input\">");
 			            	out.println("                </div>");
 			            	out.println("                <div>");
-			            	out.println("                    <label for=\"\" class=\"login__label\">UserName</label>");
-			            	out.println("                    <input type=\"text\" name=\"username\" placeholder=\"Introduceti numele de utilizator\" value=\""+ rs2.getString("username") +"\" required class=\"login__input\">");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">UserName</label>");
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent + ";\" type=\"text\" name=\"username\" placeholder=\"Introduceti numele de utilizator\" value=\""+ rs2.getString("username") +"\" required class=\"login__input\">");
 			            	out.println("                </div>");
 			            	out.println("                <div>");
-			            	out.println("                    <label for=\"\" class=\"login__label\">Departament</label>");
-			            	out.println("                    <select name=\"departament\" class=\"login__input\">");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Departament</label>");
+			            	out.println("                    <select style=\"color: " + text + "; border-color:" + accent + ";\" name=\"departament\" class=\"login__input\">");
 			
 			                     String id_dep = "";
 			                     String den_dep = "";
@@ -178,8 +178,8 @@ if (sesi != null) {
 			                        out.println("                    </select>");
 			                        out.println("                </div>");
 			                        out.println("                <div>");
-			                        out.println("                    <label for=\"\" class=\"login__label\">Tip/Ierarhie</label>");
-			                        out.println("                    <select name=\"tip\" class=\"login__input\">");
+			                        out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Tip/Ierarhie</label>");
+			                        out.println("                    <select style=\"color: " + text + "; border-color:" + accent + ";\" name=\"tip\" class=\"login__input\">");
 			                        
 			                        String tip = null;
 			                        String nume = null;
@@ -234,9 +234,13 @@ if (sesi != null) {
 				            out.println("                </div>");
 				            out.println("</td></tr></table>");
 				            
-				            out.println("                <div class=\"login__buttons\">");
-				            out.println("                    <input type=\"submit\" value=\"Submit\" class=\"login__button login__button-ghost\">");
-				            out.println("                </div>");
+				            out.println("<a style=\"color: " + accent + "\" href ='modifdel.jsp' class='login__forgot''>Inapoi</a>");
+		                    %>
+		                        <div class="login__buttons">
+		                    <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+		                    type="submit" value="Modificati" class="login__button">
+		                </div>
+		                <%
 				            	        }
 				            	    }
 				            	}
