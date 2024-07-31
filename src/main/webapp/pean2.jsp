@@ -19,36 +19,105 @@
         return output.toString();
     }
 %>
+<%
+HttpSession sesi = request.getSession(false);
+if (sesi != null) {
+    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+    if (currentUser != null) {
+        String username = currentUser.getUsername();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip FROM useri WHERE username = ?")) {
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                int userId = rs.getInt("id");
+                int userType = rs.getInt("tip");
 
+                // Allow only non-admin users to access this page
+                if (userType == 4) {
+                    response.sendRedirect("adminok.jsp");
+                    return;
+                }
+                String accent = null;
+              	 String clr = null;
+              	 String sidebar = null;
+              	 String text = null;
+              	 String card = null;
+              	 String hover = null;
+              	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                     // Check for upcoming leaves in 3 days
+                     String query = "SELECT * from teme where id_usr = ?";
+                     try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                         stmt.setInt(1, userId);
+                         try (ResultSet rs2 = stmt.executeQuery()) {
+                             if (rs2.next()) {
+                               accent =  rs2.getString("accent");
+                               clr =  rs2.getString("clr");
+                               sidebar =  rs2.getString("sidebar");
+                               text = rs2.getString("text");
+                               card =  rs2.getString("card");
+                               hover = rs2.getString("hover");
+                             }
+                         }
+                     }
+                     // Display the user dashboard or related information
+                     //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                     // Add additional user-specific content here
+                 } catch (SQLException e) {
+                     out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                     e.printStackTrace();
+                 }
+                String statusParam = request.getParameter("status");
+                String depParam = request.getParameter("dep");
+
+                int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
+                int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
+                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
+%>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Raport</title>
     <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <style>
        body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            
         }
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 500px;
             margin: 0 auto;
             padding: 0;
         }
         h1, h3 {
             text-align: center;
-            margin-bottom: 20px;
+            top: 0;
+            margin: 0;
+            bottom: 0;
         }
         #myChart {
-            width: 90%;
+            width: 100%;
             height: 400px;
              font-size: 13px;
-             left: 50%;
+             
              padding: 0;
-             margin: 0;
+             margin: auto;
+             top: -20%;
+             position: relative;
+            
         }
        
         .navigation, .login__check {
@@ -68,38 +137,7 @@
         
     </style>
 </head>
-<body>
-<%
-HttpSession sesi = request.getSession(false);
-if (sesi != null) {
-    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-    if (currentUser != null) {
-        String username = currentUser.getUsername();
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-            preparedStatement.setString(1, username);
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                int userId = rs.getInt("id");
-                int userType = rs.getInt("tip");
-				int userDep = rs.getInt("id_dep");
-                // Allow only non-admin users to access this page
-                if (userType == 4) {
-                    response.sendRedirect("adminok.jsp");
-                    return;
-                }
-
-                String statusParam = request.getParameter("status");
-                String depParam = request.getParameter("dep");
-
-                int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
-                int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
-                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-                dep = userDep;
-
-%>
-                
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(sidebar);%>">             
 <%
                 Map<Integer, Integer> leaveCountMap = new HashMap<>();
                 for (int i = 1; i <= 12; i++) {
@@ -156,7 +194,7 @@ if (sesi != null) {
                 }
 %>
                 <div class="container" id="content">
-                <h3 style="text-align: center;"> Vizualizare concedii
+                <h3 style="padding: 0; margin: 0; top: -10%; color: <%=accent%>" text-align: center;"> Vizualizare concedii
                 <%
                 // note to self -> ca sa apara tot graficul pe pagina, sa fie el vizibil mai intai pe pagina
                 if (status == 0) {
@@ -178,7 +216,7 @@ if (sesi != null) {
                 	out.println("cu orice status");
                 }
                 if (dep == -1) {
-                	out.println("pe toata institutia");
+                	out.println("pe departamentul meu");
                 } else {
                 	  try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
                           try (ResultSet rs1 = stm.executeQuery()) {
@@ -192,17 +230,17 @@ if (sesi != null) {
                       }
                 }
                 %>
-                </h3>
+               </h3>
                     <div id="myChart"></div>
                 </div>
                 
-<div class="login__check">
+<div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
                     <form id="statusForm" onsubmit="return false;">
                         <div>
-                            <label class="login__label">Status</label>
-                            <select name="status" class="login__input" onchange="submitForm()">
+                            <label style="color:<%out.println(text);%>" class="login__label">Status</label>
+                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="status" class="login__input" onchange="submitForm()">
                                 <option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
-                                <%
+                                 <%
                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
                                     try (ResultSet rs1 = stm.executeQuery()) {
                                         while (rs1.next()) {
@@ -216,10 +254,12 @@ if (sesi != null) {
                             </select>
                         </div>
                        
-                        <input type="submit" value="submit">
+                       <input style="margin-top:1em;  box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" type="submit" value="Genereaza" class="login__button">
                     </form>
                 </div>
-                <button onclick="generatePDF()">Generate PDF</button>
+               <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" onclick="generatePDF()">Descarcati PDF</button>
                 <script>
                     window.onload = function() {
                         zingchart.render({

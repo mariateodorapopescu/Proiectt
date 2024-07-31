@@ -7,6 +7,57 @@
 <%@ page import="java.util.*" %>  
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
+<%
+HttpSession sesi = request.getSession(false);
+if (sesi != null) {
+    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+    if (currentUser != null) {
+        String username = currentUser.getUsername();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                int userType = rs.getInt("tip");
+                int userId = rs.getInt("id");
+                int userDep = rs.getInt("id_dep");
+                // Allow only non-admin users to access this page
+                if (userType == 4) {
+                    response.sendRedirect("adminok.jsp");
+                    return;
+                }
+                String accent = null;
+            	 String clr = null;
+            	 String sidebar = null;
+            	 String text = null;
+            	 String card = null;
+            	 String hover = null;
+            	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                   // Check for upcoming leaves in 3 days
+                   String query = "SELECT * from teme where id_usr = ?";
+                   try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                       stmt.setInt(1, userId);
+                       
+                       try (ResultSet rs2 = stmt.executeQuery()) {
+                           if (rs2.next()) {
+                             accent =  rs2.getString("accent");
+                             clr =  rs2.getString("clr");
+                             sidebar =  rs2.getString("sidebar");
+                             text = rs2.getString("text");
+                             card =  rs2.getString("card");
+                             hover = rs2.getString("hover");
+                           }
+                       }
+                   }
+                   // Display the user dashboard or related information
+                   //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                   // Add additional user-specific content here
+               } catch (SQLException e) {
+                   out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                   e.printStackTrace();
+               }
+            	 %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,10 +69,10 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <style>
-    .leave-1 { background-color: #90ee90; } /* Light green for 1 person */
-    .leave-2 { background-color: #ffff99; } /* Yellow for 2 people */
-    .leave-3 { background-color: #ffcc99; } /* Orange for 3 people */
-    .leave-more { background-color: #ff6666; } /* Red for more than 3 people */
+    .leave-1 { background-color: #88D66C; } /* Light green for 1 person */
+    .leave-2 { background-color: #FFDE4D; } /* Yellow for 2 people */
+    .leave-3 { background-color: #FF8225; } /* Orange for 3 people */
+    .leave-more { background-color: #C63C51; } /* Red for more than 3 people */
     /* Tooltip container */
 .tooltip {
   position: relative;
@@ -52,29 +103,29 @@
 </style>
     
 </head>
-<body>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(sidebar);%>">
 
-<div class="container calendar-container">
+<div style="background: <%=clr %>; box-shadow: none; border-radius: 2rem; margin-top: 5em;"class="container calendar-container">
 <div class="ceva tooltip">Legenda
   <span class="ceva tooltiptext">transparent = 0;<br> verde = 1; <br>galben = 2; <br>portocaliu = 3; <br>rosu = >3 </span>
 </div>
-    <div class="navigation">
+    <div style="color: <%= accent %>;" class="navigation">
     
-        <button onclick="previousMonth()">❮</button>
+        <button style="border-color: <%= clr %>; background: <%= clr %>;" onclick="previousMonth()">❮</button>
         <div class="month-year" id="monthYear"></div>
         
-        <button onclick="nextMonth()">❯</button>
+        <button style="border-color: <%= clr %>; background: <%= clr %>;" onclick="nextMonth()">❯</button>
     </div>
-    <table class="calendar" id="calendar">
+    <table style="background: <%= sidebar %>;" class="calendar" id="calendar">
         <thead>
-            <tr>
-                <th class="calendar">Lu.</th>
-                <th class="calendar">Ma.</th>
-                <th class="calendar">Mi.</th>
-                <th class="calendar">Jo.</th>
-                <th class="calendar">Vi.</th>
-                <th class="calendar">Sâ.</th>
-                <th class="calendar">Du.</th>
+            <tr >
+                <th style="background: <%= accent %>; color: <%= sidebar %>; " class="calendar">Lu.</th>
+                <th style="background: <%= accent %>; color: <%= sidebar %>; " class="calendar">Ma.</th>
+                <th style="background: <%= accent %>; color: <%= sidebar %>; " class="calendar">Mi.</th>
+                <th style="background: <%= accent %>; color: <%= sidebar %>; " class="calendar">Jo.</th>
+                <th style="background: <%= accent %>; color: <%= sidebar %>; " class="calendar">Vi.</th>
+                <th style="background: <%= accent %>; color: <%= sidebar %>; " class="calendar">Sâ.</th>
+                <th style="background: <%= accent %>; color: <%= sidebar %>; " class="calendar">Du.</th>
             </tr>
         </thead>
         <tbody class="calendar" id="calendar-body">
@@ -82,7 +133,7 @@
         </tbody>
     </table>
 </div>
-<form id="dateForm" action="testviewpers2.jsp" method="post" style="display:none;">
+<form id="dateForm" action="testviewpers.jsp" method="post" style="display:none;">
     <input type="date" name="selectedDate" id="selectedDate">
 </form>
 <script src="./responsive-login-form-main/assets/js/calendar3.js"></script>
@@ -117,27 +168,8 @@ Map<String, ArrayList<String>> persoane = new HashMap<>();
     };
 </script>
 
-<%
-HttpSession sesi = request.getSession(false);
-if (sesi != null) {
-    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-    if (currentUser != null) {
-        String username = currentUser.getUsername();
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-        		PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-            preparedStatement.setString(1, username);
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                int userId = rs.getInt("id");
-                int userType = rs.getInt("tip");
-				int userDep = rs.getInt("id_dep");
-                if (userType == 4) {
-                    response.sendRedirect("adminok.jsp");
-                    return;
-                }
-            
-                String data = null;
+<%                
+	String data = null;
                 
                 data = request.getParameter("selectedDate");
                
@@ -159,11 +191,11 @@ if (sesi != null) {
              
               
                try (PreparedStatement stmt = connection.prepareStatement(
-                       "SELECT nume, prenume, start_c, end_c FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE (MONTH(start_c) = ? OR MONTH(end_c) = ?) AND YEAR(start_c) = ? and useri.id_dep = ?")) {
-                   stmt.setInt(1, month);
-                   stmt.setInt(2, month);
-                   stmt.setInt(3, calendar.get(Calendar.YEAR));
-                   stmt.setInt(4, userDep);
+                       "SELECT nume, prenume, start_c, end_c FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE (MONTH(start_c) = ? OR MONTH(end_c) = ?) AND YEAR(start_c) = ? and useri.id_dep = ?;")) {
+                           stmt.setInt(1, month);
+                           stmt.setInt(2, month);
+                           stmt.setInt(3, calendar.get(Calendar.YEAR));
+                           stmt.setInt(4, userDep);
                    ResultSet rs1 = stmt.executeQuery();
                    
                    while (rs1.next()) {
@@ -285,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Solicitarea AJAX pentru actualizarea calendarului
     function fetchCalendarData(month, year) {
-        fetch(testviewpers2.jsp?month=${month+1}&year=${year})
+        fetch(testviewpers.jsp?month=${month+1}&year=${year})
             .then(response => response.text())
             .then(html => {
                 document.getElementById('calendar-body').innerHTML = html;

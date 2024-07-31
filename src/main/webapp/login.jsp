@@ -71,7 +71,7 @@
             <h1 style="color: <%= accent %>;" class="login__title">Conectare</h1>
             <div class="login__inputs">
                 <label style="color: <%= text %>;" for="username" class="login__label">Nume de utilizator</label>
-                <input style="background: <%= sidebar %>; border-color: <%= accent %>; " type="text" id="username" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
+                <input style="color: <%= text %>; background: <%= sidebar %>; border-color: <%= accent %>; " type="text" id="username" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
                 
                 <div>
                                 <label style="color: <%=text%>;" for="" class="login__label">Parola</label>
@@ -83,7 +83,7 @@
                                     
                                 </div>
             </div>
-            <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+            <input style="color: <%= text %>; margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" type="submit" value="Conectare" class="login__button"><% 
     String loginAttempts = request.getParameter("loginAttempts");
     if (loginAttempts != null && Integer.parseInt(loginAttempts) >= 1) {

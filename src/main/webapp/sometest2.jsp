@@ -31,7 +31,59 @@
         return monthNames[month - 1];
     }
 %>  
+<%
 
+HttpSession sesi = request.getSession(false);
+if (sesi != null) {
+    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+    if (currentUser != null) {
+        String username = currentUser.getUsername();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip FROM useri WHERE username = ?")) {
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                int userId = rs.getInt("id");
+                int userType = rs.getInt("tip");
+
+                // Allow only non-admin users to access this page
+                if (userType == 4) {
+                    response.sendRedirect("adminok.jsp");
+                    return;
+                } 
+                
+                String accent = null;
+             	 String clr = null;
+             	 String sidebar = null;
+             	 String text = null;
+             	 String card = null;
+             	 String hover = null;
+             	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                    // Check for upcoming leaves in 3 days
+                    String query = "SELECT * from teme where id_usr = ?";
+                    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                        stmt.setInt(1, userId);
+                        try (ResultSet rs2 = stmt.executeQuery()) {
+                            if (rs2.next()) {
+                              accent =  rs2.getString("accent");
+                              clr =  rs2.getString("clr");
+                              sidebar =  rs2.getString("sidebar");
+                              text = rs2.getString("text");
+                              card =  rs2.getString("card");
+                              hover = rs2.getString("hover");
+                            }
+                        }
+                    }
+                    // Display the user dashboard or related information
+                    //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                    // Add additional user-specific content here
+                } catch (SQLException e) {
+                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                    e.printStackTrace();
+                }
+
+%>
 <!DOCTYPE html>  
 <html>  
 <head>  
@@ -46,21 +98,26 @@
         }
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             padding: 0;
         }
         h1, h3 {
             text-align: center;
-            margin-bottom: 20px;
+            top: 0;
+            margin: 0;
+            bottom: 0;
         }
         #myChart {
-            width: 90%;
+            width: 100%;
             height: 400px;
              font-size: 13px;
-             left: 50%;
+             
              padding: 0;
-             margin: 0;
+             margin: auto;
+             top: -20%;
+             position: relative;
+            
         }
        
         .navigation, .login__check {
@@ -79,8 +136,17 @@
         }
         
     </style>
+     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
 </head>  
-<body>  
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(sidebar);%>">
+
 <%
 String lunaa = null;
 int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
@@ -94,48 +160,28 @@ if (selectedMonthParam != null && selectedYearParam != null) {
     currentYear = Integer.parseInt(selectedYearParam);
 }
 
-HttpSession sesi = request.getSession(false);
-if (sesi != null) {
-    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-    if (currentUser != null) {
-        String username = currentUser.getUsername();
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-        		PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-            preparedStatement.setString(1, username);
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                int userId = rs.getInt("id");
-                int userType = rs.getInt("tip");
-				int userDep = rs.getInt("id_dep");
-                // Allow only non-admin users to access this page
-                if (userType == 4) {
-                    response.sendRedirect("adminok.jsp");
-                    return;
-                } 
                 
                 String statusParam = request.getParameter("status");
                 String depParam = request.getParameter("dep");
 
                 int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
                 int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
-                dep = userDep;
                 
-                out.print("<div class='navigation'>");
-                out.print("<form action='" + request.getContextPath() + "/sometest2.jsp' method='post' style='display: inline;'>");
+                out.print("<div style=\"color: " + accent + "; position: sticky; top: 95%; \" class='navigation'>");
+                out.print("<form action='" + request.getContextPath() + "/sometest.jsp' method='post' style='display: inline;'>");
                 out.print("<input type='hidden' name='selectedMonth' value='" + (currentMonth == 1 ? 12 : currentMonth - 1) + "'/>");
                 out.print("<input type='hidden' name='selectedYear' value='" + (currentMonth == 1 ? currentYear - 1 : currentYear) + "'/>");
                 out.print("<input type='hidden' name='status' value='" + status + "'/>");
                 out.print("<input type='hidden' name='dep' value='" + dep + "'/>");
-                out.print("<input type='submit' value='❮ Anterior' />");
+                out.print("<input type='submit' value='❮' />");
                 out.print("</form>");
                 out.print("<h3>" + getMonthName(currentMonth) + " " + currentYear + "</h3>");
-                out.print("<form action='" + request.getContextPath() + "/sometest2.jsp' method='post' style='display: inline;'>");
+                out.print("<form action='" + request.getContextPath() + "/sometest.jsp' method='post' style='display: inline;'>");
                 out.print("<input type='hidden' name='selectedMonth' value='" + (currentMonth == 12 ? 1 : currentMonth + 1) + "'/>");
                 out.print("<input type='hidden' name='selectedYear' value='" + (currentMonth == 12 ? currentYear + 1 : currentYear) + "'/>");
                 out.print("<input type='hidden' name='status' value='" + status + "'/>");
                 out.print("<input type='hidden' name='dep' value='" + dep + "'/>");
-                out.print("<input type='submit' value='Următor ❯' />");
+                out.print("<input type='submit' value='❯' />");
                 out.print("</form>");
                 out.print("</div>");
                 
@@ -251,7 +297,7 @@ if (sesi != null) {
                 
                 %>
 <div class="container" id="content">
-<h3> Vizualizare concedii
+                <h3 style="padding: 0; margin: 0; top: -10%; color: <%=accent%>" text-align: center;"> Vizualizare concedii
                 <%
                 if (status == 0) {
                 	out.println("neaprobate");
@@ -272,7 +318,7 @@ if (sesi != null) {
                 	out.println("cu orice status");
                 }
                 if (dep == -1) {
-                	out.println("pe toata institutia");
+                	out.println("din departamentul meu");
                 } else {
                 	  try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
                           try (ResultSet rs1 = stm.executeQuery()) {
@@ -290,13 +336,12 @@ if (sesi != null) {
                 </h3>
     <div id="myChart"></div>  
 </div>
-  
-                <div class="login__check">
+   <div style="position: fixed; left: 5%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
                     <form id="statusForm" onsubmit="return false;">
                         <div>
-                            <label class="login__label">Status</label>
-                            <select name="status" class="login__input" onchange="submitForm()">
-                                <option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
+                            <label style="color:<%out.println(text);%>"  class="login__label">Status</label>
+                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="status" class="login__input" onchange="submitForm()">
+                                <<option value="3" <%= (status == 3 ? "selected" : "") %>>Oricare</option>
                                 <%
                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
                                     try (ResultSet rs1 = stm.executeQuery()) {
@@ -311,11 +356,13 @@ if (sesi != null) {
                             </select>
                         </div>
                        
-                        <input type="submit" value="submit">
+                        <input style="margin-top:1em;  box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" type="submit" value="Genereaza" class="login__button">
                     </form>
                    
                 </div>
-                 <button onclick="generate()">Generate PDF</button>
+                <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" onclick="generate()">Descarcati PDF</button>
                 
 
 <script>
