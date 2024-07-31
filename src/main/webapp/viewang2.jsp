@@ -60,36 +60,31 @@ if (sesi != null) {
 <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
 <title>Rapoarte</title>
 <style>
-    * {
-       
+     * {
+        box-sizing: border-box;
         margin: 0;
         padding: 0;
     }
     body, html {
         background: <%= clr %>;
-        padding: 0;
-        marging: 0;
+        font-family: Arial, sans-serif;
         overflow-x: hidden;
     }
     nav {
         width: 100%;
         background-color: <%= sidebar %>;
-        
         display: flex;
-        justify-content: center;
+        justify-content: space-around; /* Changed to space-around for better spacing */
         position: fixed;
         top: 0;
         z-index: 1000;
-        padding: 0;
-        margin: 0;
+        padding: 10px 0;
     }
     nav a {
-        flex-grow: 1;
-        
-        padding: 12px 10px;
+        padding: 12px 6px; /* Reduced padding for smaller screens */
         text-align: center;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 14px; /* Adjust font size if needed */
         color: <%= text %>;
         transition: background-color 0.3s, color 0.3s;
     }
@@ -99,11 +94,18 @@ if (sesi != null) {
     }
     iframe {
         width: 100%;
-        height: 100vh; /* Adjusted for nav height */
+        height: calc(100vh - 50px); /* Adjusted for nav height */
         border: none;
         position: relative;
-        top: 0;
-         overflow-y: hidden;
+        top: 50px; /* Height of nav */
+        overflow-y: auto;
+    }
+
+    @media (max-width: 600px) {
+        nav a {
+            flex-grow: 1;
+            font-size: 12px; /* Smaller font size for very small screens */
+        }
     }
 </style>
 </head>
@@ -111,10 +113,10 @@ if (sesi != null) {
 
 <nav>
     <a  href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
-    <a href="viewp.jsp" target="contentFrame">Concedii personale</a>
-    <a href="viewdepeu.jsp" target="contentFrame">Din departamentul meu</a>
-    <a href="pean2.jsp" target="contentFrame">Raport pe an</a>
-    <a href="sometest2.jsp" target="contentFrame">Raport lunar</a>
+    <a href="viewp.jsp" target="contentFrame">Personale</a>
+    <a href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
+    <a href="pean2.jsp" target="contentFrame">Anual</a>
+    <a href="sometest2.jsp" target="contentFrame">Lunar</a>
     <a href="testviewpers2.jsp" target="contentFrame">Calendar</a>
 </nav>
 
