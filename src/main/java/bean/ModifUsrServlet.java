@@ -48,7 +48,7 @@ public class ModifUsrServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?dn=true");
             return;
         }
-        
+        /*
         int nrsef = -1;
         int nrdir = -1;
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -87,7 +87,7 @@ public class ModifUsrServlet extends HttpServlet {
             response.sendRedirect("modifdel.jsp?pmd=true");
             return;
         }
-
+*/
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");

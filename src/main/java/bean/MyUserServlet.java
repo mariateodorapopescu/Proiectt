@@ -79,7 +79,7 @@ public class MyUserServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?dn=true");
             return;
         }
-        
+      /*  
         int nrsef = -1;
         int nrdir = -1;
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -117,7 +117,7 @@ public class MyUserServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?pmd=true");
             return;
         }
-
+*/
         try {
             employeeDao.registerEmployee(employee);
             response.setContentType("text/html;charset=UTF-8");

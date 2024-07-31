@@ -128,7 +128,9 @@
             <h1 style="color: <%= accent %>;">Bun venit!</h1>
         </div>
        <button style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
-                    class="login__button"><a href="login.jsp">Intrati</a> </button>
+                    class="login__button"><a href="login.jsp" style="display: block; text-align: center; margin:0; top:-10px; box-shadow: 0 6px 24px <%= accent %>; background: <%= accent %>; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+    Intrati
+</a> </button>
     </div>
 
   
