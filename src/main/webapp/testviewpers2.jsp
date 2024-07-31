@@ -133,7 +133,7 @@ if (sesi != null) {
         </tbody>
     </table>
 </div>
-<form id="dateForm" action="testviewpers.jsp" method="post" style="display:none;">
+<form id="dateForm" action="testviewpers2.jsp" method="post" style="display:none;">
     <input type="date" name="selectedDate" id="selectedDate">
 </form>
 <script src="./responsive-login-form-main/assets/js/calendar3.js"></script>
@@ -235,9 +235,10 @@ Map<String, ArrayList<String>> persoane = new HashMap<>();
                // System.out.println("JSON Data: " + jsonData);
             
                  
-               try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ?")) {
+               try (PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE start_c <= ? AND end_c >= ? and useri.id_dep = ?")) {
                    stmt.setString(1, data);
                    stmt.setString(2, data);
+                   stmt.setInt(3, userDep);
                    ResultSet rs1 = stmt.executeQuery();
                    while (rs1.next()) {
                    	
@@ -317,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Solicitarea AJAX pentru actualizarea calendarului
     function fetchCalendarData(month, year) {
-        fetch(testviewpers.jsp?month=${month+1}&year=${year})
+        fetch(testviewpers2.jsp?month=${month+1}&year=${year})
             .then(response => response.text())
             .then(html => {
                 document.getElementById('calendar-body').innerHTML = html;

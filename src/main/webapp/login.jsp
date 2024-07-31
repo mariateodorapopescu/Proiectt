@@ -83,7 +83,7 @@
                                     
                                 </div>
             </div>
-            <input style="color: <%= text %>; margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+            <input style="color: <%= sidebar %>; margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" type="submit" value="Conectare" class="login__button"><% 
     String loginAttempts = request.getParameter("loginAttempts");
     if (loginAttempts != null && Integer.parseInt(loginAttempts) >= 1) {
