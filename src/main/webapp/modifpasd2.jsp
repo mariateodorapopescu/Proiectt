@@ -1,141 +1,126 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
-<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
-<%@ page import="javax.sql.DataSource" %>
-<%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<%
+<%@ page import="bean.MyUser" %>
 
+<%
 HttpSession sesi = request.getSession(false);
-if (sesi != null) {
-    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-    if (currentUser != null) {
-        String username = currentUser.getUsername();
-        Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-            preparedStatement.setString(1, username);
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                int id = rs.getInt("id");
-                int userType = rs.getInt("tip");
-                int userdep = rs.getInt("id_dep");
-                if (userType == 4) {  // Assuming only type 4 users can approve
-                	
-                	String accent = null;
-                 	 String clr = null;
-                 	 String sidebar = null;
-                 	 String text = null;
-                 	 String card = null;
-                 	 String hover = null;
-                 	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                        // Check for upcoming leaves in 3 days
-                        String query = "SELECT * from teme where id_usr = ?";
-                        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                            stmt.setInt(1, id);
-                            try (ResultSet rs2 = stmt.executeQuery()) {
-                                if (rs2.next()) {
-                                  accent =  rs2.getString("accent");
-                                  clr =  rs2.getString("clr");
-                                  sidebar =  rs2.getString("sidebar");
-                                  text = rs2.getString("text");
-                                  card =  rs2.getString("card");
-                                  hover = rs2.getString("hover");
-                                }
-                            }
-                        }
-                        // Display the user dashboard or related information
-                        //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                        // Add additional user-specific content here
-                    } catch (SQLException e) {
-                        out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                        e.printStackTrace();
-                    }
-                 	 
-    %>
+if (sesi == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+if (currentUser == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+
+String username = currentUser.getUsername();
+String accent = "#03346E", clr = "#d8d9e1", sidebar = "#ecedfa", text = "#333", card = "#ecedfa", hover = "#ecedfa";
+int userId = -1, userType = -1;
+
+try {
+    Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+        
+        preparedStatement.setString(1, username);
+        ResultSet rs = preparedStatement.executeQuery();
+
+        if (!rs.next()) {
+            out.println("<script type='text/javascript'>alert('No data found for user!'); location='login.jsp';</script>");
+            return;
+        }
+
+        userId = rs.getInt("id");
+        userType = rs.getInt("tip");
+
+        if (userType != 4) {
+            response.sendRedirect("dashboard.jsp");
+            return;
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM teme WHERE id_usr = ?")) {
+            stmt.setInt(1, userId);
+            ResultSet rs2 = stmt.executeQuery();
+            if (rs2.next()) {
+                accent = rs2.getString("accent");
+                clr = rs2.getString("clr");
+                sidebar = rs2.getString("sidebar");
+                text = rs2.getString("text");
+                card = rs2.getString("card");
+                hover = rs2.getString("hover");
+            }
+        }
+    }
+} catch (Exception e) {
+    e.printStackTrace();
+    out.println("<script type='text/javascript'>alert('Database error!'); location='login.jsp';</script>");
+    return;
+}
+%>
+
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    
-      <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <title>Modificare parola</title>
-</head>
-<body>
-<%
-                    		   int userId = Integer.parseInt(request.getParameter("idd"));
-								out.println("<div class=\"container\">");
-                    		   out.println("<div class=\"login__content\">");
-                    		   out.println("<img src=\"./responsive-login-form-main/assets/img/bg-login.jpg\" alt=\"login image\" class=\"login__img login__img-light\">");
-                    		   out.println("<img src=\"./responsive-login-form-main/assets/img/bg-login-dark.jpg\" alt=\"login image\" class=\"login__img login__img-dark\">");
-                               out.println("<div align='center'>");
-                               out.println("<h1>Modificare parola</h1>");
-                               out.println("<form action='" + request.getContextPath() + "/ModifPasdServlet' method='post' class='login__form'>");
-                               out.println("<input type='hidden' name='id' value='" + userId + "' />");
-                               out.println("<table style='width: 80%'>");
-                               out.println("<tr><td>Parola noua</td><td><input type='password' name='password' required class='login__input'/></td></tr>");
-                               out.println("<tr><td><input type='submit' value='Submit' class='login__button login__button-ghost'/></td></tr>");
-                               out.println("</table>");
-                               out.println("</form>");
-                               out.println("</div>");
-                               out.println("<a href ='login.jsp' class='login__forgot'>Inapoi</a>");
-                               out.println("</div>");
-                               out.println("</div>");
-                               if ("true".equals(request.getParameter("p"))) {
-                              	 out.println("<script type='text/javascript'>");
-                       	        out.println("alert('Trebuie sa alegeti o parola mai complexa!');");
-                       	        out.println("</script>");
-                              	    out.println("<br>Parola trebuie sa contina:<br>");
-                              	    out.println("- minim 8 caractere<br>");
-                              	    out.println("- un caracter special (!()?*\\[\\]{}:;_\\-\\\\/`~'<>@#$%^&+=])<br>");
-                              	    out.println("- o litera mare<br>");
-                              	    out.println("- o litera mica<br>");
-                              	    out.println("- o cifra<br>");
-                              	    out.println("- cifrele alaturate sa nu fie egale sau consecutive<br>");
-                              	    out.println("- literele alaturate sa nu fie egale sau una dupa <br>cealalta, inclusiv diacriticele");
-                    	   }
-                          
-                } else {
-                	switch (userType) {
-                    case 1: response.sendRedirect("tip1ok.jsp"); break;
-                    case 2: response.sendRedirect("tip1ok.jsp"); break;
-                    case 3: response.sendRedirect("sefok.jsp"); break;
-                    case 0: response.sendRedirect("dashboard.jsp"); break;
-                }
-                }
-            } else {
-            	out.println("<script type='text/javascript'>");
-                out.println("alert('Date introduse incorect sau nu exista date!');");
-                out.println("</script>");
-                response.sendRedirect("modifdel.jsp");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            out.println("<script type='text/javascript'>");
-	        out.println("alert('Eroare la baza de date!');");
-	       
-	        out.println("</script>");
-            response.sendRedirect("modifdel.jsp");
+    <style>
+        :root {
+            --bg: <%=accent%>;
+            --clr: <%=clr%>;
+            --sd: <%=sidebar%>;
+            --text: <%=text%>;
+            background: <%=clr%>;
         }
-    } else {
-    	out.println("<script type='text/javascript'>");
-        out.println("alert('Utilizator neconectat!');");
-        out.println("</script>");
-        response.sendRedirect("logout");
-    }
-} else {
-	out.println("<script type='text/javascript'>");
-    out.println("alert('Nu e nicio sesiune activa!');");
-    out.println("</script>");
-    response.sendRedirect("logout");
-}
-%>
+    </style>
+</head>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
+
+<div class="container" style="background: <%=clr%>; color: <%=text%>;">
+    <div class="login__content" style="justify-content: center; border-radius: 2rem; border-color: <%=sidebar%>; background: <%=clr%>;">
+        <div align='center'>
+            
+            <form style="background:  <%=sidebar%>; border-color: <%=sidebar%>;" action="<%=request.getContextPath()%>/ModifPasdServlet" method='post' class='login__form'>
+            <h1 style="color: <%=accent%>;">Modificare parola</h1>
+                <input type='hidden' name='id' value='<%=userId%>' />
+                <table style='width: 80%'>
+                    <tr>
+                        <td style="color:  <%=text%>;">Parola noua:</td>
+                        <td><input style="background:  <%=clr%>; color: <%=text%>; border-color: <%=accent%>;" type='password' name='password' placeholder="Introduceti parola" required class='login__input'/></td>
+                    </tr>
+                    <tr><td>  <a style="color:  <%=accent%>;" href='login.jsp' class='login__forgot'>Inapoi</a></td></tr>
+                    <tr>
+                  
+                        <td colspan='2'><input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    type="submit" value="Submit" class="login__button"></td>
+                    </tr>
+                </table>
+                 
+            </form>
+           
+        </div>
+    </div>
+</div>
+
+<% if ("true".equals(request.getParameter("p"))) { %>
+    <script type='text/javascript'>
+        alert('Trebuie sa alegeti o parola mai complexa!');
+    </script>
+    <br>Parola trebuie sa contina:<br>
+    - minim 8 caractere<br>
+    - un caracter special (!()?*\\[\\]{}:;_\\-\\\\/`~'<>@#$%^&+=])<br>
+    - o litera mare<br>
+    - o litera mica<br>
+    - o cifra<br>
+    - cifrele alaturate sa nu fie egale sau consecutive<br>
+    - literele alaturate sa nu fie egale sau una dupa <br>cealalta, inclusiv diacriticele
+<% } %>
+
 </body>
 </html>

@@ -1,76 +1,93 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<% String accent = "#03346E", clr = "#d8d9e1", sidebar = "#ecedfa", text = "#333", card = "#ecedfa", hover = "#ecedfa"; %>
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="ISO-8859-1">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <!--=============== REMIXICONS ===============-->
-        <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-        <!--=============== CSS ===============-->
-        <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-        
-        <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-        
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+<link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
 <title>Login</title>
-<script type="text/javascript">
-    function submitForm() {
-        document.getElementById("postLogin").submit();
-    }
-</script>
 <style>
+    body {
+        --bg: <%= accent %>;
+        --clr: <%= clr %>;
+        --sd: <%= sidebar %>;
+        --text: <%= text %>;
+        background: <%= clr %>;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 20px;
+    }
+    .container {
+        background: <%= sidebar %>;
+        padding: 20px;
+        border-radius: 2rem;
+       
+        width: 100%; /* Responsive width */
+        max-width: 75%; /* Maximum width */
+    }
+    .logo img {
+        width: 80%; /* Smaller logo for small screens */
+        max-width: 150px; /* Maximum width of the logo */
+        margin-bottom: 20px; /* Space below the logo */
+    }
+  
+    .login__button {
+        background: <%= accent %>;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+    }
+    @media (max-width: 300px) {
+        .logo, .login__form {
+            padding: 10px;
+        }
+        h1, label {
+            font-size: 0.8rem; /* Smaller font size for smaller screens */
+        }
+    }
+   
       input::-ms-reveal,
       input::-ms-clear {
         display: none;
       }
-    </style>
+   
+</style>
 </head>
 <body>
-
- <div class="container">
-            <div class="login__content">
-                <img src="./responsive-login-form-main/assets/img/bg-login.jpg" alt="login image" class="login__img login__img-light">
-                <img src="./responsive-login-form-main/assets/img/bg-login-dark.jpg" alt="login image" class="login__img login__img-dark">
-    
-                <form action="<%= request.getContextPath() %>/login" method="post" class="login__form">
-                    <div>
-                        <h1 class="login__title">
-                            <span>Conectare</span>
-                        </h1>
-                        <p class="login__description">
-                            
-                        </p>
-                    </div>
-                    
-                    <div>
-                        <div class="login__inputs">
-                            <div>
-                                <label for="" class="login__label">Nume de utilizator</label>
-                                <input type="text" placeholder="Introduceti numele de utilizator" required class="login__input" name="username">
-                            </div>
-    
-                            <div>
-                                <label for="" class="login__label">Parola</label>
+    <div class="container" style="margin:0; padding: 0; justify-content: center;">
+        <div class="logo">
+            <img src="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" alt="Logo">
+            <h1 style="color: <%= accent %>;">Firma XYZ</h1>
+        </div>
+        <form style="margin:0; background: <%= clr %>; border-color: <%= clr %>; " action="<%= request.getContextPath() %>/login" method="post" class="login__form">
+            <h1 style="color: <%= accent %>;" class="login__title">Conectare</h1>
+            <div class="login__inputs">
+                <label style="color: <%= text %>;" for="username" class="login__label">Nume de utilizator</label>
+                <input style="background: <%= sidebar %>; border-color: <%= accent %>; " type="text" id="username" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
+                
+                <div>
+                                <label style="color: <%=text%>;" for="" class="login__label">Parola</label>
     
                                 <div class="login__box">
-                                    <input type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass" name="password">
+                                    <input style="color: <%=text%>; background:  <%=sidebar%>; border-color: <%=accent%>;" type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass" name="password">
                                     <i class="ri-eye-off-line login__eye" id="input-icon"></i>
                                     
                                     
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="login__buttons">
-                            <input type="submit" value="Conectare" class="login__button login__button-ghost">
-                        </div>
-  <% 
+            </div>
+            <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" type="submit" value="Conectare" class="login__button"><% 
     String loginAttempts = request.getParameter("loginAttempts");
     if (loginAttempts != null && Integer.parseInt(loginAttempts) >= 1) {
-        out.println("<a href='forgotpass.jsp' class='login__forgot'>Am uitat parola</a>");
+        out.println("<a style='color: " + accent + ";' href='forgotpass.jsp' class='login__forgot'>Am uitat parola</a>");
     }
 %>
                     </div>

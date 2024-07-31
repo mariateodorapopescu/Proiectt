@@ -18,7 +18,7 @@
                 if (rs.next()) {
                     int id = rs.getInt("id");
                     int userType = rs.getInt("tip");
-                    if (userType == 4) {
+                    if (userType == 5) {
                         response.sendRedirect("adminok.jsp");
                     } else {
                         String accent = null;
@@ -87,7 +87,7 @@
 %>
 <html>
 <head>
-    <title>Adaugare concediu</title>
+    <title>Configurari</title>
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <!--=============== CSS ===============-->

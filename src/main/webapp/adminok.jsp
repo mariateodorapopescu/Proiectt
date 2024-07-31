@@ -596,7 +596,15 @@ body {
                         <div class="sitextt">Departamente</div>
                     </a>
                 </li>
-              
+               <li style="--bg: <%out.println(accent); %>;">
+                     <a href="setari.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="switch"></ion-icon>
+                        </div>
+                        <div class="sitextt">Configurari</div>
+                    </a>
+                </li>
+                </div>
             <div class="sibottom">
                 <li style="--bg:<%out.println(text); %>;">
                     <a href="despr.jsp" class="load-content" target="iframe">
