@@ -148,13 +148,13 @@ int pag = -1;
                     	PreparedStatement stmtt2 = null;
                     	%>
                     	
-                    	<div class="main-content">
+                    	<div class="main-content" style="background:<%out.println(sidebar);%>; ">
         <div class="header">
          </div>
-        <div class="content">
-            <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%> ">             	
+        <div class="content" style="border-radius: 2rem; margin-top:5%; ">
+            <div class="intro" style="border-radius: 2rem; background:<%out.println(clr);%>; color:<%out.println(text);%> ">             	
                     	
-                 <div class="events"  style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                 <div class="events"  style="border-radius: 2rem; background:<%out.println(clr);%>; color:<%out.println(text);%>" id="content">
                  <%
                     	
                     	if (pag == 3) {
@@ -215,20 +215,21 @@ int pag = -1;
                     	%>
  	
                 <h3><%out.println(today); %></h3>
-                <table >
-                    <thead>
-                        <tr>
+                <table style="color: white">
+                    <thead style="color: white">
+                        <tr style="color: white">
                    
-                    <th>Departament</th>
-                    <th>Nume</th>
-                    <th>Prenume</th>
-                    <th>Functie</th>
-                    <th>Inceput</th>
-                    <th>Final</th>
-                    <th>Motiv</th>
-                    <th>Locatie</th>
-                    <th>Tip concediu</th>
-                    <th>Status</th>
+                   
+                    <th style="color: white">Nume</th>
+                    <th style="color: white">Prenume</th>
+                    <th style="color: white">Functie</th>
+                     <th style="color: white">Departament</th>
+                    <th style="color: white">Inceput</th>
+                    <th style="color: white">Final</th>
+                    <th style="color: white">Motiv</th>
+                    <th style="color: white">Locatie</th>
+                    <th style="color: white">Tip concediu</th>
+                    <th style="color: white">Status</th>
                 </tr>
             </thead>
              <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
@@ -611,13 +612,13 @@ int pag = -1;
 
                           while (rss1.next()) {
                               found = true;
-                              out.print("<tr><td data-label='Departament'>" + rss1.getString("departament") + "</td><td data-label='Nume'>" +
-                                        rss1.getString("nume") + "</td><td data-label='Prenume'>" + rss1.getString("prenume") + "</td><td data-label='Functie'>" + rss1.getString("functie") + "</td><td data-label='Inceput'>" +
+                              out.print("<tr><td data-label='Nume'>" +
+                                        rss1.getString("nume") + "</td><td data-label='Prenume'>" + rss1.getString("prenume") + "</td><td data-label='Functie'>" + rss1.getString("functie") + "</td>" + "<td data-label='Departament'>" + rss1.getString("departament") + "</td>" + "<td data-label='Inceput'>" +
                                         rss1.getDate("start_c") + "</td><td data-label='Final'>" + rss1.getDate("end_c") + "</td><td data-label='Motiv'>" + rss1.getString("motiv") + "</td><td data-label='Locatie'>" +
                                         rss1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rss1.getString("tipcon") + "</td>");
 
                               if (rss1.getString("status").compareTo("neaprobat") == 0) {
-                                  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-close-line'></i></span></td></tr>");
+                                  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("dezaprobat sef") == 0) {
                             	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");

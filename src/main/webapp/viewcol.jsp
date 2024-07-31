@@ -4,6 +4,59 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+    HttpSession sesi = request.getSession(false);
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        if (currentUser != null) {
+            String user = currentUser.getUsername();
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("select id, tip, prenume, id_dep from useri where username = ?")) {
+                preparedStatement.setString(1, user);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    int userId = rs.getInt("id");
+                    int userType = rs.getInt("tip");
+                    int userdep = rs.getInt("id_dep");
+                    if (userType == 4) {
+                        switch (userType) {
+                            case 1: response.sendRedirect("tip1ok.jsp"); break;
+                            case 2: response.sendRedirect("tip2ok.jsp"); break;
+                            case 3: response.sendRedirect("sefok.jsp"); break;
+                            case 4: response.sendRedirect("adminok.jsp"); break;
+                        }
+                    } else {
+                    	 String accent = null;
+                      	 String clr = null;
+                      	 String sidebar = null;
+                      	 String text = null;
+                      	 String card = null;
+                      	 String hover = null;
+                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, userId);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                             // Display the user dashboard or related information
+                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                             // Add additional user-specific content here
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                        %>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
@@ -28,45 +81,21 @@
 }
     </style>
 </head>
-<body>
-<%
-    HttpSession sesi = request.getSession(false);
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String user = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select id, tip, prenume, id_dep from useri where username = ?")) {
-                preparedStatement.setString(1, user);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                    int userId = rs.getInt("id");
-                    int userType = rs.getInt("tip");
-                    int userdep = rs.getInt("id_dep");
-                    if (userType == 4) {
-                        switch (userType) {
-                            case 1: response.sendRedirect("tip1ok.jsp"); break;
-                            case 2: response.sendRedirect("tip2ok.jsp"); break;
-                            case 3: response.sendRedirect("sefok.jsp"); break;
-                            case 4: response.sendRedirect("adminok.jsp"); break;
-                        }
-                    } else {
-                        %>
-                        <div class="container">
-                            <div class="login__content">
-                                <img src="./responsive-login-form-main/assets/img/bg-login.jpg" alt="login image" class="login__img login__img-light">
-                                <img src="./responsive-login-form-main/assets/img/bg-login-dark.jpg" alt="login image" class="login__img login__img-dark">
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(sidebar);%>">
 
-                                <form action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
+                        <div class="container" style="height: 100vh; border-radius: 2rem; margin: 0; background: <%out.println(sidebar);%>">
+                            <div class="login__content" style="height: 100vh; top: -1em; border-radius: 2rem; margin: 0; padding: 1em; background:<%out.println(clr);%>; color:<%out.println(text);%> ">
+                                
+                                <form style=" border-radius: 2rem; border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
                                     <div>
-                                        <h1 class="login__title"><span>Vizualizare concedii ale unui angajat</span></h1>
+                                        <h1 class="login__title"><span style="color:<%out.println(accent);%> ">Vizualizare concedii ale unui angajat</span></h1>
                                     </div>
                                     
                                     <div class="login__inputs">
                                         <div>
-                                            <label class="login__label">Utilizator (Nume, Prenume, Username)</label>
-                                            <select name="id" class="login__input">
+    
+                                            <label style="color:<%out.println(text);%> " class="login__label">Utilizator (Nume, Prenume, Username)</label>
+                                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="id" class="login__input">
                                                 <%
                                                 try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri")) {
                                                     ResultSet rs1 = stm.executeQuery();
@@ -83,8 +112,8 @@
                                         </div>
                                         
                                         <div>
-                                            <label class="login__label">Status</label>
-                                            <select name="status" class="login__input">
+                                            <label style="color:<%out.println(text);%> " class="login__label">Status</label>
+                                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " name="status" class="login__input">
                                                 <option value="3">Oricare</option>
                                                 <%
                                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
@@ -105,8 +134,8 @@
                                         </div>
                                         
                                         <div>
-                                            <label class="login__label">Tip</label>
-                                            <select name="tip" class="login__input">
+                                            <label style="color:<%out.println(text);%> " class="login__label">Tip</label>
+                                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " name="tip" class="login__input">
                                                 <option value="-1">Oricare</option>
                                                 <%
                                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM tipcon;")) {
@@ -128,17 +157,17 @@
 
                                         <div class="login__check">
                                             <input type="checkbox" id="an" name="an" class="login__check-input"/>
-                                            <label for="an" class="login__check-label">An</label>
+                                            <label style="color:<%out.println(text);%> " for="an" class="login__check-label">An</label>
                                         </div>
 
-                                        <div>
-                                            <label class="login__label">Inceput</label>
-                                            <input type="date" id="start" name="start" min="1954-01-01" max="2036-12-31" class="login__input"/>
+                                        <div id="start">
+                                            <label style="color:<%out.println(text);%> " class="login__label">Inceput</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="date" id="start" name="start" min="1954-01-01" max="2036-12-31" class="login__input"/>
                                         </div>
 
-                                        <div>
-                                            <label class="login__label">Final</label>
-                                            <input type="date" id="end" name="end" min="1954-01-01" max="2036-12-31" class="login__input"/>
+                                        <div id="end">
+                                            <label style="color:<%out.println(text);%> " class="login__label">Final</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="date" id="end" name="end" min="1954-01-01" max="2036-12-31" class="login__input"/>
                                         </div>
                                     </div>
 
@@ -147,7 +176,8 @@
                                     <input type="hidden" name="pag" value="4"/>
                                     
                                     <div class="login__buttons">
-                                        <input type="submit" value="Submit" class="login__button login__button-ghost"/>
+                                       <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" type="submit" value="Cautati" class="login__button">
                                     </div>
                                 </form>
                             </div>

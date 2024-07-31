@@ -117,8 +117,10 @@
             /* Hide scrollbar for Chrome, Safari and Opera */
              -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
-height: 90%;
+height: 100%;
 border-radius: 2em;
+margin: 0;
+padding: 0;
         }
         iframe::-webkit-scrollbar {
   display: none;

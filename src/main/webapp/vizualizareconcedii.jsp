@@ -1,111 +1,149 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="bean.MyUser" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+HttpSession sesi = request.getSession(false);
+if (sesi != null) {
+    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+    if (currentUser != null) {
+        String username = currentUser.getUsername();
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+            preparedStatement = connection.prepareStatement("SELECT tip, prenume, id FROM useri WHERE username = ?");
+            preparedStatement.setString(1, username);
+            rs = preparedStatement.executeQuery();
+
+            if (!rs.next()) {
+                out.println("<script type='text/javascript'>alert('Date introduse incorect sau nu exista date!');</script>");
+            } else {
+                int userId = rs.getInt("id");
+                String userType = rs.getString("tip");
+                String accent = "##03346E";
+                String clr = "#d8d9e1";
+                String sidebar =  "#ecedfa";
+                String text = "#333";
+                String card =  "#ecedfa";
+               	String hover = "#ecedfa";
+                // Retrieve user theme settings
+                try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM teme WHERE id_usr = ?")) {
+                    stmt.setInt(1, userId);
+                    try (ResultSet rs2 = stmt.executeQuery()) {
+                        if (rs2.next()) {
+                           	accent = rs2.getString("accent");
+                            clr = rs2.getString("clr");
+                            sidebar = rs2.getString("sidebar");
+                            text = rs2.getString("text");
+                            card = rs2.getString("card");
+                            hover = rs2.getString("hover");
+
+                            // Output user-specific style settings
+                            out.println("<style>:root {--bg:" + accent + "; --clr:" + clr + "; --sd:" + sidebar + "; --text:" + text + "; background:" + clr + ";}</style>");
+                        }
+                    }
+                }
+                %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dynamic Content Loading</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+<link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+<title>Rapoarte</title>
 <style>
     * {
-        box-sizing: border-box;
+       
         margin: 0;
         padding: 0;
     }
     body, html {
-        font-family: 'Arial', sans-serif;
-        background: linear-gradient(120deg, #a6c0fe 0%, #f68084 100%);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: stretch;
-        color: #fff;
-         margin: 0;
+        background: <%= clr %>;
         padding: 0;
+        marging: 0;
+        overflow-x: hidden;
     }
-    table {
+    nav {
         width: 100%;
-        min-width: 300px; /* Limit maximum width */
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        top: 0;
-        left: 0;
+        background-color: <%= sidebar %>;
+        
+        display: flex;
+        justify-content: center;
         position: fixed;
-         border-collapse: collapse;
+        top: 0;
+        z-index: 1000;
+        padding: 0;
+        margin: 0;
     }
-    th, td {
-        padding: 12px 15px;
+    nav a {
+        flex-grow: 1;
+        
+        padding: 12px 10px;
         text-align: center;
-        transition: background-color 0.3s;
-        height:10vh;
-    }
-    a {
-        color: #fff;
         text-decoration: none;
-        font-size: 14px; /* Adjust font size for smaller screens */
-        transition: color 0.3s;
+        font-size: 14px;
+        color: <%= text %>;
+        transition: background-color 0.3s, color 0.3s;
     }
-    a:hover {
-        color: #000;
-        background-color: rgba(255, 255, 255, 0.2);
-        padding: 30px;
-        padding-bottom: 25px;
-        margin: 0;
-    }
-    a:active {
-        color: #000;
-        background-color: rgba(255, 255, 255, 0.2);
-         padding: 30px;
-        padding-bottom: 25px;
-        margin: 0;
-    }
-    a:focus {
-        color: #000;
-        background-color: rgba(255, 255, 255, 0.2);
-         padding: 30px;
-        padding-bottom: 25px;
-        margin: 0;
+    nav a:hover, nav a:active, nav a:focus {
+        background-color: <%= accent %>;
+        color: <%= clr %>;
     }
     iframe {
         width: 100%;
-        transition: height 0.5s ease;
-        height: 0; /* Initially hidden */
+        height: 100vh; /* Adjusted for nav height */
         border: none;
+        position: relative;
+        top: 0;
+         overflow-y: hidden;
     }
-    
 </style>
 </head>
 <body>
-<table>
-    <tr>
-        <td><a href="viewconcoldepeu.jsp" class="load-content" target="iframee">Coleg_departament</a></td>
-        <td><a href="viewcol.jsp" class="load-content" target="iframee">Angajat</a></td>
-        <td><a href="viewp.jsp" class="load-content" target="iframee">Concedii personale</a></td>
-        <td><a href="viewdepeu.jsp" class="load-content" target="iframee">Din departamentul meu</a></td>
-        <td><a href="viewcondep.jsp" class="load-content" target="iframee">Dintr-un departament</a></td>
-        <td><a href="viewtot.jsp" class="load-content" target="iframee">Din toata institutia</a></td>
-         <td><a href="pean.jsp" class="load-content" target="iframee">Raport pe an</a></td>
-          <td><a href="sometest.jsp" class="load-content" target="iframee">Raport lunar</a></td>
-          <td><a href="testviewpers.jsp" class="load-content" target="iframee">Calendar</a></td>
-        <!-- <td><a href="about:blank" class="load-content">Inapoi</a></td> -->
-    </tr>
-</table>
-<iframe name="iframee" id='iframee' src="#"></iframe>
-<script>
-    document.querySelectorAll('.load-content').forEach(link => {
-        link.addEventListener('click', function(event) {
-            const iframe = document.getElementById('iframee');
-            // Check if iframe is already expanded
-            if (iframe.style.height === '0px' || iframe.style.height === '0') {
-                iframe.style.height = '90vh'; // Expand the iframe
-            } else {
-                iframe.style.height = '0'; // Minimize the iframe
-                // Optional: if you want to keep the iframe expanded unless explicitly minimized
-               
+
+<nav>
+    <a  href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
+    <a href="viewcol.jsp" target="contentFrame">Angajat</a>
+    <a href="viewp.jsp" target="contentFrame">Concedii personale</a>
+    <a href="viewdepeu.jsp" target="contentFrame">Din departamentul meu</a>
+    <a href="viewcondep.jsp" target="contentFrame">Dintr-un departament</a>
+    <a href="viewtot.jsp" target="contentFrame">Din toata institutia</a>
+    <a href="pean.jsp" target="contentFrame">Raport pe an</a>
+    <a href="sometest.jsp" target="contentFrame">Raport lunar</a>
+    <a href="testviewpers.jsp" target="contentFrame">Calendar</a>
+</nav>
+
+<iframe name="contentFrame" src="about:blank"></iframe>
+
+</body>
+</html>
+
+    <%
             }
-        });
-        setTimeout(() => {
-            iframe.style.height = '90vh';
-        }, 500); // Delay to allow the iframe to load content before expanding
-    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.println("<script type='text/javascript'>alert('Eroare la baza de date!'); location='logout';</script>");
+        } finally {
+            if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
+            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException ignore) {}
+            if (connection != null) try { connection.close(); } catch (SQLException ignore) {}
+        }
+    } else {
+        out.println("<script type='text/javascript'>alert('Utilizator neconectat!'); location='logout';</script>");
+    }
+} else {
+    out.println("<script type='text/javascript'>alert('Nu e nicio sesiune activa!'); location='logout';</script>");
+}
+    
+    %>
 </script>
 </body>
 </html>

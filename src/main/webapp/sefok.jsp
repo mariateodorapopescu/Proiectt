@@ -108,7 +108,7 @@
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <title>Concedii</title>
     <style>
-        iframe {
+          iframe {
             width: 100%;
             border: none;
             transition: height 0.5s ease;
@@ -117,8 +117,10 @@
             /* Hide scrollbar for Chrome, Safari and Opera */
              -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
-height: 90%;
+height: 100%;
 border-radius: 2em;
+margin: 0;
+padding: 0;
         }
         iframe::-webkit-scrollbar {
   display: none;
