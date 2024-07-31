@@ -68,10 +68,10 @@ if (sesi != null) {
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <style>
-    .leave-1 { background-color: #90ee90; } /* Light green for 1 person */
-    .leave-2 { background-color: #ffff99; } /* Yellow for 2 people */
-    .leave-3 { background-color: #ffcc99; } /* Orange for 3 people */
-    .leave-more { background-color: #ff6666; } /* Red for more than 3 people */
+    .leave-1 { background-color: #88D66C; } /* Light green for 1 person */
+    .leave-2 { background-color: #FFDE4D; } /* Yellow for 2 people */
+    .leave-3 { background-color: #FF8225; } /* Orange for 3 people */
+    .leave-more { background-color: #C63C51; } /* Red for more than 3 people */
     /* Tooltip container */
 .tooltip {
   position: relative;
