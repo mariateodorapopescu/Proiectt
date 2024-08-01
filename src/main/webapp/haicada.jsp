@@ -54,6 +54,16 @@ if (sesi != null) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+     <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <style>
         body {
             margin: 0;
@@ -72,6 +82,10 @@ if (sesi != null) {
         }
         h1, h3 {
             text-align: center;
+            padding: 0; 
+            margin: 0; 
+            top: -10%; 
+            color: <%=accent%>
         }
         #myChart {
             width: 100%;
@@ -81,12 +95,11 @@ if (sesi != null) {
 </head>
 <body>
 <div class="container" id="content">
-    <h3 id="chartHeader" style="color: <%=text%>;"></h3>
+    <h3 id="chartHeader" style="color: <%=accent%>;"></h3>
     <div id="myChart"></div>
 </div>
 <div class="container" id="content">
-                <h3 style="padding: 0; margin: 0; top: -10%; color: <%=accent%>" text-align: center;"> 
-                </h3>
+                
                     <div id="myChart"></div>
                 </div>
                 <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
@@ -131,7 +144,73 @@ if (sesi != null) {
                  </form>
                  <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
-               
+                <script>
+                function autoSubmit() {
+                    document.getElementById('statusForm').submit();
+                }
+                    window.onload = function() {
+                        zingchart.render({
+                            id: "myChart",
+                            width: "100%",
+                            height: 400,
+                            data: {
+                                "type": "bar",
+                                "title": {
+                                    "text": "Numar angajati / luna"
+                                },
+                                "scale-x": {
+                                    "labels": monthsData
+                                },
+                                "plot": {
+                                    "line-width": 1
+                                },
+                                "series": [{
+                                    "values": countsData
+                                }]
+                            }
+                        });
+                    };
+
+                    function generate() {
+                        const element = document.getElementById("content");
+                        html2pdf()
+                        .from(element)
+                        .save();
+                    }
+
+                    function submitForm() {
+                        const form = document.getElementById("statusForm");
+                        const data = new FormData(form);
+                        const params = new URLSearchParams(data).toString();
+                        fetch("pean.jsp?" + params)
+                            .then(response => response.text())
+                            .then(html => {
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            });
+                    }
+                    
+                    function generatePDF() {
+                        const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
+                        html2pdf().set({
+                            pagebreak: { mode: ['css', 'avoid-all'] },
+                            html2canvas: {
+                                scale: 2, // Increase scale to enhance quality
+                                logging: true,
+                                dpi: 192,
+                                letterRendering: true,
+                                useCORS: true // Ensures external content is handled properly
+                            },
+                            jsPDF: {
+                                unit: 'pt',
+                                format: 'a4',
+                                orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
+                            }
+                        }).from(element).save();
+                    }
+                   
+                </script>
                 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -182,7 +261,12 @@ $(document).ready(function() {
             width: '100%'
         });
     } 
-
+    function generate() {
+        const element = document.getElementById("content");
+        html2pdf()
+        .from(element)
+        .save();
+    }
     function generatePDF() {
                     const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
                     html2pdf().set({

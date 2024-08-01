@@ -89,7 +89,7 @@ if (sesi != null) {
         color: <%= text %>;
         transition: background-color 0.3s, color 0.3s;
     }
-    nav a:hover, nav a:active, nav a:focus {
+    nav a:hover, nav a:active nav a:focus{
         background-color: <%= accent %>;
         color: <%= clr %>;
     }
@@ -108,22 +108,44 @@ if (sesi != null) {
             font-size: 12px; /* Smaller font size for very small screens */
         }
     }
+    .active-tab {
+        background-color: <%= accent %>; 
+        color: white; /* White text for active tab */
+    }
 </style>
 </head>
 <body>
 
 <nav>
-    <a href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
-    <a href="viewcol.jsp" target="contentFrame">Angajat</a>
-    <a href="viewp.jsp" target="contentFrame">Personale</a>
-    <a href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
-    <a href="viewcondep.jsp" target="contentFrame">Alt dept.</a>
-    <a href="viewtot.jsp" target="contentFrame">Total</a>
-    <a href="pean.jsp" target="contentFrame">Anual</a>
-    <a href="sometest.jsp" target="contentFrame">Lunar</a>
-    <a href="testviewpers.jsp" target="contentFrame">Calendar</a>
+    <a id="unu" onclick="setActiveTab('unu')" href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
+    <a id="doi" onclick="setActiveTab('doi')" href="viewcol.jsp" target="contentFrame">Angajat</a>
+    <a id="trei" onclick="setActiveTab('trei')" href="viewp.jsp" target="contentFrame">Personale</a>
+    <a id="patru" onclick="setActiveTab('patru')" href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
+    <a id="cinci" onclick="setActiveTab('cinci')" href="viewcondep.jsp" target="contentFrame">Alt dept.</a>
+    <a id="sase" onclick="setActiveTab('sase')" href="viewtot.jsp" target="contentFrame">Total</a>
+    <a id="sapte" onclick="setActiveTab('sapte')" href="pean.jsp" target="contentFrame">Anual</a>
+    <a id="opt" onclick="setActiveTab('opt')" href="sometest.jsp" target="contentFrame">Lunar</a>
+    <a id="noua" onclick="setActiveTab('noua')" href="testviewpers.jsp" target="contentFrame">Calendar</a>
 </nav>
+<script>
 
+function setActiveTab(tabId) {
+    // Remove active class from all tabs
+    document.querySelectorAll('nav a').forEach(tab => tab.classList.remove('active-tab'));
+    // Add active class to clicked tab
+    document.getElementById(tabId).classList.add('active-tab');
+    // Store the active tab in sessionStorage
+    sessionStorage.setItem('activeTab', tabId);
+}
+
+// Event listener to maintain the active state on page reload
+window.onload = function() {
+    const activeTab = sessionStorage.getItem('activeTab');
+    if (activeTab) {
+        setActiveTab(activeTab);
+    }
+};
+</script>
 <iframe name="contentFrame" src="about:blank"></iframe>
 <% }
             
