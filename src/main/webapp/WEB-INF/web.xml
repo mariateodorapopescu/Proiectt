@@ -258,4 +258,24 @@
     <servlet-name>DisplayImage</servlet-name>
     <url-pattern>/DisplayImage</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>PeanServlet</display-name>
+    <servlet-name>PeanServlet</servlet-name>
+    <servlet-class>bean.PeanServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PeanServlet</servlet-name>
+    <url-pattern>/PeanServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>JsonServlet</display-name>
+    <servlet-name>JsonServlet</servlet-name>
+    <servlet-class>bean.JsonServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JsonServlet</servlet-name>
+    <url-pattern>/JsonServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

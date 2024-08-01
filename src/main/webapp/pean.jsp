@@ -237,7 +237,7 @@ if (sesi != null) {
                 </div>
                 
 <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
-                    <form id="statusForm" onsubmit="return false;">
+                    <form id="statusForm" onsubmit="return false;" onchange="autoSubmit()">
                         <div>
                             <label style="color:<%out.println(text);%>" class="login__label">Status</label>
                             <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="status" class="login__input" onchange="submitForm()">
@@ -272,13 +272,16 @@ if (sesi != null) {
                                 %>
                             </select>
                         </div>
-                        <input style="margin-top:1em;  box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                         <input style="margin-top:1em;  box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" type="submit" value="Genereaza" class="login__button">
                     </form>
                 </div>
                 <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
                 <script>
+                function autoSubmit() {
+                    document.getElementById('statusForm').submit();
+                }
                     window.onload = function() {
                         zingchart.render({
                             id: "myChart",
