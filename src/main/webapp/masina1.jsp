@@ -478,7 +478,7 @@ int pag = -1;
                                          "JOIN concedii c ON c.id_ang = u.id " +
                                          "JOIN statusuri s ON c.status = s.status " +
                                          "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.tip = ? c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
+                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.tip = ? and c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
                     			stmtt2 = connection.prepareStatement(sql);
                     			stmtt2.setInt(1, dep);
                 			stmtt2.setInt(2, tip);
