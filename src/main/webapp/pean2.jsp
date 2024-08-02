@@ -19,7 +19,7 @@ if (sesi != null) {
         String username = currentUser.getUsername();
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip, id_dep FROM useri WHERE username = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, id_dep, tip FROM useri WHERE username = ?")) {
             preparedStatement.setString(1, username);
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.next()) {
@@ -123,15 +123,10 @@ if (sesi != null) {
                                 %>
                             </select>
                         </div>
-                        <div>
-                            <label style="color:<%out.println(text);%>" class="login__label">Departament</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="dep" class="login__input">
-                                <option value=>Oricare</option>
-                               
-                            </select>
-                        </div>
-                         
+                       <input type="hidden" name="dep" value=<%out.println(userDep);%>>
+                          <input type="hidden" name="tip" value="1">
                  </form>
+                  
                  <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
                 <script>

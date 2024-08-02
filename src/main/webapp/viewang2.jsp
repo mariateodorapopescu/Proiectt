@@ -49,6 +49,7 @@ if (sesi != null) {
                         }
                     }
                 }
+                
                 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +89,7 @@ if (sesi != null) {
         color: <%= text %>;
         transition: background-color 0.3s, color 0.3s;
     }
-    nav a:hover, nav a:active, nav a:focus {
+    nav a:hover, nav a:active nav a:focus{
         background-color: <%= accent %>;
         color: <%= clr %>;
     }
@@ -107,42 +108,67 @@ if (sesi != null) {
             font-size: 12px; /* Smaller font size for very small screens */
         }
     }
+    .active-tab {
+        background-color: <%= accent %>; 
+        color: white; /* White text for active tab */
+    }
 </style>
 </head>
 <body>
 
 <nav>
-    <a  href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
-    <a href="viewp.jsp" target="contentFrame">Personale</a>
-    <a href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
-    <a href="pean2.jsp" target="contentFrame">Anual</a>
-    <a href="sometest2.jsp" target="contentFrame">Lunar</a>
-    <a href="testviewpers2.jsp" target="contentFrame">Calendar</a>
+    <a id="unu" onclick="setActiveTab('unu')" href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
+   
+    <a id="trei" onclick="setActiveTab('trei')" href="viewp.jsp" target="contentFrame">Personale</a>
+    <a id="patru" onclick="setActiveTab('patru')" href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
+  
+   
+    <a id="sapte" onclick="setActiveTab('sapte')" href="pean2.jsp" target="contentFrame">Anual</a>
+    <a id="opt" onclick="setActiveTab('opt')" href="sometest2.jsp" target="contentFrame">Lunar</a>
+    <a id="noua" onclick="setActiveTab('noua')" href="testviewpers2.jsp" target="contentFrame">Calendar</a>
+    
 </nav>
+<script>
 
+function setActiveTab(tabId) {
+    // Remove active class from all tabs
+    document.querySelectorAll('nav a').forEach(tab => tab.classList.remove('active-tab'));
+    // Add active class to clicked tab
+    document.getElementById(tabId).classList.add('active-tab');
+    // Store the active tab in sessionStorage
+    sessionStorage.setItem('activeTab', tabId);
+}
+
+// Event listener to maintain the active state on page reload
+window.onload = function() {
+    const activeTab = sessionStorage.getItem('activeTab');
+    if (activeTab) {
+        setActiveTab(activeTab);
+    }
+};
+</script>
 <iframe name="contentFrame" src="about:blank"></iframe>
-
-</body>
-</html>
-
-    <%
+<% }
+            
+            }catch(Exception e) {
+                e.printStackTrace();
+                out.println("<script type='text/javascript'>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("</script>");
+                response.sendRedirect("login.jsp");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            out.println("<script type='text/javascript'>alert('Eroare la baza de date!'); location='logout';</script>");
-        } finally {
-            if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
-            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException ignore) {}
-            if (connection != null) try { connection.close(); } catch (SQLException ignore) {}
+        } else {
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Utilizator neconectat!');");
+            out.println("</script>");
+            response.sendRedirect("login.jsp");
         }
     } else {
-        out.println("<script type='text/javascript'>alert('Utilizator neconectat!'); location='logout';</script>");
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
     }
-} else {
-    out.println("<script type='text/javascript'>alert('Nu e nicio sesiune activa!'); location='logout';</script>");
-}
-    
-    %>
-</script>
+            %>
 </body>
 </html>
