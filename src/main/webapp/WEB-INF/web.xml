@@ -298,4 +298,34 @@
     <servlet-name>JsonServlet3</servlet-name>
     <url-pattern>/JsonServlet3</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>LeaveDataServlet</display-name>
+    <servlet-name>LeaveDataServlet</servlet-name>
+    <servlet-class>bean.LeaveDataServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LeaveDataServlet</servlet-name>
+    <url-pattern>/LeaveDataServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>LeaveDataServlet2</display-name>
+    <servlet-name>LeaveDataServlet2</servlet-name>
+    <servlet-class>bean.LeaveDataServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LeaveDataServlet2</servlet-name>
+    <url-pattern>/ceva</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>decenulvede</display-name>
+    <servlet-name>decenulvede</servlet-name>
+    <servlet-class>bean.decenulvede</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>decenulvede</servlet-name>
+    <url-pattern>/decenulvede</url-pattern>
+  </servlet-mapping>
 </web-app>

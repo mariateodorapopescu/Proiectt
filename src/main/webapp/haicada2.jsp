@@ -1,16 +1,4 @@
 <%@ page import="java.io.*, java.util.*, java.sql.*, bean.MyUser, jakarta.servlet.http.*" %>
-<%! 
-public String join(ArrayList<?> arr, String del) {
-    StringBuilder output = new StringBuilder();
-    for (int i = 0; i < arr.size(); i++) {
-        if (i > 0) output.append(del);
-        if (arr.get(i) instanceof String) output.append("\"");
-        output.append(arr.get(i));
-        if (arr.get(i) instanceof String) output.append("\"");
-    }
-    return output.toString();
-}
-%>
 <%
 HttpSession sesi = request.getSession(false);
 if (sesi != null) {
@@ -46,9 +34,13 @@ if (sesi != null) {
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Raport</title>
-    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <title>Fullcalendar Integration</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script> 
+     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -79,6 +71,7 @@ if (sesi != null) {
             max-width: 500px;
             margin: 0 auto;
             padding: 0;
+            background: <%=sidebar%>
         }
         h1, h3 {
             text-align: center;
@@ -94,222 +87,75 @@ if (sesi != null) {
     </style>
 </head>
 <body>
-<div style="margin-top: 1em;" class="container" id="content">
-    <h3 id="chartHeader" style="color: <%=accent%>;"></h3>
-    <div id="myChart"></div>
-</div>
-<div class="container" id="content">
-                
-                    <div id="myChart"></div>
-                </div>
-                <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
-                    <form id="statusForm" method="post" onsubmit="return false;">
-                    
-                    <div>
-						    <label style="color:<%out.println(text);%>" class="login__label">Luna</label>
-						    <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="month" class="login__input" >
-						        <option value="1">Ianuarie</option>
-						        <option value="2">Februarie</option>
-						        <option value="3">Martie</option>
-						        <option value="4">Aprilie</option>
-						        <option value="5">Mai</option>
-						        <option value="6">Iunie</option>
-						        <option value="7">Iulie</option>
-						        <option value="8">August</option>
-						        <option value="9">Septembrie</option>
-						        <option value="10">Octombrie</option>
-						        <option value="11">Noiembrie</option>
-						        <option value="12">Decembrie</option>
-						    </select>
-						</div>
-                    
-                        <div>
-                            <label style="color:<%out.println(text);%>" class="login__label">Status</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="status" class="login__input" >
-                                <option value="3" >Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("status");
-                                            String nume = rs1.getString("nume_status");
-                                            // out.println("<option value='" + id + "' " + (status == id ? "selected" : "") + ">" + nume + "</option>");
-                                            out.println("<option value='" + id + "'>" + nume + "</option>");
-                                        }
-                                    }
-                                }
-                                %>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="color:<%out.println(text);%>" class="login__label">Departament</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="dep" class="login__input">
-                                <option value="-1">Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("id_dep");
-                                            String nume = rs1.getString("nume_dep");
-                                            // out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
-                                            out.println("<option value='" + id + "'" + ">" + nume + "</option>");
-                                        }
-                                    }
-                                }
-                                %>
-                            </select>
-                        </div>
-                          <input type="hidden" name="tip" value="2">
-                 </form>
-                 
-                 <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
-                    class="login__button" onclick="generatePDF()">Descarcati PDF</button>
-                <script>
-                function autoSubmit() {
-                    document.getElementById('statusForm').submit();
-                }
-                    window.onload = function() {
-                        zingchart.render({
-                            id: "myChart",
-                            width: "100%",
-                            height: 400,
-                            data: {
-                                "type": "bar",
-                                "title": {
-                                    "text": "Numar angajati / zi"
-                                },
-                                "scale-x": {
-                                    "labels": monthsData
-                                },
-                                "plot": {
-                                    "line-width": 1
-                                },
-                                "series": [{
-                                    "values": countsData
-                                }]
-                            }
-                        });
-                    };
-
-                    function generate() {
-                        const element = document.getElementById("content");
-                        html2pdf()
-                        .from(element)
-                        .save();
-                    }
-
-                    function submitForm() {
-                        const form = document.getElementById("statusForm");
-                        const data = new FormData(form);
-                        const params = new URLSearchParams(data).toString();
-                        fetch("haicada2.jsp?" + params)
-                            .then(response => response.text())
-                            .then(html => {
-                                document.open();
-                                document.write(html);
-                                document.close();
-                            });
-                    }
-                    
-                    function generatePDF() {
-                        const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
-                        html2pdf().set({
-                            pagebreak: { mode: ['css', 'avoid-all'] },
-                            html2canvas: {
-                                scale: 2, // Increase scale to enhance quality
-                                logging: true,
-                                dpi: 192,
-                                letterRendering: true,
-                                useCORS: true // Ensures external content is handled properly
-                            },
-                            jsPDF: {
-                                unit: 'pt',
-                                format: 'a4',
-                                orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
-                            }
-                        }).from(element).save();
-                    }
-                   
-                </script>
-                </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-
-            
-$(document).ready(function() {
-    fetchChartData();
-    function autoSubmit() {
-        document.getElementById('statusForm').submit();
-    }
-    // face autosubmit
- $('#statusForm').on('change', 'select', function() {
-        fetchChartData(); // Call this function on change
-    });
-
-    function fetchChartData() {
-        $.ajax({
-            url: 'JsonServlet', // Ensure this URL is correct
-            type: 'POST',
-            data: $('#statusForm').serialize(), // Serialize the form data
-            dataType: 'json', // Expecting JSON response
-            success: function(response) {
-                updateChart(response); // Update the chart with the response
-            },
-            error: function(xhr, status, error) {
-                alert('Error: ' + xhr.statusText);
-            }
-        });
-    }
-
-    function updateChart(data) {
-        $('#chartHeader').text(data.h3); // Set the header text
-        zingchart.render({
-            id: 'myChart',
-            data: {
-                type: 'bar',
-                title: {
-                    text: 'Numar angajati / luna'
-                },
-                scaleX: {
-                    values: data.months.map(month => month.toString())
-                },
-                series: [{
-                    values: data.counts
-                }]
-            },
-            height: 400,
-            width: '100%'
-        });
-    } 
-    function generate() {
-        const element = document.getElementById("content");
-        html2pdf()
-        .from(element)
-        .save();
-    }
-    function generatePDF() {
-                    const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
-                    html2pdf().set({
-                        pagebreak: { mode: ['css', 'avoid-all'] },
-                        html2canvas: {
-                            scale: 2, // Increase scale to enhance quality
-                            logging: true,
-                            dpi: 192,
-                            letterRendering: true,
-                            useCORS: true // Ensures external content is handled properly
-                        },
-                        jsPDF: {
-                            unit: 'pt',
-                            format: 'a4',
-                            orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
-                        }
-                    }).from(element).save();
-                }
-    
-});
-</script>
+    <h2 style="color:<%=accent%>"><center>Calendar</center></h2>
+    <div class="container">
+        <div style="color:<%=text%>" id="calendar"></div>
+    </div>
 </body>
 </html>
+
+<script>
+    $(document).ready(function() {
+        $('#calendar').fullCalendar({
+        	locale: 'ro',
+            events: function(start, end, timezone, callback) {
+                $.ajax({
+                    url: 'LeaveDataServlet',
+                    type: 'POST',
+                    dataType: 'json', // Ensure that response is expected to be JSON
+                    data: {
+                        start: start.format(),
+                        end: end.format()
+                    },
+                    success: function(events) {
+                        // Assuming 'events' is an array of event objects in the correct format
+                        callback(events);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching events: " + xhr.status + " " + error);
+                    }
+                });
+               
+            },
+            header:
+            {
+            left: 'month, agendaWeek, agendaDay, list',
+            center: 'title',
+            right: 'prev, today, next'
+            },
+            buttonText:
+            {
+            today: 'Today',
+            month: 'Month',
+            week: 'Week',
+            day: 'Day',
+            list: 'List'
+            },
+            
+       	 selectable: true,
+            selectHelper: true,
+            select: function()
+            {
+                $('#myModal').modal('toggle');
+            },
+            header:
+            {
+            left: 'month, agendaWeek, agendaDay, list',
+            center: 'title',
+            right: 'prev, today, next'
+            },
+            buttonText:
+            {
+            today: 'Today',
+            month: 'Month',
+            week: 'Week',
+            day: 'Day',
+            list: 'List'
+            }
+        
+        });
+    });
+</script>
 <%
                             }
                         }
