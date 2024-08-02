@@ -12,10 +12,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.json.JSONObject;
 
@@ -189,55 +193,63 @@ public class JsonServlet extends HttpServlet {
 					    leaveCountMap.put(i, 0);
 					}
 					
-					String baseQuery = "SELECT DAY(start_c) AS day, CEIL(COUNT(*) / 2) AS numar_concedii FROM concedii";
-					
-					String joinClause = " JOIN useri ON concedii.id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep";
-					String whereClause = " WHERE YEAR(start_c) = ? AND MONTH(start_c) = ?";
-					
-					ArrayList<String> conditions = new ArrayList<>();
-					
-					if (status != 3) {
-					    conditions.add(" status = ?");
-					}
-					if (dep != -1) {
-					    conditions.add(" departament.id_dep = ?");
-					}
-					if (!conditions.isEmpty()) {
-					    whereClause += " AND " + String.join(" AND", conditions);
-					}
-					
-					String query = baseQuery + joinClause + whereClause + " GROUP BY DAY(start_c)";
-					
-					// Execute the query (pseudo-code, assuming a method to execute SQL and handle exceptions)
-					try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-					     PreparedStatement stmt = conn.prepareStatement(query)) {
-					    
-					    stmt.setInt(1, currentYear);
-					    stmt.setInt(2, month2);
-					    int paramIndex = 3;
-					    if (status != 3) {
-					        stmt.setInt(paramIndex++, status);
-					    }
-					    if (dep != -1) {
-					        stmt.setInt(paramIndex++, dep);
-					    }
-					
-					    try (ResultSet rs = stmt.executeQuery()) {
-					        while (rs.next()) {
-					            int day = rs.getInt("day");
-					            int count = rs.getInt("numar_concedii");
-					            leaveCountMap.put(day, count);
-					        }
-					    }  catch (SQLException e) {
-					    e.printStackTrace();
-					}
+					 Map<String, List<String>> leaveDataByDate = new TreeMap<>();
+		              String sql = "";
+		              sql =  "SELECT nume, prenume, start_c, end_c FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE (MONTH(start_c) = ? OR MONTH(end_c) = ?) AND YEAR(start_c) = ?";
+		              if (status != 3) {
+	                	   sql += " and concedii.status = ?";
+	                   }
+		              if (dep != -1) {
+		            	  sql += " and useri.id_dep = ?";
+		              }
+					 try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+							 PreparedStatement stmt = conn.prepareStatement(sql)) {
+		                   stmt.setInt(1, month2);
+		                   stmt.setInt(2, month2);
+		                   stmt.setInt(3, calendar.get(Calendar.YEAR));
+		                   int param = 4;
+		                   if (status != 3) {
+		                	   stmt.setInt(param++, status);
+		                   }
+		                   if (dep != -1) {
+		                	   stmt.setInt(param++, dep);
+		                   }
+		                   ResultSet rs1 = stmt.executeQuery();
+		                   String nume = "";
+		                   String prenume = "";
+		                   String fullnume = "";
+		                   while (rs1.next()) {
+		                       nume = rs1.getString("nume");
+		                       prenume = rs1.getString("prenume");
+		                       fullnume = nume + " " + prenume;
 
-                    ArrayList<Integer> months = new ArrayList<>();
-                    ArrayList<Integer> counts = new ArrayList<>();
-                    for (int i = 1; i <= daysInMonth; i++) {
-                        months.add(i);
-                        counts.add(leaveCountMap.get(i));
-                    }
+		                       LocalDate startDate = rs1.getDate("start_c").toLocalDate();
+		                       LocalDate endDate = rs1.getDate("end_c").toLocalDate();
+
+		                       LocalDate currentDate = startDate;
+
+		                       while (!currentDate.isAfter(endDate)) {
+		                           String dateKey = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		                           leaveDataByDate.computeIfAbsent(dateKey, k -> new ArrayList<>()).add(fullnume);
+		                           currentDate = currentDate.plusDays(1);
+		                       }
+		                   }
+		               } catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					System.out.println(leaveDataByDate);
+					 ArrayList<Integer> months = new ArrayList<>();
+				        ArrayList<Integer> counts = new ArrayList<>();
+				        
+				        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd");
+				        leaveDataByDate.forEach((dateKey, names) -> {
+				            LocalDate date = LocalDate.parse(dateKey, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+				            months.add(Integer.parseInt(date.format(dayFormatter))); // Add day of month
+				            counts.add(names.size()); // Add count of people
+				        });
+				        System.out.println(months);
+				        System.out.println(counts);
                     System.out.println(status + " " + dep);
                     JSONObject json = new JSONObject();
                     json.put("months", new JSONArray(months));
@@ -267,7 +279,8 @@ public class JsonServlet extends HttpServlet {
                     if (dep == -1) {
                     	depp = "toata institutia";
                     } else {
-                    	  try (PreparedStatement stm = conn.prepareStatement("SELECT * FROM departament;")) {
+                    	 try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                    			 PreparedStatement stm = conn.prepareStatement("SELECT * FROM departament;")) {
                               try (ResultSet rs2 = stm.executeQuery()) {
                                   while (rs2.next()) {
                                       int id = rs2.getInt("id_dep");
@@ -276,7 +289,10 @@ public class JsonServlet extends HttpServlet {
                                       depp = "departamentul " + nume;
                                   }
                               }
-                          }
+                          } catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
                     }
                     String monthh = "";
                    
@@ -324,14 +340,11 @@ public class JsonServlet extends HttpServlet {
                     response.setHeader("Access-Control-Allow-Origin", "*"); // for development only, specify domains in production
                     response.setHeader("Access-Control-Allow-Methods", "POST");
                     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
+                    
                     PrintWriter out = response.getWriter();
                     out.print(json.toString());
                     out.flush();
-                } catch (SQLException e) {
-    				// TODO Auto-generated catch block
-    				e.printStackTrace();
-    			}
+               
            }
 
 	}
