@@ -278,4 +278,24 @@
     <servlet-name>JsonServlet</servlet-name>
     <url-pattern>/JsonServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>JsonServlet2</display-name>
+    <servlet-name>JsonServlet2</servlet-name>
+    <servlet-class>bean.JsonServlet2</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JsonServlet2</servlet-name>
+    <url-pattern>/JsonServlet2</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>JsonServlet3</display-name>
+    <servlet-name>JsonServlet3</servlet-name>
+    <servlet-class>bean.JsonServlet3</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JsonServlet3</servlet-name>
+    <url-pattern>/JsonServlet3</url-pattern>
+  </servlet-mapping>
 </web-app>

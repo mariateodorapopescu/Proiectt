@@ -19,13 +19,12 @@ if (sesi != null) {
         String username = currentUser.getUsername();
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip, id_dep FROM useri WHERE username = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip FROM useri WHERE username = ?")) {
             preparedStatement.setString(1, username);
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.next()) {
                 int userId = rs.getInt("id");
                 int userType = rs.getInt("tip");
-                int userDep = rs.getInt("id_dep");
                 if (userType == 4) {
                     response.sendRedirect("adminok.jsp");
                     return;
@@ -105,6 +104,25 @@ if (sesi != null) {
                 </div>
                 <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
                     <form id="statusForm" method="post" onsubmit="return false;">
+                    
+                    <div>
+						    <label style="color:<%out.println(text);%>" class="login__label">Luna</label>
+						    <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="month" class="login__input" >
+						        <option value="1">Ianuarie</option>
+						        <option value="2">Februarie</option>
+						        <option value="3">Martie</option>
+						        <option value="4">Aprilie</option>
+						        <option value="5">Mai</option>
+						        <option value="6">Iunie</option>
+						        <option value="7">Iulie</option>
+						        <option value="8">August</option>
+						        <option value="9">Septembrie</option>
+						        <option value="10">Octombrie</option>
+						        <option value="11">Noiembrie</option>
+						        <option value="12">Decembrie</option>
+						    </select>
+						</div>
+                    
                         <div>
                             <label style="color:<%out.println(text);%>" class="login__label">Status</label>
                             <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="status" class="login__input" >
@@ -126,12 +144,24 @@ if (sesi != null) {
                         <div>
                             <label style="color:<%out.println(text);%>" class="login__label">Departament</label>
                             <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="dep" class="login__input">
-                                <option value=>Oricare</option>
-                               
+                                <option value="-1">Oricare</option>
+                                <%
+                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
+                                    try (ResultSet rs1 = stm.executeQuery()) {
+                                        while (rs1.next()) {
+                                            int id = rs1.getInt("id_dep");
+                                            String nume = rs1.getString("nume_dep");
+                                            // out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
+                                            out.println("<option value='" + id + "'" + ">" + nume + "</option>");
+                                        }
+                                    }
+                                }
+                                %>
                             </select>
                         </div>
-                         
+                          <input type="hidden" name="tip" value="2">
                  </form>
+                 
                  <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
                 <script>
@@ -146,7 +176,7 @@ if (sesi != null) {
                             data: {
                                 "type": "bar",
                                 "title": {
-                                    "text": "Numar angajati / luna"
+                                    "text": "Numar angajati / zi"
                                 },
                                 "scale-x": {
                                     "labels": monthsData
@@ -172,7 +202,7 @@ if (sesi != null) {
                         const form = document.getElementById("statusForm");
                         const data = new FormData(form);
                         const params = new URLSearchParams(data).toString();
-                        fetch("pean.jsp?" + params)
+                        fetch("haicada2.jsp?" + params)
                             .then(response => response.text())
                             .then(html => {
                                 document.open();

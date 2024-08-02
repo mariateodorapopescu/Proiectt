@@ -140,8 +140,9 @@ if (sesi != null) {
                                 %>
                             </select>
                         </div>
-                         
+                          <input type="hidden" name="tip" value="1">
                  </form>
+                  
                  <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
                 <script>
