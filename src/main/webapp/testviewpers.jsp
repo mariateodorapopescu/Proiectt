@@ -34,128 +34,64 @@ if (sesi != null) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Calendar</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
+    <title>Calendar View</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script> 
-     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-     <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/locale-all.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
-            --bg: <%=accent%>;
-            --clr: <%=clr%>;
-            --sd: <%=sidebar%>;
-            --text: <%=text%>;
-            background: <%=sidebar%>;
+            font-family: Arial, sans-serif;
+            background-color: <%=sidebar%>;
         }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 0;
-            background: <%=sidebar%>
-        }
-        h1, h3 {
-            text-align: center;
-            padding: 0; 
-            margin: 0; 
-            top: -10%; 
-            color: <%=accent%>
-        }
-        #myChart {
-            width: 100%;
-            height: 900px;
+        #calendar {
+            max-width: 900px;
+            margin: 50px auto;
         }
     </style>
 </head>
 <body>
-    <h2 style="color:<%=accent%>"><center>Calendar</center></h2>
-    <div class="container">
-        <div style="color:<%=text%>" id="calendar"></div>
-    </div>
+    <div id='calendar'></div>
+    <script>
+        $(document).ready(function() {
+            var calendar = $('#calendar').fullCalendar({
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                },
+                locale: 'ro', // Romanian language
+                buttonIcons: true,
+                weekNumbers: false,
+                navLinks: true,
+                editable: true,
+                dayMaxEvents: true,
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        url: 'LeaveDataServlet',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            start: start.format(),
+                            end: end.format()
+                        },
+                        success: function(response) {
+                            callback(response);
+                        },
+                        error: function() {
+                            alert('There was an error while fetching events!');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
-<script>
-    $(document).ready(function() {
-        $('#calendar').fullCalendar({
-        	locale: 'ro',
-            events: function(start, end, timezone, callback) {
-                $.ajax({
-                    url: 'LeaveDataServlet',
-                    type: 'POST',
-                    dataType: 'json', // Ensure that response is expected to be JSON
-                    data: {
-                        start: start.format(),
-                        end: end.format()
-                    },
-                    success: function(events) {
-                        // Assuming 'events' is an array of event objects in the correct format
-                        callback(events);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error fetching events: " + xhr.status + " " + error);
-                    }
-                });
-               
-            },
-            header:
-            {
-            left: 'month, agendaWeek, agendaDay, list',
-            center: 'title',
-            right: 'prev, today, next'
-            },
-            buttonText:
-            {
-            today: 'Today',
-            month: 'Month',
-            week: 'Week',
-            day: 'Day',
-            list: 'List'
-            },
-            
-       	 selectable: true,
-            selectHelper: true,
-            select: function()
-            {
-                $('#myModal').modal('toggle');
-            },
-            header:
-            {
-            left: 'month, agendaWeek, agendaDay, list',
-            center: 'title',
-            right: 'prev, today, next'
-            },
-            buttonText:
-            {
-            today: 'Today',
-            month: 'Month',
-            week: 'Week',
-            day: 'Day',
-            list: 'List'
-            }
-        
-        });
-    });
-</script>
 <%
                             }
                         }
