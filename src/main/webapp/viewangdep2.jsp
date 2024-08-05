@@ -159,7 +159,7 @@
                               
                 </div>
                  <div class="into">
-                  <button id="generate" onclick="generate()" >Descarcati PDF</button> </div>
+                  <button id="generate" onclick="generate()" >Descarcati PDF</button>
                 <%
                  
             		

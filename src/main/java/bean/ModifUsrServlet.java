@@ -48,14 +48,16 @@ public class ModifUsrServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?dn=true");
             return;
         }
-        /*
+        
         int nrsef = -1;
         int nrdir = -1;
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-      	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 3 group by id_dep having id_dep = ?;");
-        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 0 group by id_dep having id_dep = ? and id <> ?;")) {
-        	preparedStatement.setInt(1, departament);
-        	stmt.setInt(1, departament);
+      	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 0 and id != ? group by id_dep having id_dep = ?;");
+        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 3 and id != ? group by id_dep having id_dep = ?;")) {
+        	preparedStatement.setInt(2, departament);
+        	preparedStatement.setInt(1, id);
+        	stmt.setInt(2, departament);
+        	stmt.setInt(1, id);
                   ResultSet rs = preparedStatement.executeQuery();
                   ResultSet res = stmt.executeQuery();
                while (rs.next()) {
@@ -87,7 +89,7 @@ public class ModifUsrServlet extends HttpServlet {
             response.sendRedirect("modifdel.jsp?pmd=true");
             return;
         }
-*/
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");

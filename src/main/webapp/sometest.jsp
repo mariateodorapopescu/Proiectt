@@ -233,11 +233,7 @@ if (sesi != null) {
                    
                 </script>
                 </div>
-      <div id="gcf-simple"></div>
-<!-- 481723586664-u2c47k1u29dsums8be10eh0urhckh4g9.apps.googleusercontent.com -->
-<!-- https://calendar.google.com/calendar/u/0?cid=ODUyMzE2OTdhYTc2ZDdjNTllNjY2ZDc3MWUzNDI3OTE4YzNhMjQwODViMTllNDc5MmUxZDk5OWIwMzVlODA5YkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t -->
-<iframe src="https://calendar.google.com/calendar/embed?src=85231697aa76d7c59e666d771e3427918c3a24085b19e4792e1d999b035e809b%40group.calendar.google.com&ctz=Europe%2FBucharest" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 
             
@@ -337,5 +333,3 @@ $(document).ready(function() {
     response.sendRedirect("login.jsp");
 }
 %>
-AIzaSyB4bISX5NRVpdSaAN_SS5NvtyaRLPYqNrY
-<!-- AIzaSyB4bISX5NRVpdSaAN_SS5NvtyaRLPYqNrY -->

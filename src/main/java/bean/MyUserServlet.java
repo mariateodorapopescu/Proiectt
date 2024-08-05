@@ -79,14 +79,16 @@ public class MyUserServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?dn=true");
             return;
         }
-      /*  
+       // username ul e unic
         int nrsef = -1;
         int nrdir = -1;
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-      	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 3 group by id_dep having id_dep = ?;");
-        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 0 group by id_dep having id_dep = ?;")) {
-        	preparedStatement.setInt(1, dep);
-        	stmt.setInt(1, dep);
+      	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 3 and username != ? group by id_dep having id_dep = ?;");
+        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 0 and username != ? group by id_dep having id_dep = ?;")) {
+        	preparedStatement.setInt(2, dep);
+        	preparedStatement.setString(1, username);
+        	stmt.setInt(2, dep);
+        	stmt.setString(1, username);
                   ResultSet rs = preparedStatement.executeQuery();
                   ResultSet res = stmt.executeQuery();
                while (rs.next()) {
@@ -101,11 +103,11 @@ public class MyUserServlet extends HttpServlet {
 				 PrintWriter out = response.getWriter();
 				    out.println("<script type='text/javascript'>");
 				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'modifdel.jsp';");
+				    out.println("window.location.href = 'signin.jsp';"); 
 				    out.println("</script>");
 				    out.close();
 				    e.printStackTrace();
-		        throw new IOException("Eroare la baza de date =(", e);
+		        throw new IOException("Eroare la baza de date", e);
 		    }
         
         if (tip == 3 && nrsef == 1) {
@@ -117,7 +119,7 @@ public class MyUserServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?pmd=true");
             return;
         }
-*/
+
         try {
             employeeDao.registerEmployee(employee);
             response.setContentType("text/html;charset=UTF-8");

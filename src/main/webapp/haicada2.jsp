@@ -1,180 +1,88 @@
-<%@ page import="java.io.*, java.util.*, java.sql.*, bean.MyUser, jakarta.servlet.http.*" %>
-<%
-HttpSession sesi = request.getSession(false);
-if (sesi != null) {
-    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-    if (currentUser != null) {
-        String username = currentUser.getUsername();
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip FROM useri WHERE username = ?")) {
-            preparedStatement.setString(1, username);
-            ResultSet rs = preparedStatement.executeQuery();
-            if (rs.next()) {
-                int userId = rs.getInt("id");
-                int userType = rs.getInt("tip");
-                if (userType == 4) {
-                    response.sendRedirect("adminok.jsp");
-                    return;
-                }
-                String accent, clr, sidebar, text, card, hover;
-                try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                    String query = "SELECT * from teme where id_usr = ?";
-                    try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                        stmt.setInt(1, userId);
-                        try (ResultSet rs2 = stmt.executeQuery()) {
-                            if (rs2.next()) {
-                                accent = rs2.getString("accent");
-                                clr = rs2.getString("clr");
-                                sidebar = rs2.getString("sidebar");
-                                text = rs2.getString("text");
-                                card = rs2.getString("card");
-                                hover = rs2.getString("hover");
-%>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Fullcalendar Integration</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script> 
-     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-     <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset='utf-8' />
 
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            --bg: <%=accent%>;
-            --clr: <%=clr%>;
-            --sd: <%=sidebar%>;
-            --text: <%=text%>;
-            background: <%=sidebar%>;
-        }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 0;
-            background: <%=sidebar%>
-        }
-        h1, h3 {
-            text-align: center;
-            padding: 0; 
-            margin: 0; 
-            top: -10%; 
-            color: <%=accent%>
-        }
-        #myChart {
-            width: 100%;
-            height: 900px;
-        }
-    </style>
-</head>
-<body>
-    <h2 style="color:<%=accent%>"><center>Calendar</center></h2>
-    <div class="container">
-        <div style="color:<%=text%>" id="calendar"></div>
-    </div>
-</body>
-</html>
+  <title>
+    Test
+  </title>
 
+
+<link href='/docs/dist/demo-to-codepen.css' rel='stylesheet' />
+
+
+
+
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+
+<script src='/docs/dist/demo-to-codepen.js'></script>
+
+
+  <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales-all.global.min.js'></script>
 <script>
-    $(document).ready(function() {
-        $('#calendar').fullCalendar({
-        	locale: 'ro',
-            events: function(start, end, timezone, callback) {
-                $.ajax({
-                    url: 'LeaveDataServlet',
-                    type: 'POST',
-                    dataType: 'json', // Ensure that response is expected to be JSON
-                    data: {
-                        start: start.format(),
-                        end: end.format()
-                    },
-                    success: function(events) {
-                        // Assuming 'events' is an array of event objects in the correct format
-                        callback(events);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error fetching events: " + xhr.status + " " + error);
-                    }
-                });
-               
-            },
-            header:
-            {
-            left: 'month, agendaWeek, agendaDay, list',
-            center: 'title',
-            right: 'prev, today, next'
-            },
-            buttonText:
-            {
-            today: 'Today',
-            month: 'Month',
-            week: 'Week',
-            day: 'Day',
-            list: 'List'
-            },
-            
-       	 selectable: true,
-            selectHelper: true,
-            select: function()
-            {
-                $('#myModal').modal('toggle');
-            },
-            header:
-            {
-            left: 'month, agendaWeek, agendaDay, list',
-            center: 'title',
-            right: 'prev, today, next'
-            },
-            buttonText:
-            {
-            today: 'Today',
-            month: 'Month',
-            week: 'Week',
-            day: 'Day',
-            list: 'List'
-            }
-        
-        });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var initialLocaleCode = 'ro';
+    var localeSelectorEl = document.getElementById('locale-selector');
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+      },
+      locale: initialLocaleCode,
+      buttonIcons: true, // show the prev/next text
+      weekNumbers: false,
+      navLinks: true, // can click day/week names to navigate views
+      editable: true,
+      dayMaxEvents: true, // allow "more" link when too many events
+      events: [{"color":"#88D66C","start":"2024-07-13","end":"2024-07-20","title":"Eremia Catalin Constantin","textColor":"white"},{"color":"#88D66C","start":"2024-09-15","end":"2024-09-18","title":"Eremia Catalin Constantin","textColor":"white"},{"color":"#10439F","start":"2024-07-15","end":"2024-07-18","title":"Rebreanu Cecilia Ioana","textColor":"white"},{"color":"#10439F","start":"2024-07-22","end":"2024-07-27","title":"Rebreanu Cecilia Ioana","textColor":"white"},{"color":"#10439F","start":"2024-09-17","end":"2024-09-27","title":"Rebreanu Cecilia Ioana","textColor":"white"},{"color":"#10439F","start":"2024-09-29","end":"2024-10-16","title":"Rebreanu Cecilia Ioana","textColor":"white"},{"color":"#88D66C","start":"2024-07-25","end":"2024-07-28","title":"Eremia Catalin Constantin","textColor":"white"},{"color":"#88D66C","start":"2024-09-25","end":"2024-09-29","title":"Eremia Catalin Constantin","textColor":"white"}]
+
     });
+
+    calendar.render();
+
+   
+
+  });
+  
+  
+
 </script>
-<%
-                            }
-                        }
-                    } catch (SQLException e) {
-                        out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            out.println("<script type='text/javascript'>alert('Database error!');</script>");
-            response.sendRedirect("login.jsp");
-        }
-    } else {
-        out.println("<script type='text/javascript'>alert('User not logged in!');</script>");
-        response.sendRedirect("login.jsp");
-    }
-} else {
-    out.println("<script type='text/javascript'>alert('No active session!');</script>");
-    response.sendRedirect("login.jsp");
-}
-%>
+<style>
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
+  }
+
+  #top {
+    background: #eee;
+    border-bottom: 1px solid #ddd;
+    padding: 0 10px;
+    line-height: 40px;
+    font-size: 12px;
+  }
+
+  #calendar {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 10px;
+  }
+
+</style>
+</head><body>
+
+  <div id='calendar'></div>
+
+</body>
+
+
+</html>

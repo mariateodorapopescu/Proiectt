@@ -97,7 +97,7 @@
                                     <div class="login__inputs">
                                         <div>
                                             <label class="login__label" style="color:<%out.println(text);%>">Status</label>
-                                            <select style="border-color:<%out.println(accent);%>; background: <%out.println(sidebar);%>" name="iddep" class="login__input">
+                                            <select style="color:<%out.println(text);%>; border-color:<%out.println(accent);%>; background: <%out.println(sidebar);%>" name="iddep" class="login__input">
                                                 <option value="3">Oricare</option>
                                                 <%
                                                
@@ -117,7 +117,7 @@
                         }
 
                         out.println("</select></div></div>");
-                        %> <a href="viewang3.jsp" class="login__forgot" style="margin:0; top:-10px; color:<%out.println(accent);%> ">Inapoi</a> <%
+                        %> <a href="viewang.jsp" class="login__forgot" style="margin:0; top:-10px; color:<%out.println(accent);%> ">Inapoi</a> <%
                         out.println("<div class='login__buttons'><input style='box-shadow: 0 6px 24px "  + accent + "; background:" + accent + "' class='login__button' type='submit' value='Submit' /></div>");
                         out.println("</form>");
                         out.println("</div>");
