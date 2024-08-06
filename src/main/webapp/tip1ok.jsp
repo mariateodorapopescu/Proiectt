@@ -555,7 +555,12 @@ body {
 .menu button:hover {
     background-color: black;
 }
-        
+        .sitextt {
+color: <%=text%>
+}  
+a .sitextt:hover, .sitextt {
+color: <%=accent%>
+}
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
@@ -578,7 +583,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="home"></ion-icon>
                         </div>
-                        <div style="color: <%out.println(text); %>" class="sitextt">Acasa</div>
+                        <div  class="sitextt">Acasa</div>
                     </a>
                 </li>
                
@@ -587,7 +592,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="today"></ion-icon>
                         </div>
-                        <div class="sitextt">Notificari</div>
+                        <div  class="sitextt">Notificari</div>
                     </a>
                 </li>
                 <li style="--bg: <%out.println(accent); %>">
@@ -595,7 +600,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="stats"></ion-icon>
                         </div>
-                        <div class="sitextt">Statistici</div>
+                        <divstyle="color: <%out.println(text); %>"  class="sitextt">Statistici</div>
                     </a>
                 </li>
                 
@@ -604,7 +609,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="apps"></ion-icon>
                         </div>
-                        <div class="sitextt">Actiuni</div>
+                        <div  class="sitextt">Actiuni</div>
                     </a>
                 </li>
                 
@@ -613,7 +618,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="switch"></ion-icon>
                         </div>
-                        <div class="sitextt">Configurari</div>
+                        <div  class="sitextt">Configurari</div>
                     </a>
                 </li>
             </div>
@@ -626,7 +631,7 @@ body {
                                 <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
                             </div>
                         </div>
-                        <div class="sitextt"> <% out.println(nume);%></div>
+                        <div  class="sitextt"> <% out.println(nume);%></div>
                     </a>
                 </li>
                 <li style="--bg: <%out.println(text); %>;">
@@ -636,7 +641,7 @@ body {
                         </div>
                         
                         
-                        <div class="sitextt">Deconectare</div>
+                        <div  class="sitextt">Deconectare</div>
                     </a>
                 </li>
                 

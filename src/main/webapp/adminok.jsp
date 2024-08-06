@@ -555,6 +555,12 @@ body {
 .menu button:hover {
     background-color: black;
 }
+.sitextt {
+color: <%=text%>
+}  
+a .sitextt:hover, .sitextt {
+color: <%=accent%>
+}
         
     </style>
 </head>
@@ -578,7 +584,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="home"></ion-icon>
                         </div>
-                        <div style="color: <%out.println(text); %>" class="sitextt">Acasa</div>
+                        <div  class="sitextt">Acasa</div>
                     </a>
                 </li>
                 <li style="--bg: <%out.println(accent); %>">
@@ -586,7 +592,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="people"></ion-icon>
                         </div>
-                        <div class="sitextt">Angajati</div>
+                        <div  class="sitextt">Angajati</div>
                     </a>
                 </li>
                
@@ -595,7 +601,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="briefcase"></ion-icon>
                         </div>
-                        <div class="sitextt">Departamente</div>
+                        <div  class="sitextt">Departamente</div>
                     </a>
                 </li>
                <li style="--bg: <%out.println(accent); %>;">
@@ -603,7 +609,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="switch"></ion-icon>
                         </div>
-                        <div class="sitextt">Configurari</div>
+                        <div  class="sitextt">Configurari</div>
                     </a>
                 </li>
                 </div>
@@ -615,7 +621,7 @@ body {
                                 <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
                             </div>
                         </div>
-                        <div class="sitextt"> <% out.println(nume);%></div>
+                        <div  class="sitextt"> <% out.println(nume);%></div>
                     </a>
                 </li>
                 <li style="--bg: <%out.println(text); %>;">
@@ -625,7 +631,7 @@ body {
                         </div>
                         
                         
-                        <div class="sitextt">Deconectare</div>
+                        <div  class="sitextt">Deconectare</div>
                     </a>
                 </li>
                 

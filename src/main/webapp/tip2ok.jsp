@@ -150,6 +150,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     position: relative;
+    color: <%=text%>;
 }
 
 .sidebar.active {
@@ -158,17 +159,20 @@ body {
 
 .sidebar ul {
     flex-grow: 1;
+    color: <%=text%>;
 }
 
 .sidebar ul li {
     list-style: none;
     position: relative;
+    color: <%=text%>;
 }
 
 .sidebar ul li.active {
     background: var(--clr);
     border-top-left-radius: 1.5rem;
     border-bottom-left-radius: 1.5rem;
+    color: <%=text%>;
 }
 
 .sidebar ul li.active::before{
@@ -181,6 +185,7 @@ body {
     top: -1.93rem;
     right: 0;
     box-shadow: 1rem 1rem 0 1rem var(--clr);
+    color: <%=text%>;
 }
 
 .sidebar ul li.active::after {
@@ -194,6 +199,7 @@ body {
     right: 0;
     box-shadow: 1rem -1rem 0 1rem var(--clr);
     z-index: 20;
+    color: <%=text%>;
 }
 
 .sidebar ul li.active::after {
@@ -201,6 +207,7 @@ body {
     right: 0;
     box-shadow: 1rem -1rem 0 1rem var(--sd);
     z-index: 20;
+    color: <%=text%>;
 }
 
 .sidebar ul li.logo {
@@ -224,14 +231,15 @@ body {
 .sidebar ul li.logo a .sitext {
     font-size: 1.2em;
     font-weight: 500;
-    color: var(--clr);
+   
     display: flex;
     align-items: center;
     font-size: 1em;
-    color: var(--text);
+    
     padding-left: 1.5rem;
     letter-spacing: 0.05em;
     transition: 0.5s;
+    color: <%=text%>;
 }
 
 .sidebar ul li a,
@@ -239,6 +247,7 @@ body {
     display: flex;
     white-space: nowrap;
     text-decoration: none;
+     color: <%=text%>;
 }
 
 .sidebar ul li a .siiconn {
@@ -248,7 +257,7 @@ body {
     min-width: 2rem;
     height: 3rem;
     font-size: 1.5em;
-    color: var(--text);
+     color: <%=text%>;
     transition: 0.5s;
     z-index: 22;
 }
@@ -260,6 +269,7 @@ body {
 
 .sidebar ul li.active a .sitextt {
     margin-left: 1rem;
+     color: <%=text%>;
 }
 
 .sidebar ul li.active a .siiconn::before {
@@ -555,7 +565,10 @@ body {
 .menu button:hover {
     background-color: black;
 }
-        
+.sidebar ul li a .sitextt {
+    color: <%=text%>;  
+}
+
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
@@ -578,7 +591,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="home"></ion-icon>
                         </div>
-                        <div style="color: <%out.println(text); %>" class="sitextt">Acasa</div>
+                        <div  class="sitextt">Acasa</div>
                     </a>
                 </li>
                
@@ -595,7 +608,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="stats"></ion-icon>
                         </div>
-                        <div class="sitextt">Statistici</div>
+                        <div  class="sitextt">Statistici</div>
                     </a>
                 </li>
                 
@@ -604,7 +617,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="apps"></ion-icon>
                         </div>
-                        <div class="sitextt">Actiuni</div>
+                        <div  class="sitextt">Actiuni</div>
                     </a>
                 </li>
                 
@@ -613,7 +626,7 @@ body {
                         <div class="siiconn">
                             <ion-icon name="switch"></ion-icon>
                         </div>
-                        <div class="sitextt">Configurari</div>
+                        <div  class="sitextt">Configurari</div>
                     </a>
                 </li>
             </div>
@@ -626,7 +639,7 @@ body {
                                 <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
                             </div>
                         </div>
-                        <div class="sitextt"> <% out.println(nume);%></div>
+                        <div  class="sitextt"> <% out.println(nume);%></div>
                     </a>
                 </li>
                 <li style="--bg: <%out.println(text); %>;">
@@ -636,7 +649,7 @@ body {
                         </div>
                         
                         
-                        <div class="sitextt">Deconectare</div>
+                        <div  class="sitextt">Deconectare</div>
                     </a>
                 </li>
                 

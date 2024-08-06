@@ -97,10 +97,12 @@
             background-color: var(--sd);
             border-radius: 2rem;
             /*box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);*/
-            padding: 30px;
+            padding: 30px; 
+            top; 0;
             width: 400px;
             max-width: 90%;
             text-align: center;
+            margin: 0;
         }
         .profile-card img {
             width: 120px;

@@ -146,10 +146,10 @@
                         	<div class="main-content">
         <div class="header">
          </div>
-        <div class="content">
-            <div class="intro" style="background:<%out.println(sidebar);%>;">
+        <div style=" border-radius: 2rem;" class="content">
+            <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>;">
            
-                 <div class="events" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                 <div class="events" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
                   <h1>Cereri noi de concedii</h1>
                 <h3><%out.println(today); %></h3>
                 <table>
