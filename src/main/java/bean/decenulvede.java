@@ -77,7 +77,7 @@ public class decenulvede extends HttpServlet {
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
              PreparedStatement statement = connection.prepareStatement(
-                 "SELECT accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ?")) {
+                 "SELECT accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ? and concedii.status = 2")) {
             statement.setInt(1, departmentId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {

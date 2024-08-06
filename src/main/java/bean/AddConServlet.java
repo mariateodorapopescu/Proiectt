@@ -88,7 +88,7 @@ public class AddConServlet extends HttpServlet {
         con.setDurata(durata);
       
         try {
-			if (!maimulteconcedii(request)) {
+			if (maimulteconcedii(request)) {
 				 response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
@@ -413,7 +413,7 @@ public class AddConServlet extends HttpServlet {
 		        throw new IOException("Eroare la baza de date", e);
 		    }
 
-		    return nr < 3;
+		    return nr > 3;
 		}
 
 		public static boolean maimultezile(HttpServletRequest request) throws ClassNotFoundException, IOException {

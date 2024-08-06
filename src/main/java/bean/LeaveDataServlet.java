@@ -60,7 +60,7 @@ public class LeaveDataServlet extends HttpServlet {
 
 	        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false&serverTimezone=UTC", "root", "student");
 	             Statement statement = connection.createStatement();
-	             ResultSet rs = statement.executeQuery("SELECT accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr")) {
+	             ResultSet rs = statement.executeQuery("SELECT accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr where concedii.status = 2")) {
 
 	            while (rs.next()) {
 	                JSONObject event = new JSONObject();
@@ -99,7 +99,7 @@ public class LeaveDataServlet extends HttpServlet {
 
 	        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 	             Statement statement = connection.createStatement();
-	             ResultSet rs = statement.executeQuery("SELECT accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr")) {
+	             ResultSet rs = statement.executeQuery("SELECT accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr where concedii.status = 2")) {
 
 	            while (rs.next()) {
 	                JSONObject event = new JSONObject();

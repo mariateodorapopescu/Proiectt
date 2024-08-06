@@ -112,9 +112,10 @@
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
        
+    
        .tooltip {
   position: relative;
-  display: inline-block;
+  
   border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
@@ -194,28 +195,28 @@
                                         rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
                                         rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
                                 if (rs1.getString("status").compareTo("neaprobat") == 0) {
-                                    out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
+                                    out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
                                     out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
                                     out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                                 
                                 }
                                 if (rs1.getString("status").compareTo("dezaprobat sef") == 0) {
-                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
                               	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                             }
                                 if (rs1.getString("status").compareTo("dezaprobat director") == 0) {
-                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
                               	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                             }
                                 if (rs1.getString("status").compareTo("aprobat director") == 0) {
-                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
                               	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                             }
                                 if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                              	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
                               	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                             }

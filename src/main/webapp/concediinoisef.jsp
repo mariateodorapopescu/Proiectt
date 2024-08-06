@@ -114,7 +114,7 @@
        
        .tooltip {
   position: relative;
-  display: inline-block;
+  
   border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
@@ -195,10 +195,12 @@
 
                               
                               if (rs1.getString("status").compareTo("neaprobat") == 0) {
-                                  out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
+                                  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
                                   out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='aprobsef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
                                   out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='ressef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
-                              }}
+                              }
+                              
+                            }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
                             }
