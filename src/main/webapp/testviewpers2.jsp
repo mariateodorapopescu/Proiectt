@@ -41,17 +41,41 @@ if (sesi != null) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/locale-all.js"></script>
+     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            
             background-color: <%=sidebar%>;
         }
         #calendar {
-            max-width: 900px;
-            margin: 50px auto;
+            max-width: 700px;
+            max-height: 700px;
+            padding: 0;
+            margin: 20px auto;
+           
         }
+        
+		table, 
+		td,
+		thead,
+		tbody,
+		.fc-row {
+			border-color: <%=clr%> !important;
+			background: <%=sidebar%> !important;
+			text: <%=accent%>; !important;
+		}
+		
+		th, hr{
+			border-color: <%=accent%> !important;
+			background: <%=accent%> !important;
+			color: white;
+		}
+		
     </style>
 </head>
 <body>
@@ -70,6 +94,42 @@ if (sesi != null) {
                 navLinks: true,
                 editable: true,
                 dayMaxEvents: true,
+                defaultView: 'month',
+                dayRender: function(date, cell)
+                {
+                var today = $.fullCalendar.moment();
+                if(date.get('date')==today.get('date'))
+                {
+                   // cell.css("background", "rgb(52, 140, 235)");
+                   cell.css("textColor", "white");
+                  
+                }
+                },
+                selectable: true,
+                selectHelper: true,
+
+                dayClick: function (date, jsEvent, view) {
+                    //var D = moment(date);
+                    t.row.add([
+                        counter,
+                        date.format('dddd,MMMM DD,YYYY'),
+                        'testing'
+                    ]).draw(false);
+
+                    counter++;
+
+                    cell.css("background-color", "teal");
+                },
+                
+                dayRender: function(date, cell) { 
+
+                	var today = $.fullCalendar.moment(); 
+                	var end = $.fullCalendar.moment().add(7, 'days'); 
+                	if (date.get('date') == today.get('date')) { $(".fc-"+date.format('ddd').toLowerCase()).css("background", "#f8f9fa"); 
+                	$("th.fc-"+date.format('ddd').toLowerCase()).text("Holiday"); 
+                	$("th.fc-"+date.format('ddd').toLowerCase()).css("background", "red"); 
+                	$("th.fc-"+date.format('ddd').toLowerCase()).css("color", "#fff"); } },
+                	
                 events: function(start, end, timezone, callback) {
                     $.ajax({
                     	url: 'decenulvede',

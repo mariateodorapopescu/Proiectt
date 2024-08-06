@@ -155,16 +155,16 @@
                     <thead>
                         <tr >
                     
-                    <th>Departament</th>
-                    <th>Nume</th>
-                    <th>Prenume</th>
-                    <th>Functie</th>
-                    <th>Inceput</th>
-                    <th>Final</th>
-                    <th>Motiv</th>
-                    <th>Locatie</th>
-                    <th>Tip concediu</th>
-                    <th>Status</th>
+                    <th style="color: white;">Departament</th>
+                    <th style="color: white;">Nume</th>
+                    <th style="color: white;">Prenume</th>
+                    <th style="color: white;">Functie</th>
+                    <th style="color: white;">Inceput</th>
+                    <th style="color: white;">Final</th>
+                    <th style="color: white;">Motiv</th>
+                    <th style="color: white;">Locatie</th>
+                    <th style="color: white;">Tip concediu</th>
+                    <th style="color: white;">Status</th>
                     
                 </tr>
                     </thead>

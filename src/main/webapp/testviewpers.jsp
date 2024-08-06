@@ -45,13 +45,32 @@ if (sesi != null) {
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            
             background-color: <%=sidebar%>;
         }
         #calendar {
-            max-width: 900px;
-            margin: 50px auto;
+            max-width: 700px;
+            max-height: 700px;
+            padding: 0;
+            margin: 20px auto;
+           
         }
+        
+		table, 
+		td,
+		thead,
+		tbody,
+		.fc-row {
+			border-color: <%=clr%> !important;
+			background: <%=sidebar%> !important;
+			text: <%=accent%>; !important;
+		}
+		
+		th, hr{
+			border-color: <%=accent%> !important;
+			background: <%=accent%> !important;
+			color: white;
+		}
     </style>
 </head>
 <body>

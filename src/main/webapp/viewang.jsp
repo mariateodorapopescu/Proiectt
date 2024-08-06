@@ -21,7 +21,7 @@
     <title>Acasa</title>
     <style>
         
-        a, a:visited, a:hover, a:active{color:#eaeaea !important}
+        a, a:visited, a:hover, a:active{color:white !important}
     </style>
 </head>
 <body>
@@ -115,9 +115,9 @@
                     	<div class="main-content" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
                     	<div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                 <h3 style="color:<%out.println(text);%>">Ce doriti sa faceti?</h3>
-                 <button style="--bg:<%out.println(accent);%>"> <a href = "viewcolegi.jsp" style="text-decoration:none;">Vizualizare angajati din toata institutia</a></button>
-       <button style="--bg:<%out.println(accent);%> ;"><a href = "viewangdep.jsp" style="text-decoration:none;">Vizualizare angajati dintr-un anumit departament</a></button>
-       <button style="--bg:<%out.println(accent);%> ;"><a href = "viewcolegidep.jsp" style="text-decoration:none;">Vizualizare angajati din departamentul meu</a></button>
+                 <button style="color:white; --bg:<%out.println(accent);%>"> <a href = "viewcolegi.jsp" style="text-decoration:none;">Vizualizare angajati din toata institutia</a></button>
+       <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "viewangdep.jsp" style="text-decoration:none;">Vizualizare angajati dintr-un anumit departament</a></button>
+       <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "viewcolegidep.jsp" style="text-decoration:none;">Vizualizare angajati din departamentul meu</a></button>
                
                </div>
                </div>

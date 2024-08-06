@@ -75,7 +75,7 @@ int pag = -1;
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <style>
         
-        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+        a, a:visited, a:hover, a:active{color:white !important; text-decoration: none;}
     
     
         .status-icon {
@@ -140,6 +140,12 @@ int pag = -1;
                     		perioada = 1;
                     		start = request.getParameter("start");
                     		end = request.getParameter("end");
+                    		if (start.compareTo("")==0) {
+                    			perioada = 0;
+                    		}
+                    		if (end.compareTo("")==0) {
+                    			perioada = 0;
+                    		}
                     	}
                     	
                     	 pag = Integer.valueOf(request.getParameter("pag"));

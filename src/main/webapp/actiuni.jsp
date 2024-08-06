@@ -94,7 +94,7 @@
     <title>Acasa</title>
     <style>
         
-        a, a:visited, a:hover, a:active{color:#eaeaea !important}
+        a, a:visited, a:hover, a:active{color:white !important}
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
