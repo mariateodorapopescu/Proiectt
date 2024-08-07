@@ -328,4 +328,14 @@
     <servlet-name>decenulvede</servlet-name>
     <url-pattern>/decenulvede</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GMailServlet</display-name>
+    <servlet-name>GMailServlet</servlet-name>
+    <servlet-class>bean.GMailServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GMailServlet</servlet-name>
+    <url-pattern>/GMailServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

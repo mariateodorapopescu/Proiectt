@@ -157,13 +157,13 @@
         %></h3>
         <div class="info">
             <%
-                
+                String email = "";
                 try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
                      PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, data_nasterii, adresa, email, telefon, username, denumire, nume_dep, zilecons, zileramase, conluate, conramase FROM useri NATURAL JOIN tipuri NATURAL JOIN departament WHERE username = ?")) {
                     stmt.setString(1, username);
                     ResultSet rs1 = stmt.executeQuery();
                     if (rs1.next()) {
-                        
+                        email = rs1.getString("email");
                         out.println("<div><span>Concedii luate:</span> " + rs1.getString("conluate") + "</div>");
                         out.println("<div><span>Concedii ramase:</span> " + rs1.getString("conramase") + "</div>");
                         out.println("<div><span>Zile luate:</span> " + rs1.getString("zilecons") + "</div>");
@@ -181,7 +181,7 @@
         int cate = -1;
    	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
             // Check for upcoming leaves in 3 days
-            String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 <= date(NOW()) AND id_ang = ?";
+            String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 >= date(NOW()) AND id_ang = ?";
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setInt(1, id);
                 try (ResultSet rs2 = stmt.executeQuery()) {
@@ -190,7 +190,7 @@
                     }
                 }
             }
-           
+           // System.out.println(cate);
             // Display the user dashboard or related information
             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
             // Add additional user-specific content here
@@ -199,8 +199,6 @@
             e.printStackTrace();
         }
    	 
-   		
-         
         int cate2 = -1;
      	if (cate >= 1) {
      		 String query2 = "SELECT CASE WHEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) between 0 and 4 THEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) ELSE -1 END AS dif FROM concedii WHERE id_ang = ? order by dif desc limit 1";
@@ -213,8 +211,18 @@
                      }
                  }
              }
+             // System.out.println(cate2);
              if (cate2 > 0)
-     		out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
+	     		{
+            	 out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
+            	 // isi ia deconectare dupa si nu inteleg de ce + nu merge redirectarea ok + cum automatizez?
+            			 %>
+            	 <h1>Test Email Sender</h1>
+            	    <form action="/Proiect/MailServlet" method="get">
+            	        <button type="submit">Send Test Email</button>
+            	    </form>
+			            <%
+	     		}
      	}
         %>
     </div>
