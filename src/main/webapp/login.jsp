@@ -91,6 +91,7 @@
     }
 %>
                     </div>
+                    <input type="hidden" name="page" value="1">
                 </form>
             </div>
         </div>
@@ -122,6 +123,7 @@
     <form name="postForm" action="dashboard.jsp" method="POST" style="display:none;">
         <input type="hidden" name="username" value="${param.username}">
     </form>
+   
 </div>
 <script src="./responsive-login-form-main/assets/js/main.js"></script>
 </body>

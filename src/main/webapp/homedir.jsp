@@ -214,14 +214,9 @@
              // System.out.println(cate2);
              if (cate2 > 0)
 	     		{
-            	 out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
+            	 //out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
             	 // isi ia deconectare dupa si nu inteleg de ce + nu merge redirectarea ok + cum automatizez?
-            			 %>
-            	 <h1>Test Email Sender</h1>
-            	    <form action="/Proiect/MailServlet" method="get">
-            	        <button type="submit">Send Test Email</button>
-            	    </form>
-			            <%
+            		System.out.println("ok");
 	     		}
      	}
         %>

@@ -338,4 +338,34 @@
     <servlet-name>GMailServlet</servlet-name>
     <url-pattern>/GMailServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>OTP</display-name>
+    <servlet-name>OTP</servlet-name>
+    <servlet-class>bean.OTP</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OTP</servlet-name>
+    <url-pattern>/OTP</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>OTP2</display-name>
+    <servlet-name>OTP2</servlet-name>
+    <servlet-class>bean.OTP2</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OTP2</servlet-name>
+    <url-pattern>/OTP2</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>OTP3</display-name>
+    <servlet-name>OTP3</servlet-name>
+    <servlet-class>bean.OTP3</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OTP3</servlet-name>
+    <url-pattern>/OTP3</url-pattern>
+  </servlet-mapping>
 </web-app>

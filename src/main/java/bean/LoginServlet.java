@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
     	        }
     	        session = request.getSession(true); // Create a new session
     	        session.setAttribute("currentUser", validatedUser);
-    	        response.sendRedirect("intermediar.jsp"); // Redirect to an intermediary page or dashboard
+    	        response.sendRedirect("/Proiect/OTP?username=" + username); // Redirect to an intermediary page or dashboard
     	    } else {
     	    	
     	    	 Integer loginAttempts = (Integer) request.getSession(true).getAttribute("loginAttempts");

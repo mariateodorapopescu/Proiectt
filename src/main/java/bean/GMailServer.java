@@ -48,6 +48,10 @@ public class GMailServer extends javax.mail.Authenticator
     }  
     
 	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
+		System.out.println(subject);
+		System.out.println(body);
+		System.out.println(sender);
+		System.out.println(recipients);
 		  try {
 	          // Assuming Email is a class from com.email.durgesh that handles email operations
 	          Email email = new Email(user, password);
@@ -55,6 +59,7 @@ public class GMailServer extends javax.mail.Authenticator
 	          email.setSubject(subject);
 	          email.setContent(body, "text/html");
 	          email.addRecipient(recipients);
+	          
 	          email.send();
 	      } catch (Exception e) {
 	          e.printStackTrace();    
