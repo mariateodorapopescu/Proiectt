@@ -144,6 +144,7 @@ if (sesi != null) {
    
                           <input type="hidden" name="tip" value="1">
                  </form>
+                 <input type="color" id="color-picker" value=<%=accent %>>
                   <p id="ceva1" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=sidebar %></p>
                    <p id="ceva2" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=accent %></p>
                  <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
@@ -202,7 +203,7 @@ var clear = document.getElementById("ceva1").innerText;
 var accent = document.getElementById("ceva2").innerText;
 var hbnm = "";
 let colorPicker;
-const defaultColor = "#0000ff";
+const defaultColor = accent;
 
 window.addEventListener("load", startup, false);
 
@@ -256,23 +257,71 @@ $(document).ready(function() {
                 },
                 series: [{
                     values: data.counts,
-                    backgroundColor: accent // Sets the color of the bars
+                    //backgroundColor: accent // Sets the color of the bars
+                    backgroundColor: document.getElementById("color-picker").value
+                    
                 }],
                 plot: { // Additional styling for plot area
                     valueBox: {
                         text: '%v', // Displaying value on the bar
                         placement: 'top',
                         fontColor: '#FFF',
-                        backgroundColor: accent,
+                        backgroundColor: document.getElementById("color-picker").value,
                         borderRadius: 3
-                    }
+                    },
+                "animation": {
+                    "effect": "ANIMATION_EXPAND_BOTTOM",
+                    "method": "ANIMATION_STRONG_EASE_OUT",
+                    "sequence": "ANIMATION_BY_PLOT_AND_NODE",
+                    "speed": 275
+                }
                 }
             },
             height: 400,
             width: '100%'
         });
-    } 
+    }  
+    document.getElementById('color-picker').addEventListener('change', function(e) {
+        var myConfig2 = {
+        type: 'bar',
+        plot: {
+            "animation": {
+                "effect": "ANIMATION_EXPAND_BOTTOM",
+                "method": "ANIMATION_STRONG_EASE_OUT",
+                "sequence": "ANIMATION_BY_PLOT_AND_NODE",
+                "speed": 275
+            },
+            valueBox: {
+                text: '%v', // Displaying value on the bar
+                placement: 'top',
+                fontColor: '#FFF',
+                backgroundColor: document.getElementById("color-picker").value,
+                borderRadius: 3
+            }
+        },
+        title: {
+            text: 'Numar angajati / luna'
+        },
+        scaleX: {
+            values: data.months.map(month => month.toString())
+        },
+        series: [{
+            values: data.counts,
+                backgroundColor: document.getElementById("color-picker").value
+            }
+        ]
+    };
+
+    // Render the initial chart
+    zingchart.render({
+        id: 'myChart',
+        data: myConfig2,
+        height: '100%',
+        width: '100%'
+    });
+    }, false);
 });
+
 </script>
 
 </body>
