@@ -8,12 +8,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimerTask;
 
 public class Testing extends TimerTask
 {
-
+	private static Map<String, Long> lastSentMap = new HashMap<>();
 	public void run()
 	{
 		 try {
@@ -36,7 +38,6 @@ public class Testing extends TimerTask
 
 	        }
 	
-	
 	private void sendReminders(Connection connection) throws Exception {
 	    String query = "SELECT DISTINCT useri.id, useri.email, concedii.start_c, concedii.end_c, locatie, concedii.motiv, tipcon.motiv AS tip_motiv, DATEDIFF(concedii.start_c, CURRENT_DATE()) AS days_until_start "
 	            + "FROM useri "
@@ -54,10 +55,15 @@ public class Testing extends TimerTask
 	    }
 	}
 
-
 	private void sendEmail(ResultSet rs) throws Exception {
+		 long currentTimeMillis = System.currentTimeMillis();
+		 
 	    int id = rs.getInt("id");
 	    String to = rs.getString("email");
+	    if (lastSentMap.containsKey(to) && (currentTimeMillis - lastSentMap.get(to)) < 3600000) {
+            System.out.println(to + " a primit deja un email in ultima ora.");
+            return;
+        }
 	    Date startDate = rs.getDate("start_c");
 	    Date endDate = rs.getDate("end_c");
 	    int daysUntilStart = rs.getInt("days_until_start"); // Added this line to capture days until start
@@ -78,11 +84,14 @@ public class Testing extends TimerTask
 
 	    try {
 	        sender.send(subject, message, Constants.setFrom, to);
-	        System.out.println("ok");
+	        lastSentMap.put(to, currentTimeMillis);
+	        System.out.println("S-a trimis mail la " + to);
+	        //System.out.println("ok");
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        System.out.println("NOTok");
+	       // System.out.println("NOTok");
 	    }  
+	    
 	}
 
 }

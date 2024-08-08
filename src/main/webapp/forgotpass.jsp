@@ -75,10 +75,15 @@
     HttpSession sess = request.getSession(false); // Make sure you have the correct import for HttpSession
     if (sess != null) {
         String username = (String) sess.getAttribute("username"); // Assuming username is stored in session
-        
+        String redir = "";
         // Check if the username is actually retrieved from the session
         if (username != null && !username.isEmpty()) {
-        	
+        	 if (request.getParameter("page").compareTo("2") == 0) {
+            	 redir = "/modifpasd2.jsp?page=2";
+            }
+            else {
+           redir = "/modifpasd2.jsp";
+            }
         	%>
         	 <div class="flex-container">
             
@@ -114,30 +119,36 @@
            
         } else {
             // If username is not in session, redirect to login
+            if (request.getParameter("page").compareTo("2") == 0) {
+            	 redir = "/OTP?page=2";
+            }
+            else {
+           redir = "/OTP?page=2";
+            }
             %>
         	<div class="flex-container">
             
             <div class="form-container">
          
 
-                <form action="<%= request.getContextPath() %>/modifpasd2.jsp" method="post" class="login__form">
-                    <div>
-                        <h1 class="login__title"><span>Modificare parola</span></h1>
+               <form action="<%= request.getContextPath() %><%= redir %>" method="post" class="login__form">
+                     <div>
+                         <h1 class="login__title"><span>Modificare parola</span></h1>
+                         
+                     </div>
+                     
+                     <div class="login__inputs">
                         
-                    </div>
-                    
-                    <div class="login__inputs">
+                         <div>
+                             <label class="login__label">Nume de utilizator</label>
+                             <input type="text" placeholder="Introduceti numele de utilizator" required class="login__input" name='username'/>
+                         </div>
+                          <%  out.println("            <a href=\"about:blank\" class=\"login__forgot\">Inapoi</a>"); %>
                        
-                        <div>
-                            <label class="login__label">Cod</label>
-                            <input type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
-                        </div>
-                       
-                        <%  out.println("            <a href=\"login.jsp\" class=\"login__forgot\">Inapoi</a>"); %>
-                        <div class="login__buttons">
-                            <input type="submit" value="Modificare" class="login__button login__button-ghost">
-                        </div>
-                    </form>
+                         <div class="login__buttons">
+                             <input type="submit" value="Modificare" class="login__button login__button-ghost">
+                         </div>
+                     </form>
                     <%
                     out.println("</div>");
                     %>

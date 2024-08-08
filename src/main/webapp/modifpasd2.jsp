@@ -9,14 +9,16 @@ if (sesi == null) {
     response.sendRedirect("login.jsp");
     return;
 }
-
+String username = "";
 MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
 if (currentUser == null) {
-    response.sendRedirect("login.jsp");
-    return;
+    // response.sendRedirect("login.jsp");
+    username = (String) sesi.getAttribute("username");
+    // return;
+} else {
+username = currentUser.getUsername();
 }
-
-String username = currentUser.getUsername();
+// System.out.println("From modifpasd2.jsp: " + username);
 String accent = "#03346E", clr = "#d8d9e1", sidebar = "#ecedfa", text = "#333", card = "#ecedfa", hover = "#ecedfa";
 int userId = -1, userType = -1;
 
@@ -35,12 +37,13 @@ try {
 
         userId = rs.getInt("id");
         userType = rs.getInt("tip");
+        //System.out.println("From modifpasd2.jsp: " + userId + " " + userType);
 
-        if (userType != 4) {
-            response.sendRedirect("dashboard.jsp");
-            return;
-        }
-
+       // if (userType != 4) {
+         //   response.sendRedirect("dashboard.jsp");
+          //  return;
+       // }
+     
         try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM teme WHERE id_usr = ?")) {
             stmt.setInt(1, userId);
             ResultSet rs2 = stmt.executeQuery();
@@ -58,6 +61,17 @@ try {
     e.printStackTrace();
     out.println("<script type='text/javascript'>alert('Database error!'); location='login.jsp';</script>");
     return;
+}
+int id = -1;
+String ceva = null;
+ceva = request.getParameter("idd");
+if (userType == 4) {
+if (ceva != null) {
+	id = Integer.parseInt(ceva);
+}
+}
+if (id != -1) {
+userId = id;
 }
 %>
 

@@ -35,6 +35,7 @@ public class LoginServlet extends HttpServlet {
     	        }
     	        session = request.getSession(true); // Create a new session
     	        session.setAttribute("currentUser", validatedUser);
+    	        session.setAttribute("username", username); // Store username in session
     	        response.sendRedirect("/Proiect/OTP?username=" + username); // Redirect to an intermediary page or dashboard
     	    } else {
     	    	

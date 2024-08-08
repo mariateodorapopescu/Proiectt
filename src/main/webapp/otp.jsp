@@ -11,6 +11,7 @@
         String password = request.getParameter("password");
         String old_otp = request.getParameter("oldotp");
         String accent = "#03346E", clr = "#d8d9e1", sidebar = "#ecedfa", text = "#333", card = "#ecedfa", hover = "#ecedfa";
+        String pagee = request.getParameter("page");
                         %>
 <html>
 <head>
@@ -126,6 +127,7 @@
         <input type="hidden" name="username" value="<%=username%>">
                                          <input type="hidden" name="password" value="<%=password%>">
                                          <input type="hidden" name="oldotp" value="<%=old_otp%>">
+                                         <input type="hidden" name="page" value="<%=pagee%>"> 
                                     </form>
                                     <%
                                     out.println("</div>");

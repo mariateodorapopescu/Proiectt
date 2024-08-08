@@ -16,10 +16,13 @@
 
 <%
 HttpSession sesi = request.getSession(false);
+    		String username = null;
 if (sesi != null) {
+	 username = (String) sesi.getAttribute("username");
     MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
     if (currentUser != null) {
-        String username = currentUser.getUsername();
+        username = currentUser.getUsername();
+       
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet rs = null;
@@ -63,10 +66,11 @@ if (sesi != null) {
                 // Check if the user type is not admin
                 if (!"4".equals(userType)) {
                     // Logic for non-admin users
-                    String cnp = request.getParameter("cnp");
-                    if (cnp != null) {
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT id FROM useri WHERE cnp = ?")) {
-                            stmt.setInt(1, Integer.parseInt(cnp));
+                   
+                    username = (String) sesi.getAttribute("username");
+                    
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT id FROM useri WHERE username = ?")) {
+                            stmt.setString(1, username);
                             try (ResultSet rs1 = stmt.executeQuery()) {
                                 if (!rs1.next() || rs1.getInt("id") != userId) {
                                     out.println("<script type='text/javascript'>alert('Cod incorect sau acces neautorizat!'); location='modifdel.jsp';</script>");
@@ -74,7 +78,7 @@ if (sesi != null) {
                                 }
                             }
                         }
-                    }
+                    
                 } else {
                 	userId = Integer.parseInt(request.getParameter("id"));
                 }

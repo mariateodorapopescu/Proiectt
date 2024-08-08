@@ -87,7 +87,7 @@
                     class="login__button" type="submit" value="Conectare" class="login__button"><% 
     String loginAttempts = request.getParameter("loginAttempts");
     if (loginAttempts != null && Integer.parseInt(loginAttempts) >= 1) {
-        out.println("<a style='color: " + accent + ";' href='forgotpass.jsp' class='login__forgot'>Am uitat parola</a>");
+        out.println("<a style='color: " + accent + ";' href='forgotpass.jsp?page=2' class='login__forgot'>Am uitat parola</a>");
     }
 %>
                     </div>

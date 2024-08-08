@@ -58,7 +58,8 @@ if (sesi != null) {
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <script nonce="undefined" src="https://cdn.zingchart.com/zingchart.min.js"></script>
+ 
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
@@ -140,38 +141,20 @@ if (sesi != null) {
                                 %>
                             </select>
                         </div>
+   
                           <input type="hidden" name="tip" value="1">
                  </form>
-                  
+                  <p id="ceva1" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=sidebar %></p>
+                   <p id="ceva2" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=accent %></p>
                  <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
                 <script>
                 function autoSubmit() {
                     document.getElementById('statusForm').submit();
                 }
+                
                     window.onload = function() {
-                        zingchart.render({
-                            id: "myChart",
-                            width: "100%",
-                            height: 400,
-                            data: {
-                                "type": "bar",
-                                "title": {
-                                    "text": "Numar angajati / luna"
-                                },
-                                "scale-x": {
-                                    "labels": monthsData
-                                },
-                                "plot": {
-                                    "line-width": 1
-                                },
-                                "series": [{
-                                    "values": countsData
-                                }]
-                            }
-                        });
-                    };
-
+                    	
                     function generate() {
                         const element = document.getElementById("content");
                         html2pdf()
@@ -215,15 +198,32 @@ if (sesi != null) {
                 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+var clear = document.getElementById("ceva1").innerText;
+var accent = document.getElementById("ceva2").innerText;
+var hbnm = "";
+let colorPicker;
+const defaultColor = "#0000ff";
 
-            
+window.addEventListener("load", startup, false);
+
+function startup() {
+  colorPicker = document.querySelector("#color-picker");
+  colorPicker.value = defaultColor;
+ 
+  colorPicker.addEventListener("change", updateFirst, false);
+  colorPicker.select();
+}
+
+function updateFirst(event) {
+  
+    hbrnm = event.target.value;
+  
+}
+
 $(document).ready(function() {
     fetchChartData();
-    function autoSubmit() {
-        document.getElementById('statusForm').submit();
-    }
-    // face autosubmit
- $('#statusForm').on('change', 'select', function() {
+
+    $('#statusForm').on('change', 'select', function() {
         fetchChartData(); // Call this function on change
     });
 
@@ -243,11 +243,11 @@ $(document).ready(function() {
     }
 
     function updateChart(data) {
-        $('#chartHeader').text(data.h3); // Set the header text
         zingchart.render({
             id: 'myChart',
             data: {
                 type: 'bar',
+                backgroundColor: clear, // Sets the background color of the chart area
                 title: {
                     text: 'Numar angajati / luna'
                 },
@@ -255,40 +255,26 @@ $(document).ready(function() {
                     values: data.months.map(month => month.toString())
                 },
                 series: [{
-                    values: data.counts
-                }]
+                    values: data.counts,
+                    backgroundColor: accent // Sets the color of the bars
+                }],
+                plot: { // Additional styling for plot area
+                    valueBox: {
+                        text: '%v', // Displaying value on the bar
+                        placement: 'top',
+                        fontColor: '#FFF',
+                        backgroundColor: accent,
+                        borderRadius: 3
+                    }
+                }
             },
             height: 400,
             width: '100%'
         });
     } 
-    function generate() {
-        const element = document.getElementById("content");
-        html2pdf()
-        .from(element)
-        .save();
-    }
-    function generatePDF() {
-                    const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
-                    html2pdf().set({
-                        pagebreak: { mode: ['css', 'avoid-all'] },
-                        html2canvas: {
-                            scale: 2, // Increase scale to enhance quality
-                            logging: true,
-                            dpi: 192,
-                            letterRendering: true,
-                            useCORS: true // Ensures external content is handled properly
-                        },
-                        jsPDF: {
-                            unit: 'pt',
-                            format: 'a4',
-                            orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
-                        }
-                    }).from(element).save();
-                }
-    
 });
 </script>
+
 </body>
 </html>
 <%

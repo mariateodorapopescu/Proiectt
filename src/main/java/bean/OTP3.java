@@ -14,10 +14,21 @@ public class OTP3 extends HttpServlet {
         HttpSession session = request.getSession();
         String sessionOtp = (String) session.getAttribute("otp");
         String userOtp = request.getParameter("userOtp");
-
+        String page = request.getParameter("page");
         if (userOtp.equals(sessionOtp)) {
             session.removeAttribute("otp"); // Clear the OTP from the session after successful verification
-            response.sendRedirect("dashboard.jsp"); // Redirect to dashboard or success page
+            if (page != null) {
+	            if (page.compareTo("2") == 0) {
+	            	response.sendRedirect("modifpasd2.jsp"); 
+	            	return;
+	            } else if (page.compareTo("3") == 0) {
+	            	response.sendRedirect("modifusr2.jsp"); 
+	            	return;
+	            } else {
+	            response.sendRedirect("dashboard.jsp"); // Redirect to dashboard or success page
+	            return;
+	            }
+            }
         } else {
             response.sendRedirect("otp.jsp?error=Invalid OTP");
         }
