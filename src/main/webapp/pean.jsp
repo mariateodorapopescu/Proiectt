@@ -269,6 +269,17 @@ $(document).ready(function() {
                         backgroundColor: document.getElementById("color-picker").value,
                         borderRadius: 3
                     },
+                    "hover-mode": "node",
+                    "hover-state": {
+                      "background-color": "black"
+                    },
+                    "selection-mode": "plot",
+                    "selected-state": {
+                      "background-color": "black",
+                      "border-width": 5,
+                      "border-color": "white",
+                      "line-style": "dashdot"
+                    },
                 "animation": {
                     "effect": "ANIMATION_EXPAND_BOTTOM",
                     "method": "ANIMATION_STRONG_EASE_OUT",
