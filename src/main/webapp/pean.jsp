@@ -99,7 +99,7 @@ if (sesi != null) {
     <h3 id="chartHeader" style="color: <%=accent%>;"></h3>
     <div id="myChart"></div>
 </div>
-<div class="container" id="content">
+<div class="container">
                 
                     <div id="myChart"></div>
                 </div>
@@ -244,7 +244,8 @@ $(document).ready(function() {
     }
 
     function updateChart(data) {
-        zingchart.render({
+    	 $('#chartHeader').text(data.h3);
+    	zingchart.render({
             id: 'myChart',
             data: {
                 type: 'bar',
@@ -332,6 +333,30 @@ $(document).ready(function() {
     });
     }, false);
 });
+function generate() {
+    const element = document.getElementById("content");
+    html2pdf()
+    .from(element)
+    .save();
+}
+function generatePDF() {
+                const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
+                html2pdf().set({
+                    pagebreak: { mode: ['css', 'avoid-all'] },
+                    html2canvas: {
+                        scale: 2, // Increase scale to enhance quality
+                        logging: true,
+                        dpi: 192,
+                        letterRendering: true,
+                        useCORS: true // Ensures external content is handled properly
+                    },
+                    jsPDF: {
+                        unit: 'pt',
+                        format: 'a4',
+                        orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
+                    }
+                }).from(element).save();
+            }
 
 </script>
 
