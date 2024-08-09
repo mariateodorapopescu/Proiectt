@@ -167,10 +167,10 @@ public class MyUserServlet extends HttpServlet {
             String subject1 = "Bun venit in companie!";
     	    String message11 = "<h1>Ne bucuram sa va avem in echipa noastra! =) </h1>"; 
     	    String message12 = "<h2>Ne face placere de cunostinta! Mult succes in continuare! </h2>"; 
-    	    
+    	    String message13 = "<h3>Date de conectare: </h3> <p> <b>Nume de utilizator: </b>" + username + "<br><b>Parola: </b>" + password + "<br></p>";
     	    String message16 = "<p>Mai jos aveti atasat un scurt ghid de utilizare al platfomei. =) <br> Va dorim toate cele bune! &#x1F607; \r\n"
     	    		+ " </p>";
-    	    String message1 = message11 + message12 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
+    	    String message1 = message11 + message12 + message13 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
     	    		+ "</i></b>";
     	   
     	    try {
