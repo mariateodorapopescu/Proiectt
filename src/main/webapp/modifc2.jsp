@@ -28,7 +28,7 @@
             background-color: #2a2a2a;
             padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+           
         }
         
         .calendar-container {
@@ -72,7 +72,7 @@
         
     </style>
 </head>
-<body>
+
 <% 
 HttpSession sesi = request.getSession(false);
 if (sesi != null) {
@@ -94,6 +94,37 @@ if (sesi != null) {
 	                        break;
                 	}
                 } // el i currentuser din sesiune deci e ok
+                String accent = null;
+             	 String clr = null;
+             	 String sidebar = null;
+             	 String text = null;
+             	 String card = null;
+             	 String hover = null;
+             	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                    // Check for upcoming leaves in 3 days
+                    String query = "SELECT * from teme where id_usr = ?";
+                    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                        stmt.setInt(1, userId);
+                        try (ResultSet rs2 = stmt.executeQuery()) {
+                            if (rs2.next()) {
+                              accent =  rs2.getString("accent");
+                              clr =  rs2.getString("clr");
+                              sidebar =  rs2.getString("sidebar");
+                              text = rs2.getString("text");
+                              card =  rs2.getString("card");
+                              hover = rs2.getString("hover");
+                            }
+                        }
+                    }
+                    
+                   
+                    // Display the user dashboard or related information
+                    //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                    // Add additional user-specific content here
+                } catch (SQLException e) {
+                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                    e.printStackTrace();
+                }
            String data = request.getParameter("idcon");
                 System.out.println(data);
        //int data = Integer.valueOf(request.getParameter("idcon"));
@@ -110,59 +141,61 @@ if (sesi != null) {
            int tip = rs1.getInt("tip"); 
                 
 %>
-                    <div class="flex-container">
-                    <div class="calendar-container">
-                        <div class="navigation">
-                            <button class='prev' onclick="previousMonth()">❮</button>
-                            <div class="month-year" id="monthYear"></div>
-                            <button class='next' onclick="nextMonth()">❯</button>
-                        </div>
-                        <table class="calendar" id="calendar">
-                            <thead>
-                                <tr>
-                                    <th class="calendar">Lu.</th>
-                                    <th class="calendar">Ma.</th>
-                                    <th class="calendar">Mi.</th>
-                                    <th class="calendar">Jo.</th>
-                                    <th class="calendar">Vi.</th>
-                                    <th class="calendar">Sâ.</th>
-                                    <th class="calendar">Du.</th>
-                                </tr>
-                            </thead>
-                            <tbody class="calendar" id="calendar-body">
-                                <!-- Calendar will be generated here -->
-                            </tbody>
-                        </table>
-                        
-                    </div>
-                    <div class="form-container">
-                 
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-                        <form action="<%= request.getContextPath() %>/modifcon" method="post" class="login__form">
+                    <div class="flex-container">
+                            <div class="calendar-container" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="calendar">
+                                <div class="navigation">
+                                    <button class='prev' onclick="previousMonth()">❮</button>
+                                    <div class="month-year" id="monthYear"></div>
+                                    <button class='next' onclick="nextMonth()">❯</button>
+                                </div>
+                                <table class="calendar" id="calendar">
+                                    <thead >
+                                        <tr >
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar">Lu.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Ma.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Mi.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Jo.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Vi.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Sâ.</th>
+                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Du.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="calendar" id="calendar-body" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
+                                        <!-- Calendar will be generated here -->
+                                    </tbody>
+                                </table>
+                                
+                            </div>
+                            <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+                         
+    
+                        <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifcon" method="post" class="login__form">
                             <div>
-                                <h1 class="login__title"><span>Modificare concediu</span></h1>
+                                <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Modificare concediu</span></h1>
                                 <%
                                 //out.println("<p style='margin:0; padding:0; position:relative; top:0;'>Zile ramase: " + zile + "; Concedii ramase: " + con + "</p>");
                                 %>
                             </div>
                             
-                            <div class="login__inputs">
+                            <div class="login__inputs" style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>">
                                 <div>
-                                    <label class="login__label">Data plecare</label>
-                                    <input class="login__input" type='date' id='start' name='start' min='1954-01-01' max='2036-12-31' required value=<% out.println(data_s);%> onchange='highlightDate()'/>
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Data plecare</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='date' id='start' name='start' min='1954-01-01' max='2036-12-31' required value=<% out.println(data_s);%> onchange='highlightDate()'/>
                                 </div>
                                 <div>
-                                    <label class="login__label">Data sosire</label>
-                                    <input class="login__input" type='date' id='end' name='end' min='1954-01-01' max='2036-12-31' required value=<% out.println(data_e);%> onchange='highlightDate()'/>
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Data sosire</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='date' id='end' name='end' min='1954-01-01' max='2036-12-31' required value=<% out.println(data_e);%> onchange='highlightDate()'/>
                                 </div>
                                 <div>
-                                    <label class="login__label">Motiv</label>
-                                    <input type="text" placeholder="Introduceti motivul" required class="login__input" name='motiv' value = <% out.println(motiv);%>/>
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Motiv</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" required class="login__input" name='motiv' value = <% out.println(motiv);%>/>
                                 </div>
                                 <div>
                                 <%String motiv2 = ""; %>
-                                    <label class="login__label">Tip concediu</label>
-                                    <select name='tip' class="login__input" value = <% out.println(motiv2);%>>
+                                    <label style=" color:<%out.println(text);%>" class="login__label">Tip concediu</label>
+                                    <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name='tip' class="login__input" value = <% out.println(motiv2);%>>
                                     <%
                                     try (PreparedStatement stmt = connection.prepareStatement("SELECT tip, motiv FROM tipcon")) {
                                         ResultSet rs2 = stmt.executeQuery();
@@ -174,15 +207,15 @@ if (sesi != null) {
                                     }
                                     out.println("</select></div>");
                                     %>
-                                    <div>
-                                        <label class="login__label">Locatie</label>
-                                        <input type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie' value = <% out.println(locatie);%>/>
+                                   <div>
+                                            <label style=" color:<%out.println(text);%>" class="login__label">Locatie</label>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie' value = <% out.println(locatie);%>/>
                                     </div>
                                 </div>
                                <% out.println("<input type='hidden' name='userId' value='" + userId + "'/>"); %> 
                                 <% out.println("<input type='hidden' name='idcon' value='" + id + "'/>"); %> 
                                 <div class="login__buttons">
-                                    <input type="submit" value="Adaugare" class="login__button login__button-ghost">
+                                    <input class="login__button" type="submit" value="Modificare" style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
                                 </div>
                             </form>
                             <%

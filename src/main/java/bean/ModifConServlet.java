@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,22 +56,29 @@ public class ModifConServlet extends HttpServlet {
 		//doGet(request, response);
 //		int uid = Integer.valueOf(request.getParameter("userId"));
 		int id = Integer.valueOf(request.getParameter("idcon"));
+		int tip = Integer.valueOf(request.getParameter("tip"));
 		String start = request.getParameter("start");
 		String end = request.getParameter("end");
     	String motiv = request.getParameter("motiv");
     	String locatie = request.getParameter("locatie");
-
+    	int durata = 0;
+   	 LocalDate start_c = LocalDate.parse(start);
+		    LocalDate end_c = LocalDate.parse(end);
+		    long daysBetween = ChronoUnit.DAYS.between(start_c, end_c); 
+		    durata = (int) daysBetween;
         ConcediuCon con = new ConcediuCon();
         con.setId(id);
+        con.setTip(tip);
 //        con.setId_ang(uid);
         con.setStart(start);
         con.setEnd(end);
         con.setMotiv(motiv);
         con.setLocatie(locatie);
+        con.setDurata(durata);
         
         int uid = -1;
         String QUERY3 = "select id_ang from concedii where id = ?;";
-	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // aci crapa
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); 
 		         PreparedStatement stm = conn.prepareStatement(QUERY3)) {
 		        stm.setInt(1, id);
 		        try (ResultSet res = stm.executeQuery()) {
@@ -292,6 +300,189 @@ public class ModifConServlet extends HttpServlet {
         
         try {
             concediu.check(con);
+            
+            // trimit notificare la angajat
+            String tod = "";
+            String tos = "";
+            String toa = "";
+            String nume = "";
+            String prenume = "";
+            String motivv = "";
+            int tipp = -1;
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+       	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
+       	         		+ "")) {
+       	        stmt.setInt(1, uid);
+       	        
+       	        ResultSet rs = stmt.executeQuery();
+       	        if (rs.next()) {
+       	            tos = rs.getString("email_sef");
+       	            toa = rs.getString("email_ang");
+       	            tod = rs.getString("email_dir");
+       	            nume = rs.getString("nume_ang");
+       	            prenume = rs.getString("prenume_ang");
+       	            tipp = rs.getInt("tip");
+       	        }
+       	    } catch (SQLException e) {
+       	        throw new ServletException("Eroare BD =(", e);
+       	    }
+            
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+          	         PreparedStatement stmt = connection.prepareStatement("select motiv from tipcon where tip = ?;")) {
+          	        stmt.setInt(1, tip);
+          	        
+          	        ResultSet rs = stmt.executeQuery();
+          	        if (rs.next()) {
+          	            motivv = rs.getString("motiv");
+          	            
+          	        }
+          	    } catch (SQLException e) {
+          	        throw new ServletException("Eroare BD=(", e);
+          	    }
+            
+            GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+            
+            // hai sa facem un before and after =)
+            String starto = "";
+            String endo = "";
+            String loco = "";
+            String motivo = "";
+            String tipo = "";
+            String motivvo = "";
+            int tippo = -1;
+            int durato = -1;
+            String data = "";
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+          	         PreparedStatement stmt = connection.prepareStatement("select datediff(end_c, start_c) as durata from concedii where id = ?;"
+          	         		+ "")) {
+          	        stmt.setInt(1, id);
+          	        
+          	        ResultSet rs = stmt.executeQuery();
+          	        if (rs.next()) {
+          	            
+          	            durato = rs.getInt("durata") + 1;
+          	        }
+          	    } catch (SQLException e) {
+          	        throw new ServletException("Eroare BD =(", e);
+          	    }
+            
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+       	         PreparedStatement stmt = connection.prepareStatement("select * from concedii where id = ?;"
+       	         		+ "")) {
+       	        stmt.setInt(1, id);
+       	        
+       	        ResultSet rs = stmt.executeQuery();
+       	        if (rs.next()) {
+       	            starto = rs.getString("start_c");
+       	            endo = rs.getString("end_c");
+       	            loco = rs.getString("locatie");
+       	            motivo = rs.getString("motiv");
+       	            tippo = rs.getInt("tip");
+       	            data = rs.getString("added");
+       	        }
+       	    } catch (SQLException e) {
+       	        throw new ServletException("Eroare BD =(", e);
+       	    }
+            
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+         	         PreparedStatement stmt = connection.prepareStatement("select motiv from tipcon where tip = ?;")) {
+         	        stmt.setInt(1, tippo);
+         	        
+         	        ResultSet rs = stmt.executeQuery();
+         	        if (rs.next()) {
+         	            motivvo = rs.getString("motiv");
+         	            
+         	        }
+         	    } catch (SQLException e) {
+         	        throw new ServletException("Eroare BD=(", e);
+         	    }
+            
+            if (tipp != 0) {
+	           // trimit confirmare modificare la angajat 
+	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    	    String message11 = "<h1>Felicitari! &#x1F389; Concediul dvs. din data de " + data + " a fost modificat cu succes! &#x1F389;</h1>"; 
+	    	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607;"
+	    	    		+ "</h2>";
+	    	    String message13 = "<h3>&#x1F4DD;Detalii despre vechiul concediu:</h3>";
+	    	    String message14 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
+	    	    String message15 = "<h3>&#x1F4DD;Detalii despre noua modificare:</h3>";
+	    	    String message16 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
+	    	    String message1 = message11 + message12 + message13 + message14 + message15 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    		+ "</i></b>";
+	    	   
+	    	    try {
+	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", toa);
+	    	       
+	    	    } catch (Exception e) {
+	    	        e.printStackTrace();
+	    	       
+	    	    }  
+            }
+    	    if (tipp != 3 || tipp != 0) {
+	    	 // trimit notificare la sef
+	    	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
+	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a modificat un concediu, mai exact unul din data de " + data + "."
+	    	    		+ "</h2>";
+	    	    String message13 = "<h3>&#x1F4DD;Detalii despre vechiul concediu:</h3>";
+	    	    String message14 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
+	    	    String message15 = "<h3>&#x1F4DD;Detalii despre noua modificare:</h3>";
+	    	    String message16 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
+	    	    String message1 = message21 + message22 + message13 + message14 + message15 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    		+ "</i></b>";
+	    	    // GMailServer sender2 = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+	
+	    	    try {
+	    	        sender.send(subject2, message1, "liviaaamp@gmail.com", tos);
+	    	       
+	    	    } catch (Exception e) {
+	    	        e.printStackTrace();
+	    	       
+	    	    }  
+    	    } 
+    	    if (tipp == 3){
+    	    	// trimit notificare la director
+	    	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
+	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a modificat un concediu, mai exact unul din data de " + data + "."
+	    	    		+ "</h2>";
+	    	    String message13 = "<h3>&#x1F4DD;Detalii despre vechiul concediu:</h3>";
+	    	    String message14 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
+	    	    String message15 = "<h3>&#x1F4DD;Detalii despre noua modificare:</h3>";
+	    	    String message16 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
+	    	    String message1 = message21 + message22 + message13 + message14 + message15 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    		+ "</i></b>";
+	    	   
+	    	    try {
+	    	        sender.send(subject2, message1, "liviaaamp@gmail.com", tod);
+	    	       
+	    	    } catch (Exception e) {
+	    	        e.printStackTrace();
+	    	       
+	    	    }  
+    	    }
+    	    if (tipp == 0){
+    	    	// trimit notificare la director ca angajat
+	    	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    	    
+	    	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
+	    	    String message22 = "<h2>Felicitari! &#x1F389; Concediul din data de " + data + " a fost modificat cu succes! &#x1F389; </h2><h3>Nu uitati sa-l aprobati sau sa-l respingeti!&#x1F609;\r\n"
+	    	    		+ "</h3>";
+	    	    String message13 = "<h3>&#x1F4DD;Detalii despre vechiul concediu:</h3>";
+	    	    String message14 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
+	    	    String message15 = "<h3>&#x1F4DD;Detalii despre noua modificare:</h3>";
+	    	    String message16 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
+	    	    String message1 = message21 + message22 + message13 + message14 + message15 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    		+ "</i></b>";
+	    	    try {
+	    	        sender.send(subject2, message1, "liviaaamp@gmail.com", tod);
+	    	       
+	    	    } catch (Exception e) {
+	    	        e.printStackTrace();
+	    	       
+	    	    }  
+    	    }
+            
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
@@ -368,7 +559,7 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Eroare la baza de date", e);
+	        throw new IOException("Eroare la baza de date =(", e);
 	    }
 
 	    return nr < 3;
@@ -390,7 +581,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date", e);
+		        throw new IOException("Eroare la baza de date =(", e);
 		    }
 
 	    Set<LocalDate> holidays = getLegalHolidays();
@@ -459,7 +650,7 @@ public class ModifConServlet extends HttpServlet {
 			        }
 			    } catch (SQLException e) {
 			        printSQLException(e);
-			        throw new IOException("Eroare la baza de date", e);
+			        throw new IOException("Eroare la baza de date =(", e);
 			    }
 		    
 		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -473,7 +664,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date", e);
+		        throw new IOException("Eroare la baza de date =(", e);
 		    }
 
 		    return nr < 1;
@@ -540,7 +731,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date", e);
+		        throw new IOException("Eroare la baza de date =(", e);
 		    }
 	    
 	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -553,7 +744,7 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Eroare la baza de date", e);
+	        throw new IOException("Eroare la baza de date =( ", e);
 	    }
 	    System.out.println(depid);
 	    // Check total users in department
@@ -568,7 +759,7 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Eroare la baza de date", e);
+	        throw new IOException("Eroare la baza de date =(", e);
 	    }
 	    System.out.println(total);
 	    // Check total leaves in department within specific dates
@@ -590,7 +781,7 @@ public class ModifConServlet extends HttpServlet {
 	        }
 	    } catch (SQLException e) {
 	        printSQLException(e);
-	        throw new IOException("Eroare la baza de date", e);
+	        throw new IOException("Eroare la baza de date =(", e);
 	    }
 	    System.out.println(nr);
 	    return nr <= (total / 2);
@@ -618,7 +809,7 @@ public class ModifConServlet extends HttpServlet {
 			        }
 			    } catch (SQLException e) {
 			        printSQLException(e);
-			        throw new IOException("Eroare la baza de date", e);
+			        throw new IOException("Eroare la baza de date =(", e);
 			    }
 
 			    return nr < 2;
@@ -640,7 +831,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date", e);
+		        throw new IOException("Eroare la baza de date =(", e);
 		    }
     	
     	String QUERY2 = "select * from useri where id = ?;";
@@ -655,7 +846,7 @@ public class ModifConServlet extends HttpServlet {
 		        }
 		    } catch (SQLException e) {
 		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date", e);
+		        throw new IOException("Eroare la baza de date =(", e);
 		    }
 	    
     	if (userType == 0) {

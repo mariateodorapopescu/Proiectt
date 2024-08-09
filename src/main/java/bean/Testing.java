@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimerTask;
 
+import jakarta.servlet.ServletException;
+
 public class Testing extends TimerTask
 {
 	// private static Map<String, Long> lastSentMap = new HashMap<>();
@@ -94,6 +96,73 @@ public class Testing extends TimerTask
 	       // System.out.println("NOTok");
 	    }  
 	    
+	    
+	    String tod = "";
+        String tos = "";
+        String toa = "";
+        String nume = "";
+        String prenume = "";
+        String motivv = "";
+        int tipp = -1;
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+   	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
+   	         		+ "")) {
+   	        stmt.setInt(1, id);
+   	        
+   	        ResultSet rs2 = stmt.executeQuery();
+   	        if (rs2.next()) {
+   	            tos = rs2.getString("email_sef");
+   	            toa = rs2.getString("email_ang");
+   	            tod = rs2.getString("email_dir");
+   	            nume = rs2.getString("nume_ang");
+   	            prenume = rs2.getString("prenume_ang");
+   	            tipp = rs2.getInt("tip");
+   	        }
+   	    } catch (SQLException e) {
+   	        throw new ServletException("Eroare BD =(", e);
+   	    } 
+        if (tipp != 0 || tipp != 3) {
+           // trimit confirmare inregistrare la angajat 
+    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+    	    String message11 = "<h1>Ultimile noutati </h1>"; 
+    	    String message12 = "<h2>Angajatul " + nume + " " + prenume + " pleaca maine in concediu"
+    	    		+ "</h2>";
+    	    String message13 = "<h3>&#x1F4DD;Detalii despre concediu:</h3>";
+    	    String message14 = "<p>Concediul e in perioada " + formattedStart + " - " + formattedEnd + " in " + locatie + " pe motivul " + motiv + " - " + tipMotiv + ". </p><br>";
+    	    
+    	    String message16 = "<p>Sa-i uram sejur placut/sa-i fim alaturi! Doar suntem ca o familie!  &#x2728;\r\n"
+    	    		+ " </p>";
+    	    String message4 = message11 + message12 + message13 + message14 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+    	    		+ "</i></b>";
+    	   
+    	    try {
+    	        sender.send(subject1, message4, "liviaaamp@gmail.com", tos);
+    	       
+    	    } catch (Exception e) {
+    	        e.printStackTrace();
+    	    }  
+        }
+        if (tipp == 3) {
+            // trimit confirmare inregistrare la angajat 
+     	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+     	    String message11 = "<h1>Ultimile noutati </h1>"; 
+     	    String message12 = "<h2>Angajatul " + nume + " " + prenume + " pleaca maine in concediu"
+     	    		+ "</h2>";
+     	    String message13 = "<h3>&#x1F4DD;Detalii despre concediu:</h3>";
+     	    String message14 = "<p>Concediul e in perioada " + formattedStart + " - " + formattedEnd + " in " + locatie + " pe motivul " + motiv + " - " + tipMotiv + ". </p><br>";
+     	    
+     	    String message16 = "<p>Sa-i uram sejur placut/sa-i fim alaturi! Doar suntem ca o familie!  &#x2728;\r\n"
+     	    		+ " </p>";
+     	    String message4 = message11 + message12 + message13 + message14 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+     	    		+ "</i></b>";
+     	   
+     	    try {
+     	        sender.send(subject1, message4, "liviaaamp@gmail.com", tod);
+     	       
+     	    } catch (Exception e) {
+     	        e.printStackTrace();
+     	    }  
+         }
 	}
 
 }

@@ -9,7 +9,7 @@ public class ModifConDao {
 
     public int check(ConcediuCon concediu) throws ClassNotFoundException, SQLException {
         // Correct SQL update statement
-        String UPDATE_CONCEDII_SQL = "UPDATE concedii SET start_c = ?, end_c = ?, motiv = ?, locatie = ? WHERE id = ?;";
+        String UPDATE_CONCEDII_SQL = "UPDATE concedii SET start_c = ?, end_c = ?, motiv = ?, locatie = ?, modified = (select current_date()) WHERE id = ?;";
 
         int result = 0;
         Class.forName("com.mysql.cj.jdbc.Driver");

@@ -61,6 +61,127 @@ public class AprobSefServlet extends HttpServlet {
 //            }
 
             dep.modif(idcon); // Assuming this method handles the modification of the leave status
+            
+         // trimit notificare la angajat
+            GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+            String tod = "";
+            String tos = "";
+            String toa = "";
+            String nume = "";
+            String prenume = "";
+            String motivv = "";
+            int tipp = -1;
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+       	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
+       	         		+ "")) {
+       	        stmt.setInt(1, uid);
+       	        
+       	        ResultSet rs = stmt.executeQuery();
+       	        if (rs.next()) {
+       	            tos = rs.getString("email_sef");
+       	            toa = rs.getString("email_ang");
+       	            tod = rs.getString("email_dir");
+       	            nume = rs.getString("nume_ang");
+       	            prenume = rs.getString("prenume_ang");
+       	            tipp = rs.getInt("tip");
+       	        }
+       	    } catch (SQLException e) {
+       	        throw new ServletException("Eroare BD =(", e);
+       	    } 
+       
+            String starto = "";
+            String endo = "";
+            String loco = "";
+            String motivo = "";
+            String tipo = "";
+            String motivvo = "";
+            int tippo = -1;
+            int durato = -1;
+            String data = "";
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+          	         PreparedStatement stmt = connection.prepareStatement("select datediff(end_c, start_c) as durata from concedii where id = ?;"
+          	         		+ "")) {
+          	        stmt.setInt(1, idcon);
+          	        
+          	        ResultSet rs = stmt.executeQuery();
+          	        if (rs.next()) {
+          	            
+          	            durato = rs.getInt("durata") + 1;
+          	        }
+          	    } catch (SQLException e) {
+          	        throw new ServletException("Eroare BD =(", e);
+          	    }
+            
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+       	         PreparedStatement stmt = connection.prepareStatement("select * from concedii where id = ?;"
+       	         		+ "")) {
+       	        stmt.setInt(1, idcon);
+       	        
+       	        ResultSet rs = stmt.executeQuery();
+       	        if (rs.next()) {
+       	            starto = rs.getString("start_c");
+       	            endo = rs.getString("end_c");
+       	            loco = rs.getString("locatie");
+       	            motivo = rs.getString("motiv");
+       	            tippo = rs.getInt("tip");
+       	            data = rs.getString("added");
+       	        }
+       	    } catch (SQLException e) {
+       	        throw new ServletException("Eroare BD =(", e);
+       	    }
+            
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+         	         PreparedStatement stmt = connection.prepareStatement("select motiv from tipcon where tip = ?;")) {
+         	        stmt.setInt(1, tippo);
+         	        
+         	        ResultSet rs = stmt.executeQuery();
+         	        if (rs.next()) {
+         	            motivvo = rs.getString("motiv");
+         	            
+         	        }
+         	    } catch (SQLException e) {
+         	        throw new ServletException("Eroare BD=(", e);
+         	    }
+            
+	          
+	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    	    String message11 = "<h1>Felicitari! &#x1F389; Concediul dvs. din data de " + data + " a fost citit si este in curs de procesare! &#x1F389; </h1>"; 
+	    	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607;"
+	    	    		+ "</h2>";
+	    	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
+	    	    String message14 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
+	    	    
+	    	    String message16 = "<p>Va dorim toate cele bune! \r\n"
+	    	    		+ " </p>";
+	    	    String message1 = message11 + message12 + message13 + message14 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    		+ "</i></b>";
+	    	   
+	    	    try {
+	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", toa);
+	    	       
+	    	    } catch (Exception e) {
+	    	        e.printStackTrace();
+	    	       
+	    	    }  
+	    	    
+	    	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
+	    	    String message22 = "<h2>Concediul angajatului " + nume + " " + prenume + " a fost partial aprobat."
+	    	    		+ "</h2>";
+	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul din data de " + data + ":</h3>";
+	    	    String message24 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
+	    	    
+	    	    String message2 = message21 + message22 + message23 + message24 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    		+ " </i></b>";
+	    	   
+	    	    try {
+	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tod);
+	    	       
+	    	    } catch (Exception e) {
+	    	        e.printStackTrace();
+	    	       
+	    	    }  
+            
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");

@@ -16,7 +16,7 @@ import bean.MyUser;
 public class AprobDirDao {
 
 	public int modif(int id) throws ClassNotFoundException, SQLException {
-	    String INSERT_USERS_SQL = "UPDATE concedii SET status = 2 WHERE id = ?";
+	    String INSERT_USERS_SQL = "UPDATE concedii SET status = 2, acc_res = (select current_date()) WHERE id = ?";
 
 	    int result = 0;
 

@@ -100,13 +100,13 @@ public class OTP extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            throw new ServletException("Error processing OTP", e);
+            throw new ServletException("Eroare OTP", e);
         }
     }
     
     private void sendEmail(String email, String otp) throws Exception {
-        String subject = "\u27A1 Cod verificare conectare \u27A1";
-        String message = "<h1>Codul este: " + otp + "</h1><p>Discretia este recomandata!&#x1F642;\r\n"
+        String subject = "\uD83D\uDD11 Cod verificare conectare \uD83D\uDD11";
+        String message = "<h1>Codul este: " + otp + "</h1><p>Discretia este recomandata! &#x1F642;"
         		+ "</p>";
         GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
         

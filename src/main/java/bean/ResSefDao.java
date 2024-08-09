@@ -16,7 +16,7 @@ import bean.MyUser;
 public class ResSefDao {
 
 	public int modif(int id) throws ClassNotFoundException, SQLException {
-	    String INSERT_USERS_SQL = "UPDATE concedii SET status = -1 WHERE id = ? and id_ang != 0";
+	    String INSERT_USERS_SQL = "UPDATE concedii SET status = -1, acc_res = (select current_date()) WHERE id = ? and id_ang != 0";
 	    // trebuie sa aflu user-ul curent
 	    
 	    int result = 0;

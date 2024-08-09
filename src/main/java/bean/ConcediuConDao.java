@@ -32,8 +32,8 @@ public class ConcediuConDao {
 	public int check(ConcediuCon concediu) throws ClassNotFoundException, SQLException {
 		// tre sa vad cum iau id_ul userului curent
 	    String INSERT_USERS_SQL = "INSERT INTO concedii" +
-	        "  (id_ang, start_c, end_c, motiv, locatie, status, concedii.tip, durata) VALUES " +
-	        " (?, ?, ?, ?, ?, ?, ?, ?);";
+	        "  (id_ang, start_c, end_c, motiv, locatie, status, concedii.tip, durata, added, modified, acc_res) VALUES " +
+	        " (?, ?, ?, ?, ?, ?, ?, ?, (select current_date()), (select current_date()), (select current_date()));";
 
 	    int result = 0;
 
