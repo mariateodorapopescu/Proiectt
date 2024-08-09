@@ -15,7 +15,7 @@ import java.util.TimerTask;
 
 public class Testing extends TimerTask
 {
-	private static Map<String, Long> lastSentMap = new HashMap<>();
+	// private static Map<String, Long> lastSentMap = new HashMap<>();
 	public void run()
 	{
 		 try {
@@ -43,7 +43,8 @@ public class Testing extends TimerTask
 	            + "FROM useri "
 	            + "JOIN concedii ON useri.id = concedii.id_ang "
 	            + "JOIN tipcon ON concedii.tip = tipcon.tip "
-	            + "WHERE DATEDIFF(concedii.start_c, CURRENT_DATE()) BETWEEN 0 AND 3 AND concedii.status = 2;";
+	            + "WHERE DATEDIFF(concedii.start_c, CURRENT_DATE()) BETWEEN 0 AND 1 AND concedii.status = 2;";
+	    // mai are o zi pana la concediu
 
 	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 	        ResultSet rs = preparedStatement.executeQuery();
@@ -51,7 +52,7 @@ public class Testing extends TimerTask
 	            sendEmail(rs);
 	        }
 	    } catch (SQLException e) {
-	        throw new IOException("Database query failed: " + e.getMessage(), e);
+	        throw new IOException("Eroare BD: " + e.getMessage(), e);
 	    }
 	}
 
@@ -60,10 +61,10 @@ public class Testing extends TimerTask
 		 
 	    int id = rs.getInt("id");
 	    String to = rs.getString("email");
-	    if (lastSentMap.containsKey(to) && (currentTimeMillis - lastSentMap.get(to)) < 3600000) {
-            System.out.println(to + " a primit deja un email in ultima ora.");
-            return;
-        }
+	    // if (lastSentMap.containsKey(to) && (currentTimeMillis - lastSentMap.get(to)) < 3600000) {
+        //     System.out.println(to + " a primit deja un email in ultima ora.");
+        //    return;
+        //}
 	    Date startDate = rs.getDate("start_c");
 	    Date endDate = rs.getDate("end_c");
 	    int daysUntilStart = rs.getInt("days_until_start"); // Added this line to capture days until start
@@ -75,17 +76,18 @@ public class Testing extends TimerTask
 	    String formattedStart = sdf.format(startDate);
 	    String formattedEnd = sdf.format(endDate);
 
-	    String subject = "Aveti o notificare!";
-	    String message1 = "<h1>Aveti un concediu incepand in " + daysUntilStart + " zile!</h1>"; // Modified this line to include days until start
+	    String subject = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    String message1 = "<h1>Mai aveti o zi pana la concediu!&#x1F389;</h1>"; 
 	    String message2 = "Concediul e in perioada " + formattedStart + " - " + formattedEnd + " in " + locatie + " pe motivul " + motiv + " - " + tipMotiv + ". <br>";
-	    String message3 = "Va dorim vacanta placuta!<br>";
-	    String message = message1 + "<br>" + message2 + "<br>" + message3 + "<br> Conducerea firmei XYZ.";
+	    String message3 = "<h2>Va dorim concediu placut!&#x1F60E;</h2>";
+	    String message = message1 + message2 + message3 + "<b><i>Conducerea firmei XYZ.</i></b>&#x1F917;";
+	   
 	    GMailServer sender = new GMailServer(Constants.setFrom, Constants.setPassword);
 
 	    try {
 	        sender.send(subject, message, Constants.setFrom, to);
-	        lastSentMap.put(to, currentTimeMillis);
-	        System.out.println("S-a trimis mail la " + to);
+	        // lastSentMap.put(to, currentTimeMillis);
+	        // System.out.println("S-a trimis mail la " + to);
 	        //System.out.println("ok");
 	    } catch (Exception e) {
 	        e.printStackTrace();

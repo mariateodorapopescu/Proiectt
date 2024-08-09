@@ -105,8 +105,9 @@ public class OTP extends HttpServlet {
     }
     
     private void sendEmail(String email, String otp) throws Exception {
-        String subject = "Cod verificare conectare";
-        String message = "<h1>Codul OTP (One time password) este: " + otp + "</h1><p>Acesta este valid timp de 10 minute. Discretia este recomandata!</p>";
+        String subject = "\u27A1 Cod verificare conectare \u27A1";
+        String message = "<h1>Codul este: " + otp + "</h1><p>Discretia este recomandata!&#x1F642;\r\n"
+        		+ "</p>";
         GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
         
         sender.send(subject, message, "liviaaamp@gmail.com", email);

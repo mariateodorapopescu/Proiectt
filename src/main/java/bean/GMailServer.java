@@ -13,6 +13,9 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
+
+import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
 
 import com.email.durgesh.Email;
 
@@ -56,8 +59,9 @@ public class GMailServer extends javax.mail.Authenticator
 	          // Assuming Email is a class from com.email.durgesh that handles email operations
 	          Email email = new Email(user, password);
 	          email.setFrom("emailfantoma@xyz.com", "Firma XYZ");
-	          email.setSubject(subject);
-	          email.setContent(body, "text/html");
+	          email.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+	          //email.setContent(body, "text/html");
+	          email.setContent(StringEscapeUtils.unescapeJava(body), "text/html; charset=UTF-8");
 	          email.addRecipient(recipients);
 	          
 	          email.send();
