@@ -360,8 +360,10 @@ public class AddConServlet extends HttpServlet {
 	    	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607;"
 	    	    		+ "</h2>";
 	    	    String message13 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message14 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
-	    	    String message1 = message11 + message12 + message13 + message14 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    String message14 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " </p>";
+	    	    String message1 = message11 + message12 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
 	    	    		+ "</i></b>";
 	    	   
 	    	    try {
@@ -379,10 +381,11 @@ public class AddConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a adaugat un nou concediu."
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
-	    	    
-	    	    String message2 = message21 + message22 + message23 + message24 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
-	    	    		+ " </i></b>";
+	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " </p>";
+	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
+	    	    		+ "</i></b>";
 	    	   
 	    	    // GMailServer sender2 = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
 	
@@ -401,10 +404,11 @@ public class AddConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a adaugat un nou concediu."
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
-	    	    
-	    	    String message2 = message21 + message22 + message23 + message24 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
-	    	    		+ " </i></b>";
+	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " </p>";
+	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
+	    	    		+ "</i></b>";
 	    	   
 	    	    try {
 	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tod);
@@ -422,10 +426,11 @@ public class AddConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Felicitari! &#x1F389; Concediul a fost programat cu succes! &#x1F389; </h2><h3>Nu uitati sa-l aprobati sau sa-l respingeti!&#x1F609;\r\n"
 	    	    		+ "</h3>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p>Inceput: " + start + "<br> Final: " + end + "<br>Locatie: " + locatie + "<br> Motiv: " + motiv + "<br>Tip concediu: " + motivv + "Durata: " + durata + " zile<br></p>";
-	    	    
-	    	    String message2 = message21 + message22 + message23 + message24 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
-	    	    		+ " </i></b>";
+	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " </p>";
+	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
+	    	    		+ "</i></b>";
 	
 	    	    try {
 	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tod);

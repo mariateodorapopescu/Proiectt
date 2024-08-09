@@ -171,11 +171,12 @@ public class DelConServlet extends HttpServlet {
 	    	    String message12 = "<h2>Tocmai ati sters cu succes un concediu, mai exact cel din data de " + data 
 	    	    		+ "</h2>";
 	    	    String message13 = "<h3>&#x1F4DD;Detalii despre vechiul concediu:</h3>";
-	    	    String message14 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
-	    	    
-	    	    String message16 = "<p>Nu uitati ca puteti oricand sa programati un nou concediu in locul acestuia! &#x2728;\r\n"
+	    	    String message14 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + durato + " zile<br></p>";
+	    	    String message17 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
 	    	    		+ " </p>";
-	    	    String message1 = message11 + message12 + message13 + message14 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    String message16 = "<br><p>Nu uitati ca puteti oricand sa programati un nou concediu in locul acestuia! &#x2728;\r\n"
+	    	    		+ " </p>";
+	    	    String message1 = message11 + message12 + message13 + message14 + message16 + message17 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
 	    	    		+ "</i></b>";
 	    	   
 	    	    try {
@@ -194,15 +195,15 @@ public class DelConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " tocmai a sters cu succes un concediu, mai exact unul din data de " + data
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre vechiul concediu:</h3>";
-	    	    String message24 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
-	    	    
+	    	    String message24 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + durato + " zile<br></p>";
+	    	    String message27 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " </p>";
 	    	    String message26 = "<p>Din pacate nu se stiu motivele pentru care a facut aceasta. Poate a intervenit ceva/poate ceva nu a mers bine. <br> In schimb, le putem veni in ajutor cu sustinere, recomandari, sfaturi. &#x1F609;\r\n"
 	    	    		+ " Doar suntem o familie &#x1F917;\r\n"
 	    	    		+ ""
 	    	    		+ " </p>";
-	    	    String message2 = message21 + message22 + message23 + message24 + message26 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    String message2 = message21 + message22 + message23 + message24 + message26 + message27 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
 	    	    		+ "</i></b>";
-	    	   
 	    	    try {
 	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tos);
 	    	        
@@ -219,13 +220,14 @@ public class DelConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " tocmai a sters cu succes un concediu, mai exact unul din data de " + data
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre vechiul concediu:</h3>";
-	    	    String message24 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
-	    	    
+	    	    String message24 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + durato + " zile<br></p>";
+	    	    String message27 = "<p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " </p>";
 	    	    String message26 = "<p>Din pacate nu se stiu motivele pentru care a facut aceasta. Poate a intervenit ceva/poate ceva nu a mers bine. <br> In schimb, le putem veni in ajutor cu sustinere, recomandari, sfaturi. &#x1F609;\r\n"
 	    	    		+ " Doar suntem o familie &#x1F917;\r\n"
 	    	    		+ ""
 	    	    		+ " </p>";
-	    	    String message2 = message21 + message22 + message23 + message24 + message26 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    String message2 = message21 + message22 + message23 + message24 + message26 + message27 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
 	    	    		+ "</i></b>";
 	    	   
 	    	    try {

@@ -142,20 +142,19 @@ public class AprobSefServlet extends HttpServlet {
          	    } catch (SQLException e) {
          	        throw new ServletException("Eroare BD=(", e);
          	    }
-            
 	          
 	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-	    	    String message11 = "<h1>Felicitari! &#x1F389; Concediul dvs. din data de " + data + " a fost citit si este in curs de procesare! &#x1F389; </h1>"; 
+	    	    String message11 = "<h1>Felicitari! &#x1F389; <br> Concediul dvs. din data de " + data + " a fost citit si este in curs de procesare! &#x1F389; </h1>"; 
 	    	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607;"
 	    	    		+ "</h2>";
 	    	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
-	    	    String message14 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
+	    	    String message14 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + durato + " zile<br></p>";
 	    	    
-	    	    String message16 = "<p>Va dorim toate cele bune! \r\n"
+	    	    String message16 = "<p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " \r\n"
 	    	    		+ " </p>";
-	    	    String message1 = message11 + message12 + message13 + message14 + message16 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
+	    	    String message1 = message11 + message12 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
 	    	    		+ "</i></b>";
-	    	   
 	    	    try {
 	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", toa);
 	    	       
@@ -169,10 +168,12 @@ public class AprobSefServlet extends HttpServlet {
 	    	    String message22 = "<h2>Concediul angajatului " + nume + " " + prenume + " a fost partial aprobat."
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul din data de " + data + ":</h3>";
-	    	    String message24 = "<p>Inceput: " + starto + "<br> Final: " + endo + "<br>Locatie: " + loco + "<br> Motiv: " + motivo + "<br>Tip concediu: " + motivvo + "Durata: " + durato + " zile<br></p>";
-	    	    
-	    	    String message2 = message21 + message22 + message23 + message24 + "<b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea&#x1F642;\r\n"
-	    	    		+ " </i></b>";
+	    	    String message24 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + durato + " zile<br></p>";
+	    	    String message26 = "<p>Va dorim toate cele bune! &#x1F607; \r\n"
+	    	    		+ " \r\n"
+	    	    		+ " </p>";
+	    	    String message2 = message21 + message22 + message23 + message24 + message26 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
+	    	    		+ "</i></b>";
 	    	   
 	    	    try {
 	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tod);

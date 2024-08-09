@@ -1,5 +1,6 @@
 package bean;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +13,9 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
 import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
@@ -43,12 +46,82 @@ public class GMailServer extends javax.mail.Authenticator
         props.setProperty("mail.smtp.quitwait", "false");  
 
         session = Session.getDefaultInstance(props, this);
+        session.setDebug(true);
     }  
 
     protected PasswordAuthentication getPasswordAuthentication()
     {
         return new PasswordAuthentication(user, password);
     }  
+    
+    public synchronized void sendattach(String subject, String body, String sender, String recipients, String filepath) throws Exception {
+		//System.out.println(subject);
+		//System.out.println(body);
+		//System.out.println(sender);
+		//System.out.println(recipients);
+    	MimeMessage m = new MimeMessage(session);
+
+		  try {
+	          // Assuming Email is a class from com.email.durgesh that handles email operations
+	          
+	          m.setFrom("liviaaamp@gmail.com");
+	          m.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+	          //email.setContent(body, "text/html");
+	         // email.setContent(StringEscapeUtils.unescapeJava(body), "text/html; charset=UTF-8");
+	          m.addRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
+	  		
+	  		//adding subject to message
+	  		m.setSubject(subject);
+	  	
+	  		
+	  		//attachement..
+	  		
+	  		//file path
+	  		String path=filepath;
+	  		
+	  		MimeMultipart mimeMultipart = new MimeMultipart();
+	  		//text
+	  		//file
+	  		
+	  		MimeBodyPart textMime = new MimeBodyPart();
+	  		
+	  		MimeBodyPart fileMime = new MimeBodyPart();
+	  		
+	  		try {
+	  			
+	  			textMime.setText(body);
+	  			//textMime.setContent(body, path);
+	  			textMime.setContent(body, "text/html; charset=UTF-8");
+	  			
+	  			File file=new File(path);
+	  			fileMime.attachFile(file);
+	  			
+	  			mimeMultipart.addBodyPart(textMime);
+	  			
+	  			mimeMultipart.addBodyPart(fileMime);
+	  			
+	  		} catch (Exception e) {
+	  			
+	  			e.printStackTrace();
+	  		}
+
+	  		//m.setContent(StringEscapeUtils.unescapeJava(body),"text/html; charset=UTF-8");
+	  		m.setContent(mimeMultipart);
+	  		
+	  		//send 
+	  		//Step 3 : send the message using Transport class
+	  		Transport.send(m);
+	  		
+	  		}catch (Exception e) {
+	  			e.printStackTrace();
+	  		}
+	  		
+
+	  		System.out.println("Sent success...................");
+	          
+	          // email.send();
+	      
+	}
     
 	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
 		//System.out.println(subject);

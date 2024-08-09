@@ -122,6 +122,65 @@ public class MyUserServlet extends HttpServlet {
 
         try {
             employeeDao.registerEmployee(employee);
+            
+         // trimit notificare la angajat
+            GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+            String to = "";
+           
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+       	         PreparedStatement stmt = connection.prepareStatement("select email from useri where id_dep = ? and username != ?;"
+       	         		+ "")) {
+       	        stmt.setInt(1, dep);
+       	        stmt.setString(2, username); 
+       	        ResultSet rs = stmt.executeQuery();
+       	        if (rs.next()) {
+       	        	while (rs.next()) {
+       	        		to = rs.getString("email");
+           	            
+
+        	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+        	    	    String message11 = "<h1>Ultimile noutati </h1>"; 
+        	    	    String message12 = "<h2>Avem un nou coleg de departament si anume pe " + nume + " " + prenume + "! </h2>"; 
+        	    	    
+        	    	    String message16 = "<p>Sa-i uram bun venit si sa facem cunostinta cu aceasta persoana. &#x1F609;\r\n"
+        	    	    		+ " <br> Doar suntem o familie! &#x1F917;\r\n"
+        	    	    		+ " <br> Va dorim toate cele bune! &#x1F607; \r\n"
+        	    	    		+ " </p>";
+        	    	    String message1 = message11 + message12 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
+        	    	    		+ "</i></b>";
+        	    	   
+        	    	    try {
+        	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", to);
+        	    	       
+        	    	    } catch (Exception e) {
+        	    	        e.printStackTrace();
+        	    	       
+        	    	    }  
+                    
+       	        	}
+       	            
+       	        }
+       	    } catch (SQLException e) {
+       	        throw new ServletException("Eroare BD =(", e);
+       	    } 
+            
+            String subject1 = "Bun venit in companie!";
+    	    String message11 = "<h1>Ne bucuram sa va avem in echipa noastra! =) </h1>"; 
+    	    String message12 = "<h2>Ne face placere de cunostinta! Mult succes in continuare! </h2>"; 
+    	    
+    	    String message16 = "<p>Mai jos aveti atasat un scurt ghid de utilizare al platfomei. =) <br> Va dorim toate cele bune! &#x1F607; \r\n"
+    	    		+ " </p>";
+    	    String message1 = message11 + message12 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
+    	    		+ "</i></b>";
+    	   
+    	    try {
+    	        sender.sendattach(subject1, message1, "liviaaamp@gmail.com", email, "C:\\Users\\Popi\\eclipse-workspace\\Proiect\\ghid.pdf");
+    	       
+    	    } catch (Exception e) {
+    	        e.printStackTrace();
+    	       
+    	    }  
+            
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
