@@ -106,7 +106,7 @@
    
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
-      <title>Concedii</title>
+    <title>Concedii</title>
     <style>
           iframe {
             width: 100%;
@@ -150,6 +150,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     position: relative;
+    color: <%=text%>;
 }
 
 .sidebar.active {
@@ -158,17 +159,20 @@ body {
 
 .sidebar ul {
     flex-grow: 1;
+    color: <%=text%>;
 }
 
 .sidebar ul li {
     list-style: none;
     position: relative;
+    color: <%=text%>;
 }
 
 .sidebar ul li.active {
     background: var(--clr);
     border-top-left-radius: 1.5rem;
     border-bottom-left-radius: 1.5rem;
+    color: <%=text%>;
 }
 
 .sidebar ul li.active::before{
@@ -181,6 +185,7 @@ body {
     top: -1.93rem;
     right: 0;
     box-shadow: 1rem 1rem 0 1rem var(--clr);
+    color: <%=text%>;
 }
 
 .sidebar ul li.active::after {
@@ -194,6 +199,7 @@ body {
     right: 0;
     box-shadow: 1rem -1rem 0 1rem var(--clr);
     z-index: 20;
+    color: <%=text%>;
 }
 
 .sidebar ul li.active::after {
@@ -201,6 +207,7 @@ body {
     right: 0;
     box-shadow: 1rem -1rem 0 1rem var(--sd);
     z-index: 20;
+    color: <%=text%>;
 }
 
 .sidebar ul li.logo {
@@ -224,14 +231,15 @@ body {
 .sidebar ul li.logo a .sitext {
     font-size: 1.2em;
     font-weight: 500;
-    color: var(--clr);
+   
     display: flex;
     align-items: center;
     font-size: 1em;
-    color: var(--text);
+    
     padding-left: 1.5rem;
     letter-spacing: 0.05em;
     transition: 0.5s;
+    color: <%=text%>;
 }
 
 .sidebar ul li a,
@@ -239,6 +247,7 @@ body {
     display: flex;
     white-space: nowrap;
     text-decoration: none;
+     color: <%=text%>;
 }
 
 .sidebar ul li a .siiconn {
@@ -248,7 +257,7 @@ body {
     min-width: 2rem;
     height: 3rem;
     font-size: 1.5em;
-    color: var(--text);
+     color: <%=text%>;
     transition: 0.5s;
     z-index: 22;
 }
@@ -260,6 +269,7 @@ body {
 
 .sidebar ul li.active a .sitextt {
     margin-left: 1rem;
+     color: <%=text%>;
 }
 
 .sidebar ul li.active a .siiconn::before {
@@ -555,12 +565,10 @@ body {
 .menu button:hover {
     background-color: black;
 }
-        .sitextt {
-color: <%=text%>
-}  
-a .sitextt:hover, .sitextt {
-color: <%=accent%>
+.sidebar ul li a .sitextt {
+    color: <%=text%>;  
 }
+
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
@@ -592,7 +600,7 @@ color: <%=accent%>
                         <div class="siiconn">
                             <ion-icon name="today"></ion-icon>
                         </div>
-                        <div  class="sitextt">Notificari</div>
+                        <div class="sitextt">Notificari</div>
                     </a>
                 </li>
                 <li style="--bg: <%out.println(accent); %>">
@@ -600,7 +608,7 @@ color: <%=accent%>
                         <div class="siiconn">
                             <ion-icon name="stats"></ion-icon>
                         </div>
-                        <divstyle="color: <%out.println(text); %>"  class="sitextt">Statistici</div>
+                        <div  class="sitextt">Statistici</div>
                     </a>
                 </li>
                 

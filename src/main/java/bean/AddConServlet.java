@@ -60,7 +60,7 @@ public class AddConServlet extends HttpServlet {
     	int durata = 0;
     	 LocalDate start_c = LocalDate.parse(start);
 		    LocalDate end_c = LocalDate.parse(end);
-		    long daysBetween = ChronoUnit.DAYS.between(start_c, end_c); 
+		    long daysBetween = ChronoUnit.DAYS.between(start_c, end_c) + 1; 
 		    durata = (int) daysBetween + 1;
 		    if (end_c.isBefore(start_c)) {
 		        throw new IOException("Data de final nu poate fi inaintea celei de inceput!");
@@ -90,7 +90,7 @@ public class AddConServlet extends HttpServlet {
         con.setMotiv(motiv);
         con.setLocatie(locatie);
         con.setTip(tip);
-        con.setDurata(durata);
+        con.setDurata((durata + 1));
       
         try {
 			if (maimulteconcedii(request)) {
@@ -360,7 +360,7 @@ public class AddConServlet extends HttpServlet {
 	    	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607;"
 	    	    		+ "</h2>";
 	    	    String message13 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message14 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message14 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
 	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
 	    	    		+ " </p>";
 	    	    String message1 = message11 + message12 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
@@ -381,7 +381,7 @@ public class AddConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a adaugat un nou concediu."
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
 	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
 	    	    		+ " </p>";
 	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
@@ -404,7 +404,7 @@ public class AddConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a adaugat un nou concediu."
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
 	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
 	    	    		+ " </p>";
 	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
@@ -426,7 +426,7 @@ public class AddConServlet extends HttpServlet {
 	    	    String message22 = "<h2>Felicitari! &#x1F389; Concediul a fost programat cu succes! &#x1F389; </h2><h3>Nu uitati sa-l aprobati sau sa-l respingeti!&#x1F609;\r\n"
 	    	    		+ "</h3>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
 	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
 	    	    		+ " </p>";
 	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
@@ -462,7 +462,7 @@ public class AddConServlet extends HttpServlet {
 
 	private boolean concediuExista(int uid, LocalDate start, LocalDate end) throws ServletException {
 	    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-	         PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM concedii WHERE id_ang = ? AND start_c = ? AND end_c = ?")) {
+	         PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM concedii WHERE id_ang = ? AND start_c = ? AND end_c = ? and status >= 0")) {
 	        stmt.setInt(1, uid);
 	        stmt.setDate(2, java.sql.Date.valueOf(start));
 	        stmt.setDate(3, java.sql.Date.valueOf(end));

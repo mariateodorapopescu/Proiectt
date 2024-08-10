@@ -174,7 +174,7 @@ if ("#d8d9e1".equals(clr)) {
                 </div>
                 <div class="login__inputs" style="border-color:<%= accent %>; color:<%= text %>">
                     <div>
-                        <label style="color:<%= light %>" class="login__label">Tematica</label>
+                        <label style="color:<%= text %>" class="login__label">Tematica</label>
                         <select style="border-color:<%= accent %>; background:<%= clr %>; color:<%= text %>" name='corp' class="login__input">
                             <option value='1' <%= (light == 1) ? "selected" : "" %>>Luminoasa</option>
                             <option value='0' <%= (light == 0) ? "selected" : "" %>>Intunecata</option>

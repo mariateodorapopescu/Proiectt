@@ -115,13 +115,13 @@
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
                     	
-                    	<div class="main-content">
-        <div class="header">
+                    	<div style="border-radius:2rem;" class="main-content">
+        <div style="border-radius:2rem;" class="header">
             
         </div>
-        <div class="content">
-            <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" >
-                <div class="events" id="content" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+        <div style="border-radius:2rem;" class="content">
+            <div class="intro" style="border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" >
+                <div class="events" id="content" style="border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                  <h1>Departamente din toata institutia</h1>
                 <h3><%out.println(today); %></h3>
                
@@ -130,17 +130,17 @@
                     <thead>
                          <tr style="color:<%out.println("white");%>">
                          <th>Nume departament</th>
-                            <th>Cod de identificare</th>
+                            <th>Nr. angajati</th>
                         </tr>
                     </thead>
                     <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                         <%
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM departament")) {
+                        try (PreparedStatement stmt = connection.prepareStatement("select dep.nume_dep, dep.id_dep, count(*) as total from useri ang join departament dep on ang.id_dep = dep.id_dep group by dep.id_dep;")) {
                             ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
                             while (rs1.next()) {
                                 found = true;
-                                out.println("<tr><td>" + rs1.getString("nume_dep") + "</td><td>" + rs1.getString("id_dep") + "</td></tr>");
+                                out.println("<tr><td>" + rs1.getString("nume_dep") + "</td><td>" + rs1.getString("total") + "</td></tr>");
                             }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
