@@ -4,6 +4,9 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Locale" %>
 <%
     HttpSession sesi = request.getSession(false);
 int pag = -1;
@@ -224,18 +227,23 @@ int pag = -1;
                 <table style="color: white">
                     <thead style="color: white">
                         <tr style="color: white">
-                   
-                   
-                    <th style="color: white">Nume</th>
-                    <th style="color: white">Prenume</th>
-                    <th style="color: white">Functie</th>
-                     <th style="color: white">Departament</th>
-                    <th style="color: white">Inceput</th>
-                    <th style="color: white">Final</th>
-                    <th style="color: white">Motiv</th>
-                    <th style="color: white">Locatie</th>
-                    <th style="color: white">Tip concediu</th>
-                    <th style="color: white">Status</th>
+                    
+                    <th style="color:white">Nr.crt</th>
+                    <th style="color:white">Nume</th>
+                    <th style="color:white">Prenume</th>
+                    <th style="color:white">Fct</th>
+                    <th style="color:white">Dep</th>
+                    <th style="color:white">Inceput</th>
+                    <th style="color:white">Final</th>
+                    <th style="color:white">Motiv</th>
+                    <th style="color:white">Locatie</th>
+                    <th style="color:white">Tip</th>
+                    <th style="color:white">Adaugat</th>
+                    <th style="color:white">Modif</th>
+                     <th style="color:white">Acc/Res</th>
+                    <th style="color:white">Status</th>
+                    
+                     
                 </tr>
             </thead>
              <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
@@ -243,7 +251,7 @@ int pag = -1;
                     	if (pag == 3 || pag == 4 || pag == 5) {
                     		
                     		if (status == 3 && tip == -1 && perioada == 0) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -256,7 +264,7 @@ int pag = -1;
                     			  stmtt2.setInt(1, id);
                     		}
                     		if (status == 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -270,7 +278,7 @@ int pag = -1;
                    			stmtt2.setInt(2, tip);
                   		}
                     		if (status != 3 && tip == -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -284,7 +292,7 @@ int pag = -1;
                    			stmtt2.setInt(2, status);
                   		}
                     		if (status != 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -299,7 +307,7 @@ int pag = -1;
                    			stmtt2.setInt(3, status);
                   		}
                     		if (status == 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -315,7 +323,7 @@ int pag = -1;
                 				stmtt2.setString(4, end);
                     		}
                     		if (status == 3 && tip != -1 && perioada == 1) {
-                  			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                  			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                        "FROM useri u " +
                                        "JOIN tipuri t ON u.tip = t.tip " +
@@ -332,7 +340,7 @@ int pag = -1;
               				stmtt2.setString(5, end);
                   		}
                     		if (status != 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -349,7 +357,7 @@ int pag = -1;
                 				stmtt2.setString(5, end);
                     		}
                     		if (status != 3 && tip != -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -370,7 +378,7 @@ int pag = -1;
                     	
                     	if (pag == 6 || pag == 7) {
                     		if (status == 3 && tip == -1 && perioada == 0) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -383,7 +391,7 @@ int pag = -1;
                     			  stmtt2.setInt(1, dep);
                     		}
                     		if (status == 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -397,7 +405,7 @@ int pag = -1;
                    			stmtt2.setInt(2, tip);
                   		}
                     		if (status != 3 && tip == -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -411,7 +419,7 @@ int pag = -1;
                    			stmtt2.setInt(2, status);
                   		}
                     		if (status != 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -426,7 +434,7 @@ int pag = -1;
                    			stmtt2.setInt(3, status);
                   		}
                     		if (status == 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -442,7 +450,7 @@ int pag = -1;
                 				stmtt2.setString(4, end);
                     		}
                     		if (status == 3 && tip != -1 && perioada == 1) {
-                  			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                  			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                        "FROM useri u " +
                                        "JOIN tipuri t ON u.tip = t.tip " +
@@ -459,7 +467,7 @@ int pag = -1;
               				stmtt2.setString(5, end);
                   		}
                     		if (status != 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -476,7 +484,7 @@ int pag = -1;
                 				stmtt2.setString(5, end);
                     		}
                     		if (status != 3 && tip != -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -496,7 +504,7 @@ int pag = -1;
                     	}
                     	if (pag == 8) {
                     		if (status == 3 && tip == -1 && perioada == 0) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -508,7 +516,7 @@ int pag = -1;
                     			  stmtt2 = connection.prepareStatement(sql);
                     		}
                     		if (status == 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -521,7 +529,7 @@ int pag = -1;
                    			stmtt2.setInt(1, tip);
                   		}
                     		if (status != 3 && tip == -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -534,7 +542,7 @@ int pag = -1;
                    			stmtt2.setInt(1, status);
                   		}
                     		if (status != 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                         "FROM useri u " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -548,7 +556,7 @@ int pag = -1;
                    			stmtt2.setInt(2, status);
                   		}
                     		if (status == 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -563,7 +571,7 @@ int pag = -1;
                 				stmtt2.setString(3, end);
                     		}
                     		if (status == 3 && tip != -1 && perioada == 1) {
-                  			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                  			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                        "FROM useri u " +
                                        "JOIN tipuri t ON u.tip = t.tip " +
@@ -579,7 +587,7 @@ int pag = -1;
               				stmtt2.setString(4, end);
                   		}
                     		if (status != 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -595,7 +603,7 @@ int pag = -1;
                 				stmtt2.setString(4, end);
                     		}
                     		if (status != 3 && tip != -1 && perioada == 1) {
-                    			  sql = "SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                          "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                          "FROM useri u " +
                                          "JOIN tipuri t ON u.tip = t.tip " +
@@ -615,13 +623,21 @@ int pag = -1;
                     	
                     	  ResultSet rss1 = stmtt2.executeQuery();
                           boolean found = false;
-
+							int nr = 1;
                           while (rss1.next()) {
                               found = true;
-                              out.print("<tr><td data-label='Nume'>" +
-                                        rss1.getString("nume") + "</td><td data-label='Prenume'>" + rss1.getString("prenume") + "</td><td data-label='Functie'>" + rss1.getString("functie") + "</td>" + "<td data-label='Departament'>" + rss1.getString("departament") + "</td>" + "<td data-label='Inceput'>" +
-                                        rss1.getDate("start_c") + "</td><td data-label='Final'>" + rss1.getDate("end_c") + "</td><td data-label='Motiv'>" + rss1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                        rss1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rss1.getString("tipcon") + "</td>");
+                              // int nr = 1;
+                              
+                                String added = rss1.getString("added") != null ? rss1.getString("added") : " - ";
+                                String modif = rss1.getString("modified") != null ? rss1.getString("modif") : " - ";
+                                String accres = rss1.getString("acc_res") != null ? rss1.getString("acc_res") : " - ";
+                                		
+                                out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
+                                        rss1.getString("nume") + "</td><td data-label='Prenume'>" + rss1.getString("prenume") + "</td><td data-label='Fct'>" + rss1.getString("functie") + "</td><td data-label='Dep'>" + rss1.getString("departament") + 
+                                        "</td>" + "<td data-label='Inceput'>" +
+                                        		rss1.getString("start_c")+ "</td><td data-label='Final'>" + rss1.getString("end_c") + "</td><td data-label='Motiv'>" + rss1.getString("motiv") + "</td><td data-label='Locatie'>" +
+                                        rss1.getString("locatie") + "</td>" + "<td data-label='Tip'>" + rss1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
+                                        "<td data-label='Acc/Res'>" + accres + "</td>");
 
                               if (rss1.getString("status").compareTo("neaprobat") == 0) {
                                   out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
@@ -642,6 +658,7 @@ int pag = -1;
                             	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
                                   //out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
                               }
+                              nr++;
                           }
                           if (!found) {
                               out.println("<tr><td colspan='11'>Nu exista date.</td></tr>");

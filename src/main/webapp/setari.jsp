@@ -187,17 +187,22 @@ if ("#d8d9e1".equals(clr)) {
                             <option value='#FF8225' <%= "#FF8225".equals(accent) ? "selected" : "" %>>Oranj</option>
                             <option value='#FFDE4D' <%= "#FFDE4D".equals(accent) ? "selected" : "" %>>Galben</option>
                             <option value='#88D66C' <%= "#88D66C".equals(accent) ? "selected" : "" %>>Verde</option>
-                            <option value='#6EACDA' <%= "#6EACDA".equals(accent) ? "selected" : "" %>>Albastru</option>
-                            <option value='#10439F' <%= "#10439F".equals(accent) ? "selected" : "" %>>Indigo</option>
-                            <option value='#B692C2' <%= "#B692C2".equals(accent) ? "selected" : "" %>>Violet</option>
+                            <option value='#03ADDE' <%= "#03ADDE".equals(accent) ? "selected" : "" %>>Albastru</option>
+                            <option value='#3056B5' <%= "#3056B5".equals(accent) ? "selected" : "" %>>Indigo</option>
+                            <option value='#A349A4' <%= "#A349A4".equals(accent) ? "selected" : "" %>>Violet</option>
+                            <option value='#C8BFE7' <%= "#C8BFE7".equals(accent) ? "selected" : "" %>>Lila</option>
                             <option value='#E3A5C7' <%= "#E3A5C7".equals(accent) ? "selected" : "" %>>Roz</option>
-                            <option value='#36C2CE' <%= "#36C2CE".equals(accent) ? "selected" : "" %>>Turcoaz</option>
-                            <option value='#74512D' <%= "#74512D".equals(accent) ? "selected" : "" %>>Maro</option>
-                            <option value='#686D76' <%= "#686D76".equals(accent) ? "selected" : "" %>>Gri</option>
-                            <option value='#151515' <%= "#151515".equals(accent) ? "selected" : "" %>>Negru</option>
-                            <option value='#EEF7FF' <%= "#EEF7FF".equals(accent) ? "selected" : "" %>>Alb</option>
-                            <option value='#FFF2D7' <%= "#FFF2D7".equals(accent) ? "selected" : "" %>>Bej</option>
                             <option value='#E90074' <%= "#E90074".equals(accent) ? "selected" : "" %>>Magenta</option>
+                            <option value='#880015' <%= "#880015".equals(accent) ? "selected" : "" %>>Grena</option>
+                            <option value='#FF7E5B' <%= "#FF7E5B".equals(accent) ? "selected" : "" %>>Corai</option>
+                             <option value='#D1AF79' <%= "#D1AF79".equals(accent) ? "selected" : "" %>>Bej</option>
+                              <option value='#74512D' <%= "#74512D".equals(accent) ? "selected" : "" %>>Maro</option>
+                              <option value='#1BC694' <%= "#1BC694".equals(accent) ? "selected" : "" %>>Verde Inchis</option>
+                            <option value='#36C2CE' <%= "#36C2CE".equals(accent) ? "selected" : "" %>>Turcoaz</option>
+                        <option value='#587B96' <%= "#587B96".equals(accent) ? "selected" : "" %>>Gri-albastrui</option>   
+                            <option value='#686D76' <%= "#686D76".equals(accent) ? "selected" : "" %>>Gri</option>
+                         <option value='#A7EC21' <%= "#A7EC21".equals(accent) ? "selected" : "" %>>Lime</option>    
+                         <option value='#E6AF3C' <%= "#E6AF3C".equals(accent) ? "selected" : "" %>>Auriu</option> 
                         </select>
                     </div>
                     <input type='hidden' name='userId' value='<%= id %>'/>
@@ -213,6 +218,7 @@ if ("#d8d9e1".equals(clr)) {
 <%
                     }
                 } else {
+                	// #88D66C #10439F #C8BFE7 #E6AF3C
                     out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");

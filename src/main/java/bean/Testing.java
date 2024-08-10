@@ -78,6 +78,8 @@ public class Testing extends TimerTask
 	    String formattedStart = sdf.format(startDate);
 	    String formattedEnd = sdf.format(endDate);
 
+	    
+	    
 	    String subject = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
 	    String message1 = "<h1>Mai aveti o zi pana la concediu!&#x1F389;</h1>"; 
 	    String message2 = "Concediul e in perioada " + formattedStart + " - " + formattedEnd + " in " + locatie + " pe motivul " + motiv + " - " + tipMotiv + ". <br>";

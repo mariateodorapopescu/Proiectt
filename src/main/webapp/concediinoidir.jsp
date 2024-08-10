@@ -156,16 +156,19 @@
                     <thead>
                         <tr >
                         
-                   
-                    <th style="color:white">Departament</th>
+                   <th style="color:white">Nr.crt</th>
                     <th style="color:white">Nume</th>
                     <th style="color:white">Prenume</th>
-                    <th style="color:white">Functie</th>
+                    <th style="color:white">Fct</th>
+                    <th style="color:white">Dep</th>
                     <th style="color:white">Inceput</th>
                     <th style="color:white">Final</th>
                     <th style="color:white">Motiv</th>
                     <th style="color:white">Locatie</th>
-                    <th style="color:white">Tip concediu</th>
+                    <th style="color:white">Tip</th>
+                    <th style="color:white">Adaugat</th>
+                    <th style="color:white">Modif</th>
+                     <th style="color:white">Acc/Res</th>
                     <th style="color:white">Status</th>
                      <th style="color:white">Aprobati</th>
                      <th style="color:white">Respingeti</th>
@@ -175,7 +178,7 @@
                     
                     
                     <%
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                 "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                                 "FROM useri u " +
                                 "JOIN tipuri t ON u.tip = t.tip " +
@@ -188,12 +191,22 @@
                         	stmt.setInt(1, userdep);
                         	ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
+                            int nr = 1;
                             while (rs1.next()) {
                                 found = true;
-                                out.print("<tr><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
-                                        rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Inceput'>" +
-                                        rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                        rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
+                                
+                                
+                                String added = rs1.getString("added") != null ? rs1.getString("added") : " - ";
+                                String modif = rs1.getString("modified") != null ? rs1.getString("modif") : " - ";
+                                String accres = rs1.getString("acc_res") != null ? rs1.getString("acc_res") : " - ";
+                                		
+                                out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
+                                        rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Fct'>" + rs1.getString("functie") + "</td><td data-label='Dep'>" + rs1.getString("departament") + 
+                                        "</td>" + "<td data-label='Inceput'>" +
+                                        		rs1.getString("start_c")+ "</td><td data-label='Final'>" + rs1.getString("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
+                                        rs1.getString("locatie") + "</td>" + "<td data-label='Tip'>" + rs1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
+                                        "<td data-label='Acc/Res'>" + accres + "</td>");
+                                
                                 if (rs1.getString("status").compareTo("neaprobat") == 0) {
                                     out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
                                     out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
@@ -220,7 +233,7 @@
                               	out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='aprobdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='resdir?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                             }
-                              
+                              nr++;
                              }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
