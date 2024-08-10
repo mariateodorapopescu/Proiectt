@@ -102,7 +102,7 @@ if (sesi != null) {
 </div>
 <div class="container">
                 
-                    <div id="myChart"></div>
+                    <div id="myChart" style="margin: 0; padding: 0; "></div>
                 </div>
                 <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
                     <form id="statusForm" method="post" onsubmit="return false;">
@@ -129,9 +129,9 @@ if (sesi != null) {
                           <input type="hidden" name="tip" value="1">
                  </form>
                  <input type="color" id="color-picker" value=<%=accent %>>
-                  <p id="ceva1" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=sidebar%></p>
-                   <p id="ceva2" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=accent%></p>
-                 <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                   <p id="ceva1" style="color:rgba(0,0,0,0); width: 0; height; 0; padding:0; margin:0; top: 0; bottom: 0;"><%=sidebar %></p>
+                   <p id="ceva2" style="color:rgba(0,0,0,0); width: 0; height; 0; padding:0; margin:0; top: 0; bottom: 0;"><%=accent %></p>
+                 <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 25%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
                 <script>
                 function autoSubmit() {

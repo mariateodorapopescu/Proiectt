@@ -150,7 +150,7 @@ public class AprobDirServlet extends HttpServlet {
 	    	    String message11 = "<h1>Felicitari! &#x1F389; <br> Concediul dvs. din data de " + data + " a fost aprobat! &#x1F389; </h1>"; 
 	    	    
 	    	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
-	    	    String message14 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + durato + " zile<br></p>";
+	    	    String message14 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + (durato) + " zile<br></p>";
 	    	    
 	    	    String message16 = "<p>Va dorim toate cele bune! &#x1F607; \r\n"
 	    	    		+ " </p>";

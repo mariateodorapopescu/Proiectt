@@ -168,7 +168,7 @@ public class AprobSefServlet extends HttpServlet {
 	    	    String message22 = "<h2>Concediul angajatului " + nume + " " + prenume + " a fost partial aprobat."
 	    	    		+ "</h2>";
 	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul din data de " + data + ":</h3>";
-	    	    String message24 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + durato + " zile<br></p>";
+	    	    String message24 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + (durato) + " zile<br></p>";
 	    	    String message26 = "<p>Va dorim toate cele bune! &#x1F607; \r\n"
 	    	    		+ " \r\n"
 	    	    		+ " </p>";

@@ -61,7 +61,7 @@ public class AddConServlet extends HttpServlet {
     	 LocalDate start_c = LocalDate.parse(start);
 		    LocalDate end_c = LocalDate.parse(end);
 		    long daysBetween = ChronoUnit.DAYS.between(start_c, end_c); 
-		    durata = (int) daysBetween;
+		    durata = (int) daysBetween + 1;
 		    if (end_c.isBefore(start_c)) {
 		        throw new IOException("Data de final nu poate fi inaintea celei de inceput!");
 		    }
