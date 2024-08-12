@@ -48,7 +48,33 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+	
+	   // Funcția de generare a calendarului
 
+	   // Extragerea datelor din elementele ascunse și aplicarea evidențierii
+	   const startDateText = document.getElementById("pstart").innerText;
+	   const endDateText = document.getElementById("pend").innerText;
+	   const startDate1 = new Date(startDateText);
+	   const endDate1 = new Date(endDateText);
+
+	   highlightDates1(startDate1, endDate1);
+	   // Asumăm că există o funcție definită care populează calendarul
+	   // Exemplu simplificat:
+
+	   function highlightDates1(startDate, endDate) {
+	       let cells = calendarBody.querySelectorAll('td[data-date]');
+	       cells.forEach(function(cell) {
+	           let dateOfCell = new Date(cell.getAttribute('data-date'));
+	           if (dateOfCell >= startDate && dateOfCell <= endDate) {
+	               cell.classList.add('highlight');
+	               cell.style.backgroundColor = bg;
+	           } else {
+	               cell.classList.remove('highlight');
+	               cell.style.backgroundColor = defaultBg;
+	           }
+	       });
+	   }
+	
     function renderCalendar(month, year) {
         calendarBody.innerHTML = '';
         let firstDay = (new Date(year, month).getDay() + 6) % 7;

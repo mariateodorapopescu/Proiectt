@@ -7,7 +7,6 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Locale" %>
-
 <%
     HttpSession sesi = request.getSession(false);
     if (sesi != null) {
@@ -23,7 +22,7 @@
                     int id = rs.getInt("id");
                     int userType = rs.getInt("tip");
                     int userdep = rs.getInt("id_dep");
-                    if (userType != 4) {  // Assuming only type 4 users can approve
+                    if (userType != 4 && userType != 0) { // Assuming only type 4 users can approve
                     	
                     	
                     	String today = null;
@@ -116,12 +115,13 @@
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
        
-     
+   
        .tooltip {
   position: relative;
   
   border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
+
 /* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
@@ -149,16 +149,15 @@
                         	<div class="main-content">
         <div class="header">
          </div>
-        <div  style=" border-radius: 2rem;" class="content">
-            <div class="intro" style=" border-radius: 2rem; background:<%out.println(sidebar);%>;">
+        <div style=" border-radius: 2rem;" class="content">
+            <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>;">
            
-                 <div class="events" style=" border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
-                  <h1>Modificare concedii</h1>
+                 <div class="events" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                  <h1>Toate concediile personale din acest an</h1>
                 <h3><%out.println(today); %></h3>
                 <table>
                     <thead>
                         <tr >
-                        
                     
                     <th style="color:white">Nr.crt</th>
                     <th style="color:white">Nume</th>
@@ -174,15 +173,16 @@
                     <th style="color:white">Modif</th>
                      <th style="color:white">Acc/Res</th>
                     <th style="color:white">Status</th>
+                    <th style="color:white">Modificati</th>
+                    <th style="color:white">Stergeti</th>
                     
-                     <th style="color: white;">Modificati</th>
-                     <th style="color: white;">Stergeti</th>
+                   
                 </tr>
                     </thead>
                    <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
-                   
-                   <%
-            if (userType != 3 || userType != 0) {
+                    
+                    <%
+            if (userType == 1 || userType == 2) {
             	
                         try (PreparedStatement stmt = connection.prepareStatement("SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                                 "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
@@ -192,7 +192,7 @@
                                 "JOIN concedii c ON c.id_ang = u.id " +
                                 "JOIN statusuri s ON c.status = s.status " +
                                 "JOIN tipcon ct ON c.tip = ct.tip " +
-                                "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ? and c.status = 0")) {
+                                "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ?")) {
                             
                         	stmt.setInt(1, id);
                         	ResultSet rs1 = stmt.executeQuery();
@@ -200,23 +200,9 @@
                             int nr = 1;
                             while (rs1.next()) {
                                 found = true;
-                                //Date startDate = rs.getDate("start_c");
-                        	    //Date endDate = rs.getDate("end_c");
-
-                        	    //SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", new Locale("ro", "RO"));
-                        	    //String formattedStart = sdf.format(startDate);
-                        	    //String formattedEnd = sdf.format(endDate);
-                      
-                               // Date addedd = rs1.getDate("added") != null ? rs1.getDate("added") : null;
-                                //Date modified = rs1.getDate("modified") != null ? rs1.getDate("modified") : null;
-                                //Date accress = rs1.getDate("acc_res") != null ? rs1.getDate("acc_res") : null;
-                     
-                                		//String added = addedd != null ? sdf.format(addedd) : " - ";
-                                		//String modif = modified != null ? sdf.format(modified) : " - ";
-                                		// String accres = accress != null ? sdf.format(accress) : " - ";
                                 
                                 String added = rs1.getString("added") != null ? rs1.getString("added") : " - ";
-                                String modif = rs1.getString("modified") != null ? rs1.getString("modif") : " - ";
+                                String modif = rs1.getString("modified") != null ? rs1.getString("modified") : " - ";
                                 String accres = rs1.getString("acc_res") != null ? rs1.getString("acc_res") : " - ";
                                 		
                                 out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
@@ -225,13 +211,26 @@
                                         		rs1.getString("start_c")+ "</td><td data-label='Final'>" + rs1.getString("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
                                         rs1.getString("locatie") + "</td>" + "<td data-label='Tip'>" + rs1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
                                         "<td data-label='Acc/Res'>" + accres + "</td>");
-                              
+                                
                               if (rs1.getString("status").compareTo("neaprobat") == 0) {
                             	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
-                                  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
-                                  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+                            	    out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
+                                    out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+    
                               }
-                              nr++;  
+                              if (rs1.getString("status").compareTo("aprobat sef") == 0) {
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                                  }
+                              if (rs1.getString("status").compareTo("aprobat director") == 0) {
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                                  }
+                              if (rs1.getString("status").compareTo("dezaprobat sef") == 0) {
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Respins sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                                  }
+                              if (rs1.getString("status").compareTo("dezaprobat director") == 0) {
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Respins director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                                  }
+                              nr++;
                             }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
@@ -239,7 +238,7 @@
                             
                         }
             } else {
-            	try (PreparedStatement stmt = connection.prepareStatement("SELECT c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+            	try (PreparedStatement stmt = connection.prepareStatement("SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
                         "FROM useri u " +
                         "JOIN tipuri t ON u.tip = t.tip " +
@@ -247,24 +246,47 @@
                         "JOIN concedii c ON c.id_ang = u.id " +
                         "JOIN statusuri s ON c.status = s.status " +
                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ? and c.status = 1")) {
+                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id = ?")) {
                     
                 	stmt.setInt(1, id);
                 	ResultSet rs1 = stmt.executeQuery();
                     boolean found = false;
+                    int nr = 1;
                     while (rs1.next()) {
                         found = true;
-                        out.print("<tr><td data-label='Departament'>" + rs1.getString("departament") + "</td><td data-label='Nume'>" +
-                                rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Inceput'>" +
-                                rs1.getDate("start_c") + "</td><td data-label='Final'>" + rs1.getDate("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                rs1.getString("locatie") + "</td>" + "<td data-label='Tip concediu'>" + rs1.getString("tipcon") + "</td>");
-
-                      
+                        
+                        String added = rs1.getString("added") != null ? rs1.getString("added") : " - ";
+                        String modif = rs1.getString("modified") != null ? rs1.getString("modified") : " - ";
+                        String accres = rs1.getString("acc_res") != null ? rs1.getString("acc_res") : " - ";
+                        		
+                        out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
+                                rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Fct'>" + rs1.getString("functie") + "</td><td data-label='Dep'>" + rs1.getString("departament") + 
+                                "</td>" + "<td data-label='Inceput'>" +
+                                		rs1.getString("start_c")+ "</td><td data-label='Final'>" + rs1.getString("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
+                                rs1.getString("locatie") + "</td>" + "<td data-label='Tip'>" + rs1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
+                                "<td data-label='Acc/Res'>" + accres + "</td>");
+                        
+                      if (rs1.getString("status").compareTo("neaprobat") == 0) {
+                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
+                    	   
+                      }
                       if (rs1.getString("status").compareTo("aprobat sef") == 0) {
                     	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
-                          out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
+                    	  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                           out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
-                      }}
+    
+                      }
+                      if (rs1.getString("status").compareTo("aprobat director") == 0) {
+                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                          }
+                      if (rs1.getString("status").compareTo("dezaprobat sef") == 0) {
+                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Respins sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                          }
+                      if (rs1.getString("status").compareTo("dezaprobat director") == 0) {
+                    	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Respins director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                          }
+                      nr++;
+                    }
                     if (!found) {
                         out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
                     }
@@ -278,12 +300,12 @@
                               
                 </div>
                 <div class="into">
-                 
-                    <button ><a href='actiuni.jsp'>Inapoi</a></button></div>
+                  <button id="generate" onclick="generate()" >Descarcati PDF</button>
                 </div>
                 
                 <%
-
+        
+        
                     } else {
                     	switch (userType) {
                         case 1: response.sendRedirect("tip1ok.jsp"); break;
@@ -296,27 +318,26 @@
                 	out.println("<script type='text/javascript'>");
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
-                    response.sendRedirect("concediinoieu.jsp");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 out.println("<script type='text/javascript'>");
     	        out.println("alert('Eroare la baza de date!');");
-    	       
+    	        out.println("alert('" + e.getMessage() + "');");
     	        out.println("</script>");
-                response.sendRedirect("concediinoieu.jsp");
+                response.sendRedirect("login.jsp");
             }
         } else {
         	out.println("<script type='text/javascript'>");
 	        out.println("alert('Utilizator neconectat!');");
 	        out.println("</script>");
-            response.sendRedirect("logout");
+            response.sendRedirect("login.jsp");
         }
     } else {
     	out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("logout");
+        response.sendRedirect("login.jsp");
     }
 %>
 <script>

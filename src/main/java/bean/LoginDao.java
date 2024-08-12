@@ -24,7 +24,7 @@ public class LoginDao {
                         user = new MyUser(); // Assuming MyUser has more fields you might want to fill
                         user.setUsername(loginBean.getUsername());
                         // Add other details as needed from ResultSet
-                        String INSERT_USERS_SQL = "UPDATE useri SET status = 1 WHERE username = ?";
+                        String INSERT_USERS_SQL = "UPDATE useri SET activ = 1 WHERE username = ?";
                 	    int result = 0;
                 	    Class.forName("com.mysql.cj.jdbc.Driver");
                 	    try (

@@ -31,7 +31,7 @@ public class LogoutServlet extends HttpServlet {
             throws IOException {
         try {
             HttpSession session = request.getSession();
-            String INSERT_USERS_SQL = "UPDATE useri SET status = 0 WHERE username = ?";
+            String INSERT_USERS_SQL = "UPDATE useri SET activ = 0 WHERE username = ?";
     	    int result = 0;
     	    Class.forName("com.mysql.cj.jdbc.Driver");
     	   

@@ -200,7 +200,7 @@
                                 found = true;
                                 
                                 String added = rs1.getString("added") != null ? rs1.getString("added") : " - ";
-                                String modif = rs1.getString("modified") != null ? rs1.getString("modif") : " - ";
+                                String modif = rs1.getString("modified") != null ? rs1.getString("modified") : " - ";
                                 String accres = rs1.getString("acc_res") != null ? rs1.getString("acc_res") : " - ";
                                 		
                                 out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +

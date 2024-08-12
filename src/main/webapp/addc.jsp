@@ -308,8 +308,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    
-
     // Update and validate dates
     dp1.addEventListener("change", highlightDates);
     dp2.addEventListener("change", highlightDates);
