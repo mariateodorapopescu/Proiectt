@@ -1,41 +1,56 @@
 document.addEventListener("DOMContentLoaded", function() {
     const dp1 = document.getElementById("start");
     const dp2 = document.getElementById("end");
-    const monthYear = document.getElementById('monthYear');
     const calendarBody = document.getElementById('calendar-body');
-	const bg = "#32a852";
+    const monthYear = document.getElementById('monthYear');
+    const bg = "#32a852"; // Background color for highlighted dates
+    const defaultBg = ""; // Default background color for non-selected dates
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    let selectedStartDate = null;
-    let selectedEndDate = null;
 
     const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 
-    // Event listeners for date inputs
-    if (dp1 && dp2) {
-        dp1.addEventListener("change", updateEndDate);
-        dp2.addEventListener("change", validateDates);
+    calendarBody.addEventListener('click', function(event) {
+        if (event.target.tagName === 'TD' && event.target.getAttribute('data-date')) {
+            handleDateClick(event.target.getAttribute('data-date'));
+        }
+    });
+
+    function handleDateClick(clickedDate) {
+        if (!dp1.value) {
+            dp1.value = clickedDate;
+        } else if (!dp2.value) {
+            if (new Date(clickedDate) >= new Date(dp1.value)) {
+                dp2.value = clickedDate;
+            } else {
+                dp1.value = clickedDate;
+                dp2.value = '';
+            }
+        } else {
+            dp1.value = clickedDate;
+            dp2.value = '';
+        }
+        highlightDates();
     }
 
-    // Ensures that the end date is not before the start date
-    function updateEndDate() {
-        if (dp2.value < dp1.value) {
-            dp2.value = dp1.value;
-        }
-        highlightDate();
-    }
+    function highlightDates() {
+        const startDate = dp1.value ? new Date(dp1.value) : null;
+        const endDate = dp2.value ? new Date(dp2.value) : null;
 
-    // Validates that the end date is not before the start date
-    function validateDates() {
-        if (dp2.value < dp1.value) {
-            alert("Data de final nu poate fi mai mică decât cea de început!");
-            dp2.value = dp1.value;
-        }
-        highlightDate();
+        Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => {
+            const currentDate = new Date(td.getAttribute('data-date'));
+            if (startDate && endDate && currentDate >= startDate && currentDate <= endDate) {
+                td.classList.add('highlight');
+                td.style.backgroundColor = bg;
+            } else {
+                td.classList.remove('highlight');
+                td.style.backgroundColor = defaultBg; // Reset to default background color
+            }
+        });
     }
 
     function renderCalendar(month, year) {
-        calendarBody.innerHTML = ''; // Clear existing entries
+        calendarBody.innerHTML = '';
         let firstDay = (new Date(year, month).getDay() + 6) % 7;
         let daysInMonth = 32 - new Date(year, month, 32).getDate();
         let date = 1;
@@ -51,47 +66,76 @@ document.addEventListener("DOMContentLoaded", function() {
                     let fullDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
                     cell.setAttribute('data-date', fullDate);
                     cell.textContent = date;
-                    if (selectedStartDate && selectedEndDate && isDateInRange(date, month, year)) {
-                        cell.classList.add('highlight');
-						cell.style.backgroundColor = bg;
-                    }
                     date++;
                 }
                 row.appendChild(cell);
             }
             calendarBody.appendChild(row);
         }
+        highlightDates();
     }
 
-    function isDateInRange(date, month, year) {
-        const currentDate = new Date(year, month, date);
-        return currentDate >= selectedStartDate && currentDate <= selectedEndDate;
-    }
+    // Update and validate dates
+    dp1.addEventListener("change", highlightDates);
+    dp2.addEventListener("change", highlightDates);
 
-    function highlightDate() {
-        const startDatePicker = document.getElementById('start');
-        const endDatePicker = document.getElementById('end');
-        selectedStartDate = startDatePicker.value ? new Date(startDatePicker.value) : null;
-        selectedEndDate = endDatePicker.value ? new Date(endDatePicker.value) : null;
+    // Render the calendar
+    renderCalendar(currentMonth, currentYear);
+	    
+	    function updateEndDate() {
+	        if (dp2.value < dp1.value) {
+	            dp2.value = dp1.value;
+	        }
+	        highlightDates();
+	    }
 
-        if (selectedStartDate) {
-            selectedStartDate.setHours(0, 0, 0, 0);
-            currentMonth = selectedStartDate.getMonth();  // Update current month to selected start date's month
-            currentYear = selectedStartDate.getFullYear(); // Update current year
-        }
+	    function validateDates() {
+	        if (dp2.value < dp1.value) {
+	            alert("Data de final nu poate fi mai mică decât cea de început!");
+	            dp2.value = dp1.value;
+	        }
+	        highlightDates();
+	    }
 
-        if (selectedEndDate) {
-            selectedEndDate.setHours(23, 59, 59, 999);
-            if (selectedEndDate < selectedStartDate) {
-                endDatePicker.value = startDatePicker.value;
-                selectedEndDate = new Date(selectedStartDate);
-                selectedEndDate.setHours(23, 59, 59, 999);
-            }
-        }
+	    function renderCalendar(month, year) {
+	        calendarBody.innerHTML = '';
+	        let firstDay = (new Date(year, month).getDay() + 6) % 7;
+	        let daysInMonth = 32 - new Date(year, month, 32).getDate();
+	        let date = 1;
+	        monthYear.textContent = monthNames[month] + " " + year;
 
-        renderCalendar(currentMonth, currentYear);
-    }
+	        for (let i = 0; i < 6; i++) {
+	            let row = document.createElement('tr');
+	            for (let j = 0; j < 7; j++) {
+	                let cell = document.createElement('td');
+	                if (i === 0 && j < firstDay || date > daysInMonth) {
+	                    cell.textContent = '';
+	                } else {
+	                    let fullDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+	                    cell.setAttribute('data-date', fullDate);
+	                    cell.textContent = date;
+	                    date++;
+	                }
+	                row.appendChild(cell);
+	            }
+	            calendarBody.appendChild(row);
+	        }
+	        highlightDates();
+	    }
 
+	    dp1.addEventListener("change", function() {
+	        updateEndDate();
+	        highlightDates();
+	    });
+
+	    dp2.addEventListener("change", function() {
+	        validateDates();
+	        highlightDates();
+	    });
+
+	    renderCalendar(currentMonth, currentYear);
+	
+	
     function previousMonth() {
         if (currentMonth === 0) {
             currentMonth = 11;

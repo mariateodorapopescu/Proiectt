@@ -310,6 +310,25 @@ public class AddConServlet extends HttpServlet {
 	        return; 
 	    }
 	    
+	    try {
+			if (oktip(con)) {
+			    response.setContentType("text/html;charset=UTF-8");
+			    PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Nu poate avea mai multe zile decat tipul concediului!');");
+			    out.println("window.location.href = 'actiuni.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    return; 
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
         try {
             concediu.check(con);
             
@@ -460,6 +479,29 @@ public class AddConServlet extends HttpServlet {
         }
 	}
 
+	private boolean oktip(ConcediuCon con) throws SQLException {
+		String start = con.getStart();
+		String end = con.getEnd();
+		LocalDate start_c = LocalDate.parse(start);
+	    LocalDate end_c = LocalDate.parse(end);
+	    long daysBetween = ChronoUnit.DAYS.between(start_c, end_c) + 1; 
+	    int durata = 0;
+	    durata = (int) daysBetween + 1;
+	    int durata2 = 0;
+		String QUERY = "select nr_zile from tipcon;";
+	   
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // aci crapa
+		         PreparedStatement stm = conn.prepareStatement(QUERY)) {
+		        
+		        try (ResultSet res = stm.executeQuery()) {
+		            if (res.next()) {
+		                durata2 = res.getInt("nr_zile");
+		            }
+		        }
+		    } 
+	    return durata2 < durata;
+	}
+	
 	private boolean concediuExista(int uid, LocalDate start, LocalDate end) throws ServletException {
 	    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 	         PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM concedii WHERE id_ang = ? AND start_c = ? AND end_c = ? and status >= 0")) {

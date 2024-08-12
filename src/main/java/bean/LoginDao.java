@@ -24,10 +24,36 @@ public class LoginDao {
                         user = new MyUser(); // Assuming MyUser has more fields you might want to fill
                         user.setUsername(loginBean.getUsername());
                         // Add other details as needed from ResultSet
+                        String INSERT_USERS_SQL = "UPDATE useri SET status = 1 WHERE username = ?";
+                	    int result = 0;
+                	    Class.forName("com.mysql.cj.jdbc.Driver");
+                	    try (
+                	         PreparedStatement preparedStatement1 = connection.prepareStatement(INSERT_USERS_SQL)) {
+                	        
+                	        preparedStatement1.setString(1, loginBean.getUsername());
+                	        result = preparedStatement1.executeUpdate();
+                	    } catch (SQLException e) {
+                	        printSQLException(e);
+                	    }
                     }
                 }
             }
         }
         return user;
     }
+    private void printSQLException(SQLException ex) {
+        for (Throwable e: ex) {
+            if (e instanceof SQLException) {
+                e.printStackTrace(System.err);
+                System.err.println("SQLState: " + ((SQLException) e).getSQLState());
+                System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
+                System.err.println("Message: " + e.getMessage());
+                Throwable t = ex.getCause();
+                while (t != null) {
+                    System.out.println("Cause: " + t);
+                    t = t.getCause();
+                }
+            }
+        }
+    } 
 }
