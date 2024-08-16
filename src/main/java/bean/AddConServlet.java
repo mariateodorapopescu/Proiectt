@@ -1,5 +1,5 @@
 package bean;
-
+// importuri de librarii
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -281,15 +281,15 @@ public class AddConServlet extends HttpServlet {
 		}
         
         // acum, diferit de celalte metode, se verifica tipul de utilizator pentru ca daca este sef (3) sau director (0), nu pot fi 2/departament
-        String QUERY2 = "select * from useri where id = ?;"; // interogarea este un string
-	    int userType = -1; // pentru cazul in care nu se gaseste nimic in baza de date sau introgarea nu este corecta, ar ramane -1
-	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); 
+        String sql2 = "select * from useri where id = ?;"; // interogarea este un string
+	    int tip2 = -1; // pentru cazul in care nu se gaseste nimic in baza de date sau introgarea nu este corecta, ar ramane -1
+	    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); 
 	    		// se creaza conexiune (uneori mai puneam si Class.forName pentru driver, acum a mers si asa
-		        PreparedStatement stm = conn.prepareStatement(QUERY2)) { //se pregateste pentru a face interogarea
+		        PreparedStatement stm = conexiune.prepareStatement(sql2)) { //se pregateste pentru a face interogarea
 		        stm.setInt(1, id); // adaug variabile
-		        try (ResultSet res = stm.executeQuery()) { // se executa interogarea
-		            if (res.next()) { // se extrag date din rezultatul interogarii, mai exact tipul de utilizator care a adaugat concediul
-		                userType = res.getInt("tip");
+		        try (ResultSet rezultat = stm.executeQuery()) { // se executa interogarea
+		            if (rezultat.next()) { // se extrag date din rezultatul interogarii, mai exact tipul de utilizator care a adaugat concediul
+		                tip2 = rezultat.getInt("tip");
 		            }
 		        }
 		    } catch (SQLException e) { // interogarile pot arunca exceptii si daca da, atunci semnalizez cu alerta si redirectare la pagina de adaugare/modificare concediu
@@ -305,7 +305,7 @@ public class AddConServlet extends HttpServlet {
 		        throw new IOException("Eroare la baza de date =(", e);
 		    }
 	    
-	    if (userType == 0) {
+	    if (tip2 == 0) {
 	    	// daca utilizatorul este director, pot face verificarea sa nu fie mai mult de 2 directori plecati
 	    	 try {
 	 			if (!preamultid(concediul, request)) {
@@ -342,7 +342,7 @@ public class AddConServlet extends HttpServlet {
 	    }
 	    
 	    // daca utilizatorul este director sau sef, atunci concediul este deja aprobat sef, altfel este neaprobat
-	    if (userType == 0 || userType == 3) {
+	    if (tip2 == 0 || tip2 == 3) {
 	    	concediul.setStatus(1);
 	    } else {
 	    	concediul.setStatus(0);
@@ -486,10 +486,10 @@ public class AddConServlet extends HttpServlet {
 	    int durata2 = 0;
 	    durata2 = (int) durata + 1;
 	    int durata3 = 0;
-		String QUERY = "select nr_zile from tipcon;";
+		String sql = "select nr_zile from tipcon;";
 	   
 	    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-		        PreparedStatement stm = conexiune.prepareStatement(QUERY)) {
+		        PreparedStatement stm = conexiune.prepareStatement(sql)) {
 		        try (ResultSet rezultat = stm.executeQuery()) {
 		            if (rezultat.next()) {
 		                durata3 = rezultat.getInt("nr_zile");
@@ -767,29 +767,32 @@ public class AddConServlet extends HttpServlet {
 		 * @throws IOException
 		 */
 		public static boolean preamultid(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException{
-				int nr = 0;
-			    Class.forName("com.mysql.cj.jdbc.Driver");
-			    String QUERY = "select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= ? and month(start_c) = ? and day(start_c) <= ? and month(start_c) <= ? and status > 0 group by useri.tip having useri.tip = 0;";
-			  
-			    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-			         PreparedStatement stm = con.prepareStatement(QUERY)) {
-			        Data start_c = stringToDate(concediu.getStart());
-			        Data end_c = stringToDate(concediu.getEnd());
-			        stm.setInt(1, start_c.getZi());
-			        stm.setInt(2, start_c.getLuna());
-			        stm.setInt(3, end_c.getZi());
-			        stm.setInt(4, end_c.getLuna());
-			        try (ResultSet rs = stm.executeQuery() ) {
-			            if (rs.next()) {
-			                nr = rs.getInt("total");
-			            }
-			        }
-			    } catch (SQLException e) {
-			        printSQLException(e);
-			        throw new IOException("Eroare la baza de date", e);
-			    }
+			// declarare si initializare variabile
+			int nr = 0;
+			String sql = "select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= ? and month(start_c) = ?"
+					+ " and day(start_c) <= ? and month(start_c) <= ? and status > 0 group by useri.tip having useri.tip = 0;";
+			Data inceput = stringToDate(concediu.getStart());
+	        Data sfarsit = stringToDate(concediu.getEnd());
+		    Class.forName("com.mysql.cj.jdbc.Driver");
+		    
+		    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		        PreparedStatement stm = conexiune.prepareStatement(sql)) {
+	
+		        stm.setInt(1, inceput.getZi());
+		        stm.setInt(2, inceput.getLuna());
+		        stm.setInt(3, sfarsit.getZi());
+		        stm.setInt(4, sfarsit.getLuna());
+		        try (ResultSet rezultat = stm.executeQuery() ) {
+		            if (rezultat.next()) {
+		                nr = rezultat.getInt("total");
+		            }
+		        }
+		    } catch (SQLException e) {
+		        printSQLException(e);
+		        throw new IOException("Eroare la baza de date", e);
+		    }
 
-			    return nr < 2;
+		    return nr < 2;
 			}
 		
 		/**
