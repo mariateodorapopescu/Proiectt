@@ -279,6 +279,21 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    function validateDates() {
+        if (dp2.value < dp1.value) {
+            alert("Data de final nu poate fi mai mică decât cea de început!");
+            dp2.value = dp1.value;
+        }
+        highlightDates();
+    }
+    
+    dp1.addEventListener("change", function() {
+        dp2.min = dp1.value;
+        if (dp2.value < dp1.value) {
+            dp2.value = ''; // Reset dp2 if it's less than dp1
+        }
+    });
+    
     function handleDateClick(clickedDate) {
         // Parse the clicked date and increment it by one day
         let parsedDate = new Date(clickedDate);
@@ -313,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => {
             let date = new Date(td.getAttribute('data-date') );
-            td.style.backgroundColor = (startDate && endDate && date >= startDate-1 && date < endDate) ? bg : defaultBg;
+            td.style.backgroundColor = (startDate && endDate && date >= startDate && date < endDate) ? bg : defaultBg;
         });
     }
 
@@ -366,9 +381,12 @@ document.addEventListener("DOMContentLoaded", function() {
 	    }
 	    highlightDate();
 	}
+ // updateEndDate();
 	// Update and validate dates
     dp1.addEventListener("change", highlightDates);
     dp2.addEventListener("change", highlightDates);
+    dp1.addEventListener("change", updateEndDate);
+    dp2.addEventListener("change", validateDates);
     renderCalendar(currentMonth, currentYear);
 });
 
