@@ -428,7 +428,7 @@ public class AddConServlet extends HttpServlet {
             asyncContext.start(() -> {
                 try {
                 	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
-                    Async1.send(id, tip, inceput, sfarsit, motiv, locatie, durata2);
+                    MailAsincron.send(id, tip, inceput, sfarsit, motiv, locatie, durata2);
                     asyncContext.complete();  // Completarea actiunii asincrone
                 } catch (Exception e) {
                     e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
