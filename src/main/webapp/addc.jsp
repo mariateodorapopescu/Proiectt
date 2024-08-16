@@ -79,71 +79,72 @@
 		}
 	
      :root{
-          --first-color: #2a2a2a;
-		  --second-color: hsl(249, 64%, 47%);
-		  --title-color-light: hsl(244, 12%, 12%);
-		  --text-color-light: hsl(244, 4%, 36%);
-		  --body-color-light: hsl(208, 97%, 85%);
-		  --title-color-dark: hsl(0, 0%, 95%);
-		  --text-color-dark: hsl(0, 0%, 80%);
-		  --body-color-dark: #1a1a1a;
-		  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
-		  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
-		  --form-bg-color-dark: #333;
-		  --form-border-color-dark: #3a3a3a;
-		  /*========== Font and typography ==========*/
-		  --body-font: "Poppins", sans-serif;
-		  --h2-font-size: 1.25rem;
-		  --small-font-size: .813rem;
-		  --smaller-font-size: .75rem;
-		  /*========== Font weight ==========*/
-		  --font-medium: 500;
-		  --font-semi-bold: 600;
-		        }
+     /*========== culori de baza ==========*/
+      --first-color: #2a2a2a;
+	  --second-color: hsl(249, 64%, 47%);
+	  /*========== cuulori text ==========*/
+	  --title-color-light: hsl(244, 12%, 12%);
+	  --text-color-light: hsl(244, 4%, 36%);
+	  --title-color-dark: hsl(0, 0%, 95%);
+	  --text-color-dark: hsl(0, 0%, 80%);
+	  /*========== cuulori corp ==========*/
+	  --body-color-light: hsl(208, 97%, 85%);
+	  --body-color-dark: #1a1a1a;
+	  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
+	  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
+	  --form-bg-color-dark: #333;
+	  --form-border-color-dark: #3a3a3a;
+	  /*========== Font ==========*/
+	  --body-font: "Poppins", sans-serif;
+	  --h2-font-size: 1.25rem;
+	  --small-font-size: .813rem;
+	  --smaller-font-size: .75rem;
+	  --font-medium: 500;
+	  --font-semi-bold: 600;
+	 }
 		        
-		::placeholder {
-		  color: var(--text);
-		  opacity: 1; /* Firefox */
-		}
-		
-		::-ms-input-placeholder { /* Edge 12-18 */
-		  color: var(--text);
-		}
-		       
-        .flex-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 2rem;
-            margin: 2rem;
-        }
-        
-        .calendar-container, .form-container {
-            background-color: #2a2a2a;
-            padding: 1rem;
-            border-radius: 8px;
-           
-        }
-        
-        .calendar-container {
-            max-width: 300px;
-        }
-        
-         th.calendar, td.calendar {
-            border: 1px solid #1a1a1a;
-            text-align: center;
-            padding: 8px;
-            font-size: 12px;
-        }
-        
-        th.calendar {
-            background-color: #333;
-        }
-        
-        .highlight {
-            /*background-color: #32a852;*/
-            color: white;
-        }
+	::placeholder {
+	  color: var(--text);
+	  opacity: 1; /* Firefox */
+	}
+	
+	::-ms-input-placeholder { /* Edge 12-18 */
+	  color: var(--text);
+	}
+	       
+    .flex-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 2rem;
+        margin: 2rem;
+    }
+    
+    .calendar-container, .form-container {
+        background-color: #2a2a2a;
+        padding: 1rem;
+        border-radius: 8px;
+       
+    }
+    
+    .calendar-container {
+        max-width: 300px;
+    }
+    
+     th.calendar, td.calendar {
+        border: 1px solid #1a1a1a;
+        text-align: center;
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    th.calendar {
+        background-color: #333;
+    }
+    
+    .highlight {
+        color: white;
+    }
        
     </style>
 </head>
