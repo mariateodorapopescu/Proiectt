@@ -5,26 +5,28 @@
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <%
-    HttpSession sesi = request.getSession(false);
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
+// codul pentru fisierele .jsp arata in mare parte cam asa, dupa aceasta structura
+// incep prin a face rost de sesiune si de datele stocate la nivel de sesiune, adica utilizatorul
+// apoi pe baza a ceea ce am stocat in utilizator, selectez si fac alte interogari ca sa aflu alte lucruri
+// in mare, daca am sesiune activa, utilizator in sesiune (adica e cineva conectat) 
+// se afiseaza pagina in functie de tipul si de utilizatorul in sine (tematica, tipul de dashboard, alte functionalitati)
+    HttpSession sesiune = request.getSession(false); // selectez sesiunea fara a crea alta
+    if (sesiune != null) {
+        MyUser utilizatorcurent = (MyUser) sesiune.getAttribute("currentUser"); // selectez atributul de user stocat la conectare
+        if (utilizatorcurent != null) {
+            String numeutilizator = utilizatorcurent.getUsername(); // aflu numele de utilizator, caci acesta este unic si deci pot incepe prin a face interogari pe baza sa
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select * from useri where username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                    int id = rs.getInt("id");
-                    int userType = rs.getInt("tip");
-                   // String zile = rs.getString("zileramase");
-                    //System.out.println(zile);
-                   //  String con = rs.getString("conramase");
-                    if (userType == 4) {
+            try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                PreparedStatement stmt = conexiune.prepareStatement("select * from useri where username = ?")) {
+                stmt.setString(1, numeutilizator);
+                ResultSet rezultat = stmt.executeQuery();
+                if (rezultat.next()) {
+                    int id = rezultat.getInt("id");
+                    int tip1 = rezultat.getInt("tip");
+                    if (tip1 == 4) {
                         response.sendRedirect("adminok.jsp"); 
-                        
                     } else {
+                    	// selectez culorile pentru tema/schema de culoare
                     	 String accent = null;
                       	 String clr = null;
                       	 String sidebar = null;
@@ -32,31 +34,24 @@
                       	 String card = null;
                       	 String hover = null;
                       	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             // Check for upcoming leaves in 3 days
                              String query = "SELECT * from teme where id_usr = ?";
-                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                 stmt.setInt(1, id);
-                                 try (ResultSet rs2 = stmt.executeQuery()) {
-                                     if (rs2.next()) {
-                                       accent =  rs2.getString("accent");
-                                       clr =  rs2.getString("clr");
-                                       sidebar =  rs2.getString("sidebar");
-                                       text = rs2.getString("text");
-                                       card =  rs2.getString("card");
-                                       hover = rs2.getString("hover");
+                             try (PreparedStatement stmt2 = conexiune.prepareStatement(query)) {
+                                 stmt2.setInt(1, id);
+                                 try (ResultSet rezultat2 = stmt2.executeQuery()) {
+                                     if (rezultat2.next()) {
+                                       accent =  rezultat2.getString("accent");
+                                       clr =  rezultat2.getString("clr");
+                                       sidebar =  rezultat2.getString("sidebar");
+                                       text = rezultat2.getString("text");
+                                       card =  rezultat2.getString("card");
+                                       hover = rezultat2.getString("hover");
                                      }
                                  }
                              }
-                             
-                            
-                             // Display the user dashboard or related information
-                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                             // Add additional user-specific content here
                          } catch (SQLException e) {
                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                              e.printStackTrace();
                          }
-                      	 
                         %>
 <html>
 <head>
@@ -69,9 +64,52 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     
-    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <!--=============== icon ===============-->
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">4
     
+    <!--=============== alt CSS ===============-->
     <style>
+     @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+     
+	* {
+	    margin: 0;
+	    padding: 0;
+	    box-sizing: border-box;
+	    font-family: 'Poppins', sans-serif;
+		}
+	
+     :root{
+          --first-color: #2a2a2a;
+		  --second-color: hsl(249, 64%, 47%);
+		  --title-color-light: hsl(244, 12%, 12%);
+		  --text-color-light: hsl(244, 4%, 36%);
+		  --body-color-light: hsl(208, 97%, 85%);
+		  --title-color-dark: hsl(0, 0%, 95%);
+		  --text-color-dark: hsl(0, 0%, 80%);
+		  --body-color-dark: #1a1a1a;
+		  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
+		  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
+		  --form-bg-color-dark: #333;
+		  --form-border-color-dark: #3a3a3a;
+		  /*========== Font and typography ==========*/
+		  --body-font: "Poppins", sans-serif;
+		  --h2-font-size: 1.25rem;
+		  --small-font-size: .813rem;
+		  --smaller-font-size: .75rem;
+		  /*========== Font weight ==========*/
+		  --font-medium: 500;
+		  --font-semi-bold: 600;
+		        }
+		        
+		::placeholder {
+		  color: var(--text);
+		  opacity: 1; /* Firefox */
+		}
+		
+		::-ms-input-placeholder { /* Edge 12-18 */
+		  color: var(--text);
+		}
+		       
         .flex-container {
             display: flex;
             justify-content: center;
@@ -90,63 +128,29 @@
         .calendar-container {
             max-width: 300px;
         }
+        
          th.calendar, td.calendar {
             border: 1px solid #1a1a1a;
             text-align: center;
             padding: 8px;
             font-size: 12px;
         }
+        
         th.calendar {
             background-color: #333;
         }
+        
         .highlight {
             /*background-color: #32a852;*/
             color: white;
         }
-        :root{
-          --first-color: #2a2a2a;
-  --second-color: hsl(249, 64%, 47%);
-  --title-color-light: hsl(244, 12%, 12%);
-  --text-color-light: hsl(244, 4%, 36%);
-  --body-color-light: hsl(208, 97%, 85%);
-  --title-color-dark: hsl(0, 0%, 95%);
-  --text-color-dark: hsl(0, 0%, 80%);
-  --body-color-dark: #1a1a1a;
-  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
-  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
-  --form-bg-color-dark: #333;
-  --form-border-color-dark: #3a3a3a;
-  /*========== Font and typography ==========*/
-  --body-font: "Poppins", sans-serif;
-  --h2-font-size: 1.25rem;
-  --small-font-size: .813rem;
-  --smaller-font-size: .75rem;
-  /*========== Font weight ==========*/
-  --font-medium: 500;
-  --font-semi-bold: 600;
-        }
-        
-        ::placeholder {
-  color: var(--text);
-  opacity: 1; /* Firefox */
-}
-
-::-ms-input-placeholder { /* Edge 12-18 */
-  color: var(--text);
-}
-        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
+       
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-
                         <div class="flex-container">
+                        <!-- Calendar + formular -->
                             <div class="calendar-container" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="calendar">
                                 <div class="navigation">
                                     <button class='prev' onclick="previousMonth()">❮</button>
@@ -166,20 +170,16 @@
                                         </tr>
                                     </thead>
                                     <tbody class="calendar" id="calendar-body" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
-                                        <!-- Calendar will be generated here -->
+                                        <!-- Aici se va genera calendarul -->
                                     </tbody>
                                 </table>
-                                
                             </div>
+                            <!-- Abia acum vine formularul -->
                             <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
-                         
-    
                                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
                                     <div>
                                         <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Adaugare concediu</span></h1>
-                                        <%
-                                        //out.println("<p style='margin:0; padding:0; position:relative; top:0;'>Zile ramase: " + zile + "; Concedii ramase: " + con + "</p>");
-                                        %>
+                                        
                                     </div>
                                     
                                     <div class="login__inputs" style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>">
@@ -199,11 +199,11 @@
                                             <label style=" color:<%out.println(text);%>" class="login__label">Tip concediu</label>
                                             <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name='tip' class="login__input">
                                             <%
-                                            try (PreparedStatement stmt = connection.prepareStatement("SELECT tip, motiv FROM tipcon")) {
-                                                ResultSet rs1 = stmt.executeQuery();
-                                                while (rs1.next()) {
-                                                    int tip = rs1.getInt("tip");
-                                                    String motiv = rs1.getString("motiv");
+                                            try (PreparedStatement stmt3 = conexiune.prepareStatement("SELECT tip, motiv FROM tipcon")) {
+                                                ResultSet rezultat1 = stmt3.executeQuery();
+                                                while (rezultat1.next()) {
+                                                    int tip = rezultat1.getInt("tip");
+                                                    String motiv = rezultat1.getString("motiv");
                                                     out.println("<option value='" + tip + "'>" + motiv + "</option>");
                                                 }
                                             }
@@ -220,10 +220,7 @@
                                             <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Adaugare" class="login__button">
                                         </div>
                                     </form>
-                                    <%
-                                    out.println("</div>");
-                                    
-                                    %>
+                                   
                                 </div>
                                
                             </div>
@@ -258,6 +255,7 @@
 %>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+	// declarare si initializare variabile
     const dp1 = document.getElementById("start");
     const dp2 = document.getElementById("end");
     const calendarBody = document.getElementById('calendar-body');
@@ -272,6 +270,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var clickCount = 0; // Track the number of clicks
 
     calendarBody.addEventListener('click', function(event) {
+    	// atunci cand se face click pe o celula se trimite valoarea la formular
         if (event.target.tagName === 'TD' && event.target.getAttribute('data-date')) {
         	clickCount++;
             handleDateClick(event.target.getAttribute('data-date'));
@@ -295,63 +294,57 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     function handleDateClick(clickedDate) {
-        // Parse the clicked date and increment it by one day
+        // Se parseaza valoarea primita din tabel, ca data
         let parsedDate = new Date(clickedDate);
-        parsedDate.setDate(parsedDate.getDate() + 1);  // This properly increments the date by one day
-
-        // Convert the date back to a string in YYYY-MM-DD format for input fields
+        parsedDate.setDate(parsedDate.getDate() + 1);
+        // se pune sub format "YYYY-MM-DD" pentru a completa formularul
         let adjustedDate = parsedDate.toISOString().split('T')[0];
-
-        // Determine whether to set as start or end date
+        // daca nu e completat dp1, se pune valoarea in dp1, altfel in dp2
         if (dp1.value !== '') {
             dp2.value = adjustedDate;  // Set end date if start date is already set
         } else {
-        	
             dp1.value = adjustedDate;  // Set start date if not already set
             dp2.value = '';  // Clear end date to allow for new selection
         }
-        
-        updateCalendarToSelectedDate(parsedDate);  // Update calendar display
-        highlightDates();  // Highlight selected range
+        updateCalendarToSelectedDate(parsedDate);  // se randeaza calendarul din nou (ca sa fie si cu ce s-a marcat)
+        highlightDates();  // se marcheaza datele selectate in calendar
     }
 
-
+	// ajuta la randare, ca sa randeze cu tot cu luna si an
     function updateCalendarToSelectedDate(date) {
         currentYear = date.getFullYear();
         currentMonth = date.getMonth();
         renderCalendar(currentMonth, currentYear);
     }
 
- // Function to add days to a date
+ // adauga (matematic) o zi la o data
     function addDays(date, days) {
         var result = new Date(date);
         result.setDate(result.getDate() - days);
         return result;
     }
 
+ 	// marcheaza datele/celule din calendar/tabel
     function highlightDates() {
-        const startDate = dp1.value ? new Date(dp1.value + 'T00:00:00Z') : null;
+        const startDate = dp1.value ? new Date(dp1.value + 'T00:00:00Z') : null; // se dorste format si cu ora
         const endDate = dp2.value ? new Date(dp2.value + 'T00:00:00Z') : null;
-
-        Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => {
+        Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => { // pentru fiecare data din tabel
             const currentDate = new Date(td.getAttribute('data-date') + 'T00:00:00Z');
-
-            // Reset to default background color
+        	// se coloreaza in culoarea de baza (initial)
             td.style.backgroundColor = defaultBg;
-
-            // Check and apply background color if current date is in the desired range
+        	// daca data curenta din for e intre start si end atunci se adauga un nou atribut de stil de culoare la acea celula
             if (startDate && endDate && currentDate >= addDays(startDate, 1) && currentDate < endDate) {
                 td.style.backgroundColor = bg; // Highlight range
             }
         });
     }
 
-
+ 	// aici se randeaza calendarul
     function renderCalendar(month, year) {
         let firstDay = new Date(year, month).getDay();
-        calendarBody.innerHTML = ''; // Clear previous cells
-        monthYear.textContent = monthNames[month] + ' ' + year; // Set the current month and year
-
+        calendarBody.innerHTML = ''; // se goleste tot si se construieste de la capat
+        monthYear.textContent = monthNames[month] + ' ' + year; // se seteaza data curenta (incrementata/decrementata, 
+        		// dar mai intai la incarcarea paginii apare data curenta care se modifica in functie de sageti)
         let date = 1;
         for (let i = 0; i < 6; i++) {
             let row = document.createElement('tr');
@@ -370,47 +363,45 @@ document.addEventListener("DOMContentLoaded", function() {
             calendarBody.appendChild(row);
         }
     }
-
+ 	
+	// pentru a modifica luna calendarului, in urma
     prevButton.addEventListener('click', function() {
         currentMonth--;
         if (currentMonth < 0) {
             currentMonth = 11;
             currentYear--;
         }
+     // pentru fiecare schimbare se reface calendarul
         renderCalendar(currentMonth, currentYear);
     });
 
+ // pentru a modifica luna calendarului, inainte
     nextButton.addEventListener('click', function() {
         currentMonth++;
         if (currentMonth > 11) {
             currentMonth = 0;
             currentYear++;
         }
+        // pentru fiecare schimbare se reface calendarul
         renderCalendar(currentMonth, currentYear);
     });
- // Ensures that the end date is not before the start date
+ 
+ // functie ce verifica ca data de final sa fie dupa data de inceput a concediului
 	function updateEndDate() {
 	    if (dp2.value < dp1.value) {
 	        dp2.value = dp1.value;
 	    }
 	    highlightDate();
 	}
- // updateEndDate();
-	// Update and validate dates
+ 
+	// adauga functii care sa se modifice la fiecare schimbare a inputului de data
     dp1.addEventListener("change", highlightDates);
     dp2.addEventListener("change", highlightDates);
- 
-    
-
     dp1.addEventListener("change", updateEndDate);
     dp2.addEventListener("change", validateDates);
     renderCalendar(currentMonth, currentYear);
 });
-
 </script>
-
-
 <script src="./responsive-login-form-main/assets/js/main.js"></script>
-
 </body>
 </html>
