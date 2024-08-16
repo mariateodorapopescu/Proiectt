@@ -322,13 +322,27 @@ document.addEventListener("DOMContentLoaded", function() {
         renderCalendar(currentMonth, currentYear);
     }
 
+ // Function to add days to a date
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() - days);
+        return result;
+    }
+
     function highlightDates() {
-        const startDate = dp1.value ? new Date(dp1.value) : null;
-        const endDate = dp2.value ? new Date(dp2.value ) : null;
+        const startDate = dp1.value ? new Date(dp1.value + 'T00:00:00Z') : null;
+        const endDate = dp2.value ? new Date(dp2.value + 'T00:00:00Z') : null;
 
         Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => {
-            let date = new Date(td.getAttribute('data-date') );
-            td.style.backgroundColor = (startDate && endDate && date >= startDate && date < endDate) ? bg : defaultBg;
+            const currentDate = new Date(td.getAttribute('data-date') + 'T00:00:00Z');
+
+            // Reset to default background color
+            td.style.backgroundColor = defaultBg;
+
+            // Check and apply background color if current date is in the desired range
+            if (startDate && endDate && currentDate >= addDays(startDate, 1) && currentDate < endDate) {
+                td.style.backgroundColor = bg; // Highlight range
+            }
         });
     }
 
@@ -385,6 +399,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	// Update and validate dates
     dp1.addEventListener("change", highlightDates);
     dp2.addEventListener("change", highlightDates);
+ 
+    
+
     dp1.addEventListener("change", updateEndDate);
     dp2.addEventListener("change", validateDates);
     renderCalendar(currentMonth, currentYear);
