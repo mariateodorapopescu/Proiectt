@@ -280,17 +280,26 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function handleDateClick(clickedDate) {
-    	if (dp1.value != '')
-    	{ dp2.value = clickedDate;
-            //dp2.value='';
+        // Parse the clicked date and increment it by one day
+        let parsedDate = new Date(clickedDate);
+        parsedDate.setDate(parsedDate.getDate() + 1);  // This properly increments the date by one day
+
+        // Convert the date back to a string in YYYY-MM-DD format for input fields
+        let adjustedDate = parsedDate.toISOString().split('T')[0];
+
+        // Determine whether to set as start or end date
+        if (dp1.value !== '') {
+            dp2.value = adjustedDate;  // Set end date if start date is already set
         } else {
-            
-                dp1.value = clickedDate;
-            dp2.value='';
+        	
+            dp1.value = adjustedDate;  // Set start date if not already set
+            dp2.value = '';  // Clear end date to allow for new selection
         }
-        updateCalendarToSelectedDate(new Date(clickedDate));
-        highlightDates();
+        
+        updateCalendarToSelectedDate(parsedDate);  // Update calendar display
+        highlightDates();  // Highlight selected range
     }
+
 
     function updateCalendarToSelectedDate(date) {
         currentYear = date.getFullYear();
@@ -299,18 +308,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function highlightDates() {
-        const startDate = dp1.value ? new Date(dp1.value) : '';
-        const endDate = dp2.value ? new Date(dp2.value) : '';
+        const startDate = dp1.value ? new Date(dp1.value) : null;
+        const endDate = dp2.value ? new Date(dp2.value ) : null;
+
         Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => {
-            const currentDate = new Date(td.getAttribute('data-date'));
-            td.classList.remove('highlight');
-            td.style.backgroundColor = defaultBg; // Reset to default background color
-            if (startDate && currentDate >= startDate && (!endDate || currentDate <= endDate)) {
-                td.classList.add('highlight');
-                td.style.backgroundColor = bg;
-            }
+            let date = new Date(td.getAttribute('data-date') );
+            td.style.backgroundColor = (startDate && endDate && date >= startDate-1 && date < endDate) ? bg : defaultBg;
         });
     }
+
 
     function renderCalendar(month, year) {
         let firstDay = new Date(year, month).getDay();
