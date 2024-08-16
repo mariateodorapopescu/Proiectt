@@ -629,7 +629,7 @@ int pag = -1;
                               // int nr = 1;
                               
                                 String added = rss1.getString("added") != null ? rss1.getString("added") : " - ";
-                                String modif = rss1.getString("modified") != null ? rss1.getString("modif") : " - ";
+                                String modif = rss1.getString("modified") != null ? rss1.getString("modified") : " - ";
                                 String accres = rss1.getString("acc_res") != null ? rss1.getString("acc_res") : " - ";
                                 		
                                 out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +

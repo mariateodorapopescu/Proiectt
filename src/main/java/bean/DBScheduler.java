@@ -11,7 +11,7 @@ import java.util.Timer;
 			ReadPropertiesFile.readConfig();
 			Timer timer = new Timer();
 
-			timer.scheduleAtFixedRate(new Testing(), getTimePrecision(Constants.delay), getTimePrecision("1d"));
+			timer.scheduleAtFixedRate(new Testing(), getTimePrecision("2s"), getTimePrecision("1d"));
 
 		}
 

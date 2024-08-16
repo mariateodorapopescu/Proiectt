@@ -24,8 +24,13 @@ public class Testing extends TimerTask
 	            Class.forName("com.mysql.cj.jdbc.Driver");
 	            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
 	                sendReminders(connection);
+	                
 	                sendReminders2(connection);
+	                
 	                sendReminders3(connection);
+	                
+	                sendReminders4(connection);
+	                
 	            } catch (IOException e) {
 	                System.err.println("Error during database operation: " + e.getMessage());
 	            } catch (SQLException e1) {
@@ -43,7 +48,7 @@ public class Testing extends TimerTask
 	        }
 	
 	private void sendReminders(Connection connection) throws Exception {
-	    String query = "SELECT DISTINCT useri.id, useri.email, concedii.start_c, concedii.end_c, locatie, concedii.motiv, tipcon.motiv AS tip_motiv, DATEDIFF(concedii.start_c, CURRENT_DATE()) AS days_until_start "
+	    String query = "select useri.id, useri.email, concedii.start_c, concedii.end_c, locatie, concedii.motiv, tipcon.motiv AS tip_motiv, tipcon.motiv as tip_motiv, DATEDIFF(concedii.start_c, CURRENT_DATE()) AS days_until_start "
 	            + "FROM useri "
 	            + "JOIN concedii ON useri.id = concedii.id_ang "
 	            + "JOIN tipcon ON concedii.tip = tipcon.tip "
@@ -61,11 +66,15 @@ public class Testing extends TimerTask
 	}
 	
 	private void sendReminders2(Connection connection) throws Exception {
-	    String query = "SELECT nume, prenume, id_dep from useri where day(data_nasterii) = day(current_date() + 1) and month(data_nasterii) = (current_date() + 1);";
+	    String query = "SELECT id, nume, prenume, id_dep \r\n"
+	    		+ "FROM useri \r\n"
+	    		+ "WHERE DAY(data_nasterii) = DAY(CURRENT_DATE() + INTERVAL 1 DAY) \r\n"
+	    		+ "  AND MONTH(data_nasterii) = MONTH(CURRENT_DATE() + INTERVAL 1 DAY);\r\n"
+	    		+ "";
 	    // email zi de nastere
 	    String nume = "";
 	    String prenume = "";
-	   
+	    int id = -1;
 	    int dep = -1;
 	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 	        ResultSet rs = preparedStatement.executeQuery();
@@ -73,11 +82,12 @@ public class Testing extends TimerTask
 	            nume = rs.getString("nume");
 	            prenume = rs.getString("prenume");
 	            dep = rs.getInt("id_dep");
-	            String query2 = "SELECT email from useri where id_dep = " + dep + ";";
+	            id = rs.getInt("id");
+	            String query2 = "SELECT email from useri where id_dep = " + dep + " and id <> " + id + ";";
 	            try (PreparedStatement preparedStatement2 = connection.prepareStatement(query2)) {
 	    	        ResultSet rs2 = preparedStatement2.executeQuery();
 	    	        while (rs2.next()) {
-	    	            sendEmail2(nume, prenume, rs2);
+	    	            sendEmail2(nume, prenume, id, rs2);
 	    	        }
 	    	    } catch (SQLException e) {
 	    	        throw new IOException("Eroare BD: " + e.getMessage(), e);
@@ -90,7 +100,7 @@ public class Testing extends TimerTask
 	    
 	}
 	
-	private void sendEmail2(String nume, String prenume, ResultSet rs) throws Exception {
+	private void sendEmail2(String nume, String prenume, int id, ResultSet rs) throws Exception {
 		String to = rs.getString("email");
 	   
 	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
@@ -111,29 +121,36 @@ public class Testing extends TimerTask
 	    
 	}
 	
-	private void sendReminders3(Connection connection) throws Exception {
-	    String query = "SELECT CONCAT(sarbatori.nume, '; ', libere.nume) AS nume "
-	    		+ "FROM sarbatori "
-	    		+ "JOIN libere ON day(sarbatori.zi) = day(libere.zi) AND month(sarbatori.zi) = month(libere.zi) "
-	    		+ "WHERE day(sarbatori.zi) = day(current_date() + interval 1 day)"
-	    		+ "  AND month(sarbatori.zi) = month(current_date() + interval 1 day);";
-	    // email libere legale si sarbatori ale companiei
-	    String zi = "";
-	   
+	private void sendReminders4(Connection connection) throws Exception {
+	    String query = "SELECT email, id, nume, prenume, id_dep \r\n"
+	    		+ "FROM useri \r\n"
+	    		+ "WHERE DAY(data_nasterii) = DAY(CURRENT_DATE()) \r\n"
+	    		+ "  AND MONTH(data_nasterii) = MONTH(CURRENT_DATE());\r\n"
+	    		+ ";";
+	    // email zi de nastere
+	    String to = "";
+	    String prenume = "";
+	    int id = -1;
+	    int dep = -1;
 	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 	        ResultSet rs = preparedStatement.executeQuery();
 	        while (rs.next()) {
-	            zi = rs.getString("nume");
-	            
-	            String query2 = "SELECT email from useri;";
-	            try (PreparedStatement preparedStatement2 = connection.prepareStatement(query2)) {
-	    	        ResultSet rs2 = preparedStatement2.executeQuery();
-	    	        while (rs2.next()) {
-	    	            sendEmail3(zi, rs2);
-	    	        }
-	    	    } catch (SQLException e) {
-	    	        throw new IOException("Eroare BD: " + e.getMessage(), e);
-	    	    }
+	            to = rs.getString("email");
+	            String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    	    String message21 = "<h1>La multi ani!&#x1F389;</h1>"; 
+	    	    String message22 = "Compania va doreste multa sanatate, fericire si realizari pe toate planurile alaturi de cei dragi! &#x1F389; <br> Ne bucuram sa lucram impreuna cu dumneavoastra, sa va avem alaturi! Multumim pentru efortul depus! <br>";
+	    	    String message23 = "<h2>Va dorim toate cele bune!&#x1F60E;</h2>";
+	    	    String message222 = message21 + message22 + message23 + "<b><i>Conducerea firmei XYZ.</i></b>&#x1F917;";
+	    	   
+	    	    GMailServer sender = new GMailServer("liviaaamp@gmail.com","rtmz fzcp onhv minb");
+
+	    	    try {
+	    	        sender.send(subject2, message222, "liviaaamp@gmail.com", to);
+	    	        
+	    	    } catch (Exception e) {
+	    	        e.printStackTrace();
+	    	       
+	    	    }  
 	           
 	        }
 	    } catch (SQLException e) {
@@ -142,27 +159,59 @@ public class Testing extends TimerTask
 	    
 	}
 	
-	private void sendEmail3(String nume, ResultSet rs) throws Exception {
-		String to = rs.getString("email");
-	   
-	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-	    String message21 = "<h1>Maine este " + nume + "!&#x1F389;</h1>"; 
-	    String message22 = "Sa ne bucuram de aceasta zi impreuna! <br>";
-	    String message23 = "<h2>Va dorim toate cele bune!&#x1F60E;</h2>";
-	    String message222 = message21 + message22 + message23 + "<b><i>Conducerea firmei XYZ.</i></b>&#x1F917;";
-	   
-	    GMailServer sender = new GMailServer("liviaaamp@gmail.com","rtmz fzcp onhv minb");
+	private void sendReminders3(Connection connection) throws Exception {
+	    String query = "SELECT nume \r\n"
+	    		+ "FROM sarbatori \r\n"
+	    		+ "WHERE DAY(zi - INTERVAL 1 DAY) = DAY(CURRENT_DATE()) \r\n"
+	    		+ "  AND MONTH(zi) = MONTH(CURRENT_DATE())\r\n"
+	    		+ "\r\n"
+	    		+ "UNION\r\n"
+	    		+ "\r\n"
+	    		+ "SELECT nume \r\n"
+	    		+ "FROM libere \r\n"
+	    		+ "WHERE DAY(zi - INTERVAL 1 DAY) = DAY(CURRENT_DATE()) \r\n"
+	    		+ "  AND MONTH(zi) = MONTH(CURRENT_DATE());";
+
+	    String zi = "";
+
+	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+	        ResultSet rs = preparedStatement.executeQuery();
+	        if (rs.next()) {
+	            zi = rs.getString("nume");
+
+	            String query2 = "SELECT email FROM useri";
+	            try (PreparedStatement preparedStatement2 = connection.prepareStatement(query2);
+	                 ResultSet rs2 = preparedStatement2.executeQuery()) {
+
+	                while (rs2.next()) {
+	                    String email = rs2.getString("email");
+	                    sendEmail3(zi, email);
+	                }
+	            } catch (SQLException e) {
+	                throw new IOException("Database error: " + e.getMessage(), e);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        throw new IOException("Database error: " + e.getMessage(), e);
+	    }
+	}
+
+	private void sendEmail3(String nume, String email) throws Exception {
+	    String subject = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    String message = "<h1>Maine este " + nume + "!&#x1F389;</h1>" 
+	                   + "Sa ne bucuram de aceasta zi impreuna! <br>" 
+	                   + "<h2>Va dorim toate cele bune!&#x1F60E;</h2>"
+	                   + "<b><i>Conducerea firmei XYZ.</i></b>&#x1F917;";
+
+	    GMailServer sender = new GMailServer("your-email@gmail.com", "your-email-password");
 
 	    try {
-	        sender.send(subject2, message222, "liviaaamp@gmail.com", to);
-	        
+	        sender.send(subject, message, "your-email@gmail.com", email);
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	       
-	    }  
-	    
-	   
+	    }
 	}
+
 
 	private void sendEmail(ResultSet rs) throws Exception {
 		 long currentTimeMillis = System.currentTimeMillis();

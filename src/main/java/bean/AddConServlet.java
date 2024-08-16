@@ -17,6 +17,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.annotation.WebServlet;
 
 import org.w3c.dom.Document;
 
@@ -24,24 +29,43 @@ import org.w3c.dom.Document;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
+/**
+ * 
+ * Acest Servlet se ocupa cu adaugarea de concedii
+ */
 public class AddConServlet extends HttpServlet {
-//	private static final long serialVersionUID = 1L;
-    
+
+    /**
+     * constructor
+     */
     public AddConServlet() {
         super();
     }
     
+    /**
+     * Dao ca sa incarce datele
+     */
     private ConcediuConDao concediu;
-
+    
+    /**
+     * initializare
+     */
     public void init() {
         concediu = new ConcediuConDao();
     }
     
+    /**
+     * In cazul in care se face get pe server
+     */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		response.getWriter().append("Nu se poate face get =(");
 	}
 
+	/**
+	 * Functie care se ocupa cu transformarea unui String "YYYY-MM-DD" in data din java.util
+	 * @param data
+	 * @return Data Java
+	 */
 	protected Data toData(String data) {
 		 String[] parts = data.split("-");
 	        int an = Integer.parseInt(parts[0]);
@@ -50,51 +74,68 @@ public class AddConServlet extends HttpServlet {
 	        return new Data(zi, luna, an);
 	}
 	
+	/**
+	 * metoda post din server
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		int uid = Integer.valueOf(request.getParameter("userId"));
-		String start = request.getParameter("start");
-		String end = request.getParameter("end");
+		// declarare si initializare date
+		int id = Integer.valueOf(request.getParameter("userId")); // pentru interogari urmatoare
+		
+		// pentru a crea concediul
+		String inceput = request.getParameter("start");
+		String sfarsit = request.getParameter("end");
     	String motiv = request.getParameter("motiv");
     	String locatie = request.getParameter("locatie");
     	int tip = Integer.valueOf(request.getParameter("tip"));
+    	
+    	// extra date despre concediu
     	int durata = 0;
-    	 LocalDate start_c = LocalDate.parse(start);
-		    LocalDate end_c = LocalDate.parse(end);
-		    long daysBetween = ChronoUnit.DAYS.between(start_c, end_c) + 1; 
-		    durata = (int) daysBetween + 1;
-		    if (end_c.isBefore(start_c)) {
-		        throw new IOException("Data de final nu poate fi inaintea celei de inceput!");
-		    }
-
-		    Set<LocalDate> holidays = new HashSet<>();
-		    int year = start_c.getYear(); 
-		    holidays.add(LocalDate.of(year, 1, 1)); 
-		    holidays.add(LocalDate.of(year, 1, 2)); 
-		    holidays.add(LocalDate.of(year, 1, 6)); 
-		    holidays.add(LocalDate.of(year, 1, 7));
-		    holidays.add(LocalDate.of(year, 1, 24)); 
-		    holidays.add(LocalDate.of(year, 5, 1)); 
-		    holidays.add(LocalDate.of(year, 6, 1)); 
-		    holidays.add(LocalDate.of(year, 8, 15));
-		    holidays.add(LocalDate.of(year, 11, 30)); 
-		    holidays.add(LocalDate.of(year, 12, 1));
-		    holidays.add(LocalDate.of(year, 12, 25));
-		    holidays.add(LocalDate.of(year, 12, 26)); 
+    	LocalDate inceput2 = LocalDate.parse(inceput);
+		LocalDate sfarsit2 = LocalDate.parse(sfarsit);
+		long diferenta1 = ChronoUnit.DAYS.between(inceput2, sfarsit2) + 1; 
+		Set<LocalDate> libere = new HashSet<>();
+	    int an = inceput2.getYear(); 
+	    
+	    // concediu ca sa il incarc in Dao
+	    ConcediuCon concediul = new ConcediuCon();
+	    
+	    // verificari coerenta planificare concediu a datelor de inceput si final
+	    durata = (int) diferenta1 + 1;
+	    if (sfarsit2.isBefore(inceput2)) {
+	        throw new IOException("Data de final nu poate fi inaintea celei de inceput!");
+	    }
+	    final int durata2 = durata;
+	    
+	    // verificare daca concediul este in liberele legale, ca sa nu se numere
+	    libere.add(LocalDate.of(an, 1, 1)); 
+	    libere.add(LocalDate.of(an, 1, 2)); 
+	    libere.add(LocalDate.of(an, 1, 6)); 
+	    libere.add(LocalDate.of(an, 1, 7));
+	    libere.add(LocalDate.of(an, 1, 24)); 
+	    libere.add(LocalDate.of(an, 5, 1)); 
+	    libere.add(LocalDate.of(an, 6, 1)); 
+	    libere.add(LocalDate.of(an, 8, 15));
+	    libere.add(LocalDate.of(an, 11, 30)); 
+	    libere.add(LocalDate.of(an, 12, 1));
+	    libere.add(LocalDate.of(an, 12, 25));
+	    libere.add(LocalDate.of(an, 12, 26)); 
 		    
-		    //int duration = calculateDurationExcludingHolidaysAndNegativeStatus(uid, start_c, end_c);
-
-        ConcediuCon con = new ConcediuCon();
-        con.setId_ang(uid);
-        con.setStart(start);
-        con.setEnd(end);
-        con.setMotiv(motiv);
-        con.setLocatie(locatie);
-        con.setTip(tip);
-        con.setDurata((durata + 1));
+        // incarcare date in obiect de tip Concediu
+        concediul.setId_ang(id);
+        concediul.setStart(inceput);
+        concediul.setEnd(sfarsit);
+        concediul.setMotiv(motiv);
+        concediul.setLocatie(locatie);
+        concediul.setTip(tip);
+        concediul.setDurata((durata + 1));
       
+        // verificari concordanta date concediu -> majoritatea sunt cu try&catch pentru ca se bazeaza pe request, response, concediu
+        // cum majoritatea metodelor implementate pentru verificarea concordantei concediului sunt similare, 
+        // au acelasi tip de erori, functioneaza dupa acelasi principiu, difera numai interogarea in baza de date, alte cateva variabile
         try {
+        	// verificare daca are mai mult de 3 concedii pe an
 			if (maimulteconcedii(request)) {
-				 response.setContentType("text/html;charset=UTF-8");
+				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul nu poate avea mai mult de 3 perioade diefrite de concediu!');");
@@ -104,30 +145,31 @@ public class AddConServlet extends HttpServlet {
 				return;
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			 response.setContentType("text/html;charset=UTF-8");
-			    PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
 			response.setContentType("text/html;charset=UTF-8");
-			 PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu a gasit clasa - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
+		} catch (IOException e) {
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+			response.setContentType("text/html;charset=UTF-8");
+			PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare IO - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
 		}
         
         try {
 			if (!maimultezile(request)) {
-				 response.setContentType("text/html;charset=UTF-8");
+				// verificare daca are mai mult de 30 sau 40 de zile de concediu pe an
+				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul are deja prea multe zile de concediu!');");
@@ -137,30 +179,31 @@ public class AddConServlet extends HttpServlet {
 				return;
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			 response.setContentType("text/html;charset=UTF-8");
-			    PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
 			response.setContentType("text/html;charset=UTF-8");
-			 PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu a gasit clasa - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
+		} catch (IOException e) {
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+			response.setContentType("text/html;charset=UTF-8");
+			PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare IO - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
 		}
         
         try {
-			if (!odatavara(request) && (toData(con.getStart()).getLuna() >= 6 && toData(con.getStart()).getLuna() <= 8)) {
-				 response.setContentType("text/html;charset=UTF-8");
+			if (!odatavara(request) && (toData(concediul.getStart()).getLuna() >= 6 && toData(concediul.getStart()).getLuna() <= 8)) {
+				// verificare daca are deja un concediu pe perioada verii
+				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Utilizatorul nu poate avea mai mult de un concediu pe timpul verii!');");
@@ -170,29 +213,30 @@ public class AddConServlet extends HttpServlet {
 				return;
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			 response.setContentType("text/html;charset=UTF-8");
-			    PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
 			response.setContentType("text/html;charset=UTF-8");
-			 PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu a gasit clasa - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
+		} catch (IOException e) {
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+			response.setContentType("text/html;charset=UTF-8");
+			PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare IO - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
 		}
         
-        if (!maimultezileodata(con)) {
-        	 response.setContentType("text/html;charset=UTF-8");
+        if (!maimultezileodata(concediul)) {
+        	// verificare daca are mai mult de 21 de concediu pe o perioada de concediu
+        	response.setContentType("text/html;charset=UTF-8");
         	PrintWriter out = response.getWriter();
 			out.println("<script type='text/javascript'>");
 		    out.println("alert('Utilizatorul nu poate avea mai mult de 21 de zile / concediu!');");
@@ -203,8 +247,9 @@ public class AddConServlet extends HttpServlet {
 		}
         
         try {
-			if (!preamulti(con, request)) {
-				 response.setContentType("text/html;charset=UTF-8");
+			if (!preamulti(concediul, request)) {
+				// verificare daca sunt prea multi angajati (mai mult de jumatate) dintr-un departament plecati in concediu
+				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				out.println("<script type='text/javascript'>");
 			    out.println("alert('Au concediu prea multi utilizatori dintr-un singur departament!');");
@@ -214,54 +259,57 @@ public class AddConServlet extends HttpServlet {
 				return;
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			 response.setContentType("text/html;charset=UTF-8");
-			    PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Nu a gasit clasa - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
 			response.setContentType("text/html;charset=UTF-8");
-			 PrintWriter out = response.getWriter();
-			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Eroare IO - debug only!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-			    e.printStackTrace();
+		    PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu a gasit clasa - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
+		} catch (IOException e) {
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+			response.setContentType("text/html;charset=UTF-8");
+			PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Eroare IO - debug only!');");
+		    out.println("window.location.href = 'actiuni.jsp';");
+		    out.println("</script>");
+		    out.close();
+		    e.printStackTrace();
 		}
         
-        String QUERY2 = "select * from useri where id = ?;";
-	    int userType = -1;
-	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // aci crapa
-		         PreparedStatement stm = conn.prepareStatement(QUERY2)) {
-		        stm.setInt(1, uid);
-		        try (ResultSet res = stm.executeQuery()) {
-		            if (res.next()) {
+        // acum, diferit de celalte metode, se verifica tipul de utilizator pentru ca daca este sef (3) sau director (0), nu pot fi 2/departament
+        String QUERY2 = "select * from useri where id = ?;"; // interogarea este un string
+	    int userType = -1; // pentru cazul in care nu se gaseste nimic in baza de date sau introgarea nu este corecta, ar ramane -1
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); 
+	    		// se creaza conexiune (uneori mai puneam si Class.forName pentru driver, acum a mers si asa
+		        PreparedStatement stm = conn.prepareStatement(QUERY2)) { //se pregateste pentru a face interogarea
+		        stm.setInt(1, id); // adaug variabile
+		        try (ResultSet res = stm.executeQuery()) { // se executa interogarea
+		            if (res.next()) { // se extrag date din rezultatul interogarii, mai exact tipul de utilizator care a adaugat concediul
 		                userType = res.getInt("tip");
 		            }
 		        }
-		    } catch (SQLException e) {
+		    } catch (SQLException e) { // interogarile pot arunca exceptii si daca da, atunci semnalizez cu alerta si redirectare la pagina de adaugare/modificare concediu
 		        printSQLException(e);
 		        response.setContentType("text/html;charset=UTF-8");
-				 PrintWriter out = response.getWriter();
-				    out.println("<script type='text/javascript'>");
-				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'actiuni.jsp';");
-				    out.println("</script>");
-				    out.close();
-				    e.printStackTrace();
+				PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Eroare la baza de date - debug only!');");
+			    out.println("window.location.href = 'actiuni.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 		        throw new IOException("Eroare la baza de date =(", e);
 		    }
 	    
 	    if (userType == 0) {
+	    	// daca utilizatorul este director, pot face verificarea sa nu fie mai mult de 2 directori plecati
 	    	 try {
-	 			if (!preamultid(con, request)) {
-	 				 response.setContentType("text/html;charset=UTF-8");
+	 			if (!preamultid(concediul, request)) {
+	 				response.setContentType("text/html;charset=UTF-8");
 	 				PrintWriter out = response.getWriter();
 					out.println("<script type='text/javascript'>");
 				    out.println("alert('Au concediu prea multi directori!');");
@@ -271,35 +319,37 @@ public class AddConServlet extends HttpServlet {
 					return;
 				}
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				 response.setContentType("text/html;charset=UTF-8");
-				    PrintWriter out = response.getWriter();
-				    out.println("<script type='text/javascript'>");
-				    out.println("alert('Nu a gasit clasa - debug only!');");
-				    out.println("window.location.href = 'actiuni.jsp';");
-				    out.println("</script>");
-				    out.close();
-				    e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
 				response.setContentType("text/html;charset=UTF-8");
-				 PrintWriter out = response.getWriter();
-				    out.println("<script type='text/javascript'>");
-				    out.println("alert('Eroare IO - debug only!');");
-				    out.println("window.location.href = 'actiuni.jsp';");
-				    out.println("</script>");
-				    out.close();
-				    e.printStackTrace();
+			    PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Nu a gasit clasa - debug only!');");
+			    out.println("window.location.href = 'actiuni.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
+			} catch (IOException e) {
+				// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+				response.setContentType("text/html;charset=UTF-8");
+				PrintWriter out = response.getWriter();
+			    out.println("<script type='text/javascript'>");
+			    out.println("alert('Eroare IO - debug only!');");
+			    out.println("window.location.href = 'actiuni.jsp';");
+			    out.println("</script>");
+			    out.close();
+			    e.printStackTrace();
 			}
 	    }
 	    
+	    // daca utilizatorul este director sau sef, atunci concediul este deja aprobat sef, altfel este neaprobat
 	    if (userType == 0 || userType == 3) {
-	    	con.setStatus(1);
+	    	concediul.setStatus(1);
 	    } else {
-	    	con.setStatus(0);
+	    	concediul.setStatus(0);
 	    }
 	    
-	    if (concediuExista(uid, start_c, end_c)) {
+	    // daca exista deja un concediu cu aceleasi date in baza de date, atunci e duplicat si, deci, nu se adauga
+	    if (concediuExista(id, inceput2, sfarsit2)) {
 	        response.setContentType("text/html;charset=UTF-8");
 	        PrintWriter out = response.getWriter();
 	        out.println("<script type='text/javascript'>");
@@ -310,8 +360,9 @@ public class AddConServlet extends HttpServlet {
 	        return; 
 	    }
 	    
+	    // verificare daca se incareaza in numarul de zile conform tipului de concediu (concediu medical, concediu de odihna, concediu fara plata etc)
 	    try {
-			if (oktip(con)) {
+			if (oktip(concediul)) {
 			    response.setContentType("text/html;charset=UTF-8");
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
@@ -322,144 +373,85 @@ public class AddConServlet extends HttpServlet {
 			    return; 
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
 			e.printStackTrace();
+			response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Eroare la baza de date!');");
+	        out.println("window.location.href = 'actiuni.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
 			e.printStackTrace();
+			response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Eroare la baza de date!');");
+	        out.println("window.location.href = 'actiuni.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
 		}
 	    
+	    // cum la neindeplinirea unei reguli de verificare a concediului se intampla redirectare si return, 
+	    // daca a ajuns in acest punct inseamna ca concediul este valid si, deci, se poate incarca in baza de date
+	    
         try {
-            concediu.check(con);
+            concediu.check(concediul);
             
-            String tod = "";
-            String tos = "";
-            String toa = "";
-            String nume = "";
-            String prenume = "";
-            String motivv = "";
-            int tipp = -1;
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-       	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
-       	         		+ "")) {
-       	        stmt.setInt(1, uid);
-       	        
-       	        ResultSet rs = stmt.executeQuery();
-       	        if (rs.next()) {
-       	            tos = rs.getString("email_sef");
-       	            toa = rs.getString("email_ang");
-       	            tod = rs.getString("email_dir");
-       	            nume = rs.getString("nume_ang");
-       	            prenume = rs.getString("prenume_ang");
-       	            tipp = rs.getInt("tip");
-       	        }
-       	    } catch (SQLException e) {
-       	        throw new ServletException("Eroare BD =(", e);
-       	    }
+            // aici vine partea asincrona
+            // incercare 1
+            /*
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(() -> {
+            	// public void send(int uid, int tip, String start, String end, String motiv, String locatie, int durata) throws ServletException {
+                try {
+					Async1.send(uid, tip, start, end, motiv, locatie, durataa);
+				} catch (ServletException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            });
+            executorService.shutdown();  // Oprește executorul după trimiterea emailului
+            */
             
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-          	         PreparedStatement stmt = connection.prepareStatement("select motiv from tipcon where tip = ?;")) {
-          	        stmt.setInt(1, tip);
-          	        
-          	        ResultSet rs = stmt.executeQuery();
-          	        if (rs.next()) {
-          	            motivv = rs.getString("motiv");
-          	            
-          	        }
-          	    } catch (SQLException e) {
-          	        throw new ServletException("Eroare BD=(", e);
-          	    }
+            // se doreste varianta cu servlet asincron, nu cu mai multe thread-uri.
+            // daca ar fi mai multe thread-uri, server-ul s-ar incarca prea mult si ar deveni indisponibil -> neok
+            // jakarta este javax nou
+            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
+            asyncContext.setTimeout(10000);  // Set a reasonable timeout
+
             
-            GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+            asyncContext.start(() -> {
+                try {
+                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
+                    Async1.send(id, tip, inceput, sfarsit, motiv, locatie, durata2);
+                    asyncContext.complete();  // Completarea actiunii asincrone
+                } catch (Exception e) {
+                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
+                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
+                    response.setContentType("text/html;charset=UTF-8");
+        	        PrintWriter out = null;
+					try {
+						out = response.getWriter();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+        	        out.println("<script type='text/javascript'>");
+        	        out.println("alert('eroare din cauze necunoscute!');");
+        	        out.println("window.location.href = 'actiuni.jsp';");
+        	        out.println("</script>");
+        	        out.close();
+        	        return; 
+                    
+                }
+            });
             
-            if (tipp != 0) {
-	           // trimit confirmare inregistrare la angajat 
-	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-	    	    String message11 = "<h1>Felicitari! &#x1F389; Concediul a fost programat cu succes! &#x1F389;</h1>"; 
-	    	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607;"
-	    	    		+ "</h2>";
-	    	    String message13 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message14 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
-	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
-	    	    		+ " </p>";
-	    	    String message1 = message11 + message12 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-	    	    		+ "</i></b>";
-	    	   
-	    	    try {
-	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", toa);
-	    	       
-	    	    } catch (Exception e) {
-	    	        e.printStackTrace();
-	    	       
-	    	    }  
-            }
-    	    if (tipp != 3 || tipp != 0) {
-	    	 // trimit notificare la sef
-	    	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-	    	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
-	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a adaugat un nou concediu."
-	    	    		+ "</h2>";
-	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
-	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
-	    	    		+ " </p>";
-	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-	    	    		+ "</i></b>";
-	    	   
-	    	    // GMailServer sender2 = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
-	
-	    	    try {
-	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tos);
-	    	       
-	    	    } catch (Exception e) {
-	    	        e.printStackTrace();
-	    	       
-	    	    }  
-    	    } 
-    	    if (tipp == 3){
-    	    	// trimit notificare la director
-	    	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-	    	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
-	    	    String message22 = "<h2>Angajatul " + nume + " " + prenume + " a adaugat un nou concediu."
-	    	    		+ "</h2>";
-	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
-	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
-	    	    		+ " </p>";
-	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-	    	    		+ "</i></b>";
-	    	   
-	    	    try {
-	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tod);
-	    	       
-	    	    } catch (Exception e) {
-	    	        e.printStackTrace();
-	    	       
-	    	    }  
-    	    }
-    	    if (tipp == 0){
-    	    	// trimit notificare la director ca angajat
-	    	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-	    	    
-	    	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
-	    	    String message22 = "<h2>Felicitari! &#x1F389; Concediul a fost programat cu succes! &#x1F389; </h2><h3>Nu uitati sa-l aprobati sau sa-l respingeti!&#x1F609;\r\n"
-	    	    		+ "</h3>";
-	    	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul programat:</h3>";
-	    	    String message24 = "<p><b>Inceput:</b> " + start + "<br> <b>Final: </b> " + end + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motivv + "<br><b>Durata: </b>" + (durata - 1) + " zile<br></p>";
-	    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; \r\n"
-	    	    		+ " </p>";
-	    	    String message2 = message21 + message22 + message23 + message24 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-	    	    		+ "</i></b>";
-	
-	    	    try {
-	    	        sender.send(subject2, message2, "liviaaamp@gmail.com", tod);
-	    	       
-	    	    } catch (Exception e) {
-	    	        e.printStackTrace();
-	    	       
-	    	    }  
-    	    }
-    	    
+            // abia dupa ce trimit mail-ul trec mai departe 
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
@@ -478,108 +470,77 @@ public class AddConServlet extends HttpServlet {
 			e.printStackTrace();
         }
 	}
-
-	private boolean oktip(ConcediuCon con) throws SQLException {
-		String start = con.getStart();
-		String end = con.getEnd();
-		LocalDate start_c = LocalDate.parse(start);
-	    LocalDate end_c = LocalDate.parse(end);
-	    long daysBetween = ChronoUnit.DAYS.between(start_c, end_c) + 1; 
-	    int durata = 0;
-	    durata = (int) daysBetween + 1;
+	/**
+	 * verificare daca se incareaza in numarul de zile conform tipului de concediu (concediu medical, concediu de odihna, concediu fara plata etc)
+	 * @param concediul
+	 * @return true daca durata concediului este mai mica decat cea prevazuta pentru acel tip de concediu
+	 * @throws SQLException
+	 */
+	private boolean oktip(ConcediuCon concediul) throws SQLException {
+		// declarare si initializare variabile
+		String inceput = concediul.getStart();
+		String sfarsit = concediul.getEnd();
+		LocalDate inceput2 = LocalDate.parse(inceput);
+	    LocalDate sfarsit2 = LocalDate.parse(sfarsit);
+	    long durata = ChronoUnit.DAYS.between(inceput2, sfarsit2) + 1; // ultimul - primul + 1
 	    int durata2 = 0;
+	    durata2 = (int) durata + 1;
+	    int durata3 = 0;
 		String QUERY = "select nr_zile from tipcon;";
 	   
-	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // aci crapa
-		         PreparedStatement stm = conn.prepareStatement(QUERY)) {
-		        
-		        try (ResultSet res = stm.executeQuery()) {
-		            if (res.next()) {
-		                durata2 = res.getInt("nr_zile");
+	    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		        PreparedStatement stm = conexiune.prepareStatement(QUERY)) {
+		        try (ResultSet rezultat = stm.executeQuery()) {
+		            if (rezultat.next()) {
+		                durata3 = rezultat.getInt("nr_zile");
 		            }
 		        }
 		    } 
-	    return durata2 < durata;
+	    
+	    return durata3 < durata2;
 	}
 	
-	private boolean concediuExista(int uid, LocalDate start, LocalDate end) throws ServletException {
-	    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-	         PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM concedii WHERE id_ang = ? AND start_c = ? AND end_c = ? and status >= 0")) {
-	        stmt.setInt(1, uid);
-	        stmt.setDate(2, java.sql.Date.valueOf(start));
-	        stmt.setDate(3, java.sql.Date.valueOf(end));
+	/**
+	 * verificare daca are deja acelasi concediu (conform datelor de inceput si final) incarcat
+	 * @param id
+	 * @param inceput
+	 * @param sfarsit
+	 * @return true daca a numarat deja un concediu al acelei persoane in aceeasi perioada
+	 * @throws ServletException
+	 */
+	private boolean concediuExista(int id, LocalDate inceput, LocalDate sfarsit) throws ServletException {
+	    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+	        PreparedStatement stmt = conexiune.prepareStatement("SELECT COUNT(*) FROM concedii WHERE id_ang = ? AND start_c = ? AND end_c = ? and status >= 0")) {
+	        stmt.setInt(1, id);
+	        stmt.setDate(2, java.sql.Date.valueOf(inceput));
+	        stmt.setDate(3, java.sql.Date.valueOf(sfarsit));
 	        ResultSet rs = stmt.executeQuery();
 	        if (rs.next()) {
 	            return rs.getInt(1) > 0;
-	        }
+	        }	
 	    } catch (SQLException e) {
 	        throw new ServletException("Database error checking for existing leave", e);
 	    }
 	    return false;
 	}
-
-	
-	private int calculateDurationExcludingHolidaysAndNegativeStatus(int userId, LocalDate start, LocalDate end) throws ServletException {
-        Set<LocalDate> holidays = getLegalHolidays();
-        Set<LocalDate> excludedDays = getDaysWithNegativeStatus(userId);
-        int daysCount = 0;
-        LocalDate current = start;
-        while (!current.isAfter(end)) {
-            if (!holidays.contains(current) && !excludedDays.contains(current)) {
-                daysCount++;
-            }
-            current = current.plusDays(1);
-        }
-        return daysCount;
-    }
-	
-    private Set<LocalDate> getDaysWithNegativeStatus(int userId) throws ServletException {
-        Set<LocalDate> days = new HashSet<>();
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement stmt = connection.prepareStatement("SELECT start_c, end_c FROM concedii WHERE id_ang = ? AND status < 0")) {
-            stmt.setInt(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    LocalDate start = rs.getDate("start_c").toLocalDate();
-                    LocalDate end = rs.getDate("end_c").toLocalDate();
-                    while (!start.isAfter(end)) {
-                        days.add(start);
-                        start = start.plusDays(1);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new ServletException("SQL Error", e);
-        }
-        return days;
-    }
-
-		private static void printSQLException(SQLException ex) {
-	        for (Throwable e: ex) {
-	            if (e instanceof SQLException) {
-	                e.printStackTrace(System.err);
-	                System.err.println("SQLState: " + ((SQLException) e).getSQLState());
-	                System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
-	                System.err.println("Message: " + e.getMessage());
-	                Throwable t = ex.getCause();
-	                while (t != null) {
-	                    System.out.println("Cause: " + t);
-	                    t = t.getCause();
-	                }
-	            }
-	        }
-	    }
-		
+		/**
+		 * verificare daca are deja mai mult de 3 concedii pe an
+		 * @param request
+		 * @return true daca are mai mult de 3 perioade diferite de concediu pe an
+		 * @throws ClassNotFoundException
+		 * @throws IOException
+		 */
 		public static boolean maimulteconcedii(HttpServletRequest request) throws ClassNotFoundException, IOException {
+			// declarare si initializare variabile
 		    int nr = 0;
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-		    String QUERY = "SELECT * FROM useri WHERE useri.id = ?;";
-		    int uid = Integer.valueOf(request.getParameter("userId"));
+		    String sql = "SELECT * FROM useri WHERE useri.id = ?;";
+		    int id = Integer.valueOf(request.getParameter("userId"));
 
-		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-		         PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
-		        preparedStatement.setInt(1, uid);
-		        try (ResultSet rs = preparedStatement.executeQuery()) {
+		    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		        PreparedStatement stm = conexiune.prepareStatement(sql)) {
+		        stm.setInt(1, id);
+		        try (ResultSet rs = stm.executeQuery()) {
 		            if (rs.next()) {
 		                nr = rs.getInt("conramase"); // aici da, le ia pe alea cu status pozitiv sau 0
 		            }
@@ -591,55 +552,67 @@ public class AddConServlet extends HttpServlet {
 
 		    return nr > 3;
 		}
-
+		
+		/**
+		 * verificare daca are deja mai multe zile pe an
+		 * @param request
+		 * @return true daca are mai mult de 30/40 zile de concediu luate per total pe an
+		 * @throws ClassNotFoundException
+		 * @throws IOException
+		 */
 		public static boolean maimultezile(HttpServletRequest request) throws ClassNotFoundException, IOException {
+			// initializare si declarare variabile
 		    int nr = 0;
+		    int id = Integer.valueOf(request.getParameter("userId"));
+		    Set<LocalDate> libere = getLibereLegale();
+		    String sql = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and status >= 0;";
+		    String sql2 = "select * from useri where id = ?;";
+		    int tip = 0;
+		    
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-		    int uid = Integer.valueOf(request.getParameter("userId"));
-		    String QUERY2 = "select * from useri where id = ?;";
-		    int userType = 0;
-		    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-			         PreparedStatement stm = conn.prepareStatement(QUERY2)) {
-			        stm.setInt(1, uid);
-			        try (ResultSet res = stm.executeQuery()) {
-			            if (res.next()) {
-			                userType = res.getInt("tip");
-			            }
-			        }
-			    } catch (SQLException e) {
-			        printSQLException(e);
-			        throw new IOException("Eroare la baza de date", e);
-			    }
-
-		    Set<LocalDate> holidays = getLegalHolidays();
-		    String QUERY = "SELECT start_c, end_c FROM concedii WHERE id_ang = ? and status >= 0;";
-
-		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-		         PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
-		        preparedStatement.setInt(1, uid);
-		        try (ResultSet rs = preparedStatement.executeQuery()) {
-		            while (rs.next()) {
-		                LocalDate start = rs.getDate("start_c").toLocalDate();
-		                LocalDate end = rs.getDate("end_c").toLocalDate();
-		                while (!start.isAfter(end)) {
-		                    if (!holidays.contains(start)) {
+		    
+		    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		    	PreparedStatement stm = conexiune.prepareStatement(sql);  
+		    	PreparedStatement stm2 = conexiune.prepareStatement(sql2)) {
+		        stm2.setInt(1, id);
+		        try (ResultSet rezultat = stm2.executeQuery()) {
+		            if (rezultat.next()) {
+		                tip = rezultat.getInt("tip");
+		            }
+		        }
+		        
+		        stm.setInt(1, id);
+		        try (ResultSet rezultat = stm.executeQuery()) {
+		            while (rezultat.next()) {
+		                LocalDate inceput = rezultat.getDate("start_c").toLocalDate();
+		                LocalDate sfarsit = rezultat.getDate("end_c").toLocalDate();
+		                while (!inceput.isAfter(sfarsit)) {
+		                    if (!libere.contains(inceput)) {
 		                        nr++;
 		                    }
-		                    start = start.plusDays(1);
+		                    inceput = inceput.plusDays(1);
 		                }
 		            }
 		        }
+		        
 		    } catch (SQLException e) {
 		        printSQLException(e);
 		        throw new IOException("Eroare la baza de date", e);
 		    }
-		    if (userType == 2) {
+		    
+		    // daca e utilizator de tip 2, atunci nu are voie mai mult de 30 zile, altfel are 40
+		    if (tip == 2) {
 		        return nr < 30;
 		    }
+		    
 		    return nr < 40;
 		}
 		
-		public static Set<LocalDate> getLegalHolidays() {
+		/**
+		 * 
+		 * @return map cu liberele legale
+		 */
+		public static Set<LocalDate> getLibereLegale() {
 		    return new HashSet<>(Arrays.asList(
 		        LocalDate.of(LocalDate.now().getYear(), 1, 1),
 		        LocalDate.of(LocalDate.now().getYear(), 1, 2),
@@ -656,16 +629,157 @@ public class AddConServlet extends HttpServlet {
 		    ));
 		}
 		
+		/**
+		 * verificare daca are deja un concediu pe timpul verii
+		 * @param request
+		 * @return true daca are deja un concediu, diferit de acesta, pe timpul verii
+		 * @throws ClassNotFoundException
+		 * @throws IOException
+		 */
 		public static boolean odatavara(HttpServletRequest request) throws ClassNotFoundException, IOException{
-			 int nr = 0;
-			    Class.forName("com.mysql.cj.jdbc.Driver");
-			    String QUERY = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and concedii.status >= 0;";
-			    int uid = Integer.valueOf(request.getParameter("userId"));
+			// initializare si declarare variabile
+			int nr = 0;
+		    String sql = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and concedii.status >= 0;";
+		    int id = Integer.valueOf(request.getParameter("userId"));
+		    
+		    Class.forName("com.mysql.cj.jdbc.Driver");
+		    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		        PreparedStatement stm = conexiune.prepareStatement(sql)) {
+		        stm.setInt(1, id);
+		        try (ResultSet rezultat = stm.executeQuery()) {
+		            if (rezultat.next()) {
+		                nr = rezultat.getInt("total");
+		            }
+		        }
+		    } catch (SQLException e) {
+		        printSQLException(e);
+		        throw new IOException("Eroare la baza de date =(", e);
+		    }
 
+		    return nr < 1;
+		}
+		
+		/**
+		 * verificare numar de zile / concediu
+		 * @param concediu
+		 * @return daca un concediu are mai mult de 21 de zile
+		 */
+		public static boolean maimultezileodata(ConcediuCon concediu) {
+			// declarare si initializare variabile
+		    LocalDate inceput = LocalDate.parse(concediu.getStart());
+		    LocalDate sfarsit = LocalDate.parse(concediu.getEnd());
+		    Set<LocalDate> libere = getLibereLegale();
+		    int nr = 0;
+		    LocalDate datacurenta = inceput;
+		    
+		    while (!datacurenta.isAfter(sfarsit)) {
+		    	// ca sa nu am diferenta de zile negativa
+		        if (!libere.contains(datacurenta)) {
+		        	// efectiv numar
+		            nr++;
+		        }
+		        datacurenta = datacurenta.plusDays(1);
+		    }
+
+		    return nr < 21;
+		}
+		
+		/**
+		 * Transformare tip de date din String in date
+		 * @param dateString
+		 * @return data in format Date din java.util
+		 */
+		public static Data stringToDate(String dateString) {
+			// declarare si initializare variabile
+	        String[] parts = dateString.split("-");
+	        int an = Integer.parseInt(parts[0]);
+	        int luna = Integer.parseInt(parts[1]);
+	        int zi = Integer.parseInt(parts[2]);
+	        return new Data(zi, luna, an);
+	    }
+		
+		/**
+		 * Verificare daca intr-un departament sunt plecati mai mult de jumatate de angajati
+		 * @param concediu
+		 * @param request
+		 * @return
+		 * @throws ClassNotFoundException
+		 * @throws IOException
+		 */
+		public static boolean preamulti(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException {
+			// declarare si initializare date
+		    int nr = -1;
+		    int total = -1;
+		    int depid = -1;
+		    String sql = "SELECT id_dep FROM useri WHERE id = ?";
+		    String sql2 = "SELECT COUNT(*) AS total FROM useri WHERE id_dep = ?";
+		    String sql3 = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON useri.id = concedii.id_ang " +
+		        "WHERE useri.id_dep = ? AND start_c >= ? AND end_c <= ? and status > 0";
+		    int id = Integer.parseInt(request.getParameter("userId"));
+
+		    Class.forName("com.mysql.cj.jdbc.Driver");
+
+		    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		        PreparedStatement stmt = conexiune.prepareStatement(sql);  
+		    	PreparedStatement stmt2 = conexiune.prepareStatement(sql2);
+		    	PreparedStatement stmt3 = conexiune.prepareStatement(sql3)){
+		    	
+		    	Data inceput = stringToDate(concediu.getStart());
+		        Data sfarsit = stringToDate(concediu.getEnd());
+
+		        stmt.setInt(1, id);
+		        try (ResultSet rezultat = stmt.executeQuery()) {
+		            if (rezultat.next()) {
+		                depid = rezultat.getInt("id_dep");
+		            }
+		        }
+		        
+		        stmt2.setInt(1, depid);
+		        try (ResultSet rsTotalUsers = stmt2.executeQuery()) {
+		            if (rsTotalUsers.next()) {
+		                total = rsTotalUsers.getInt("total");
+		            }
+		        }
+
+		        stmt3.setInt(1, depid);
+		        stmt3.setDate(2, java.sql.Date.valueOf(inceput.getAn() + "-" + inceput.getLuna() + "-" + inceput.getZi()));
+		        stmt3.setDate(3, java.sql.Date.valueOf(sfarsit.getAn() + "-" + sfarsit.getLuna() + "-" + sfarsit.getZi()));
+		        try (ResultSet rsTotalLeaves = stmt3.executeQuery()) {
+		            if (rsTotalLeaves.next()) {
+		                nr = rsTotalLeaves.getInt("total");
+		            }
+		        }
+			        
+		    } catch (SQLException e) {
+		        printSQLException(e);
+		        throw new IOException("Eroare la baza de date", e);
+		    }
+		    
+		    return nr < (total / 2);
+		}
+		
+		/**
+		 * Verificare daca mai mult de 2 directori sunt plecati in concediu
+		 * @param concediu
+		 * @param request
+		 * @return true, daca daca mai mult de 2 directori sunt plecati in concediu
+		 * @throws ClassNotFoundException
+		 * @throws IOException
+		 */
+		public static boolean preamultid(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException{
+				int nr = 0;
+			    Class.forName("com.mysql.cj.jdbc.Driver");
+			    String QUERY = "select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= ? and month(start_c) = ? and day(start_c) <= ? and month(start_c) <= ? and status > 0 group by useri.tip having useri.tip = 0;";
+			  
 			    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-			         PreparedStatement preparedStatement = con.prepareStatement(QUERY)) {
-			        preparedStatement.setInt(1, uid);
-			        try (ResultSet rs = preparedStatement.executeQuery()) {
+			         PreparedStatement stm = con.prepareStatement(QUERY)) {
+			        Data start_c = stringToDate(concediu.getStart());
+			        Data end_c = stringToDate(concediu.getEnd());
+			        stm.setInt(1, start_c.getZi());
+			        stm.setInt(2, start_c.getLuna());
+			        stm.setInt(3, end_c.getZi());
+			        stm.setInt(4, end_c.getLuna());
+			        try (ResultSet rs = stm.executeQuery() ) {
 			            if (rs.next()) {
 			                nr = rs.getInt("total");
 			            }
@@ -675,120 +789,26 @@ public class AddConServlet extends HttpServlet {
 			        throw new IOException("Eroare la baza de date", e);
 			    }
 
-			    return nr < 1;
-		}
-		
-		public static boolean maimultezileodata(ConcediuCon concediu) {
-		    LocalDate start_c = LocalDate.parse(concediu.getStart());
-		    LocalDate end_c = LocalDate.parse(concediu.getEnd());
-
-		    Set<LocalDate> holidays = getLegalHolidays();
-		    
-		    int countDays = 0;
-		    LocalDate current = start_c;
-		    while (!current.isAfter(end_c)) {
-		    	
-		        if (!holidays.contains(current)) {
-		            countDays++;
-		        }
-		        current = current.plusDays(1);
-		    }
-
-		    return countDays < 21;
-		}
-		
-		public static Data stringToDate(String dateString) {
-	        String[] parts = dateString.split("-");
-	        int an = Integer.parseInt(parts[0]);
-	        int luna = Integer.parseInt(parts[1]);
-	        int zi = Integer.parseInt(parts[2]);
-	        return new Data(zi, luna, an);
-	    }
-		
-		public static boolean preamulti(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException {
-		    int nr = -1;
-		    int total = -1;
-		    int depid = -1;
-
-		    Class.forName("com.mysql.cj.jdbc.Driver");
-
-		    // Get the department ID first
-		    String queryUserDep = "SELECT id_dep FROM useri WHERE id = ?";
-		    int uid = Integer.parseInt(request.getParameter("userId"));
-
-		    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-		         PreparedStatement stmtUserDep = conn.prepareStatement(queryUserDep)) {
-		        stmtUserDep.setInt(1, uid);
-		        try (ResultSet rsUserDep = stmtUserDep.executeQuery()) {
-		            if (rsUserDep.next()) {
-		                depid = rsUserDep.getInt("id_dep");
-		            }
-		        }
-		    } catch (SQLException e) {
-		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date la departament", e);
-		    }
-		    System.out.println(depid);
-		    // Check total users in department
-		    String queryTotalUsers = "SELECT COUNT(*) AS total FROM useri WHERE id_dep = ?";
-		    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-		         PreparedStatement stmtTotalUsers = conn.prepareStatement(queryTotalUsers)) {
-		        stmtTotalUsers.setInt(1, depid);
-		        try (ResultSet rsTotalUsers = stmtTotalUsers.executeQuery()) {
-		            if (rsTotalUsers.next()) {
-		                total = rsTotalUsers.getInt("total");
-		            }
-		        }
-		    } catch (SQLException e) {
-		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date cand numara utilizatorii din departament", e);
-		    }
-		    // Check total leaves in department within specific dates
-		    String queryTotalLeaves = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON useri.id = concedii.id_ang " +
-		        "WHERE useri.id_dep = ? AND start_c >= ? AND end_c <= ? and status > 0";
-		    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-		         PreparedStatement stmtTotalLeaves = conn.prepareStatement(queryTotalLeaves)) {
-		        Data start_c = stringToDate(concediu.getStart());
-		        Data end_c = stringToDate(concediu.getEnd());
-
-		        stmtTotalLeaves.setInt(1, depid);
-		        stmtTotalLeaves.setDate(2, java.sql.Date.valueOf(start_c.getAn() + "-" + start_c.getLuna() + "-" + start_c.getZi()));
-		        stmtTotalLeaves.setDate(3, java.sql.Date.valueOf(end_c.getAn() + "-" + end_c.getLuna() + "-" + end_c.getZi()));
-		        try (ResultSet rsTotalLeaves = stmtTotalLeaves.executeQuery()) {
-		            if (rsTotalLeaves.next()) {
-		                nr = rsTotalLeaves.getInt("total");
-		            }
-		        }
-		    } catch (SQLException e) {
-		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date", e);
-		    }
-		    return nr < (total / 2);
-		}
-		
-		public static boolean preamultid(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException{
-				 int nr = 0;
-				    Class.forName("com.mysql.cj.jdbc.Driver");
-				    String QUERY = "select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= ? and month(start_c) = ? and day(start_c) <= ? and month(start_c) <= ? and status > 0 group by useri.tip having useri.tip = 0;";
-				  
-				    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-				         PreparedStatement stm = con.prepareStatement(QUERY)) {
-				        Data start_c = stringToDate(concediu.getStart());
-				        Data end_c = stringToDate(concediu.getEnd());
-				        stm.setInt(1, start_c.getZi());
-				        stm.setInt(2, start_c.getLuna());
-				        stm.setInt(3, end_c.getZi());
-				        stm.setInt(4, end_c.getLuna());
-				        try (ResultSet rs = stm.executeQuery() ) {
-				            if (rs.next()) {
-				                nr = rs.getInt("total");
-				            }
-				        }
-				    } catch (SQLException e) {
-				        printSQLException(e);
-				        throw new IOException("Eroare la baza de date", e);
-				    }
-
-				    return nr < 2;
+			    return nr < 2;
 			}
+		
+		/**
+		 * Afiseaza frumos / Pretty print o eroare dintr-o baza de date
+		 * @param ex
+		 */
+		private static void printSQLException(SQLException ex) {
+		        for (Throwable e: ex) {
+		            if (e instanceof SQLException) {
+		                e.printStackTrace(System.err);
+		                System.err.println("Stare: " + ((SQLException) e).getSQLState());
+		                System.err.println("Cod eroare: " + ((SQLException) e).getErrorCode());
+		                System.err.println("Explicatie: " + e.getMessage());
+		                Throwable t = ex.getCause();
+		                while (t != null) {
+		                    System.out.println("Cauza: " + t);
+		                    t = t.getCause();
+		                }
+		            }
+		        }
+		    }
 }

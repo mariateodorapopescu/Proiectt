@@ -143,6 +143,7 @@
     <display-name>AddConServlet</display-name>
     <servlet-name>AddConServlet</servlet-name>
     <servlet-class>bean.AddConServlet</servlet-class>
+     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>AddConServlet</servlet-name>
@@ -367,5 +368,15 @@
   <servlet-mapping>
     <servlet-name>OTP3</servlet-name>
     <url-pattern>/OTP3</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AddImage</display-name>
+    <servlet-name>AddImage</servlet-name>
+    <servlet-class>bean.AddImage</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddImage</servlet-name>
+    <url-pattern>/AddImage</url-pattern>
   </servlet-mapping>
 </web-app>

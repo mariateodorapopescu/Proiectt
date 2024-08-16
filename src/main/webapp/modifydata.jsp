@@ -143,17 +143,17 @@
              <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
           
 
-                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/OTP?page=3" method="post" class="login__form">
+                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifusr2.jsp" method="post" class="login__form">
                      <div>
                          <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Modificare date personale</span></h1>
-                         <p>Introduceti numele de utilizator </p>
+                         
                      </div>
                      
                      <div style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>" class="login__inputs">
                         
                          <div>
-                             <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Nume de utilizator</label>
-                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti numele de utilizator..." required class="login__input" name='cnp'/>
+                             <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Cod</label>
+                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
                          </div>
                         
                        
