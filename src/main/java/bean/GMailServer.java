@@ -131,7 +131,7 @@ public class GMailServer extends javax.mail.Authenticator
 		  try {
 	          // Assuming Email is a class from com.email.durgesh that handles email operations
 	          Email email = new Email(user, password);
-	          email.setFrom("emailfantoma@xyz.com", "Firma XYZ");
+	          email.setFrom("liviaaamp@gmail.com", "Firma XYZ");
 	          email.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
 	          //email.setContent(body, "text/html");
 	          email.setContent(StringEscapeUtils.unescapeJava(body), "text/html; charset=UTF-8");

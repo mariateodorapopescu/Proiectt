@@ -154,6 +154,7 @@
     <display-name>ModifConServlet</display-name>
     <servlet-name>ModifConServlet</servlet-name>
     <servlet-class>bean.ModifConServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>ModifConServlet</servlet-name>

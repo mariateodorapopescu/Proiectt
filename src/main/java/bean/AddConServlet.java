@@ -422,7 +422,7 @@ public class AddConServlet extends HttpServlet {
             // daca ar fi mai multe thread-uri, server-ul s-ar incarca prea mult si ar deveni indisponibil -> neok
             // jakarta este javax nou
             jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            asyncContext.setTimeout(10000);  // Set a reasonable timeout
+            asyncContext.setTimeout(10000);  
 
             
             asyncContext.start(() -> {
@@ -470,6 +470,7 @@ public class AddConServlet extends HttpServlet {
 			e.printStackTrace();
         }
 	}
+	
 	/**
 	 * verificare daca se incareaza in numarul de zile conform tipului de concediu (concediu medical, concediu de odihna, concediu fara plata etc)
 	 * @param concediul
@@ -687,7 +688,7 @@ public class AddConServlet extends HttpServlet {
 		/**
 		 * Transformare tip de date din String in date
 		 * @param dateString
-		 * @return data in format Date din java.util
+		 * @return data in format Data
 		 */
 		public static Data stringToDate(String dateString) {
 			// declarare si initializare variabile

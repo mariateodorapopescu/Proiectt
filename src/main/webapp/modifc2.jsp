@@ -260,63 +260,153 @@ if (sesi != null) {
 %>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-	const dp1 = document.getElementById("start");
+	// declarare si initializare variabile
+    const dp1 = document.getElementById("start");
     const dp2 = document.getElementById("end");
     const calendarBody = document.getElementById('calendar-body');
     const monthYear = document.getElementById('monthYear');
+    const prevButton = document.querySelector('.prev');
+    const nextButton = document.querySelector('.next');
     const bg = "#32a852"; // Background color for highlighted dates
     const defaultBg = ""; // Default background color for non-selected dates
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-
     const monthNames = ["Ian.", "Feb.", "Mar.", "Apr.", "Mai", "Iun.", "Iul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+    var clickCount = 0; // Track the number of clicks
 
     calendarBody.addEventListener('click', function(event) {
+    	// atunci cand se face click pe o celula se trimite valoarea la formular
         if (event.target.tagName === 'TD' && event.target.getAttribute('data-date')) {
+        	clickCount++;
             handleDateClick(event.target.getAttribute('data-date'));
+            
         }
     });
 
-    function handleDateClick(clickedDate) {
-        if (!dp1.value) {
-            dp1.value = clickedDate;
-        } else if (!dp2.value) {
-            if (new Date(clickedDate) >= new Date(dp1.value)) {
-                dp2.value = clickedDate;
-            } else {
-                dp1.value = clickedDate;
-                dp2.value = '';
-            }
-        } else {
-            dp1.value = clickedDate;
-            dp2.value = '';
+    function validateDates() {
+        if (dp2.value < dp1.value) {
+            alert("Data de final nu poate fi mai mică decât cea de început!");
+            dp2.value = dp1.value;
         }
         highlightDates();
     }
+    
+    dp1.addEventListener("change", function() {
+        dp2.min = dp1.value;
+        if (dp2.value < dp1.value) {
+            dp2.value = ''; // Reset dp2 if it's less than dp1
+        }
+    });
+    
+    function handleDateClick(clickedDate) {
+        // Se parseaza valoarea primita din tabel, ca data
+        let parsedDate = new Date(clickedDate);
+        parsedDate.setDate(parsedDate.getDate() + 1);
+        // se pune sub format "YYYY-MM-DD" pentru a completa formularul
+        let adjustedDate = parsedDate.toISOString().split('T')[0];
+        // daca nu e completat dp1, se pune valoarea in dp1, altfel in dp2
+        if (dp1.value !== '') {
+            dp2.value = adjustedDate;  // Set end date if start date is already set
+        } else {
+            dp1.value = adjustedDate;  // Set start date if not already set
+            dp2.value = '';  // Clear end date to allow for new selection
+        }
+        updateCalendarToSelectedDate(parsedDate);  // se randeaza calendarul din nou (ca sa fie si cu ce s-a marcat)
+        highlightDates();  // se marcheaza datele selectate in calendar
+    }
 
+	// ajuta la randare, ca sa randeze cu tot cu luna si an
+    function updateCalendarToSelectedDate(date) {
+        currentYear = date.getFullYear();
+        currentMonth = date.getMonth();
+        renderCalendar(currentMonth, currentYear);
+    }
+
+ // adauga (matematic) o zi la o data
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() - days);
+        return result;
+    }
+
+ 	// marcheaza datele/celule din calendar/tabel
     function highlightDates() {
-        const startDate = dp1.value ? new Date(dp1.value) : null;
-        const endDate = dp2.value ? new Date(dp2.value) : null;
-
-        Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => {
-            const currentDate = new Date(td.getAttribute('data-date'));
-            if (startDate && endDate && currentDate >= startDate && currentDate <= endDate) {
-                td.classList.add('highlight');
-                td.style.backgroundColor = bg;
-            } else {
-                td.classList.remove('highlight');
-                td.style.backgroundColor = defaultBg; // Reset to default background color
+        const startDate = dp1.value ? new Date(dp1.value + 'T00:00:00Z') : null; // se dorste format si cu ora
+        const endDate = dp2.value ? new Date(dp2.value + 'T00:00:00Z') : null;
+        Array.from(calendarBody.querySelectorAll('td[data-date]')).forEach(td => { // pentru fiecare data din tabel
+            const currentDate = new Date(td.getAttribute('data-date') + 'T00:00:00Z');
+        	// se coloreaza in culoarea de baza (initial)
+            td.style.backgroundColor = defaultBg;
+        	// daca data curenta din for e intre start si end atunci se adauga un nou atribut de stil de culoare la acea celula
+            if (startDate && endDate && currentDate >= addDays(startDate, 1) && currentDate < endDate) {
+                td.style.backgroundColor = bg; // Highlight range
             }
         });
     }
 
-    // Update and validate dates
+ 	// aici se randeaza calendarul
+    function renderCalendar(month, year) {
+        let firstDay = new Date(year, month).getDay();
+        calendarBody.innerHTML = ''; // se goleste tot si se construieste de la capat
+        monthYear.textContent = monthNames[month] + ' ' + year; // se seteaza data curenta (incrementata/decrementata, 
+        		// dar mai intai la incarcarea paginii apare data curenta care se modifica in functie de sageti)
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            let row = document.createElement('tr');
+            for (let j = 0; j < 7; j++) {
+                let cell = document.createElement('td');
+                if (i === 0 && j < firstDay || date > new Date(year, month + 1, 0).getDate()) {
+                    cell.appendChild(document.createTextNode(''));
+                } else {
+                    let cellDate = new Date(year, month, date);
+                    cell.setAttribute('data-date', cellDate.toISOString().split('T')[0]);
+                    cell.appendChild(document.createTextNode(date));
+                    date++;
+                }
+                row.appendChild(cell);
+            }
+            calendarBody.appendChild(row);
+        }
+    }
+ 	
+	// pentru a modifica luna calendarului, in urma
+    prevButton.addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+     // pentru fiecare schimbare se reface calendarul
+        renderCalendar(currentMonth, currentYear);
+    });
+
+ // pentru a modifica luna calendarului, inainte
+    nextButton.addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        // pentru fiecare schimbare se reface calendarul
+        renderCalendar(currentMonth, currentYear);
+    });
+ 
+ // functie ce verifica ca data de final sa fie dupa data de inceput a concediului
+	function updateEndDate() {
+	    if (dp2.value < dp1.value) {
+	        dp2.value = dp1.value;
+	    }
+	    highlightDate();
+	}
+ 
+	// adauga functii care sa se modifice la fiecare schimbare a inputului de data
     dp1.addEventListener("change", highlightDates);
     dp2.addEventListener("change", highlightDates);
+    dp1.addEventListener("change", updateEndDate);
+    dp2.addEventListener("change", validateDates);
+    renderCalendar(currentMonth, currentYear);
 });
 </script>
-
-<script src="./responsive-login-form-main/assets/js/calendar4.js"></script>
 <script src="./responsive-login-form-main/assets/js/main.js"></script>
 </body>
 </html>
