@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, javax.naming.*, javax.sql.*, java.util.*" %>
-<%@ page import="bean.UserData" %>
+
 <%@ page import="java.sql.*" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="javax.naming.InitialContext" %>

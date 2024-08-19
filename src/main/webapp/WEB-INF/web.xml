@@ -2,12 +2,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://jakarta.ee/xml/ns/jakartaee" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd" id="WebApp_ID" version="5.0">
   <display-name>Proiect</display-name>
   <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-    <welcome-file>default.htm</welcome-file>
+    <welcome-file>welcome.jsp</welcome-file>
   </welcome-file-list>
   <servlet>
     <description></description>
@@ -51,7 +46,7 @@
   </servlet-mapping>
   <resource-ref>
     <description>MySQL Datasource example</description>
-    <res-ref-name>jdbc/YourDataSourceName</res-ref-name>
+    <res-ref-name>jdbc/test</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
     <res-auth>Container</res-auth>
   </resource-ref>
@@ -70,6 +65,7 @@
     <display-name>ModifUsrServlet</display-name>
     <servlet-name>ModifUsrServlet</servlet-name>
     <servlet-class>bean.ModifUsrServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>ModifUsrServlet</servlet-name>
@@ -90,6 +86,7 @@
     <display-name>DelUsrServlet</display-name>
     <servlet-name>DelUsrServlet</servlet-name>
     <servlet-class>bean.DelUsrServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>DelUsrServlet</servlet-name>
@@ -168,6 +165,7 @@
     <display-name>DelConServlet</display-name>
     <servlet-name>DelConServlet</servlet-name>
     <servlet-class>bean.DelConServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>DelConServlet</servlet-name>
@@ -178,6 +176,7 @@
     <display-name>AprobDirServlet</display-name>
     <servlet-name>AprobDirServlet</servlet-name>
     <servlet-class>bean.AprobDirServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>AprobDirServlet</servlet-name>
@@ -188,6 +187,7 @@
     <display-name>ResDirServlet</display-name>
     <servlet-name>ResDirServlet</servlet-name>
     <servlet-class>bean.ResDirServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>ResDirServlet</servlet-name>
@@ -198,6 +198,7 @@
     <display-name>ResSefServlet</display-name>
     <servlet-name>ResSefServlet</servlet-name>
     <servlet-class>bean.ResSefServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>ResSefServlet</servlet-name>
@@ -208,60 +209,11 @@
     <display-name>AprobSefServlet</display-name>
     <servlet-name>AprobSefServlet</servlet-name>
     <servlet-class>bean.AprobSefServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>AprobSefServlet</servlet-name>
     <url-pattern>/aprobsef</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>ServletPDF</display-name>
-    <servlet-name>ServletPDF</servlet-name>
-    <servlet-class>bean.ServletPDF</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ServletPDF</servlet-name>
-    <url-pattern>/ServletPDF</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>MailServlet</display-name>
-    <servlet-name>MailServlet</servlet-name>
-    <servlet-class>bean.MailServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MailServlet</servlet-name>
-    <url-pattern>/MailServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>Mail</display-name>
-    <servlet-name>Mail</servlet-name>
-    <servlet-class>bean.Mail</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Mail</servlet-name>
-    <url-pattern>/Mail</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>UploadServlet</display-name>
-    <servlet-name>UploadServlet</servlet-name>
-    <servlet-class>bean.UploadServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>UploadServlet</servlet-name>
-    <url-pattern>/UploadServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>DisplayImage</display-name>
-    <servlet-name>DisplayImage</servlet-name>
-    <servlet-class>bean.DisplayImage</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>DisplayImage</servlet-name>
-    <url-pattern>/DisplayImage</url-pattern>
   </servlet-mapping>
   <servlet>
     <description></description>
@@ -372,15 +324,5 @@
   <servlet-mapping>
     <servlet-name>OTP3</servlet-name>
     <url-pattern>/OTP3</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>AddImage</display-name>
-    <servlet-name>AddImage</servlet-name>
-    <servlet-class>bean.AddImage</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>AddImage</servlet-name>
-    <url-pattern>/AddImage</url-pattern>
   </servlet-mapping>
 </web-app>
