@@ -407,7 +407,7 @@ public class ModifConServlet extends HttpServlet {
          // aici vine partea asincrona
            
             jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            asyncContext.setTimeout(10000); 
+            asyncContext.setTimeout(1000); 
 
             asyncContext.start(() -> {
                 try {

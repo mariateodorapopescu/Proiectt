@@ -414,7 +414,7 @@ public class AddConServlet extends HttpServlet {
             // daca ar fi mai multe thread-uri, server-ul s-ar incarca prea mult si ar deveni indisponibil -> neok
             // jakarta este javax nou
             jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            asyncContext.setTimeout(10000);  
+            asyncContext.setTimeout(1000);  
 
             
             asyncContext.start(() -> {

@@ -75,7 +75,7 @@ public class AprobSefServlet extends HttpServlet {
            // notificare asincrona
             // trimiterea de mailuri se face in mod asincron
             jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            asyncContext.setTimeout(10000);  
+            asyncContext.setTimeout(1000);  
             asyncContext.start(() -> {
                 try {
                 	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
