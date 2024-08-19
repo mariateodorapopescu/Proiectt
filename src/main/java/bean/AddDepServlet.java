@@ -52,7 +52,6 @@ public class AddDepServlet extends HttpServlet {
             depDao.addDep(nume);
             
             // trimiterea de mailuri se face in mod asincron
-         
             jakarta.servlet.AsyncContext asyncContext = request.startAsync();
             asyncContext.setTimeout(10000);  
             asyncContext.start(() -> {
@@ -76,8 +75,7 @@ public class AddDepServlet extends HttpServlet {
         	        out.println("window.location.href = 'actiuni.jsp';");
         	        out.println("</script>");
         	        out.close();
-        	        return; 
-                    
+        	        return;    
                 }
             });
             

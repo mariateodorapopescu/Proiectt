@@ -505,4 +505,201 @@ public class MailAsincron {
 		        e.printStackTrace();
 		    }  
 	}
+	
+	/**
+	 * Functie ce trimite mail la aprobarea unui departament de catre sef
+	 * @param uid = id utilizator
+	 * @param idconcediu = id concediu
+	 * @throws ServletException
+	 */
+	public static void send7(int id, int idconcediu) throws ServletException {
+		
+		// declarare si initializare variabile
+		String director = "";
+        String angajat = "";
+        String nume = "";
+        String prenume = "";
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+   	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
+   	         		+ "")) {
+   	        stmt.setInt(1, id);
+   	        
+   	        ResultSet rs = stmt.executeQuery();
+   	        if (rs.next()) {
+   	            angajat = rs.getString("email_ang");
+   	            director = rs.getString("email_dir");
+   	            nume = rs.getString("nume_ang");
+   	            prenume = rs.getString("prenume_ang");
+   	        }
+   	    } catch (SQLException e) {
+   	        throw new ServletException("Eroare BD =(", e);
+   	    } 
+   
+        String inceput = "";
+        String sfarsit = "";
+        String locatie = "";
+        String motiv = "";
+        String tip = "";
+        int tip3 = -1;
+        int durata = -1;
+        String data = "";
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+      	         PreparedStatement stmt = connection.prepareStatement("select datediff(end_c, start_c) as durata from concedii where id = ?;"
+      	         		+ "")) {
+      	        stmt.setInt(1, idconcediu);
+      	        
+      	        ResultSet rs = stmt.executeQuery();
+      	        if (rs.next()) {
+      	            
+      	            durata = rs.getInt("durata") + 1;
+      	        }
+      	    } catch (SQLException e) {
+      	        throw new ServletException("Eroare BD =(", e);
+      	    }
+        
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+   	         PreparedStatement stmt = connection.prepareStatement("select * from concedii where id = ?;"
+   	         		+ "")) {
+   	        stmt.setInt(1, idconcediu);
+   	        
+   	        ResultSet rs = stmt.executeQuery();
+   	        if (rs.next()) {
+   	            inceput = rs.getString("start_c");
+   	            sfarsit = rs.getString("end_c");
+   	            locatie = rs.getString("locatie");
+   	            motiv = rs.getString("motiv");
+   	            tip3 = rs.getInt("tip");
+   	            data = rs.getString("added");
+   	        }
+   	    } catch (SQLException e) {
+   	        throw new ServletException("Eroare BD =(", e);
+   	    }
+        
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+     	         PreparedStatement stmt = connection.prepareStatement("select motiv from tipcon where tip = ?;")) {
+     	        stmt.setInt(1, tip3);
+     	        
+     	        ResultSet rs = stmt.executeQuery();
+     	        if (rs.next()) {
+     	            
+     	        }
+     	    } catch (SQLException e) {
+     	        throw new ServletException("Eroare BD=(", e);
+     	    }
+		// initializare trimitator
+	    GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+	    
+	    // pregatire mail propriu-zis
+	    // trimit notificare la angajat
+	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    
+	    String message11 = "<h1>Felicitari! &#x1F389; <br> Concediul dvs. din data de " + data + " a fost citit si este in curs de procesare! &#x1F389; </h1>"; 
+	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607; </h2>";
+	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
+	    String message14 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + tip + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    String message16 = "<p>Va dorim toate cele bune! &#x1F607; </p>";
+	    
+	    String message1 = message11 + message12 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+	    // trimitere mail
+	    try {
+	        sender.send(subject1, message1, "liviaaamp@gmail.com", angajat);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }  
+	    
+	    // trimitere notificare la director
+	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    
+	    String message21 = "<h1>&#x26A0;&#xFE0F;Aveti un nou concediu de inspectat&#x26A0;&#xFE0F;</h1>"; 
+	    String message22 = "<h2>Concediul angajatului " + nume + " " + prenume + " a fost partial aprobat.</h2>";
+	    String message23 = "<h3>&#x1F4DD;Detalii despre concediul din data de " + data + ":</h3>";
+	    String message24 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + tip + "<br><b>Durata: </b>" + (durata) + " zile<br></p>";
+	    String message26 = "<p>Va dorim toate cele bune! &#x1F607; </p>";
+	    
+	    String message2 = message21 + message22 + message23 + message24 + message26 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+	   // trimitere
+	    try {
+	        sender.send(subject2, message2, "liviaaamp@gmail.com", director);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }  
+	}
+	
+	/**
+	 * Functie ce trimite mail la respingerea unui departament de catre director
+	 * @param uid = id utilizator
+	 * @param idconcediu = id concediu
+	 * @throws ServletException
+	 */
+	public static void send8(int id, int idconcediu) throws ServletException {
+		// declarare si initializare variabile
+		
+		// initializare trimitator
+        GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+        
+        // date despre concediu
+        String angajat = "";
+        String inceput = "";
+        String sfarsit = "";
+        String locatie = "";
+        String motiv = "";
+        String motiv2 = "";
+        int durata = -1;
+        String data = "";
+        
+        // creare conexiune cu baza de date si pregatire interogari
+        try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+   	         PreparedStatement stmt = conexiune.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, "
+   	         		+ "ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang "
+   	         		+ "join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;");
+   	        		PreparedStatement stmt2 = conexiune.prepareStatement("select datediff(end_c, start_c) as durata from concedii where id = ?;");
+        		PreparedStatement stmt3 = conexiune.prepareStatement("select * from concedii where id = ?;")
+        		) {
+        	// extragere email angajat
+   	        stmt.setInt(1, id);
+   	        ResultSet rezultat = stmt.executeQuery();
+   	        if (rezultat.next()) {
+   	            angajat = rezultat.getString("email_ang");
+   	        }
+   	        
+   	        // extragere durata concediu
+   	        stmt2.setInt(1, idconcediu);
+	        ResultSet rezultat2 = stmt2.executeQuery();
+	        if (rezultat2.next()) {
+	            durata = rezultat2.getInt("durata") + 1;
+	        }
+	        
+	        // extragere date despre concediu
+	        stmt3.setInt(1, idconcediu);
+   	        ResultSet rezultat3 = stmt3.executeQuery();
+   	        if (rezultat3.next()) {
+   	            inceput = rezultat3.getString("start_c");
+   	            sfarsit = rezultat3.getString("end_c");
+   	            locatie = rezultat3.getString("locatie");
+   	            motiv = rezultat3.getString("motiv");
+   	            data = rezultat3.getString("added");
+   	        }
+   	    } catch (SQLException e) {
+   	        throw new ServletException("Eroare BD =(", e);
+   	    } 
+   
+        	// trimit notificare la angajat
+        	// pregatire mail
+    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+    	    
+    	    String message11 = "<h1>Ne pare rau sa venim cu asemnea vesti, caci... &#x1F614;<br> Concediul dvs. din data de " + data + " a fost respins. &#x1F614; </h1>"; 
+    	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
+    	    String message14 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motiv2 + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+    	    String message15 = "<br><p>Nu uitati ca puteti oricand sa programati un nou concediu in locul acestuia! &#x2728; </p>";
+    	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; </p>";
+    	    
+    	    String message1 = message11 + message13 + message14 + message15 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+    	   
+    	    // trimitere efectiva
+    	    try {
+    	        sender.send(subject1, message1, "liviaaamp@gmail.com", angajat);
+    	    } catch (Exception e) {
+    	        e.printStackTrace();
+    	    }  
+	}
 }
