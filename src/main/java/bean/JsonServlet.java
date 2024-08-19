@@ -1,7 +1,6 @@
 package bean;
-
+// importare biblioteci
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,12 +22,9 @@ import java.util.TreeMap;
 
 import org.json.JSONObject;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
 import org.json.JSONArray;
 /**
- * Servlet implementation class JsonServlet
+ * implementare servlet care arunca un json 1
  */
 public class JsonServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -37,8 +33,7 @@ public class JsonServlet extends HttpServlet {
      * @see HttpServlet#HttpServlet()
      */
     public JsonServlet() {
-        super();
-        // TODO Auto-generated constructor stub
+        super(); 
     }
     PrintWriter out;
    
@@ -46,10 +41,7 @@ public class JsonServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		
-	        
-	        String statusParam = request.getParameter("status");
+			String statusParam = request.getParameter("status");
             String depParam = request.getParameter("dep");
             String monthParam = request.getParameter("month");
             String type = request.getParameter("tip");
@@ -169,7 +161,7 @@ public class JsonServlet extends HttpServlet {
                      System.out.println(json);
                      response.setContentType("application/json");
                      response.setCharacterEncoding("UTF-8");
-                     response.setHeader("Access-Control-Allow-Origin", "*"); // for development only, specify domains in production
+                     response.setHeader("Access-Control-Allow-Origin", "*");
                      response.setHeader("Access-Control-Allow-Methods", "POST");
                      response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -177,7 +169,6 @@ public class JsonServlet extends HttpServlet {
                      out.print(json.toString());
                      out.flush();
                  } catch (SQLException e) {
-     				// TODO Auto-generated catch block
      				e.printStackTrace();
      			}
             }

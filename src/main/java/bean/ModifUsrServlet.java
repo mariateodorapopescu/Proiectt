@@ -13,7 +13,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class ModifUsrServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //String originalUsername = request.getParameter("originalUsername");
     	int id = Integer.valueOf(request.getParameter("id"));
         String newUsername = request.getParameter("username");

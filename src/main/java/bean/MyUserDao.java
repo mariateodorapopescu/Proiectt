@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
-import bean.MyUser;
 
 public class MyUserDao {
 
@@ -39,8 +38,6 @@ public class MyUserDao {
 	    int result = 0;
 
 	    Class.forName("com.mysql.cj.jdbc.Driver");
-
-	    int nextId = getNextId();  // Get the next ID value
 
 	    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 	         PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USERS_SQL)) {

@@ -1,41 +1,17 @@
 package bean;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
 import java.sql.*;
-import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import jakarta.servlet.annotation.WebServlet;
-
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.json.JSONObject;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 public class LeaveDataServlet extends HttpServlet {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID1 = 133523138237161389L;
 	/**
 	 * 
 	 */

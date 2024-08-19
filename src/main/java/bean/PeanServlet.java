@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bean;
 
 import com.google.gson.Gson;
@@ -15,14 +10,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Dharmesh Mourya
- */
 @WebServlet(name = "PeanServlet", urlPatterns = {"/PeanServlet"})
 public class PeanServlet extends HttpServlet {
-
-    PrintWriter out;
+	private static final long serialVersionUID = 1L;
+	PrintWriter out;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -30,22 +21,16 @@ public class PeanServlet extends HttpServlet {
         try {
             //getting parameter from jsp
             String jsonData = request.getParameter("para");
-            System.out.println(jsonData);
-
+            
             Gson gson = new Gson();
 
-            //converting it into pojo or bean
+            //converting it into bean
             Userr data = gson.fromJson(jsonData, Userr.class);
 
             //calling the getter method
-            System.out.println("Fetching from json object");
             String name = data.getName();
             String address = data.getAddress();
 
-            System.out.println("User Name : " + name);
-            System.out.println("User Add : " + address);
-
-            //creating obj to convert it again json
             Userr user = new Userr();
 
             //setting values to object
@@ -54,9 +39,7 @@ public class PeanServlet extends HttpServlet {
 
             //converting
             String jsonObj = gson.toJson(user);
-            System.out.println(jsonObj);
-
-            //sending json response
+           
             out.print(jsonObj);
         } catch (JsonSyntaxException e) {
             out.println(e);

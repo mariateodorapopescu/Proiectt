@@ -25,13 +25,11 @@ public class LoginDao {
                         user.setUsername(loginBean.getUsername());
                         // Add other details as needed from ResultSet
                         String INSERT_USERS_SQL = "UPDATE useri SET activ = 1 WHERE username = ?";
-                	    int result = 0;
                 	    Class.forName("com.mysql.cj.jdbc.Driver");
                 	    try (
                 	         PreparedStatement preparedStatement1 = connection.prepareStatement(INSERT_USERS_SQL)) {
                 	        
                 	        preparedStatement1.setString(1, loginBean.getUsername());
-                	        result = preparedStatement1.executeUpdate();
                 	    } catch (SQLException e) {
                 	        printSQLException(e);
                 	    }

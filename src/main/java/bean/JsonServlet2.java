@@ -1,7 +1,6 @@
 package bean;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,14 +12,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import org.json.JSONArray;
 /**
@@ -52,9 +47,7 @@ public class JsonServlet2 extends HttpServlet {
 
             int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
             int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
-            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-	                
-	        Map<Integer, Integer> leaveCountMap = new HashMap<>();
+            Map<Integer, Integer> leaveCountMap = new HashMap<>();
             for (int i = 1; i <= 12; i++) {
                 leaveCountMap.put(i, 0);
             }

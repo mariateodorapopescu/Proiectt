@@ -15,7 +15,11 @@ import java.sql.SQLException;
 
 @WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         logoutUser(request, response);
@@ -32,7 +36,6 @@ public class LogoutServlet extends HttpServlet {
         try {
             HttpSession session = request.getSession();
             String INSERT_USERS_SQL = "UPDATE useri SET activ = 0 WHERE username = ?";
-    	    int result = 0;
     	    Class.forName("com.mysql.cj.jdbc.Driver");
     	   
     	    String username = "";
@@ -47,7 +50,6 @@ public class LogoutServlet extends HttpServlet {
     	         PreparedStatement preparedStatement1 = connection.prepareStatement(INSERT_USERS_SQL)) {
     	        
     	        preparedStatement1.setString(1, username);
-    	        result = preparedStatement1.executeUpdate();
     	    } catch (SQLException e) {
     	        printSQLException(e);
     	    }

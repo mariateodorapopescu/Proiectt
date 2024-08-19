@@ -25,16 +25,19 @@ import com.email.durgesh.Email;
 @SuppressWarnings("deprecation")
 public class GMailServer extends javax.mail.Authenticator
 {
+    // Setari pentru conectarea la serverul SMTP de la Gmail
     private String mailhost ="smtp.gmail.com";
     private String user;
     private String password;
     private Session session;  
 
+    // Constructor pentru initializarea sesiunii SMTP cu datele de autentificare
     public GMailServer(String user, String password) {
         this.user = user;
         this.password = password;  
 
         Properties props = new Properties();
+        // Setari pentru protocolul SMTP si porturile specifice pentru SSL si TLS
         props.setProperty("mail.transport.protocol", "smtp");
         props.setProperty("mail.smtp.host", mailhost);
         props.put("mail.smtp.auth", "true");
@@ -50,11 +53,13 @@ public class GMailServer extends javax.mail.Authenticator
         session.setDebug(true);
     }  
 
+    // Metoda pentru autentificarea folosind utilizatorul si parola
     protected PasswordAuthentication getPasswordAuthentication()
     {
         return new PasswordAuthentication(user, password);
     }  
     
+    // Metoda pentru trimiterea unui email cu atasament
     public synchronized void sendattach(String subject, String body, String sender, String recipients, String filepath) throws Exception {
     	MimeMessage m = new MimeMessage(session);
 
@@ -103,6 +108,7 @@ public class GMailServer extends javax.mail.Authenticator
 	  		System.out.println("OK");
 }
     
+    // Metoda pentru trimiterea unui email simplu
 	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
 		  try {
 	          Email email = new Email(user, password);
@@ -116,6 +122,7 @@ public class GMailServer extends javax.mail.Authenticator
 	      }
 	}
 	
+    // Metoda pentru trimiterea unui email cu mai multi destinatari
     public synchronized void sendMail(String subject, String body, String sender, String recipients) throws Exception
     {
         MimeMessage message = new MimeMessage(session);
@@ -130,6 +137,7 @@ public class GMailServer extends javax.mail.Authenticator
         Transport.send(message);
     }  
 
+    // Clasa interna pentru manipularea surselor de date binare
     public class ByteArrayDataSource implements DataSource {
         private byte[] data;
         private String type;  

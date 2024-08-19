@@ -8,9 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimerTask;
 
 import jakarta.servlet.ServletException;
@@ -87,7 +85,7 @@ public class Testing extends TimerTask
 	            try (PreparedStatement preparedStatement2 = connection.prepareStatement(query2)) {
 	    	        ResultSet rs2 = preparedStatement2.executeQuery();
 	    	        while (rs2.next()) {
-	    	            sendEmail2(nume, prenume, id, rs2);
+	    	            sendEmail2(nume, prenume, rs2);
 	    	        }
 	    	    } catch (SQLException e) {
 	    	        throw new IOException("Eroare BD: " + e.getMessage(), e);
@@ -100,7 +98,7 @@ public class Testing extends TimerTask
 	    
 	}
 	
-	private void sendEmail2(String nume, String prenume, int id, ResultSet rs) throws Exception {
+	private void sendEmail2(String nume, String prenume, ResultSet rs) throws Exception {
 		String to = rs.getString("email");
 	   
 	    String subject2 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
@@ -129,9 +127,6 @@ public class Testing extends TimerTask
 	    		+ ";";
 	    // email zi de nastere
 	    String to = "";
-	    String prenume = "";
-	    int id = -1;
-	    int dep = -1;
 	    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 	        ResultSet rs = preparedStatement.executeQuery();
 	        while (rs.next()) {
@@ -146,12 +141,9 @@ public class Testing extends TimerTask
 
 	    	    try {
 	    	        sender.send(subject2, message222, "liviaaamp@gmail.com", to);
-	    	        
 	    	    } catch (Exception e) {
 	    	        e.printStackTrace();
-	    	       
 	    	    }  
-	           
 	        }
 	    } catch (SQLException e) {
 	        throw new IOException("Eroare BD: " + e.getMessage(), e);
@@ -214,7 +206,7 @@ public class Testing extends TimerTask
 
 
 	private void sendEmail(ResultSet rs) throws Exception {
-		 long currentTimeMillis = System.currentTimeMillis();
+		 System.currentTimeMillis();
 		 
 	    int id = rs.getInt("id");
 	    String to = rs.getString("email");
@@ -224,7 +216,7 @@ public class Testing extends TimerTask
         //}
 	    Date startDate = rs.getDate("start_c");
 	    Date endDate = rs.getDate("end_c");
-	    int daysUntilStart = rs.getInt("days_until_start"); // Added this line to capture days until start
+	    rs.getInt("days_until_start");
 	    String locatie = rs.getString("locatie");
 	    String motiv = rs.getString("motiv");
 	    String tipMotiv = rs.getString("tip_motiv");
@@ -256,10 +248,8 @@ public class Testing extends TimerTask
 	    
 	    String tod = "";
         String tos = "";
-        String toa = "";
         String nume = "";
         String prenume = "";
-        String motivv = "";
         int tipp = -1;
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
    	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
@@ -269,7 +259,7 @@ public class Testing extends TimerTask
    	        ResultSet rs2 = stmt.executeQuery();
    	        if (rs2.next()) {
    	            tos = rs2.getString("email_sef");
-   	            toa = rs2.getString("email_ang");
+   	            rs2.getString("email_ang");
    	            tod = rs2.getString("email_dir");
    	            nume = rs2.getString("nume_ang");
    	            prenume = rs2.getString("prenume_ang");

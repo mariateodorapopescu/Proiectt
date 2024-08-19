@@ -1,7 +1,6 @@
 package bean;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,7 +13,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ModifPasdServlet extends HttpServlet {
-    private ModifPasdDao employeeDao;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private ModifPasdDao employeeDao;
 
     public void init() {
         employeeDao = new ModifPasdDao();
