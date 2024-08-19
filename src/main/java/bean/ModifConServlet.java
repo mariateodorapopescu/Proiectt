@@ -17,9 +17,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import bean.ConcediuCon;
-import bean.ConcediuConDao;
 /**
  * Clasa ce implementeaza ModifConServlet
  */
@@ -361,7 +358,6 @@ public class ModifConServlet extends HttpServlet {
         String locatieold = "";
         String motivold = "";
         String tipold = "";
-        String motivold2 = "";
         int tipold2 = -1;
         int durataold2 = -1;
         String data = "";
@@ -391,7 +387,6 @@ public class ModifConServlet extends HttpServlet {
     	        stmt3.setInt(1, tipold2);
     	        ResultSet rs3 = stmt3.executeQuery();
     	        if (rs3.next()) {
-    	            motivold2 = rs3.getString("motiv");
     	        }
      	        
       	    } catch (SQLException e) {

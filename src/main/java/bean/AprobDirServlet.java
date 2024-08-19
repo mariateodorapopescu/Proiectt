@@ -1,5 +1,6 @@
 package bean;
 
+//importare biblioteci
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,24 +11,37 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Servlet ce se ocupa cu aprobarea unui concediu
+ */
 public class AprobDirServlet extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	// DAO pentru baza de date
     private AprobDirDao dep;
-
+    
+/**
+ * initializare DAO
+ */
     public void init() {
         dep = new AprobDirDao();
     }
     
+    /**
+     * teoretic nu poate afce doGet, practic eu cand aprob fac o cerere get si dau sa o procesez ca pe un post 
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	doPost(request, response);
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession sesi = request.getSession(false); // This returns HttpSession directly
-        if (sesi == null) {
+        HttpSession sesiune = request.getSession(false); 
+        // o verificare in plus, la un debug, asta ca sa ma asigur ca extrag ceva valid si nu am erori dupa
+        if (sesiune == null) {
         	 response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
@@ -37,10 +51,10 @@ public class AprobDirServlet extends HttpServlet {
 		    out.close();
             return;
         }
-
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        
+        MyUser currentUser = (MyUser) sesiune.getAttribute("currentUser");
         if (currentUser == null) {
-        	 response.setContentType("text/html;charset=UTF-8");
+        	response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu e conectat niciun utilizator!');");
@@ -50,120 +64,12 @@ public class AprobDirServlet extends HttpServlet {
             return;
         }
 
-        String username = currentUser.getUsername();
-        int idcon = Integer.parseInt(request.getParameter("idcon"));
+        int idconcediu = Integer.parseInt(request.getParameter("idcon"));
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-            int uid = getEmployeeIdFromLeave(idcon, conn);
-            int uidc = getUserIdByUsername(username, conn);
-
-//            if (uid == uidc) {
-//                response.sendRedirect("login.jsp"); // Cannot approve own leave
-//                return;
-//            }
-          
-            dep.modif(idcon); // Assuming this method handles the modification of the leave status
+        try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+            dep.modif(idconcediu); // fac aprobarea in DAO, aprobare = schimbare status
             
-            // trimit notificare la angajat
-            GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
-            String tod = "";
-            String tos = "";
-            String toa = "";
-            String nume = "";
-            String prenume = "";
-            String motivv = "";
-            int tipp = -1;
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-       	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
-       	         		+ "")) {
-       	        stmt.setInt(1, uid);
-       	        
-       	        ResultSet rs = stmt.executeQuery();
-       	        if (rs.next()) {
-       	            tos = rs.getString("email_sef");
-       	            toa = rs.getString("email_ang");
-       	            tod = rs.getString("email_dir");
-       	            nume = rs.getString("nume_ang");
-       	            prenume = rs.getString("prenume_ang");
-       	            tipp = rs.getInt("tip");
-       	        }
-       	    } catch (SQLException e) {
-       	        throw new ServletException("Eroare BD =(", e);
-       	    } 
-       
-            String starto = "";
-            String endo = "";
-            String loco = "";
-            String motivo = "";
-            String tipo = "";
-            String motivvo = "";
-            int tippo = -1;
-            int durato = -1;
-            String data = "";
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-          	         PreparedStatement stmt = connection.prepareStatement("select datediff(end_c, start_c) as durata from concedii where id = ?;"
-          	         		+ "")) {
-          	        stmt.setInt(1, idcon);
-          	        
-          	        ResultSet rs = stmt.executeQuery();
-          	        if (rs.next()) {
-          	            
-          	            durato = rs.getInt("durata") + 1;
-          	        }
-          	    } catch (SQLException e) {
-          	        throw new ServletException("Eroare BD =(", e);
-          	    }
-            
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-       	         PreparedStatement stmt = connection.prepareStatement("select * from concedii where id = ?;"
-       	         		+ "")) {
-       	        stmt.setInt(1, idcon);
-       	        
-       	        ResultSet rs = stmt.executeQuery();
-       	        if (rs.next()) {
-       	            starto = rs.getString("start_c");
-       	            endo = rs.getString("end_c");
-       	            loco = rs.getString("locatie");
-       	            motivo = rs.getString("motiv");
-       	            tippo = rs.getInt("tip");
-       	            data = rs.getString("added");
-       	        }
-       	    } catch (SQLException e) {
-       	        throw new ServletException("Eroare BD =(", e);
-       	    }
-            
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         	         PreparedStatement stmt = connection.prepareStatement("select motiv from tipcon where tip = ?;")) {
-         	        stmt.setInt(1, tippo);
-         	        
-         	        ResultSet rs = stmt.executeQuery();
-         	        if (rs.next()) {
-         	            motivvo = rs.getString("motiv");
-         	            
-         	        }
-         	    } catch (SQLException e) {
-         	        throw new ServletException("Eroare BD=(", e);
-         	    }
-            
-	          
-	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-	    	    String message11 = "<h1>Felicitari! &#x1F389; <br> Concediul dvs. din data de " + data + " a fost aprobat! &#x1F389; </h1>"; 
-	    	    
-	    	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
-	    	    String message14 = "<p><b>Inceput:</b> " + starto + "<br> <b>Final: </b> " + endo + "<br><b>Locatie:</b> " + loco + "<br><b> Motiv: </b>" + motivo + "<br><b>Tip concediu: </b>" + motivvo + "<br><b>Durata: </b>" + (durato) + " zile<br></p>";
-	    	    
-	    	    String message16 = "<p>Va dorim toate cele bune! &#x1F607; \r\n"
-	    	    		+ " </p>";
-	    	    String message1 = message11 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-	    	    		+ "</i></b>";
-	    	   
-	    	    try {
-	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", toa);
-	    	       
-	    	    } catch (Exception e) {
-	    	        e.printStackTrace();
-	    	       
-	    	    }  
+           // notificare asincrona
 	    	    
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
@@ -193,30 +99,6 @@ public class AprobDirServlet extends HttpServlet {
 		    out.println("</script>");
 		    out.close();
 		}
-    }
-
-    private int getEmployeeIdFromLeave(int leaveId, Connection conn) throws SQLException {
-        String query = "SELECT id_ang FROM concedii WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, leaveId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("id_ang");
-            }
-        }
-        return -1; // default or error case
-    }
-
-    private int getUserIdByUsername(String username, Connection conn) throws SQLException {
-        String query = "SELECT id FROM useri WHERE username = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("id");
-            }
-        }
-        return -1; // default or error case
     }
 
     private static void printSQLException(SQLException ex) {

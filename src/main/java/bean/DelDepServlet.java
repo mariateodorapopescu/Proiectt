@@ -1,7 +1,6 @@
 package bean;
 // importare biblioteci
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +17,10 @@ import java.sql.SQLException;
  */
 public class DelDepServlet extends HttpServlet {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	// dao pentru comunicarea cu baza de date
     private DelDepDao employeeDao;
 
@@ -36,7 +39,7 @@ public class DelDepServlet extends HttpServlet {
      * pentru cazul in care se face actiune GET
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
-    	response.getWriter().append("Nu se poate face get =(");
+    	doPost(request, response);
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String departament = request.getParameter("username");
