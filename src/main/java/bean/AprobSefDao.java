@@ -1,49 +1,55 @@
 package bean;
-
+//importare biblioteci
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
-import org.mindrot.jbcrypt.BCrypt;
-import bean.MyUser;
-
+/**
+ * DAO pentru aprobare sef -> difera de DAO aprobari/respingeri prin SET status=1!!
+ */
 public class AprobSefDao {
-
-	public int modif(int id) throws ClassNotFoundException, SQLException {
-	    String INSERT_USERS_SQL = "UPDATE concedii SET status = 1, acc_res = (select current_date()) WHERE id = ? and id_ang != 0";
-
+	/**
+	 * Functie ce face actiunea asupra concediului, actiune ce consta in modificarea unui camp, status
+	 * @param id
+	 * @return numar coloane modificate
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public int aprobare(int id) throws ClassNotFoundException, SQLException {
+		// declarare si initializare variabile
+	    String sql = "UPDATE concedii SET status = 1, acc_res = (select current_date()) WHERE id = ? and id_ang != 0";
 	    int result = 0;
-
+	    // initializare driver pentru comunicarea cu baza de date
 	    Class.forName("com.mysql.cj.jdbc.Driver");
+	    // conexiunea cu baza de date
 	    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-	         PreparedStatement preparedStatement = con.prepareStatement(INSERT_USERS_SQL)) {
+	    		// pregatirea interogarii
+	         PreparedStatement preparedStatement = con.prepareStatement(sql)) {
 	        preparedStatement.setInt(1, id);
+	        // executia interogarii
 	        result = preparedStatement.executeUpdate();
 	    } catch (SQLException e) {
 	        printSQLException(e);
 	    }
 	    return result;
 	}
-
-    private void printSQLException(SQLException ex) {
+	/**
+	 * Afiseaza frumos / Pretty print o eroare dintr-o baza de date
+	 * @param ex
+	 */
+	private static void printSQLException(SQLException ex) {
         for (Throwable e: ex) {
             if (e instanceof SQLException) {
                 e.printStackTrace(System.err);
-                System.err.println("SQLState: " + ((SQLException) e).getSQLState());
-                System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
-                System.err.println("Message: " + e.getMessage());
+                System.err.println("Stare: " + ((SQLException) e).getSQLState());
+                System.err.println("Cod eroare: " + ((SQLException) e).getErrorCode());
+                System.err.println("Explicatie: " + e.getMessage());
                 Throwable t = ex.getCause();
                 while (t != null) {
-                    System.out.println("Cause: " + t);
+                    System.out.println("Cauza: " + t);
                     t = t.getCause();
                 }
             }
         }
-    } 
+    }
 }

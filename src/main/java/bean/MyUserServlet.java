@@ -65,7 +65,7 @@ public class MyUserServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?pn=true");
             return;
         }
-        if (!EmailValidator.validateEmail(email)) {
+        if (!EmailValidator.validare(email)) {
             response.sendRedirect("signin.jsp?e=true");
             return;
         }
@@ -75,7 +75,7 @@ public class MyUserServlet extends HttpServlet {
             return;
         }
 
-        if (!DateOfBirthValidator.validateDateOfBirth(data_nasterii)) {
+        if (!CheckerDataNasterii.valideaza(data_nasterii)) {
             response.sendRedirect("signin.jsp?dn=true");
             return;
         }

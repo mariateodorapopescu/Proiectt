@@ -22,9 +22,10 @@ import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
 
 import com.email.durgesh.Email;
 
+@SuppressWarnings("deprecation")
 public class GMailServer extends javax.mail.Authenticator
 {
-    private String mailhost ="smtp.gmail.com"; ; //"smtp.mail.yahoo.com"; //"smtp.gmail.com";
+    private String mailhost ="smtp.gmail.com";
     private String user;
     private String password;
     private Session session;  
@@ -55,33 +56,18 @@ public class GMailServer extends javax.mail.Authenticator
     }  
     
     public synchronized void sendattach(String subject, String body, String sender, String recipients, String filepath) throws Exception {
-		//System.out.println(subject);
-		//System.out.println(body);
-		//System.out.println(sender);
-		//System.out.println(recipients);
     	MimeMessage m = new MimeMessage(session);
 
 		  try {
-	          // Assuming Email is a class from com.email.durgesh that handles email operations
-	          
 	          m.setFrom("liviaaamp@gmail.com");
 	          m.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
-	          //email.setContent(body, "text/html");
-	         // email.setContent(StringEscapeUtils.unescapeJava(body), "text/html; charset=UTF-8");
 	          m.addRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
 	  		
-	  		//adding subject to message
 	  		m.setSubject(subject);
 	  	
-	  		
-	  		//attachement..
-	  		
-	  		//file path
 	  		String path=filepath;
 	  		
 	  		MimeMultipart mimeMultipart = new MimeMultipart();
-	  		//text
-	  		//file
 	  		
 	  		MimeBodyPart textMime = new MimeBodyPart();
 	  		
@@ -90,7 +76,7 @@ public class GMailServer extends javax.mail.Authenticator
 	  		try {
 	  			
 	  			textMime.setText(body);
-	  			//textMime.setContent(body, path);
+	  			
 	  			textMime.setContent(body, "text/html; charset=UTF-8");
 	  			
 	  			File file=new File(path);
@@ -105,11 +91,8 @@ public class GMailServer extends javax.mail.Authenticator
 	  			e.printStackTrace();
 	  		}
 
-	  		//m.setContent(StringEscapeUtils.unescapeJava(body),"text/html; charset=UTF-8");
 	  		m.setContent(mimeMultipart);
 	  		
-	  		//send 
-	  		//Step 3 : send the message using Transport class
 	  		Transport.send(m);
 	  		
 	  		}catch (Exception e) {
@@ -117,26 +100,16 @@ public class GMailServer extends javax.mail.Authenticator
 	  		}
 	  		
 
-	  		System.out.println("Sent success...................");
-	          
-	          // email.send();
-	      
-	}
+	  		System.out.println("OK");
+}
     
 	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
-		//System.out.println(subject);
-		//System.out.println(body);
-		//System.out.println(sender);
-		//System.out.println(recipients);
 		  try {
-	          // Assuming Email is a class from com.email.durgesh that handles email operations
 	          Email email = new Email(user, password);
 	          email.setFrom("liviaaamp@gmail.com", "Firma XYZ");
 	          email.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
-	          //email.setContent(body, "text/html");
 	          email.setContent(StringEscapeUtils.unescapeJava(body), "text/html; charset=UTF-8");
 	          email.addRecipient(recipients);
-	          
 	          email.send();
 	      } catch (Exception e) {
 	          e.printStackTrace();    
@@ -147,7 +120,6 @@ public class GMailServer extends javax.mail.Authenticator
     {
         MimeMessage message = new MimeMessage(session);
         DataHandler handler = new DataHandler(new ByteArrayDataSource(body.getBytes(), "text/html"));
-        
         message.setSender(new InternetAddress(sender));
         message.setSubject(subject);
         message.setDataHandler(handler);
@@ -161,18 +133,18 @@ public class GMailServer extends javax.mail.Authenticator
     public class ByteArrayDataSource implements DataSource {
         private byte[] data;
         private String type;  
-
+        
         public ByteArrayDataSource(byte[] data, String type) {
             super();
             this.data = data;
             this.type = type;
         }  
-
+        
         public ByteArrayDataSource(byte[] data) {
             super();
             this.data = data;
         }  
-
+        
         public void setType(String type) {
             this.type = type;
         }  

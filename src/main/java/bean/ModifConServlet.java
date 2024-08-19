@@ -73,13 +73,13 @@ public class ModifConServlet extends HttpServlet {
         final int durata2 = durata1;
         
 	    // un concediu propriu zis ca sa incarc in dao si baza de date
-	    ConcediuCon concediul = new ConcediuCon();
+	    Concediu concediul = new Concediu();
 	
 		durata1 = (int) durata0;
         concediul.setId(id);
         concediul.setTip(tip);
-        concediul.setStart(inceput);
-        concediul.setEnd(sfarsit);
+        concediul.setInceput(inceput);
+        concediul.setSfarsit(sfarsit);
         concediul.setMotiv(motiv);
         concediul.setLocatie(locatie);
         concediul.setDurata(durata1);
@@ -169,7 +169,7 @@ public class ModifConServlet extends HttpServlet {
 		}
         
         try {
-			if (!odatavara(request, concediul) && (stringToDate(concediul.getStart()).getLuna() >= 6 && stringToDate(concediul.getStart()).getLuna() <= 8)) {
+			if (!odatavara(request, concediul) && (stringToDate(concediul.getInceput()).getLuna() >= 6 && stringToDate(concediul.getInceput()).getLuna() <= 8)) {
 				// verificare daca are deja un concediu pe perioada verii
 				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter out = response.getWriter();
@@ -460,10 +460,10 @@ public class ModifConServlet extends HttpServlet {
 	 * @return true daca durata concediului este mai mica decat cea prevazuta pentru acel tip de concediu
 	 * @throws SQLException
 	 */
-	private boolean oktip(ConcediuCon concediul) throws SQLException {
+	private boolean oktip(Concediu concediul) throws SQLException {
 		// declarare si initializare variabile
-		String inceput = concediul.getStart();
-		String sfarsit = concediul.getEnd();
+		String inceput = concediul.getInceput();
+		String sfarsit = concediul.getSfarsit();
 		LocalDate inceput2 = LocalDate.parse(inceput);
 	    LocalDate sfarsit2 = LocalDate.parse(sfarsit);
 	    long durata = ChronoUnit.DAYS.between(inceput2, sfarsit2) + 1; // ultimul - primul + 1
@@ -590,7 +590,7 @@ public class ModifConServlet extends HttpServlet {
 	    ));
 	}
 	
-	public static boolean odatavara(HttpServletRequest request, ConcediuCon concediu) throws ClassNotFoundException, IOException{
+	public static boolean odatavara(HttpServletRequest request, Concediu concediu) throws ClassNotFoundException, IOException{
 		// declarare si initializare variabile
 		int nr = 0;
 		String sql = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and concedii.id <> ? and concedii.status >= 0;";
@@ -656,10 +656,10 @@ public class ModifConServlet extends HttpServlet {
 	 * @param concediu
 	 * @return daca un concediu are mai mult de 21 de zile
 	 */
-	public static boolean maimultezileodata(ConcediuCon concediu) {
+	public static boolean maimultezileodata(Concediu concediu) {
 		 int nr = 0;
-		 Data start_c = stringToDate(concediu.getStart());
-	     Data end_c = stringToDate(concediu.getEnd());
+		 Data start_c = stringToDate(concediu.getInceput());
+	     Data end_c = stringToDate(concediu.getSfarsit());
 	     nr = contor(start_c, end_c);
 	     return nr < 21;
 	}
@@ -685,7 +685,7 @@ public class ModifConServlet extends HttpServlet {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	public static boolean preamulti(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException {
+	public static boolean preamulti(Concediu concediu, HttpServletRequest request) throws ClassNotFoundException, IOException {
 		// declarare si initializare date
 	    int nr = -1;
 	    int total = -1;
@@ -703,8 +703,8 @@ public class ModifConServlet extends HttpServlet {
 	    	PreparedStatement stmt2 = conexiune.prepareStatement(sql2);
 	    	PreparedStatement stmt3 = conexiune.prepareStatement(sql3)){
 	    	
-	    	Data inceput = stringToDate(concediu.getStart());
-	        Data sfarsit = stringToDate(concediu.getEnd());
+	    	Data inceput = stringToDate(concediu.getInceput());
+	        Data sfarsit = stringToDate(concediu.getSfarsit());
 
 	        stmt.setInt(1, id);
 	        try (ResultSet rezultat = stmt.executeQuery()) {
@@ -745,13 +745,13 @@ public class ModifConServlet extends HttpServlet {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	public static boolean preamultid(ConcediuCon concediu, HttpServletRequest request) throws ClassNotFoundException, IOException{
+	public static boolean preamultid(Concediu concediu, HttpServletRequest request) throws ClassNotFoundException, IOException{
 		// declarare si initializare variabile
 		int nr = 0;
 		String sql = "select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= ? and month(start_c) = ?"
 				+ " and day(start_c) <= ? and month(start_c) <= ? and status > 0 group by useri.tip having useri.tip = 0;";
-		Data inceput = stringToDate(concediu.getStart());
-        Data sfarsit = stringToDate(concediu.getEnd());
+		Data inceput = stringToDate(concediu.getInceput());
+        Data sfarsit = stringToDate(concediu.getSfarsit());
 	    Class.forName("com.mysql.cj.jdbc.Driver");
 	    
 	    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");

@@ -1,7 +1,6 @@
 package bean;
-
+// importare biblioteci
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,11 +11,20 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-//@WebServlet("/delusr")
+/**
+ * Clasa ce implementeaza servlet-ul de stergere al unui utilizator
+ */
 public class DelUsrServlet extends HttpServlet {
-    private DelUsrDao employeeDao;
-
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	// DAO pentru baza de date
+	private DelUsrDao employeeDao;
+	
+	/**
+	 * initializare DAO
+	 */
     public void init() throws ServletException {
         try {
             employeeDao = new DelUsrDao();
@@ -24,14 +32,17 @@ public class DelUsrServlet extends HttpServlet {
             throw new ServletException("Failed to initialize DeldDao", e);
         }
     }
+    
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	doPost(request, response);
     }
+    
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	// declarare si initializare variabile
     	int id = Integer.parseInt(request.getParameter("id"));
-    	String username = fetchUsernameById(id);
-        if (username == null) {
-        	 response.setContentType("text/html;charset=UTF-8");
+    	String numeutilizator = getNumeUtilizatorDinId(id);
+        if (numeutilizator == null) {
+        	response.setContentType("text/html;charset=UTF-8");
         	PrintWriter out = response.getWriter();
  		    out.println("<script type='text/javascript'>");
  		    out.println("alert('Nu se stie cine sa fie sters');");
@@ -41,89 +52,38 @@ public class DelUsrServlet extends HttpServlet {
         }
 
         try {
-            employeeDao.deleteUser(username, id);
+            employeeDao.deleteUser(numeutilizator, id);
             
-            String nume = null;
-            String prenume = null;
-            String email = null;
-            int dep = -1;
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                     PreparedStatement preparedStatement = connection.prepareStatement("SELECT email, nume, prenume, id_dep FROM useri WHERE id = ?")) {
-                    preparedStatement.setInt(1, id);
-                    try (ResultSet rs = preparedStatement.executeQuery()) {
-                        if (rs.next()) {
-                            nume = rs.getString("nume");
-                            prenume = rs.getString("prenume");
-                            email = rs.getString("email");
-                            dep = rs.getInt("id_dep");
-                        }
-                    }
-                }
-            } catch (ClassNotFoundException | SQLException e) {
-                e.printStackTrace();
-            }
-            
-         // trimit notificare la angajat
-            GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
-            String to = "";
-           
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-       	         PreparedStatement stmt = connection.prepareStatement("select email from useri where id_dep = ? and username != ?;"
-       	         		+ "")) {
-       	        stmt.setInt(1, dep);
-       	        stmt.setString(2, username); 
-       	        ResultSet rs = stmt.executeQuery();
-       	        if (rs.next()) {
-       	        	while (rs.next()) {
-       	        		to = rs.getString("email");
-           	            
-
-        	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-        	    	    String message11 = "<h1>Ultimile noutati </h1>"; 
-        	    	    String message12 = "<h2>Colegul nostru de departament " + nume + " " + prenume + ", pleaca de la noi =( </h2>"; 
-        	    	    
-        	    	    String message16 = "<p>Sa ne luam ramas bun. &#x1F609;\r\n"
-        	    	    		+ " <br> Doar suntem o familie! &#x1F917;\r\n"
-        	    	    		+ " <br> Va dorim toate cele bune! &#x1F607; \r\n"
-        	    	    		+ " </p>";
-        	    	    String message1 = message11 + message12 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-        	    	    		+ "</i></b>";
-        	    	   
-        	    	    try {
-        	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", to);
-        	    	       
-        	    	    } catch (Exception e) {
-        	    	        e.printStackTrace();
-        	    	       
-        	    	    }  
+            // trimitere asincrona mail-uri
+            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
+            asyncContext.setTimeout(10000);
+            asyncContext.start(() -> {
+                try {
+                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
+                    MailAsincron.send10(id, numeutilizator);
+                    asyncContext.complete();  // Completarea actiunii asincrone
+                } catch (Exception e) {
+                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
+                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
+                    response.setContentType("text/html;charset=UTF-8");
+        	        PrintWriter out = null;
+					try {
+						out = response.getWriter();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+        	        out.println("<script type='text/javascript'>");
+        	        out.println("alert('eroare din cauze necunoscute!');");
+        	        out.println("window.location.href = 'actiuni.jsp';");
+        	        out.println("</script>");
+        	        out.close();
+        	        return; 
                     
-       	        	}
-       	            
-       	        }
-       	    } catch (SQLException e) {
-       	        throw new ServletException("Eroare BD =(", e);
-       	    } 
-            
-            String subject1 = "Ramas bun";
-    	    String message11 = "<h1>Ne pare rau ca plecati de la noi... =( </h1>"; 
-    	    String message12 = "<h2>Ne-a facut placere sa va avem in echipa! Sper sa ne auzim si cu alte ocazii! =) </h2>"; 
-    	    
-    	    String message16 = "<p>Va dorim toate cele bune! &#x1F607; \r\n"
-    	    		+ " </p>";
-    	    String message1 = message11 + message12 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-    	    		+ "</i></b>";
-    	   
-    	    try {
-    	        sender.send(subject1, message1, "liviaaamp@gmail.com", email);
-    	       
-    	    } catch (Exception e) {
-    	        e.printStackTrace();
-    	       
-    	    }  
+                }
+            });
             
             response.setContentType("text/html;charset=UTF-8");
+            // daca s-a facut stergerea cu succes -> redirectare la pagina in care afiseaza utilizatorii sa vada ca s-a sters
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Stergere cu succes!');");
@@ -131,6 +91,7 @@ public class DelUsrServlet extends HttpServlet {
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
+        	// daca nu s-a putut realiza actiunea -> redirectare la pagina in care afiseaza utilizatorii sa vada ca NU s-a sters
         	response.setContentType("text/html;charset=UTF-8");
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
@@ -142,22 +103,32 @@ public class DelUsrServlet extends HttpServlet {
         }
     }
     
-    private String fetchUsernameById(int userId) {
-        String username = null;
+    /**
+     * Metoda care ajuta la aflarea numelui unui utilizator dupa id
+     * @param userId
+     * @return nume de utilizator sau "" daca nu a gasit nimic
+     */
+    private String getNumeUtilizatorDinId(int userId) {
+        String numeutilizator = "";
         try {
+        	// incarcare driver
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT username FROM useri WHERE id = ?")) {
-                preparedStatement.setInt(1, userId);
-                try (ResultSet rs = preparedStatement.executeQuery()) {
-                    if (rs.next()) {
-                        username = rs.getString("username");
+            // creare conexiune
+            try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+            		// pregatire interogare
+                 PreparedStatement interogare = conexiune.prepareStatement("SELECT username FROM useri WHERE id = ?")) {
+                interogare.setInt(1, userId);
+                // executare interogare
+                try (ResultSet rezultat = interogare.executeQuery()) {
+                    if (rezultat.next()) {
+                    	// daca s-au intors niste linii, atunci se alege coloana username ca sa extragem datele de care avem nevoie
+                        numeutilizator = rezultat.getString("username");
                     }
                 }
             }
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
-        return username;
+        return numeutilizator;
     }
 }

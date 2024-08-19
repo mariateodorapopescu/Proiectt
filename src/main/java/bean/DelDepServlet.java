@@ -22,14 +22,14 @@ public class DelDepServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	// dao pentru comunicarea cu baza de date
-    private DelDepDao employeeDao;
+    private StergereDepartamentDAO employeeDao;
 
     /**
      * initializare DAO
      */
     public void init() throws ServletException {
         try {
-            employeeDao = new DelDepDao();
+            employeeDao = new StergereDepartamentDAO();
         } catch (Exception e) {
             throw new ServletException("Failed to initialize DelUsrDao", e);
         }
@@ -55,7 +55,7 @@ public class DelDepServlet extends HttpServlet {
         }
         int id = fetchId(departament);
         try {
-            employeeDao.deleteUser(departament, id);
+            employeeDao.stergere(departament, id);
             // trimit notificare la angajati
 
             // trimiterea de mailuri se face in mod asincron

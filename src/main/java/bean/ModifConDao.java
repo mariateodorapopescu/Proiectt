@@ -15,7 +15,7 @@ public class ModifConDao {
  * @throws ClassNotFoundException
  * @throws SQLException
  */
-    public int check(ConcediuCon concediu) throws ClassNotFoundException, SQLException {
+    public int check(Concediu concediu) throws ClassNotFoundException, SQLException {
         // declarare si initializare variabile
         String sql = "UPDATE concedii SET start_c = ?, end_c = ?, motiv = ?, locatie = ?, modified = (select current_date()) WHERE id = ?;";
         int rezultat = 0;
@@ -24,8 +24,8 @@ public class ModifConDao {
 
         try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
              PreparedStatement stm = conexiune.prepareStatement(sql)) {
-            stm.setString(1, concediu.getStart());
-            stm.setString(2, concediu.getEnd());
+            stm.setString(1, concediu.getInceput());
+            stm.setString(2, concediu.getSfarsit());
             stm.setString(3, concediu.getMotiv());
             stm.setString(4, concediu.getLocatie());
             stm.setInt(5, concediu.getId());

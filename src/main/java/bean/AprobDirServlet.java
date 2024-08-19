@@ -71,7 +71,7 @@ public class AprobDirServlet extends HttpServlet {
             int id = -1;
     
         try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-            dep.modif(idconcediu); // fac aprobarea in DAO, aprobare = schimbare status
+            dep.aprobare(idconcediu); // fac aprobarea in DAO, aprobare = schimbare status
             id = getIdAng(idconcediu, conexiune);
             final int id2 = id; 
            // notificare asincrona

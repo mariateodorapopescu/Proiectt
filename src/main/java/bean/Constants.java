@@ -1,5 +1,7 @@
 package bean;
-
+/**
+ * Aceasta clasa modeleaza un obicet cu variabile ce le folosesc la scheduler-ul de mailuri
+ */
 public class Constants
 {
 	public static String delay;

@@ -1,50 +1,52 @@
 package bean;
-import bean.Data;
-public class ConcediuCon {
+/**
+ * Clasa ce modeleaza un concediu pentru DAO/baza de date
+ */
+public class Concediu {
 	private int id;
 	private int id_ang;
-	private String start;
-	private String end;
+	private String inceput;
+	private String sfarsit;
 	private String motiv;
 	private String locatie;
 	private int status;
 	private int tip;
 	private int durata;
 	/**
-	 * @return the id
+	 * @return id
 	 */
 	public int getId() {
 		return id;
 	}
 	/**
-	 * @param id the id to set
+	 * @param id
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 	/**
-	 * @return the start
+	 * @return start
 	 */
-	public String getStart() {
-		return start;
+	public String getInceput() {
+		return inceput;
 	}
 	/**
-	 * @param start the start to set
+	 * @param start 
 	 */
-	public void setStart(String start) {
-		this.start = start;
+	public void setInceput(String start) {
+		this.inceput = start;
 	}
 	/**
-	 * @return the end
+	 * @return end
 	 */
-	public String getEnd() {
-		return end;
+	public String getSfarsit() {
+		return sfarsit;
 	}
 	/**
 	 * @param end the end to set
 	 */
-	public void setEnd(String end) {
-		this.end = end;
+	public void setSfarsit(String end) {
+		this.sfarsit = end;
 	}
 	/**
 	 * @return the motiv

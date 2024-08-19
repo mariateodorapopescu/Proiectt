@@ -70,7 +70,7 @@ public class ResSefServlet extends HttpServlet {
             int id = -1;
 
             try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                dep.modif(idconcediu); // fac respingerea in DAO, respingere = schimbare status
+                dep.respingere(idconcediu); // fac respingerea in DAO, respingere = schimbare status
                 id = getIdAng(idconcediu, conexiune);
                 final int id2 = id; 
                // notificare asincrona
