@@ -1,5 +1,5 @@
 package bean;
-
+// importare biblioteci
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,30 +15,41 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-//import bean.ModifUsrDao;
 import bean.MyUser;
+/**
+ * Servlet ce se ocupa cu modificarea [numelui] unui departament
+ */
 public class ModifDepServlet extends HttpServlet {
+	
+	// un DAO pentru a incarca obiectul cu modificarile
     private ModifDepDao dep;
-
+    
+    /**
+     * initializeaza DAO
+     */
     public void init() {
         dep = new ModifDepDao();
     }
-
+    
+	/**
+	 * acest servlet face numai POST
+	 */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String departament = request.getParameter("username");
         String old = request.getParameter("password");
         
         if (departament == null) {
-        	 response.setContentType("text/html;charset=UTF-8");
+        	response.setContentType("text/html;charset=UTF-8");
         	PrintWriter out = response.getWriter();
  		    out.println("<script type='text/javascript'>");
- 		    out.println("alert('Nu a incarcat departamentul!');");
+ 		    out.println("alert('Nu s-a incarcat departamentul!');");
  		    out.println("window.location.href = 'modifdeldep.jsp';");
  		    out.println("</script>");
  		    out.close();
             return;
         }
-
+        
+        // functie care verifica daca exita numai literali in nume (si cratima sau spartiu)
         if (!NameValidator.validateName(departament)) {
             response.sendRedirect("modifdep2.jsp?n=true");
             return;
@@ -47,46 +58,38 @@ public class ModifDepServlet extends HttpServlet {
         try {
             dep.modif(departament, old);
             
-            // trimit notificare la angajat
-            GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
-            String to = "";
-           
-            int tipp = -1;
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-       	         PreparedStatement stmt = connection.prepareStatement("select tip, email from useri;"
-       	         		+ "")) {
-       	        
-       	        
-       	        ResultSet rs = stmt.executeQuery();
-       	        if (rs.next()) {
-       	        	while (rs.next()) {
-       	        		to = rs.getString("email");
-           	            tipp = rs.getInt("tip");
-
-        	    	    String subject1 = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
-        	    	    String message11 = "<h1>Ultimile noutati </h1>"; 
-        	    	    String message12 = "<h2>De acum incolo, departamentul " + old + " se va numi " + departament + " </h2>"; 
-        	    	    
-        	    	    String message16 = "<p>Decizia a fost luata la nivel de conducere. <br> Va dorim toate cele bune! &#x1F607; \r\n"
-        	    	    		+ " </p>";
-        	    	    String message1 = message11 + message12 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;\r\n"
-        	    	    		+ "</i></b>";
-        	    	   
-        	    	    try {
-        	    	        sender.send(subject1, message1, "liviaaamp@gmail.com", to);
-        	    	       
-        	    	    } catch (Exception e) {
-        	    	        e.printStackTrace();
-        	    	       
-        	    	    }  
+            // trimiterea de mailuri se face in mod asincron
+            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
+            asyncContext.setTimeout(10000);  
+            asyncContext.start(() -> {
+                try {
+                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
+                    MailAsincron.send4(old, departament);
+                    asyncContext.complete();  // Completarea actiunii asincrone
+                } catch (Exception e) {
+                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
+                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
+                    response.setContentType("text/html;charset=UTF-8");
+        	        PrintWriter out = null;
+					try {
+						out = response.getWriter();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+        	        out.println("<script type='text/javascript'>");
+        	        out.println("alert('Eroare din cauze necunoscute!');");
+        	        out.println("window.location.href = 'actiuni.jsp';");
+        	        out.println("</script>");
+        	        out.close();
+        	        return; 
                     
-       	        	}
-       	            
-       	        }
-       	    } catch (SQLException e) {
-       	        throw new ServletException("Eroare BD =(", e);
-       	    } 
+                }
+            });
             
+            // apoi redirectionez la pagina care listeaza si permite modificarea si stergerea departamentelor
+            // acest lucru il fac pentru ca utilizatorul sa poata vedea ce departamente sunt la un moment dat in institutie 
+            // + sa vada ca departamanetul modificat se afla printre departamentele existente
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
@@ -95,6 +98,7 @@ public class ModifDepServlet extends HttpServlet {
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
+        	// in caz de eroare redirectionez la aceeasi pagina, ca sa poata vedea toate departamentele existente, dar cu alerta diefrita
         	response.setContentType("text/html;charset=UTF-8");
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");

@@ -25,8 +25,6 @@ import javax.servlet.annotation.WebServlet;
 
 import org.w3c.dom.Document;
 
-//import com.itextpdf.pdf2data
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 /**

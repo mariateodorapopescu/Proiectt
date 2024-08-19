@@ -113,6 +113,7 @@
     <display-name>AddDepServlet</display-name>
     <servlet-name>AddDepServlet</servlet-name>
     <servlet-class>bean.AddDepServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>AddDepServlet</servlet-name>
@@ -123,6 +124,7 @@
     <display-name>ModifDepServlet</display-name>
     <servlet-name>ModifDepServlet</servlet-name>
     <servlet-class>bean.ModifDepServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>ModifDepServlet</servlet-name>
@@ -133,6 +135,7 @@
     <display-name>DelDepServlet</display-name>
     <servlet-name>DelDepServlet</servlet-name>
     <servlet-class>bean.DelDepServlet</servlet-class>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>DelDepServlet</servlet-name>
