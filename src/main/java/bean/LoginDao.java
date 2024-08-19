@@ -11,10 +11,13 @@ public class LoginDao {
 
     public MyUser validate(MyUser loginBean) throws SQLException, ClassNotFoundException {
         MyUser user = null;
+        // Load MySQL database driver
         Class.forName("com.mysql.cj.jdbc.Driver");
 
+        // Use try-with-resources for efficient handling of the JDBC resources.
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = connection.prepareStatement("select * from useri where username = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+            
             preparedStatement.setString(1, loginBean.getUsername());
 
             try (ResultSet rs = preparedStatement.executeQuery()) {
@@ -23,24 +26,25 @@ public class LoginDao {
                     if (BCrypt.checkpw(loginBean.getPassword(), hashedPassword)) {
                         user = new MyUser(); // Assuming MyUser has more fields you might want to fill
                         user.setUsername(loginBean.getUsername());
-                        // Add other details as needed from ResultSet
+                        // Potentially add other details as needed from ResultSet
+
+                        // Update the 'activ' status in the database
                         String INSERT_USERS_SQL = "UPDATE useri SET activ = 1 WHERE username = ?";
-                	    Class.forName("com.mysql.cj.jdbc.Driver");
-                	    try (
-                	         PreparedStatement preparedStatement1 = connection.prepareStatement(INSERT_USERS_SQL)) {
-                	        
-                	        preparedStatement1.setString(1, loginBean.getUsername());
-                	    } catch (SQLException e) {
-                	        printSQLException(e);
-                	    }
+                        try (PreparedStatement preparedStatement1 = connection.prepareStatement(INSERT_USERS_SQL)) {
+                            preparedStatement1.setString(1, loginBean.getUsername());
+                            preparedStatement1.executeUpdate(); // This line executes the update
+                        }
                     }
                 }
             }
+        } catch (SQLException e) {
+            printSQLException(e);
         }
         return user;
     }
+
     private void printSQLException(SQLException ex) {
-        for (Throwable e: ex) {
+        for (Throwable e : ex) {
             if (e instanceof SQLException) {
                 e.printStackTrace(System.err);
                 System.err.println("SQLState: " + ((SQLException) e).getSQLState());
@@ -53,5 +57,5 @@ public class LoginDao {
                 }
             }
         }
-    } 
+    }
 }

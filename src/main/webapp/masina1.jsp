@@ -248,376 +248,184 @@ int pag = -1;
             </thead>
              <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                    <% 	
+                   sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                           "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
+                           "FROM useri u " +
+                           "JOIN tipuri t ON u.tip = t.tip " +
+                           "JOIN departament d ON u.id_dep = d.id_dep " +
+                           "JOIN concedii c ON c.id_ang = u.id " +
+                           "JOIN statusuri s ON c.status = s.status " +
+                           "JOIN tipcon ct ON c.tip = ct.tip ";
                     	if (pag == 3 || pag == 4 || pag == 5) {
+                    		// aici se adauga id_ang pentru ca: personal, angajat, coleg de departament
+                    		sql = sql + " where c.id_ang = ? ";
                     		
-                    		if (status == 3 && tip == -1 && perioada == 0) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ?";
-                    			  stmtt2 = connection.prepareStatement(sql);
-                    			  stmtt2.setInt(1, id);
+                    		int nr = 1;
+                    		int nrt = -1;
+                    		int nrs = -1;
+                    		int nrp1 = -1;
+                    		int nrp2 = -1;
+                    		int nrp3 = -1;
+                    		
+                    		if (perioada == 0) {
+                    			sql = sql + " and YEAR(c.start_c) = YEAR(CURDATE()) ";
                     		}
-                    		if (status == 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.tip = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			  stmtt2.setInt(1, id);
-                   			stmtt2.setInt(2, tip);
+                    		
+                    		if (tip != -1) {
+                    			sql = sql  + " and c.tip = ? ";
+                    			nr++;
+                    			nrt = nr;
                   		}
-                    		if (status != 3 && tip == -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.status = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			  stmtt2.setInt(1, id);
-                   			stmtt2.setInt(2, status);
+                    		if (status != 3) {
+                    			sql = sql  + " and c.status = ? ";
+                    			nr++;
+                    			nrs = nr;
                   		}
-                    		if (status != 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.tip = ? and c.status = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			  stmtt2.setInt(1, id);
-                   			stmtt2.setInt(2, tip);
-                   			stmtt2.setInt(3, status);
-                  		}
-                    		if (status == 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                			  stmtt2.setInt(1, id);
-                				stmtt2.setString(2, start);
-                				stmtt2.setString(3, end);
-                				stmtt2.setString(4, end);
+                    		
+                    		if (perioada == 1) {
+                    			sql = sql  + " and YEAR(c.start_c) = YEAR(CURDATE()) AND c.start_c between ? AND ? AND c.end_c <= ?";
+                    			nr++;
+                    			nrp1 = nr;
+                    			nr++;
+                    			nrp2 = nr;
+                    			nr++;
+                    			nrp3 = nr;
                     		}
-                    		if (status == 3 && tip != -1 && perioada == 1) {
-                  			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                       "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                       "FROM useri u " +
-                                       "JOIN tipuri t ON u.tip = t.tip " +
-                                       "JOIN departament d ON u.id_dep = d.id_dep " +
-                                       "JOIN concedii c ON c.id_ang = u.id " +
-                                       "JOIN statusuri s ON c.status = s.status " +
-                                       "JOIN tipcon ct ON c.tip = ct.tip " +
-                                       "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.tip = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                  			stmtt2 = connection.prepareStatement(sql);
-              			  stmtt2.setInt(1, id);
-              			stmtt2.setInt(2, tip);
-              				stmtt2.setString(3, start);
-              				stmtt2.setString(4, end);
-              				stmtt2.setString(5, end);
-                  		}
-                    		if (status != 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                			  stmtt2.setInt(1, id);
-                			stmtt2.setInt(2, status);
-                				stmtt2.setString(3, start);
-                				stmtt2.setString(4, end);
-                				stmtt2.setString(5, end);
+                    		 
+                    		stmtt2 = connection.prepareStatement(sql);
+                    		stmtt2.setInt(1, id);
+                    		
+                    		if (nrt != -1) {
+                    			stmtt2.setInt(nrt, tip);
                     		}
-                    		if (status != 3 && tip != -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.id_ang = ? and c.tip = ? c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                			  stmtt2.setInt(1, id);
-                			stmtt2.setInt(2, tip);
-                			stmtt2.setInt(3, status);
-                				stmtt2.setString(4, start);
-                				stmtt2.setString(5, end);
-                				stmtt2.setString(6, end);
+                    		
+                    		if (nrs != -1) {
+                    			stmtt2.setInt(nrs, status);
+                    		}
+                    		
+                    		if (nrp1 != -1) {
+                    			stmtt2.setString(nrp1, start);
+                    			stmtt2.setString(nrp2, end);
+                    			stmtt2.setString(nrp3, end);
                     		}
                     	}
                     	
                     	if (pag == 6 || pag == 7) {
-                    		if (status == 3 && tip == -1 && perioada == 0) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ?";
-                    			  stmtt2 = connection.prepareStatement(sql);
-                    			  stmtt2.setInt(1, dep);
+                    		// aici adaug departamentul
+							sql = sql + " where u.id_dep = ? ";
+                    		
+                    		int nr = 1;
+                    		int nrt = -1;
+                    		int nrs = -1;
+                    		int nrp1 = -1;
+                    		int nrp2 = -1;
+                    		int nrp3 = -1;
+                    		
+                    		if (perioada == 0) {
+                    			sql = sql + " and YEAR(c.start_c) = YEAR(CURDATE()) ";
                     		}
-                    		if (status == 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.tip = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			stmtt2.setInt(1, dep);
-                   			stmtt2.setInt(2, tip);
+                    		
+                    		if (tip != -1) {
+                    			sql = sql  + " and c.tip = ? ";
+                    			nr++;
+                    			nrt = nr;
                   		}
-                    		if (status != 3 && tip == -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.status = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			stmtt2.setInt(1, dep);
-                   			stmtt2.setInt(2, status);
+                    		if (status != 3) {
+                    			sql = sql  + " and c.status = ? ";
+                    			nr++;
+                    			nrs = nr;
                   		}
-                    		if (status != 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.tip = ? and c.status = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			stmtt2.setInt(1, dep);
-                   			stmtt2.setInt(2, tip);
-                   			stmtt2.setInt(3, status);
-                  		}
-                    		if (status == 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                    			stmtt2.setInt(1, dep);
-                				stmtt2.setString(2, start);
-                				stmtt2.setString(3, end);
-                				stmtt2.setString(4, end);
+                    		
+                    		if (perioada == 1) {
+                    			sql = sql  + " and YEAR(c.start_c) = YEAR(CURDATE()) AND c.start_c between ? AND ? AND c.end_c <= ?";
+                    			nr++;
+                    			nrp1 = nr;
+                    			nr++;
+                    			nrp2 = nr;
+                    			nr++;
+                    			nrp3 = nr;
                     		}
-                    		if (status == 3 && tip != -1 && perioada == 1) {
-                  			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                       "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                       "FROM useri u " +
-                                       "JOIN tipuri t ON u.tip = t.tip " +
-                                       "JOIN departament d ON u.id_dep = d.id_dep " +
-                                       "JOIN concedii c ON c.id_ang = u.id " +
-                                       "JOIN statusuri s ON c.status = s.status " +
-                                       "JOIN tipcon ct ON c.tip = ct.tip " +
-                                       "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.tip = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                  			stmtt2 = connection.prepareStatement(sql);
-                  			stmtt2.setInt(1, dep);
-              			stmtt2.setInt(2, tip);
-              				stmtt2.setString(3, start);
-              				stmtt2.setString(4, end);
-              				stmtt2.setString(5, end);
-                  		}
-                    		if (status != 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                    			stmtt2.setInt(1, dep);
-                			stmtt2.setInt(2, status);
-                				stmtt2.setString(3, start);
-                				stmtt2.setString(4, end);
-                				stmtt2.setString(5, end);
+                    		 
+                    		stmtt2 = connection.prepareStatement(sql);
+                    		stmtt2.setInt(1, dep);
+                    		
+                    		if (nrt != -1) {
+                    			stmtt2.setInt(nrt, tip);
                     		}
-                    		if (status != 3 && tip != -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ? and c.tip = ? and c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                    			stmtt2.setInt(1, dep);
-                			stmtt2.setInt(2, tip);
-                			stmtt2.setInt(3, status);
-                				stmtt2.setString(4, start);
-                				stmtt2.setString(5, end);
-                				stmtt2.setString(6, end);
+                    		
+                    		if (nrs != -1) {
+                    			stmtt2.setInt(nrs, status);
                     		}
+                    		
+                    		if (nrp1 != -1) {
+                    			stmtt2.setString(nrp1, start);
+                    			stmtt2.setString(nrp2, end);
+                    			stmtt2.setString(nrp3, end);
+                    		}
+                    		
                     	}
                     	if (pag == 8) {
-                    		if (status == 3 && tip == -1 && perioada == 0) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE())";
-                    			  stmtt2 = connection.prepareStatement(sql);
+                    		// aici e pe toata institutia
+                    		int nr = 0;
+                    		int nrt = -1;
+                    		int nrs = -1;
+                    		int nrp1 = -1;
+                    		int nrp2 = -1;
+                    		int nrp3 = -1;
+                    		
+                    		String word = " and ";
+                    		if (perioada == 0) {
+                    			nr++;
+                    			if (nr == 1) {
+                    				word = " where ";
+                    			}
+                    			sql = sql + word + " YEAR(c.start_c) = YEAR(CURDATE()) ";
                     		}
-                    		if (status == 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.tip = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			stmtt2.setInt(1, tip);
+                    		
+                    		if (tip != -1) {
+                    			nr++;
+                    			if (nr == 1) {
+                    				word = " where ";
+                    			}
+                    			sql = sql + word + " c.tip = ? ";
+                    			nrt = nr;
                   		}
-                    		if (status != 3 && tip == -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.status = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			stmtt2.setInt(1, status);
+                    		if (status != 3) {
+                    			nr++;
+                    			if (nr == 1) {
+                    				word = " where ";
+                    			}
+                    			sql = sql + word  + " c.status = ? ";
+                    			nrs = nr;
                   		}
-                    		if (status != 3 && tip != -1 && perioada == 0) {
-                    			sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                        "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                        "FROM useri u " +
-                                        "JOIN tipuri t ON u.tip = t.tip " +
-                                        "JOIN departament d ON u.id_dep = d.id_dep " +
-                                        "JOIN concedii c ON c.id_ang = u.id " +
-                                        "JOIN statusuri s ON c.status = s.status " +
-                                        "JOIN tipcon ct ON c.tip = ct.tip " +
-                                        "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.tip = ? and c.status = ?";
-                   			  stmtt2 = connection.prepareStatement(sql);
-                   			stmtt2.setInt(1, tip);
-                   			stmtt2.setInt(2, status);
-                  		}
-                    		if (status == 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                				stmtt2.setString(1, start);
-                				stmtt2.setString(2, end);
-                				stmtt2.setString(3, end);
+                    		
+                    		if (perioada == 1) {
+                    			nr++;
+                    			nrp1 = nr;
+                    			if (nr == 1) {
+                    				word = " where ";
+                    			}
+                    			sql = sql + word + " YEAR(c.start_c) = YEAR(CURDATE()) AND c.start_c between ? AND ? AND c.end_c <= ?";
+                    			nr++;
+                    			nrp2 = nr;
+                    			nr++;
+                    			nrp3 = nr;
                     		}
-                    		if (status == 3 && tip != -1 && perioada == 1) {
-                  			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                       "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                       "FROM useri u " +
-                                       "JOIN tipuri t ON u.tip = t.tip " +
-                                       "JOIN departament d ON u.id_dep = d.id_dep " +
-                                       "JOIN concedii c ON c.id_ang = u.id " +
-                                       "JOIN statusuri s ON c.status = s.status " +
-                                       "JOIN tipcon ct ON c.tip = ct.tip " +
-                                       "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.tip = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                  			stmtt2 = connection.prepareStatement(sql);
-              			stmtt2.setInt(1, tip);
-              				stmtt2.setString(2, start);
-              				stmtt2.setString(3, end);
-              				stmtt2.setString(4, end);
-                  		}
-                    		if (status != 3 && tip == -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                			stmtt2.setInt(1, status);
-                				stmtt2.setString(2, start);
-                				stmtt2.setString(3, end);
-                				stmtt2.setString(4, end);
+                    		 
+                    		stmtt2 = connection.prepareStatement(sql);
+                    		
+                    		if (nrt != -1) {
+                    			stmtt2.setInt(nrt, tip);
                     		}
-                    		if (status != 3 && tip != -1 && perioada == 1) {
-                    			  sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                                         "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                                         "FROM useri u " +
-                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                                         "JOIN concedii c ON c.id_ang = u.id " +
-                                         "JOIN statusuri s ON c.status = s.status " +
-                                         "JOIN tipcon ct ON c.tip = ct.tip " +
-                                         "WHERE YEAR(c.start_c) = YEAR(CURDATE()) and c.tip = ? c.status = ? AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			stmtt2 = connection.prepareStatement(sql);
-                			stmtt2.setInt(1, tip);
-                			stmtt2.setInt(2, status);
-                				stmtt2.setString(3, start);
-                				stmtt2.setString(4, end);
-                				stmtt2.setString(5, end);
+                    		
+                    		if (nrs != -1) {
+                    			stmtt2.setInt(nrs, status);
+                    		}
+                    		
+                    		if (nrp1 != -1) {
+                    			stmtt2.setString(nrp1, start);
+                    			stmtt2.setString(nrp2, end);
+                    			stmtt2.setString(nrp3, end);
                     		}
                     	}
                     	
@@ -626,7 +434,6 @@ int pag = -1;
 							int nr = 1;
                           while (rss1.next()) {
                               found = true;
-                              // int nr = 1;
                               
                                 String added = rss1.getString("added") != null ? rss1.getString("added") : " - ";
                                 String modif = rss1.getString("modified") != null ? rss1.getString("modified") : " - ";
@@ -718,10 +525,6 @@ int pag = -1;
                 }
 
             </script>
-
-                   
-                
-           
            <%
                 }
             

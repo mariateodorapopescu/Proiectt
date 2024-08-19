@@ -143,7 +143,7 @@
     <display-name>AddConServlet</display-name>
     <servlet-name>AddConServlet</servlet-name>
     <servlet-class>bean.AddConServlet</servlet-class>
-     <async-supported>true</async-supported>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
     <servlet-name>AddConServlet</servlet-name>
@@ -324,5 +324,45 @@
   <servlet-mapping>
     <servlet-name>OTP3</servlet-name>
     <url-pattern>/OTP3</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>addImageServlet</display-name>
+    <servlet-name>addImageServlet</servlet-name>
+    <servlet-class>bean.addImageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>addImageServlet</servlet-name>
+    <url-pattern>/addImageServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>addImage</display-name>
+    <servlet-name>addImage</servlet-name>
+    <servlet-class>bean.addImage</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>addImage</servlet-name>
+    <url-pattern>/addImage</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DisplayImage</display-name>
+    <servlet-name>DisplayImage</servlet-name>
+    <servlet-class>bean.DisplayImage</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DisplayImage</servlet-name>
+    <url-pattern>/DisplayImage</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>test</display-name>
+    <servlet-name>test</servlet-name>
+    <servlet-class>bean.PeanServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>test</servlet-name>
+    <url-pattern>/test</url-pattern>
   </servlet-mapping>
 </web-app>

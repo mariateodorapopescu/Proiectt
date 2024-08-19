@@ -4,14 +4,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.io.IOException;
-import java.io.PrintWriter;
 
+import javax.servlet.annotation.MultipartConfig;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+@MultipartConfig(maxFileSize = 16177216) // 1.5 MB
 public class ModifUsrServlet extends HttpServlet {
     /**
 	 * 
@@ -20,6 +26,8 @@ public class ModifUsrServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //String originalUsername = request.getParameter("originalUsername");
+		String idd = request.getParameter("id");
+		System.out.println(idd);
     	int id = Integer.valueOf(request.getParameter("id"));
         String newUsername = request.getParameter("username");
         String nume = request.getParameter("nume");
@@ -74,12 +82,12 @@ public class ModifUsrServlet extends HttpServlet {
            } catch (SQLException e) {
 		        // printSQLException(e);
 		        response.setContentType("text/html;charset=UTF-8");
-				 PrintWriter out = response.getWriter();
-				    out.println("<script type='text/javascript'>");
-				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'modifdel.jsp';");
-				    out.println("</script>");
-				    out.close();
+				 PrintWriter out1 = response.getWriter();
+				    out1.println("<script type='text/javascript'>");
+				    out1.println("alert('Eroare la baza de date - debug only!');");
+				    out1.println("window.location.href = 'modifdel.jsp';");
+				    out1.println("</script>");
+				    out1.close();
 				    e.printStackTrace();
 		        throw new IOException("Eroare la baza de date =(", e);
 		       
@@ -132,5 +140,46 @@ public class ModifUsrServlet extends HttpServlet {
 		    out.close();
 			e.printStackTrace();
         }
+        
+        Part filePart = request.getPart("image"); // Retrieves <input type="file" name="image">
+        InputStream inputStream = null;
+        if (filePart != null) {
+            // Obtains input stream of the upload file
+            inputStream = filePart.getInputStream();
+        }
+        Connection conn = null; // connection to the database
+        try {
+            // Connects to the database
+            DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+
+            // Constructs SQL statement
+            String sql = "UPDATE useri profil=? WHERE id=?";
+            PreparedStatement statement = conn.prepareStatement(sql);
+
+            if (inputStream != null) {
+                // Fetches input stream of the upload file for the blob column
+                statement.setBlob(1, inputStream);
+            }
+
+            int userId = Integer.parseInt(request.getParameter("id")); // Fetch this from your form or session
+            statement.setInt(2, userId);
+
+            // Sends the statement to the database server
+            int row = statement.executeUpdate();
+            if (row > 0) {
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                // Closes the database connection
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }  
     }
 }
