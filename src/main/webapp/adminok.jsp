@@ -646,7 +646,7 @@ body {
         </ul>
     </div>
     <div class="main-content">
-        <iframe name="iframe" id='iframe' src="homedir.jsp"></iframe>
+        <iframe name="iframe" id='iframe' src="homeadmin.jsp"></iframe>
     </div>
     <script src="main.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>

@@ -8,6 +8,28 @@
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Locale" %>
 <%
+// structura unei pagini suna cam asa
+// verificare daca exista sesiune activa, utilizator logat(curent), 
+// extragere date despre user cum ar fi tipul ca sa se stie ce pagina 
+// sa deschida, temele de culoare ale fiecarui utilizator
+// apoi se incarca pagina in sine
+// in ceea ce priveste gruparea de pagini concediinoieu, concediinoisef, concediinoidir, e cam asa
+// header cu titlu si data curenta
+// cap de tabel: partea comuna la toti 3 e de la nr crt la status, apoi la sef si la dir e in plus aprobati/respingeti
+// nrcrt, nume, preume, functie, departament, inceput, sfarsit, motiv, locatie, tip, adaugat, modificat, acceptat/respins, status
+// masina2?
+// apoi vine sql ul comun SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c,
+// c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep 
+// JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ?
+// la care in plus depinzand de user se adauga: and c.status = 0 (sef) and c.status = 1 (director), c.id_ang sau id = uid pentru concediinoieu
+// exista 2 tipuri de concediinoieu, unul care permite modificarea -> si aici ai cazuri: and c.status = 0 pentru tip1,tip2, and c.status = 1 pentru director si sef 
+// -> la fel, la partea comuna din capul de tabel adaugi coloanele de modificati/stergeti
+// apoi vin ultimele coloane: status, aprobati,respingeti/modificati,stergeti cu iconitele:  if (rs1.getString("status").compareTo("neaprobat") == 0) {
+// out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
+// out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='aprobsef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+// out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='ressef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>"); }
+
+// deci, hai sa pregatim teren pentru masina2 care le contine pe astea: deci in loc de 4 o sa am 1 =)
     HttpSession sesi = request.getSession(false);
     if (sesi != null) {
         MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
@@ -172,6 +194,7 @@
                     <th style="color:white">Modif</th>
                      <th style="color:white">Acc/Res</th>
                     <th style="color:white">Status</th>
+                    
                      <th style="color:white">Aprobati</th>
                      <th style="color:white">Respingeti</th>
                 </tr>
