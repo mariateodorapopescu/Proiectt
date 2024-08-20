@@ -104,7 +104,7 @@
                     	 <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                 <h3>Ce doriti sa faceti?</h3>
                  <button > <a href = "addc.jsp" style="text-decoration:none;">Adaugare concediu</a></button>
-       <button ><a href = "concediinoieu.jsp" style="text-decoration:none;">Modificare si stergere concedii</a></button>
+       <button ><a href = "concediinoisef.jsp?pag=1" style="text-decoration:none;">Modificare si stergere concedii</a></button>
               </div>
                </div>
    
