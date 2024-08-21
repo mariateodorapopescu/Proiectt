@@ -167,7 +167,8 @@
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
 
                         <div class="profile-card">
-                            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="imagine profil">
+                       <img src="${pageContext.request.contextPath}/ImageServlet" alt="Profile Image" />
+                        <!-- <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="imagine profil">  -->
                             <h1><%= prenume %></h1>
                             <h2><%= functie %></h2>
                             <div class="info">
@@ -196,7 +197,11 @@
                             </div>
                             <div class="buttons">
                                          
-                                <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"><a href='modifydata.jsp'>Modificati</a></button>
+                                <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"><a href='modifydata.jsp'>Modificati datele personale</a></button>
+                            </div>
+                            <div class="buttons">
+                                         <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"><a href='addpic.jsp'>Modificati imaginea de profil</a></button>
+                                
                             </div>
                         </div>
                         <%

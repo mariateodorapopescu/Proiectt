@@ -36,14 +36,14 @@ public class LeaveDataServlet extends HttpServlet {
 
 	        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false&serverTimezone=UTC", "root", "student");
 	             Statement statement = connection.createStatement();
-	             ResultSet rs = statement.executeQuery("SELECT accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr where concedii.status = 2")) {
+	             ResultSet rs = statement.executeQuery("SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr where concedii.status = 2")) {
 
 	            while (rs.next()) {
 	                JSONObject event = new JSONObject();
 	                event.put("title", rs.getString("nume") + " " + rs.getString("prenume"));
 	                event.put("start", rs.getDate("start_c").toString());
 	                event.put("end", rs.getDate("end_c").toString());
-	                event.put("color", rs.getString("accent")); // Example color
+	                event.put("color", rs.getString("culoare")); // Example color
 	                event.put("textColor", "white");
 	                events.put(event);
 	                System.out.println(events);
@@ -75,14 +75,14 @@ public class LeaveDataServlet extends HttpServlet {
 
 	        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 	             Statement statement = connection.createStatement();
-	             ResultSet rs = statement.executeQuery("SELECT accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr where concedii.status = 2")) {
+	             ResultSet rs = statement.executeQuery("SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr where concedii.status = 2")) {
 
 	            while (rs.next()) {
 	                JSONObject event = new JSONObject();
 	                event.put("title", rs.getString("nume") + " " + rs.getString("prenume"));
 	                event.put("start", rs.getDate("start_c").toString());
 	                event.put("end", rs.getDate("end_c").toString());
-	                event.put("color", rs.getString("accent")); // Example color
+	                event.put("color", rs.getString("culoare")); // Example color
 	                event.put("textColor", "white");
 	                events.put(event);
 	            }

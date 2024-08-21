@@ -625,7 +625,7 @@ body {
                     <a href="despr.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <div class="imgbx">
-                                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png">
+                                <img src="${pageContext.request.contextPath}/ImageServlet" alt="Profile Image" />
                             </div>
                         </div>
                         <div  class="sitextt"> <% out.println(nume);%></div>

@@ -79,7 +79,7 @@ public class decenulvede extends HttpServlet {
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
         		// pregatirea interogarii
              PreparedStatement statement = connection.prepareStatement(
-                 "SELECT accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ? and concedii.status = 2")) {
+                 "SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ? and concedii.status = 2")) {
             // setare variabile in interogare
         	statement.setInt(1, departmentId);
             ResultSet rs = statement.executeQuery();
@@ -89,7 +89,7 @@ public class decenulvede extends HttpServlet {
                 event.put("title", rs.getString("nume") + " " + rs.getString("prenume"));
                 event.put("start", rs.getDate("start_c").toString());
                 event.put("end", rs.getDate("end_c").toString());
-                event.put("color", rs.getString("accent"));
+                event.put("color", rs.getString("culoare"));
                 event.put("textColor", "white");
                 events.put(event);
             }

@@ -8,9 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimerTask;
-
+import java.time.LocalDate;
+import java.util.ArrayList;
 import jakarta.servlet.ServletException;
 
 public class Testing extends TimerTask
@@ -28,6 +30,8 @@ public class Testing extends TimerTask
 	                sendReminders3(connection);
 	                
 	                sendReminders4(connection);
+	                
+	                sendReminders5(connection);
 	                
 	            } catch (IOException e) {
 	                System.err.println("Error during database operation: " + e.getMessage());
@@ -195,10 +199,10 @@ public class Testing extends TimerTask
 	                   + "<h2>Va dorim toate cele bune!&#x1F60E;</h2>"
 	                   + "<b><i>Conducerea firmei XYZ.</i></b>&#x1F917;";
 
-	    GMailServer sender = new GMailServer("your-email@gmail.com", "your-email-password");
+	    GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
 
 	    try {
-	        sender.send(subject, message, "your-email@gmail.com", email);
+	        sender.send(subject, message, "liviaaamp@gmail.com", email);
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
@@ -310,6 +314,128 @@ public class Testing extends TimerTask
      	        e.printStackTrace();
      	    }  
          }
+	}
+	
+	private void sendReminders5(Connection connection) throws Exception {
+			        
+        HashMap<LocalDate, ArrayList<String>> onomastici = new HashMap<>();
+        onomastici.put(LocalDate.of(2024, 1, 7), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 8, 15), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 12, 25), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 4, 23), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 11, 7), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 5, 21), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 11, 30), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 12, 27), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 6, 29), new ArrayList<>()); // Initialize with an empty ArrayList
+        // onomastici.put(LocalDate.of(2024, 8, 21), new ArrayList<>()); // Initialize with an empty ArrayList
+        onomastici.put(LocalDate.of(2024, 7, 7), new ArrayList<>()); // Initialize with an empty ArrayList
+        
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Ion");
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Ionut");
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Ioana");
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Oana");
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Ionelia");
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Ionel");
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Ioneliu");
+        onomastici.get(LocalDate.of(2024, 1, 7)).add("Ionela");
+        
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Maria");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Mariana");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Maia");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Maya");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Marinela");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Marilena");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Mario");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Marian");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Marin");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Marinel");
+        onomastici.get(LocalDate.of(2024, 8, 15)).add("Marina");
+        
+        onomastici.get(LocalDate.of(2024, 12, 25)).add("Cristian");
+        onomastici.get(LocalDate.of(2024, 12, 25)).add("Cristiana");
+        onomastici.get(LocalDate.of(2024, 12, 25)).add("Cristina");
+        onomastici.get(LocalDate.of(2024, 12, 25)).add("Christian");
+        onomastici.get(LocalDate.of(2024, 12, 25)).add("Christina");
+        
+        onomastici.get(LocalDate.of(2024, 7, 7)).add("Teodor");
+        onomastici.get(LocalDate.of(2024, 7, 7)).add("Theodor");
+        onomastici.get(LocalDate.of(2024, 7, 7)).add("Teodora");
+        
+        onomastici.get(LocalDate.of(2024, 4, 23)).add("Gheorghe");
+        onomastici.get(LocalDate.of(2024, 4, 23)).add("George");
+        onomastici.get(LocalDate.of(2024, 4, 23)).add("Georgiana");
+        onomastici.get(LocalDate.of(2024, 4, 23)).add("Georgeta");
+        onomastici.get(LocalDate.of(2024, 4, 23)).add("Georgia");
+        onomastici.get(LocalDate.of(2024, 4, 23)).add("Geanina");
+        onomastici.get(LocalDate.of(2024, 4, 23)).add("Gianina");
+        
+        onomastici.get( LocalDate.of(2024, 11, 7)).add("Mihai");
+        onomastici.get( LocalDate.of(2024, 11, 7)).add("Mihail");
+        onomastici.get( LocalDate.of(2024, 11, 7)).add("Mihaela");
+        onomastici.get( LocalDate.of(2024, 11, 7)).add("Gabriel");
+        onomastici.get( LocalDate.of(2024, 11, 7)).add("Gabriela");
+        onomastici.get( LocalDate.of(2024, 11, 7)).add("Mihnea");
+        
+        onomastici.get(LocalDate.of(2024, 5, 21)).add("Constantin");
+        onomastici.get(LocalDate.of(2024, 5, 21)).add("Costin");
+        onomastici.get(LocalDate.of(2024, 5, 21)).add("Elena");
+        
+        onomastici.get(LocalDate.of(2024, 11, 30)).add("Andrei");
+        onomastici.get(LocalDate.of(2024, 11, 30)).add("Andreia");
+        onomastici.get(LocalDate.of(2024, 11, 30)).add("Andreea");
+        onomastici.get(LocalDate.of(2024, 11, 30)).add("Andreas");
+        onomastici.get(LocalDate.of(2024, 11, 30)).add("Andra");
+        onomastici.get(LocalDate.of(2024, 11, 30)).add("Andrada");
+        
+        onomastici.get(LocalDate.of(2024, 12, 27)).add("Stefan");
+        onomastici.get(LocalDate.of(2024, 12, 27)).add("Stefana");
+        onomastici.get(LocalDate.of(2024, 12, 27)).add("Stefania");
+        onomastici.get(LocalDate.of(2024, 12, 27)).add("Stefanuta");
+        onomastici.get(LocalDate.of(2024, 12, 27)).add("Stefanita");
+        
+        onomastici.get(LocalDate.of(2024, 6, 29)).add("Paul");
+        onomastici.get(LocalDate.of(2024, 6, 29)).add("Paula");
+        onomastici.get(LocalDate.of(2024, 6, 29)).add("Pavel");
+        onomastici.get(LocalDate.of(2024, 6, 29)).add("Petru");
+        onomastici.get(LocalDate.of(2024, 6, 29)).add("Petrica");
+        onomastici.get(LocalDate.of(2024, 6, 29)).add("Petruta");
+        onomastici.get(LocalDate.of(2024, 6, 29)).add("Petrut");
+        
+        //onomastici.get(LocalDate.of(2024, 8, 21)).add("Monica");
+	    for (LocalDate i : onomastici.keySet()) {
+	    	for (String j : onomastici.get(i)) {
+		    String query = "select email from useri where day(current_date())=" + i.getDayOfMonth() + " and month(current_date())= " + i.getMonthValue() + " and prenume like \"" + "%" + j + "%\"";
+		    // select email from useri where day(current_date())=21 and month(current_date())=8 and prenume like "%Monica%";
+		   
+		    String email = "";
+	
+			    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+			        ResultSet rs = preparedStatement.executeQuery();
+			        if (rs.next()) {
+			            email = rs.getString("email");
+			            sendEmail5(email);
+			        }
+			    } catch (SQLException e) {
+			        throw new IOException("Database error: " + e.getMessage(), e);
+			    }
+		    }
+	    }
+	}
+
+	private void sendEmail5(String email) throws Exception {
+	    String subject = "\uD83D\uDEA8 Aveti o notificare \uD83D\uDEA8";
+	    String message = "<h1>La multi ani cu ocazia zilei numelui!&#x1F389;</h1>" 
+	                   + "Multa sanatate, succes, fericire si realizari pe toate planurile alaturi de cei dragi! <br>" 
+	                   + "<b><i>Conducerea firmei XYZ.</i></b>&#x1F917;";
+
+	    GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+
+	    try {
+	        sender.send(subject, message, "liviaaamp@gmail.com", email);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
 
 }

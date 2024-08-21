@@ -7,10 +7,11 @@ if (sesi != null) {
         String username = currentUser.getUsername();
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, tip FROM useri WHERE username = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT culoare, id, tip FROM useri WHERE username = ?")) {
             preparedStatement.setString(1, username);
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.next()) {
+            	String culoare = rs.getString("culoare");
                 int userId = rs.getInt("id");
                 int userType = rs.getInt("tip");
                 if (userType == 4) {

@@ -36,6 +36,7 @@ public class MyUserServlet extends HttpServlet {
         int dep = Integer.valueOf(request.getParameter("departament"));
         int tip = Integer.valueOf(request.getParameter("tip"));
         int id = RandomNumberGenerator.generate();
+        String culoare = RandomColorGenerator.generate();
 
         MyUser employee = new MyUser();
         employee.setNume(nume);
@@ -49,6 +50,7 @@ public class MyUserServlet extends HttpServlet {
         employee.setDepartament(dep);
         employee.setTip(tip);
         employee.setCnp(id);
+        employee.setCuloare(culoare);
         
         if (!PasswordValidator.validatePassword(password)) {
             response.sendRedirect("signin.jsp?p=true");

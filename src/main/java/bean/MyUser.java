@@ -19,6 +19,7 @@ public class MyUser implements Serializable {
     private int tip;
     private int cnp;
     private int id;
+    private String culoare;
     public String getUsername() {
         return username;
     }
@@ -102,5 +103,15 @@ public class MyUser implements Serializable {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+	public String getCuloare() {
+		// TODO Auto-generated method stub
+		return culoare;
+	}
+	/**
+	 * @param culoare the culoare to set
+	 */
+	public void setCuloare(String culoare) {
+		this.culoare = culoare;
 	}
 }

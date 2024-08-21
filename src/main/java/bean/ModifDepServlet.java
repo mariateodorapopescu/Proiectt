@@ -50,7 +50,7 @@ public class ModifDepServlet extends HttpServlet {
 		    out.close();
 
             jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            asyncContext.setTimeout(1000);
+            
             asyncContext.start(() -> {
                 try {
                     MailAsincron.send4(old, departament);

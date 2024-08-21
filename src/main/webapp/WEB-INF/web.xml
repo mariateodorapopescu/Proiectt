@@ -365,4 +365,35 @@
     <servlet-name>test</servlet-name>
     <url-pattern>/test</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>default</servlet-name>
+    <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
+    <multipart-config>
+      <max-file-size>5242880</max-file-size>
+      <max-request-size>52428800</max-request-size>
+      <file-size-threshold>0</file-size-threshold>
+    </multipart-config>
+  </servlet>
+  <servlet>
+    <servlet-name>UploadImageServlet</servlet-name>
+    <servlet-class>bean.UploadImageServlet</servlet-class>
+    <multipart-config>
+      <location>C:\Users\Popi\Desktop</location>
+      <max-file-size>10485760</max-file-size>
+      <max-request-size>15728640</max-request-size>
+      <file-size-threshold>102400</file-size-threshold>
+    </multipart-config>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UploadImageServlet</servlet-name>
+    <url-pattern>/UploadImageServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ImageServlet</servlet-name>
+    <servlet-class>bean.ImageServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>ImageServlet</servlet-name>
+    <url-pattern>/ImageServlet</url-pattern>
+</servlet-mapping>
 </web-app>
