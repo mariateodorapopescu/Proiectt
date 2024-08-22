@@ -142,7 +142,7 @@
 
 <%
 
-                        PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on tipuri.tip = useri.tip left JOIN departament on departament.id_dep = useri.id_dep WHERE useri.id_dep = ?");
+                        PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on tipuri.tip = useri.tip left JOIN departament on departament.id_dep = useri.id_dep WHERE useri.id_dep = ? and username <> \"test\"");
                         stmt.setInt(1, idDep);
                         ResultSet rs1 = stmt.executeQuery();
                         boolean found = false;

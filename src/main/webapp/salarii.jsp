@@ -198,7 +198,7 @@
                                     rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Departament'>" + rs1.getString("departament") + 
                                      "</td>" + "<td data-label='Salariu de baza'>" + rs1.getString("salariu") + "</td>");
                             // acordare salariu
-	                              out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='acordaref?id=" + rs1.getInt("id")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+	                              out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='acordare?id=" + rs1.getInt("id")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
 	                           // acordare marire
 	                              out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='marire?id=" + rs1.getInt("id")+ "'><i class='ri-focus-line'></i></a></span></td>");
                             // acordare penalizari   

@@ -112,7 +112,7 @@
             width: 100%;
             border: none;
             transition: height 0.5s ease;
-            overflow: hidden; /* Hide scrollbars */
+            overflow: auto; /* Hide scrollbars */
             overflow-y: hidden; /* Hide vertical scrollbar */
             /* Hide scrollbar for Chrome, Safari and Opera */
              -ms-overflow-style: none;  /* IE and Edge */
@@ -670,7 +670,7 @@ body {
             </div>
         </ul>
     </div>
-    <div class="main-content">
+    <div style="margin: 0; padding: 0; overflow: auto;" class="main-content">
         <iframe name="iframe" id='iframe' src="homedir.jsp"></iframe>
     </div>
     <script src="main.js"></script>

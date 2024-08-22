@@ -521,6 +521,7 @@ public class MailAsincron {
         String angajat = "";
         String nume = "";
         String prenume = "";
+        String mentiuni = "";
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
    	         PreparedStatement stmt = connection.prepareStatement("select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;"
    	         		+ "")) {
@@ -572,6 +573,7 @@ public class MailAsincron {
    	            motiv = rs.getString("motiv");
    	            tip3 = rs.getInt("tip");
    	            data = rs.getString("added");
+   	            mentiuni = rs.getString("mentiuni");
    	        }
    	    } catch (SQLException e) {
    	        throw new ServletException("Eroare BD =(", e);
@@ -598,7 +600,7 @@ public class MailAsincron {
 	    String message11 = "<h1>Felicitari! &#x1F389; <br> Concediul dvs. din data de " + data + " a fost citit si este in curs de procesare! &#x1F389; </h1>"; 
 	    String message12 = "<h2>Totusi, acum mai trebuie sa asteptam confimarea acestuia &#x1F642; Sa fie intr-un ceas bun! &#x1F607; </h2>";
 	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
-	    String message14 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + tip + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+	    String message14 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + tip + "<br><b>Durata: </b>" + durata + " zile<br><b>Mentiuni:</b>" + mentiuni + "<br></p>";
 	    String message16 = "<p>Va dorim toate cele bune! &#x1F607; </p>";
 	    
 	    String message1 = message11 + message12 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
@@ -648,6 +650,7 @@ public class MailAsincron {
         String motiv2 = "";
         int durata = -1;
         String data = "";
+        String mentiuni = "";
         
         // creare conexiune cu baza de date si pregatire interogari
         try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -680,6 +683,7 @@ public class MailAsincron {
    	            locatie = rezultat3.getString("locatie");
    	            motiv = rezultat3.getString("motiv");
    	            data = rezultat3.getString("added");
+   	            mentiuni = rezultat3.getString("mentiuni");
    	        }
    	    } catch (SQLException e) {
    	        throw new ServletException("Eroare BD =(", e);
@@ -691,7 +695,7 @@ public class MailAsincron {
     	    
     	    String message11 = "<h1>Ne pare rau sa venim cu asemnea vesti, caci... &#x1F614;<br> Concediul dvs. din data de " + data + " a fost respins. &#x1F614; </h1>"; 
     	    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
-    	    String message14 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motiv2 + "<br><b>Durata: </b>" + durata + " zile<br></p>";
+    	    String message14 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + locatie + "<br><b> Motiv: </b>" + motiv + "<br><b>Tip concediu: </b>" + motiv2 + "<br><b>Durata: </b>" + durata + " zile<br><b>Mentiuni:</b>" + mentiuni + "<br></p>";
     	    String message15 = "<br><p>Nu uitati ca puteti oricand sa programati un nou concediu in locul acestuia! &#x2728; </p>";
     	    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607; </p>";
     	    

@@ -99,7 +99,9 @@ if (sesi != null) {
         border: none;
         position: relative;
         top: 50px; /* Height of nav */
+        overflow: hidden;
         overflow-y: auto;
+        
     }
 
     @media (max-width: 600px) {
@@ -146,7 +148,7 @@ window.onload = function() {
     }
 };
 </script>
-<iframe name="contentFrame" src="about:blank"></iframe>
+<iframe style=" padding: 0; margin: 0;" name="contentFrame" src="viewconcoldepeu.jsp"></iframe>
 <% }
             
             }catch(Exception e) {

@@ -140,7 +140,7 @@
                     	<%
                         //out.println("<h1>Vizualizare angajati din toata institutia</h1><br>");
                         //out.println("<table border='1'><tr><th>Nume</th><th>Prenume</th><th>Username</th><th>Tip</th><th>Departament</th></tr>");
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM useri left join tipuri on useri.tip = tipuri.tip left join departament on departament.id_dep = useri.id_dep")) {
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM useri left join tipuri on useri.tip = tipuri.tip left join departament on departament.id_dep = useri.id_dep where username <> \"test\";")) {
                             ResultSet rs1 = stmt.executeQuery();
                             int nr = 1;
                             boolean found = false;

@@ -86,8 +86,8 @@
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
                        
-                       <div class="container">
-                            <div class="login__content" style="border-color:<%out.println(sidebar);%>; border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                       <div style=" width:1vw; height:1vh; position: relative; top:5%; left: 25%; margin: 0; padding: 0;" "class="container">
+                            <div class="login__content" style="margin: 0; padding: 0; border-color:<%out.println(sidebar);%>; border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                                  
                                 <form style="border-color:<%out.println(accent);%>; border-radius: 2rem; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/viewangdep2.jsp" method="post" class="login__form">
                                     <div>

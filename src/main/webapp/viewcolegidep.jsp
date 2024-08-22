@@ -109,15 +109,13 @@
         a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
     </style>
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+<body style="overflow: hidden; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
                     	
-                    	<div class="main-content">
-        <div class="header">
-            
-        </div>
-         <div style="border-radius: 2rem;" class="content">
-            <div class="intro" style="border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                    	<div style="width:1vw; height:1vh; margin: 0; position: relative; padding-left:1rem; padding-right:1rem;" class="main-content">
+                    	<!--  Cum scap de scroll aici?? -->
+         <div style="overflow: hidden; border-radius: 2rem;" class="content">
+            <div class="intro" style="overflow: hidden; border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
             
                
                  <div class="events"  style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
@@ -139,7 +137,7 @@
                     	<%
                         //out.println("<h1>Vizualizare angajati din toata institutia</h1><br>");
                         //out.println("<table border='1'><tr><th>Nume</th><th>Prenume</th><th>Username</th><th>Tip</th><th>Departament</th></tr>");
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM useri left join tipuri on useri.tip = tipuri.tip left join departament on departament.id_dep = useri.id_dep where useri.id_dep = ?")) {
+                        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM useri left join tipuri on useri.tip = tipuri.tip left join departament on departament.id_dep = useri.id_dep where useri.id_dep = ? and username <> \"test\"")) {
                             stmt.setInt(1, userdep);
                         	ResultSet rs1 = stmt.executeQuery();
                             boolean found = false;
