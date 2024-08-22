@@ -52,6 +52,12 @@
                                 stmt.setString(6, sidebar2);
                                 stmt.setInt(7, id);
                                 stmt.executeUpdate();
+                                response.getWriter().println(
+                                	    "<html><head><title>Upload Status</title></head>" +
+                                	    "<body onload='window.top.location.reload();'>" + // Folosește eventul onload
+                                	    
+                                	    "</body></html>"
+                                	);
                             } catch (SQLException e) {
                                 out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                                 e.printStackTrace();
@@ -168,7 +174,7 @@ if ("#d8d9e1".equals(clr)) {
 %>
     <div class="flex-container">
         <div class="form-container" style="border-color:<%= clr %>; background:<%= clr %>; color:<%= text %>">
-            <form style="border-color:<%= clr %>; background:<%= sidebar %>; color:<%= text %>" action="" method="post" class="login__form">
+            <form id="form" style="border-color:<%= clr %>; background:<%= sidebar %>; color:<%= text %>" action="" method="post" class="login__form">
                 <div>
                     <h1 style="color:<%= accent %>" class="login__title"><span style="color:<%= accent %>">Schimbare tema</span></h1>
                 </div>
@@ -254,5 +260,16 @@ if ("#d8d9e1".equals(clr)) {
         response.sendRedirect("logout");
     }
 %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var inputs = document.querySelectorAll('.login__input');
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+});
+</script>
+
 <script src="./responsive-login-form-main/assets/js/main.js"></script>
 <script src="./responsive-login-form-main/assets/js/calendar4.js"></script>

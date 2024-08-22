@@ -67,6 +67,7 @@ if (sesi != null) {
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
 <%
+//..................
                     out.println("<div style=\"background:" + sidebar + "\" class=\"container\">");
                     out.println("<div style=\"border-radius: 2rem; background:" +  clr + "\" class=\"login__content\">");
                     out.println("<form style=\"border-color: " + accent + "; border-radius: 2rem; background:" + sidebar + "\" action=\"UploadImageServlet\" enctype=\"multipart/form-data\" method='post' class='login__form'>");

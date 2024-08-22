@@ -30,7 +30,7 @@ public class UploadImageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession(false);
-        String message = "Please log in to upload images.";
+        
         
         if (session != null) {
             MyUser currentUser = (MyUser) session.getAttribute("currentUser");
@@ -49,23 +49,29 @@ public class UploadImageServlet extends HttpServlet {
                                 PreparedStatement statement = connection.prepareStatement(sql);
                                 statement.setBlob(1, inputStream);
                                 statement.setInt(2, userId);
-                                int updateCount = statement.executeUpdate();
-                                message = updateCount > 0 ? "Image uploaded successfully." : "Failed to upload image.";
+                                int ret = statement.executeUpdate();
+                                
                             }
                         } else {
-                            message = "No image file selected.";
+                            ;;
                         }
                     } else {
-                        message = "User not found.";
+                        ;;
                     }
                 } catch (Exception e) {
-                    message = "Database error: " + e.getMessage();
+                    System.out.println(e.getMessage());
                 }
             } else {
-                message = "User not logged in!";
+                ;;
             }
         }
         
-        response.getWriter().println("<html><head><title>Upload Status</title></head><body><h3>" + message + "</h3><a href='addpic.jsp'>Go back</a></body></html>");
+        response.getWriter().println(
+        	    "<html><head><title>Upload Status</title></head>" +
+        	    "<body onload='window.top.location.reload();'>" + // Folosește eventul onload
+        	    
+        	    "</body></html>"
+        	);
+
     }
 }
