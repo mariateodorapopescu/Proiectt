@@ -74,7 +74,7 @@
     <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     
     <style>
-        <!-- Include aici CSS-ul dat -->
+       
         @charset "UTF-8";
         /*=============== GOOGLE FONTS ===============*/
         @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");

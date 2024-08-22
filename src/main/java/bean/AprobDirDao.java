@@ -15,9 +15,10 @@ public class AprobDirDao {
  * @throws ClassNotFoundException
  * @throws SQLException
  */
-	public int aprobare(int id) throws ClassNotFoundException, SQLException {
+	public int aprobare(int id, String motiv) throws ClassNotFoundException, SQLException {
 		// declarare si initializare variabile
-	    String sql = "UPDATE concedii SET status = 2, acc_res = (select current_date()) WHERE id = ?";
+		// nu are ca si celelalte sa fie id_ang != 0
+	    String sql = "UPDATE concedii SET status = 2, mentiuni = \"" + motiv + "\", acc_res = (select current_date()) WHERE id = ?";
 	    int rezultat = 0;
 	    Class.forName("com.mysql.cj.jdbc.Driver");
 	    // creare conexiune cu baza de date

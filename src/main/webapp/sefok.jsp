@@ -595,7 +595,7 @@ body {
                     </a>
                 </li>
                 <li style="--bg: <%out.println(accent); %>">
-                    <a href="viewcolegidep.jsp" class="load-content" target="iframe">
+                    <a href="viewang4.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="people"></ion-icon>
                         </div>

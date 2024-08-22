@@ -15,9 +15,11 @@ public class ResDirDao {
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 */
-	public int respingere(int id) throws ClassNotFoundException, SQLException {
-		// declarare si initializare variabile
-	    String sql = "UPDATE concedii SET status = -2, acc_res = (select current_date()) WHERE id = ? and id_ang != 0";
+	    public int respingere(int id, String motiv) throws ClassNotFoundException, SQLException {
+	    	
+			// declarare si initializare variabile
+	    	//String sql = "UPDATE concedii SET status = -2, acc_res = (select current_date()) WHERE id = ? and id_ang != 0";
+		    String sql = "UPDATE concedii SET status = -2, mentiuni = \"" + motiv + "\", acc_res = (select current_date()) WHERE id = ? and id_ang != 0";
 	    int result = 0;
 	    // initializare driver pentru comunicarea cu baza de date
 	    Class.forName("com.mysql.cj.jdbc.Driver");

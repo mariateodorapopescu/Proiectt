@@ -106,8 +106,8 @@
                     	<div class="main-content">
         <div class="header">
          </div>
-        <div class="content">
-             <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">       	
+        <div style="border-radius:2rem;" class="content">
+             <div class="intro" style="border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">       	
                     	<%
                         
                         PreparedStatement stm = connection.prepareStatement("SELECT nume_dep from departament WHERE id_dep = ?");
@@ -128,10 +128,10 @@
                 <table >
                     <thead>
                         <tr style="color:<%out.println("white");%>">
-                        
+                    <th>Nr. crt.</th>    
                     <th>Nume</th>
                     <th>Prenume</th>
-                    <th>Username</th>
+                    
                     <th>Functie</th>
                     <th>Departament</th>
                     
@@ -146,9 +146,10 @@
                         stmt.setInt(1, idDep);
                         ResultSet rs1 = stmt.executeQuery();
                         boolean found = false;
+                        int nr = 1;
                         while (rs1.next()) {
                             found = true;
-                            out.println("<tr><td>" + rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("username") + "</td><td>" + rs1.getString("denumire") + "</td><td>" + rs1.getString("nume_dep") + "</td></tr>");
+                            out.println("<tr><td>" + nr++ + "</td><td> " + rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("denumire") + "</td><td>" + rs1.getString("nume_dep") + "</td></tr>");
                         }
                         if (!found) {
                             out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");

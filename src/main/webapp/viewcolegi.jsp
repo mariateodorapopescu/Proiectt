@@ -118,8 +118,8 @@
         <div class="header">
             
         </div>
-        <div class="content">
-           <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+        <div style="border-radius: 2rem;" class="content">
+           <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
             
                
                  <div class="events"  id="content" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
@@ -128,9 +128,9 @@
                 <table style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                     <thead>
                         <tr style="color:<%out.println("white");%>">
+                                <th>Nr. crt</th>
                             <th>Nume</th>
                             <th>Prenume</th>
-                            <th>Nume utilizator</th>
                             <th>Functie</th>
                             <th>Departament</th>
                         </tr>
@@ -142,10 +142,12 @@
                         //out.println("<table border='1'><tr><th>Nume</th><th>Prenume</th><th>Username</th><th>Tip</th><th>Departament</th></tr>");
                         try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM useri left join tipuri on useri.tip = tipuri.tip left join departament on departament.id_dep = useri.id_dep")) {
                             ResultSet rs1 = stmt.executeQuery();
+                            int nr = 1;
                             boolean found = false;
                             while (rs1.next()) {
                                 found = true;
-                                out.println("<tr><td>" + rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("username") + "</td><td>" + rs1.getString("denumire") + "</td><td>" + rs1.getString("nume_dep") + "</td></tr>");   
+                                out.println("<tr><td>" + nr + "</td><td>" + rs1.getString("nume") + "</td><td>" + rs1.getString("prenume") + "</td><td>" + rs1.getString("denumire") + "</td><td>" + rs1.getString("nume_dep") + "</td></tr>");   
+                            	nr++;
                             }
                             if (!found) {
                                 out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");

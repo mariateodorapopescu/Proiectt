@@ -67,19 +67,18 @@ public class AprobDirServlet extends HttpServlet {
         }
 
         int idconcediu = Integer.parseInt(request.getParameter("idcon"));
-        
+        String motiv = request.getParameter("reason");
+        //System.out.println(motiv);
             int id = -1;
     
         try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-            
-        	dep.aprobare(idconcediu); // fac aprobarea in DAO, aprobare = schimbare status
-            
-        	id = getIdAng(idconcediu, conexiune);
+            dep.aprobare(idconcediu, motiv); // fac aprobarea in DAO, aprobare = schimbare status
+            id = getIdAng(idconcediu, conexiune);
             final int id2 = id; 
            // notificare asincrona
             // trimiterea de mailuri se face in mod asincron
             jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            
+            asyncContext.setTimeout(1000);  
             asyncContext.start(() -> {
                 try {
                 	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email

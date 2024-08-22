@@ -107,42 +107,7 @@
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
       <style>
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: <%=clr%>;
-    border-radius: 2rem;
-}
-
-.modal-content {
-    background-color: <%=sidebar%>;
-    border-radius: 2rem;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
-
-.close {
-    background-color: <%=accent%>;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
+        
         a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
   
         .status-icon {
@@ -202,74 +167,24 @@
                   <th style="color:white">Nr.crt</th>
                     <th style="color:white">Nume</th>
                     <th style="color:white">Prenume</th>
-                    <th style="color:white">Fct</th>
-                    <th style="color:white">Dep</th>
-                    <th style="color:white">Inceput</th>
-                    <th style="color:white">Final</th>
-                    <th style="color:white">Motiv</th>
-                    <th style="color:white">Locatie</th>
-                    <th style="color:white">Tip</th>
-                    <th style="color:white">Adaugat</th>
-                    <th style="color:white">Modif</th>
-                     <th style="color:white">Acc/Res</th>
-                    <th style="color:white">Status</th>
-                    <!-- Cap tabel de baza -->
-                    <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
-                     <!--  Aparent o sa reziliez concediinoieu si concediinoieu2 si fac una singura -->
-                     <!--  Ar trebui sa am un parametru de pagina =( -->
-                     <% if (request.getParameter("pag")!=null) { %>
-                     <th style="color:white">Modificati</th>
-                     <th style="color:white">Stergeti</th>
-                     <% } %>
-                     <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
-                    <%
-                    if ((userType == 3 || userType == 0) && (request.getParameter("pag")==null)) {
-                    %>
-                     <th style="color:white">Aprobati</th>
-                     <th style="color:white">Respingeti</th>
-                     <% } %>
-                      <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
-                </tr>
+                    <th style="color:white">Functie</th>
+                    <th style="color:white">Departament</th>
+                    <th style="color:white">Salariu de baza</th>
+                    <th style="color:white">Acordati salariul</th>
+                    <th style="color:white">Marire?</th>
+                     <th style="color:white">Penalizari?</th>
+                    </tr>
                     </thead>
                    <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
   
                     <%
                     // interogare de baza
-                    String sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                            "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
+                    String sql = "SELECT u.id, u.salariu, d.nume_dep AS departament, u.nume, u.prenume, " +
+                            "t.denumire AS functie " +
                             "FROM useri u " +
                             "JOIN tipuri t ON u.tip = t.tip " +
                             "JOIN departament d ON u.id_dep = d.id_dep " +
-                            "JOIN concedii c ON c.id_ang = u.id " +
-                            "JOIN statusuri s ON c.status = s.status " +
-                            "JOIN tipcon ct ON c.tip = ct.tip " +
-                            "WHERE YEAR(c.start_c) = YEAR(CURDATE())";
-                    // daca e sef
-                    if (userType == 3 && request.getParameter("pag")==null ) {
-                    	sql = sql + " and u.id_dep = " + userdep + " and c.status = 0 ";
-                    }
-                    // daca e directoe
-                    if (userType == 0) {
-                    	sql = sql + " and u.id_dep = " + userdep + " and c.status = 1 ";
-                    }
-                    // deci cand vreau eu sa modific lucruri la mine... oh well.. in plus tre sa tin cont de status
-                    if (request.getParameter("pag")!=null) {
-                    	sql = sql + " and u.id = " + id;
-                    	// pun concediile lui
-                    	if (request.getParameter("pag").compareTo("1") == 0) {
-	                    	if (userType == 1 || userType == 2) {
-	                    		sql = sql + " and c.status = 0";
-	                    	}
-	                    	// merge la director, nu merge la sef =(
-	                    	if (userType == 0 || userType == 3) {
-	                    		sql = sql + " and c.status = 1";
-	                    	}
-                    	}
-                    }
-                    // aici e fara pag=?
-                    if (userType == 1 || userType == 2) {
-                    	sql = sql + " and u.id = " + id;
-                    }
+                            "WHERE u.platit = 0 and u.id <> " + id;
                     
                     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                     	ResultSet rs1 = stmt.executeQuery();
@@ -277,59 +192,18 @@
                         int nr = 1;
                         while (rs1.next()) {
                             found = true;
-                          	// initial voiam sa fac aici un pretty print de date dar nu mi-a iesit asa ca da
-                            String added = rs1.getString("added") != null ? rs1.getString("added") : "N/A";
-                            String modif = rs1.getString("modified") != null ? rs1.getString("modified") : "N/A";
-                            String accres = rs1.getString("acc_res") != null ? rs1.getString("acc_res") : "N/A";
+                          	
                             		
                             out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
-                                    rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Fct'>" + rs1.getString("functie") + "</td><td data-label='Dep'>" + rs1.getString("departament") + 
-                                    "</td>" + "<td data-label='Inceput'>" +
-                                    		rs1.getString("start_c")+ "</td><td data-label='Final'>" + rs1.getString("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                    rs1.getString("locatie") + "</td>" + "<td data-label='Tip'>" + rs1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
-                                    "<td data-label='Acc/Res'>" + accres + "</td>");
-                            if (rs1.getString("status").compareTo("neaprobat") == 0) {
-                                out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
-                            }
-                            if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-                                out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
-                            }
-                            if (rs1.getString("status").compareTo("aprobat director") == 0) {
-                                out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
-                            }
-                            if (rs1.getString("status").compareTo("dezaprobat director") == 0) {
-                            	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
-                            }
-                            if (rs1.getString("status").compareTo("dezaprobat sef") == 0) {
-                            	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
-                            }
-                          // pana aici e partea comuna
-                          // apoi pentru sef sa aprobe sau sa respinga
-                           if (userType == 3 && (request.getParameter("pag")==null)) {
-	                          if (rs1.getString("status").compareTo("neaprobat") == 0) {
-	                        	  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='javascript:void(0);' onclick=\"showModal('aprobsef?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-checkbox-circle-line'></i></a></span></td>");
-								 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='javascript:void(0);' onclick=\"showModal('ressef?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-close-line'></i></a></span></td>");
-	                        	  
-	                          }
-                           }
-                          // apoi pentru director sa aprobe sau sa respinga
-                           if (userType == 0 && (request.getParameter("pag")==null)) {
-	                          if (rs1.getString("status").compareTo("aprobat sef") == 0) {
-	                        	  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='javascript:void(0);' onclick=\"showModal('aprobdir?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-checkbox-circle-line'></i></a></span></td>");
-	                        	  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='javascript:void(0);' onclick=\"showModal('resdir?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-close-line'></i></a></span></td>");
-									}
-                        	}
-                          // apoi pentru cine vrea sa modifice concediul
-                           if (request.getParameter("pag")!=null) {
-                        	   if ((rs1.getString("status").compareTo("neaprobat") == 0 && (userType == 1 || userType == 2)) || (rs1.getString("status").compareTo("aprobat sef") == 0 && (userType == 3 || userType == 0))) {
-	                        	   out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
-	                               out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
-	                           	} else 
-	                           	{
-	                           		out.println("<td data-label='Status'>N/A</td>");
-	                           		out.println("<td data-label='Status'>N/A</td>");  	
-	                           	}
-                        	}
+                                    rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Functie'>" + rs1.getString("functie") + "</td><td data-label='Departament'>" + rs1.getString("departament") + 
+                                     "</td>" + "<td data-label='Salariu de baza'>" + rs1.getString("salariu") + "</td>");
+                            // acordare salariu
+	                              out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='acordaref?id=" + rs1.getInt("id")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
+	                           // acordare marire
+	                              out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='marire?id=" + rs1.getInt("id")+ "'><i class='ri-focus-line'></i></a></span></td>");
+                            // acordare penalizari   
+                            out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='penalizare?id=" + rs1.getInt("id")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
+	                          
                          nr++; 
                         }
                         if (!found) {
@@ -377,18 +251,6 @@
         response.sendRedirect("login.jsp");
     }
 %>
-<div id="myModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <form id="theform" method="POST">
-            <label for="reason">Motivul acțiunii:</label>
-            <input type="text" id="reason" name="reason" required>
-            <input type="hidden" id="actionUrl" name="actionUrl">
-            <button type="submit">Trimite</button>
-        </form>
-    </div>
-</div>
-
 <script>
     function generate() {
         const element = document.getElementById("content");
@@ -396,40 +258,6 @@
         .from(element)
         .save();
     }
-    
-    function confirmAction(link, message, id) {
-        if(confirm(message)) {
-            window.location.href = link; // Redirect user to the link if confirmed
-        }
-        return false; // Stop the action if not confirmed
-    }
-    </script>
-
-<script>
-// Get the modal
-
-var modal = document.getElementById("myModal");
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal 
-function showModal(actionUrl) {
-    document.getElementById("actionUrl").value = actionUrl; // Set the action URL
-    document.getElementById("theform").action = actionUrl;
-    modal.style.display = "block";
-}
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
 </script>
-
 </body>
 </html>

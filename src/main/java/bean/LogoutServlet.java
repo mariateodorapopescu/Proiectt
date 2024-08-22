@@ -50,12 +50,12 @@ public class LogoutServlet extends HttpServlet {
     }
 
     private void updateActiveStatus(String username, boolean isActive) throws ClassNotFoundException, SQLException {
-        String query = "UPDATE useri SET activ = ? WHERE username = ?";
+        String query = "UPDATE useri SET activ = 0 WHERE username = ?";
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, isActive ? 1 : 0);
-            preparedStatement.setString(2, username);
+            //preparedStatement.setInt(1, isActive ? 1 : 0);
+            preparedStatement.setString(1, username);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             printSQLException(e);

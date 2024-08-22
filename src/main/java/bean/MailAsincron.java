@@ -442,6 +442,7 @@ public class MailAsincron {
 	    int tip3 = -1;
 	    int durata = -1;
 	    String data = "";
+	    String mentiuni = "";
 	    
 	    // pregatire conexiune cu baza de date
 	    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -474,6 +475,7 @@ public class MailAsincron {
 			            motiv2 = rs3.getString("motiv");
 			            tip3 = rs3.getInt("tip");
 			            data = rs3.getString("added");
+			            mentiuni = rs3.getString("mentiuni");
 			        }
 			        
 			        stmt4.setInt(1, tip3);
@@ -493,7 +495,7 @@ public class MailAsincron {
 		    String message11 = "<h1>Felicitari! &#x1F389; <br> Concediul dvs. din data de " + data + " a fost aprobat! &#x1F389; </h1>"; 
 		    String message13 = "<h3>&#x1F4DD;Detalii despre acest concediu:</h3>";
 		    String message14 = "<p><b>Inceput:</b> " + inceput + "<br> <b>Final: </b> " + sfarsit + "<br><b>Locatie:</b> " + 
-		    		locatie + "<br><b> Motiv: </b>" + motiv2 + "<br><b>Tip concediu: </b>" + motiv3 + "<br><b>Durata: </b>" + (durata) + " zile<br></p>";
+		    		locatie + "<br><b> Motiv: </b>" + motiv2 + "<br><b>Tip concediu: </b>" + motiv3 + "<br><b>Durata: </b>" + (durata) + " zile<br><b>Mentiuni:</b> " + mentiuni + "<br></p>";
 		    String message16 = "<p>Va dorim toate cele bune! &#x1F607; </p>";
 		    
 		    String message1 = message11 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
