@@ -121,7 +121,7 @@ public class MyUserServlet extends HttpServlet {
 
         try {
             employeeDao.registerEmployee(employee);
-            
+            System.out.println("OK");
          // trimit notificare la angajat
             GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
             String to = "";
@@ -188,6 +188,7 @@ public class MyUserServlet extends HttpServlet {
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
+        	System.out.println("NOT OK");
         	response.setContentType("text/html;charset=UTF-8");
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");

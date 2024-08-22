@@ -1,5 +1,9 @@
 package bean;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -30,7 +34,7 @@ public class MyUserDao {
 	    return nextId;
 	}
 
-	public int registerEmployee(MyUser employee) throws ClassNotFoundException, SQLException {
+	public int registerEmployee(MyUser employee) throws ClassNotFoundException, SQLException, IOException {
 	    String INSERT_USERS_SQL = "INSERT INTO useri" +
 	        "  (nume, prenume, data_nasterii, adresa, email, telefon, username, password, id_dep, tip, cnp, culoare) VALUES " +
 	        " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -54,15 +58,47 @@ public class MyUserDao {
 	        preparedStatement.setInt(9, employee.getDepartament());
 	        preparedStatement.setInt(10, employee.getTip());
 	        preparedStatement.setInt(11, employee.getCnp());
-	        preparedStatement.setString(11, employee.getCuloare());
+	        preparedStatement.setString(12, employee.getCuloare());
 	        //System.err.println(employee.getNume() + " " + employee.getPrenume() + " " + employee.getData_nasterii() + " " + employee.getAdresa() + " " + employee.getEmail() + " " + employee.getTelefon() +" " + employee.getUsername() + " " + employee.getPassword() + " " + employee.getDepartament() + " " + employee.getTip());
+	        /*
+	        File imageFile = new File("C:\\Users\\Popi\\eclipse-workspace\\Proiect\\person.jpg");
+	        try (FileInputStream fis = new FileInputStream(imageFile)) {
+	            preparedStatement.setBinaryStream(13, fis, (int) imageFile.length());
+	        } catch (FileNotFoundException e) {
+	            System.out.println("Imaginea nu a fost găsită.");
+	            e.printStackTrace();
+	        }
+	        */
 	        result = preparedStatement.executeUpdate();
 
 	    } catch (SQLException e) {
 	        printSQLException(e);
 	    }
+	    // insertUserWithImage("C:\Users\Popi\eclipse-workspace\Proiect\person.jpg", id);
 	    return result;
 	}
+	
+	public void insertUserWithImage(String imagePath, int id) {
+	    String INSERT_USERS_SQL = "INSERT INTO useri (profil) VALUES (?) where id = ?;";
+	    File imageFile = new File(imagePath);
+	    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+	         PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USERS_SQL);
+	         FileInputStream fis = new FileInputStream(imageFile)) {
+
+	        preparedStatement.setBinaryStream(1, fis, (int) imageFile.length());
+	        preparedStatement.executeUpdate();
+	    } catch (FileNotFoundException e) {
+	        System.out.println("Imaginea nu a fost găsită.");
+	        e.printStackTrace();
+	    } catch (SQLException e) {
+	        System.out.println("Eroare la baza de date.");
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        System.out.println("Eroare la citirea fișierului.");
+	        e.printStackTrace();
+	    }
+	}
+
 	public List<String> getTipuri() throws SQLException {
         List<String> tipuri = new ArrayList<>();
 
