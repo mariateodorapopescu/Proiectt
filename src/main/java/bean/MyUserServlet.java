@@ -36,7 +36,7 @@ public class MyUserServlet extends HttpServlet {
         int dep = Integer.valueOf(request.getParameter("departament"));
         int tip = Integer.valueOf(request.getParameter("tip"));
         int id = RandomNumberGenerator.generate();
-        String culoare = RandomColorGenerator.generate();
+        String culoare = RandomColorGenerator.generate(id);
 
         MyUser employee = new MyUser();
         employee.setNume(nume);

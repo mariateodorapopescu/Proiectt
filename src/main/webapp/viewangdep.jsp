@@ -83,13 +83,12 @@
     </style>
     
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+<body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-                       
-                       <div style=" width:1vw; height:1vh; position: relative; top:5%; left: 25%; margin: 0; padding: 0;" "class="container">
-                            <div class="login__content" style="margin: 0; padding: 0; border-color:<%out.println(sidebar);%>; border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
-                                 
-                                <form style="border-color:<%out.println(accent);%>; border-radius: 2rem; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/viewangdep2.jsp" method="post" class="login__form">
+                        <div class="container" style="position: fixed; top:0; left: 35%; border-radius: 2rem; padding: 0;  margin: 0; background: <%out.println(clr);%>">
+                            <div class="login__content" style="position: fixed; top: 0; border-radius: 2rem; margin: 0; height: 100vh; border-radius: 2rem; margin: 0; padding: 0; background:<%out.println(clr);%>; color:<%out.println(text);%> ">
+                                
+                                <form style="position: fixed; top: 4rem; border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/viewangdep2.jsp" method="post" class="login__form">
                                     <div>
                                         <h1 class="login__title" ><span style="color:<%out.println(accent);%>">Selectati departamentul pe care doriti sa il vizualizati</span></h1>
                                     </div>

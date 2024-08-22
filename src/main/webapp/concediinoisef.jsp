@@ -130,7 +130,8 @@
 }
 
 .close {
-    background-color: <%=accent%>;
+	background-color: <%=sidebar%>;
+    color: <%=accent%>;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -202,16 +203,16 @@
                   <th style="color:white">Nr.crt</th>
                     <th style="color:white">Nume</th>
                     <th style="color:white">Prenume</th>
-                    <th style="color:white">Fct</th>
-                    <th style="color:white">Dep</th>
+                    <th style="color:white">Functie</th>
+                    <th style="color:white">Departament</th>
                     <th style="color:white">Inceput</th>
                     <th style="color:white">Final</th>
                     <th style="color:white">Motiv</th>
                     <th style="color:white">Locatie</th>
                     <th style="color:white">Tip</th>
                     <th style="color:white">Adaugat</th>
-                    <th style="color:white">Modif</th>
-                     <th style="color:white">Acc/Res</th>
+                    <th style="color:white">Modificat</th>
+                     <th style="color:white">Vazut</th>
                     <th style="color:white">Status</th>
                     <!-- Cap tabel de baza -->
                     <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
@@ -344,6 +345,17 @@
                 <div class="into">
                   <button id="generate" onclick="generate()" >Descarcati PDF</button>
                 </div>
+                <div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="theform" method="POST">
+            <label for="reason">Motivul acțiunii:</label>
+            <input class="login__input" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" id="reason" name="reason" required>
+            <input type="hidden" id="actionUrl" name="actionUrl">
+            <button type="submit">Trimite</button>
+        </form>
+    </div>
+</div>
                 
                 <%
         			} else {
@@ -377,17 +389,7 @@
         response.sendRedirect("login.jsp");
     }
 %>
-<div id="myModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <form id="theform" method="POST">
-            <label for="reason">Motivul acțiunii:</label>
-            <input type="text" id="reason" name="reason" required>
-            <input type="hidden" id="actionUrl" name="actionUrl">
-            <button type="submit">Trimite</button>
-        </form>
-    </div>
-</div>
+
 
 <script>
     function generate() {

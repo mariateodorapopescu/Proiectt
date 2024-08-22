@@ -83,10 +83,10 @@
 </head>
 <body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-                        <div class="container" style="position: relative; top:0; left: 0; border-radius: 2rem; padding: 0;  margin: 0; background: <%out.println(clr);%>">
-                            <div class="login__content" style="position: relative; top: 0; border-radius: 2rem; margin: 0; height: 100vh; top: -1em; border-radius: 2rem; margin: 0; padding: 1em; background:<%out.println(clr);%>; color:<%out.println(text);%> ">
-                                 
-                                <form style="position: fixed; top: 5%; border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
+                        <div class="container" style="position: fixed; top:0; left: 35%; border-radius: 2rem; padding: 0;  margin: 0; background: <%out.println(clr);%>">
+                            <div class="login__content" style="position: fixed; top: 0; border-radius: 2rem; margin: 0; height: 100vh; border-radius: 2rem; margin: 0; padding: 0; background:<%out.println(clr);%>; color:<%out.println(text);%> ">
+                                
+                                <form style="position: fixed; top: 4rem;  border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
                                     <div>
                                         <h1 class="login__title"><span style="color:<%out.println(accent);%> ">Vizualizare concedii dintr-un departament</span></h1>
                                     </div>
