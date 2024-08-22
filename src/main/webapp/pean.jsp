@@ -73,7 +73,7 @@ if (sesi != null) {
             --clr: <%=clr%>;
             --sd: <%=sidebar%>;
             --text: <%=text%>;
-            background: <%=sidebar%>;
+            background: <%=clr%>;
         }
         .container {
             width: 100%;
@@ -92,8 +92,14 @@ if (sesi != null) {
             width: 100%;
             height: 900px;
         }
+        .zc-img, .zc-svg, .zc-rel .zc-top{
+        background-color: transparent;
+        }
+       
     </style>
 </head>
+
+
 <body>
 <div style="margin-top: 1em;" class="container" id="content">
     <h3 id="chartHeader" style="color: <%=accent%>;"></h3>
@@ -107,7 +113,7 @@ if (sesi != null) {
                     <form id="statusForm" method="post" onsubmit="return false;">
                         <div>
                             <label style="color:<%out.println(text);%>" class="login__label">Status</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="status" class="login__input" >
+                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name="status" class="login__input" >
                                 <option value="3" >Oricare</option>
                                 <%
                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
@@ -125,7 +131,7 @@ if (sesi != null) {
                         </div>
                         <div>
                             <label style="color:<%out.println(text);%>" class="login__label">Departament</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="dep" class="login__input">
+                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name="dep" class="login__input">
                                 <option value="-1">Oricare</option>
                                 <%
                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
@@ -247,9 +253,10 @@ $(document).ready(function() {
     	 $('#chartHeader').text(data.h3);
     	zingchart.render({
             id: 'myChart',
+            
             data: {
                 type: 'bar',
-                backgroundColor: clear, // Sets the background color of the chart area
+                backgroundColor: 'transparent', // Sets the background color of the chart area
                 title: {
                     text: 'Numar angajati / luna'
                 },
