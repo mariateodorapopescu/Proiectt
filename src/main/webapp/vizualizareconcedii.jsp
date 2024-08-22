@@ -119,15 +119,15 @@ if (sesi != null) {
 <body>
 
 <nav>
-    <a id="unu" onclick="setActiveTab('unu')" href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
-    <a id="doi" onclick="setActiveTab('doi')" href="viewcol.jsp" target="contentFrame">Angajat</a>
-    <a id="trei" onclick="setActiveTab('trei')" href="viewp.jsp" target="contentFrame">Personale</a>
-    <a id="patru" onclick="setActiveTab('patru')" href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
-    <a id="cinci" onclick="setActiveTab('cinci')" href="viewcondep.jsp" target="contentFrame">Alt dept.</a>
-    <a id="sase" onclick="setActiveTab('sase')" href="viewtot.jsp" target="contentFrame">Total</a>
-    <a id="sapte" onclick="setActiveTab('sapte')" href="pean.jsp" target="contentFrame">Anual</a>
-    <a id="opt" onclick="setActiveTab('opt')" href="sometest.jsp" target="contentFrame">Lunar</a>
-    <a id="noua" onclick="setActiveTab('noua')" href="testviewpers.jsp" target="contentFrame">Calendar</a>
+    <a class="nav a active-tab" id="unu" onclick="setActiveTab('unu')" href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
+    <a class="nav a" id="doi" onclick="setActiveTab('doi')" href="viewcol.jsp" target="contentFrame">Angajat</a>
+    <a class="nav a" id="trei" onclick="setActiveTab('trei')" href="viewp.jsp" target="contentFrame">Personale</a>
+    <a class="nav a" id="patru" onclick="setActiveTab('patru')" href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
+    <a class="nav a" id="cinci" onclick="setActiveTab('cinci')" href="viewcondep.jsp" target="contentFrame">Alt dept.</a>
+    <a class="nav a" id="sase" onclick="setActiveTab('sase')" href="viewtot.jsp" target="contentFrame">Total</a>
+    <a class="nav a" id="sapte" onclick="setActiveTab('sapte')" href="pean.jsp" target="contentFrame">Anual</a>
+    <a class="nav a" id="opt" onclick="setActiveTab('opt')" href="sometest.jsp" target="contentFrame">Lunar</a>
+    <a class="nav a" id="noua" onclick="setActiveTab('noua')" href="testviewpers.jsp" target="contentFrame">Calendar</a>
 </nav>
 <script>
 
@@ -137,7 +137,7 @@ function setActiveTab(tabId) {
     // Add active class to clicked tab
     document.getElementById(tabId).classList.add('active-tab');
     // Store the active tab in sessionStorage
-    sessionStorage.setItem('activeTab', tabId);
+    // sessionStorage.setItem('activeTab', tabId);
 }
 
 // Event listener to maintain the active state on page reload

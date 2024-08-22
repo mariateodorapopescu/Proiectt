@@ -164,9 +164,9 @@
 }
     </style>
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
-
-                        <div class="profile-card">
+<body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
+<div class="test" style="position: fixed; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0;">
+                        <div style="position: fixed; top: 2rem; left: 38%; margin: auto; border-radius: 2rem;" class="profile-card">
                        <img src="${pageContext.request.contextPath}/ImageServlet" alt="Profile Image" />
                         <!-- <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="imagine profil">  -->
                             <h1><%= prenume %></h1>
@@ -203,6 +203,7 @@
                                          <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"><a href='addpic.jsp'>Modificati imaginea de profil</a></button>
                                 
                             </div>
+                        </div>
                         </div>
                         <%
                     }
