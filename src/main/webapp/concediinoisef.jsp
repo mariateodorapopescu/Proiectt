@@ -144,6 +144,15 @@
     cursor: pointer;
 }
 
+body {
+	top: 0;
+	left: 0;
+	position: fixed;
+	width: 100vh;
+	height: 100vh;
+	padding: 0;
+	margin: 0;
+}
         a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
   
         .status-icon {
@@ -185,6 +194,10 @@
 		.tooltip:hover .tooltiptext {
 		  visibility: visible;
 		}
+       .content, .main-content {
+    overflow-x: auto; /* Permite scroll-ul orizontal */
+    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
+}
        
     </style>
     </head>

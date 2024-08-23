@@ -65,11 +65,15 @@ if (sesi != null) {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+        
     }
     body, html {
         background: <%= clr %>;
         font-family: Arial, sans-serif;
         overflow-x: hidden;
+        overflow: auto;
+        width: 100%;
+        height: 100%;
     }
     nav {
         width: 100%;
@@ -95,13 +99,17 @@ if (sesi != null) {
     }
     iframe {
         width: 100%;
-        height: calc(100vh - 50px); /* Adjusted for nav height */
-        border: none;
-        position: relative;
-        top: 50px; /* Height of nav */
-        overflow: hidden;
-        overflow-y: auto;
-        
+            border: none;
+            transition: height 0.5s ease;
+            overflow: auto; /* Hide scrollbars */
+            overflow-y: hidden; /* Hide vertical scrollbar */
+            /* Hide scrollbar for Chrome, Safari and Opera */
+             -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+height: 100%;
+border-radius: 2em;
+margin: 0;
+padding: 0;
     }
 
     @media (max-width: 600px) {
@@ -137,7 +145,7 @@ function setActiveTab(tabId) {
     // Add active class to clicked tab
     document.getElementById(tabId).classList.add('active-tab');
     // Store the active tab in sessionStorage
-    // sessionStorage.setItem('activeTab', tabId);
+    sessionStorage.setItem('activeTab', tabId);
 }
 
 // Event listener to maintain the active state on page reload
