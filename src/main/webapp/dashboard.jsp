@@ -620,9 +620,9 @@
             </li>
             <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="menuToggle"></div>
             <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="menulist">
-                <li style="--bg:<%out.println(accent); %>"  class="active">
+                <li style="--bg:<%out.println(accent); %> " class='active'>
                      <a style=" color: <%out.println(text); %>" href="homedir.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
+                        <div class="siiconn" >
                             <ion-icon name="home"></ion-icon>
                         </div>
                         <div  class="sitextt">Acasa</div>
@@ -713,7 +713,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const iframe = document.getElementById('iframe');
             const links = document.querySelectorAll('.load-content');
-
+            
+            
             links.forEach(link => {
                 link.addEventListener('click', function(event) {
                     event.preventDefault();
@@ -731,34 +732,27 @@
 // Ascultă pentru evenimentul 'load' al iframe-ului
 window.addEventListener('load', function() {
     var iframe = document.getElementById('iframe');
+    // document.querySelectorAll("li.active")[0].classList.remove('active');
     // Salvăm URL-ul curent la fiecare încărcare a iframe-ului
     iframe.addEventListener('load', function() {
-        localStorage.setItem('lastIframeSrc', iframe.src);
+        // localStorage.setItem('lastIframeSrc', iframe.src);
+        var active = document.querySelectorAll('li.active')[0];
     });
 });
 </script>
     <script>
 window.addEventListener('DOMContentLoaded', (event) => {
     var iframe = document.getElementById('iframe');
-    var lastSrc = localStorage.getItem('lastIframeSrc');
+    // var lastSrc = localStorage.getItem('lastIframeSrc');
+    var active = localStorage.getItem('active');
     // Setăm sursa iframe-ului la ultima sursă salvată, dacă există
     if (lastSrc) {
-        iframe.src = lastSrc;
+       //  iframe.src = lastSrc;
+        active.classList.add('active');
     }
-});
-window.addEventListener('load', function() {
-    var iframe = document.getElementById('yourIframeId'); // Înlocuiește cu ID-ul real al iframe-ului tău
-    iframe.onload = function() {
-        var body = iframe.contentWindow.document.body;
-        var html = iframe.contentWindow.document.documentElement;
-        var height = Math.max( body.scrollHeight, body.offsetHeight, 
-                               html.clientHeight, html.scrollHeight, html.offsetHeight );
-        iframe.style.height = height + 'px';
-    };
 });
 
 </script>
-    
                        <%
                     }
                 }
