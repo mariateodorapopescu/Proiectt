@@ -84,6 +84,7 @@ if (sesi != null) {
         top: 0;
         z-index: 1000;
         padding: 10px 0;
+        overflow: auto;
     }
     nav a {
         padding: 12px 6px; /* Reduced padding for smaller screens */
@@ -99,18 +100,18 @@ if (sesi != null) {
     }
     iframe {
         width: 100%;
-            border: none;
-            transition: height 0.5s ease;
-            overflow: auto; /* Hide scrollbars */
-            overflow-y: hidden; /* Hide vertical scrollbar */
-            /* Hide scrollbar for Chrome, Safari and Opera */
-             -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-height: 100%;
-border-radius: 2em;
-margin: 0;
-padding: 0;
-    }
+         border: none;
+         transition: height 0.5s ease;
+         overflow: hidden; /* Hide scrollbars */
+         overflow-y: hidden; /* Hide vertical scrollbar */
+         /* Hide scrollbar for Chrome, Safari and Opera */
+          -ms-overflow-style: none;  /* IE and Edge */
+		  scrollbar-width: none;  /* Firefox */
+		height: 100%;
+		border-radius: 2em;
+		margin: 0;
+		padding: 0;
+		    }
 
     @media (max-width: 600px) {
         nav a {
@@ -122,6 +123,13 @@ padding: 0;
         background-color: <%= accent %>; 
         color: white; /* White text for active tab */
     }
+    
+    ::-webkit-scrollbar {
+		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
+		}
+		iframe::-webkit-scrollbar {
+		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
+		}
 </style>
 </head>
 <body>

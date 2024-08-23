@@ -123,6 +123,16 @@ int pag = -1;
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+.content, .main-content {
+    overflow-x: auto; /* Permite scroll-ul orizontal */
+    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
+}
+
+		::-webkit-scrollbar {
+		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
+		}
+
        
     </style>
 </head>

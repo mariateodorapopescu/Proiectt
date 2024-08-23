@@ -110,6 +110,9 @@
     <style>
         
         a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+        .main-content, .content, .events {
+        overflow: auto;
+        }
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">

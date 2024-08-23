@@ -121,6 +121,9 @@
 		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
 		}
 
+::-webkit-scrollbar {
+		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
+		}
 		
         @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
 		
@@ -571,7 +574,7 @@
 		.content, .main-content {
 		    overflow: auto; /* Permite scroll-ul orizontal */
 		    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
-		    height: 100vh;
+		    height: 100%;
 		}
 		iframe {
 		    height: 100%;  /* sau o valoare specifică suficient de mare */
@@ -583,8 +586,8 @@
 		    overflow: hidden;  /* Ascunde scrollbar-ul */
 		}
 		.main-content {
-		    height: 100vh; /* asigură că înălțimea nu depășește viewport-ul */
-		    overflow-y: auto; /* permite scroll doar când este necesar în interiorul .main-content */
+		    height: 100%; /* asigură că înălțimea nu depășește viewport-ul */
+		    overflow-y: hidden; /* permite scroll doar când este necesar în interiorul .main-content */
 		}
 		.main-content {
 		    overflow: hidden; /* Ascunde orice conținut care depășește dimensiunile setate */
@@ -598,8 +601,8 @@
 		    height: 100%;
 		}
 		.container {
-		    max-height: 100vh; /* înălțimea maximă este 100% din înălțimea viewport-ului */
-		    overflow-y: auto; /* permite scroll doar când este necesar */
+		    height: 100%; /* înălțimea maximă este 100% din înălțimea viewport-ului */
+		    overflow-y: hidden; /* permite scroll doar când este necesar */
 		}
 		
 
