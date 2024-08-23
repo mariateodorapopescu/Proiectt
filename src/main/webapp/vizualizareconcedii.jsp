@@ -102,8 +102,8 @@ if (sesi != null) {
         width: 100%;
          border: none;
          transition: height 0.5s ease;
-         overflow: hidden; /* Hide scrollbars */
-         overflow-y: hidden; /* Hide vertical scrollbar */
+         overflow: auto; /* Hide scrollbars */
+         overflow-y: auto; /* Hide vertical scrollbar */
          /* Hide scrollbar for Chrome, Safari and Opera */
           -ms-overflow-style: none;  /* IE and Edge */
 		  scrollbar-width: none;  /* Firefox */

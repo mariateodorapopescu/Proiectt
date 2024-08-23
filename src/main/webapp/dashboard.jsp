@@ -572,38 +572,15 @@
 		    color: <%=text%>;  
 		}
 		.content, .main-content {
-		    overflow: auto; /* Permite scroll-ul orizontal */
+		    overflow-y: hidden; /* Permite scroll-ul orizontal */
 		    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
 		    height: 100%;
 		}
 		iframe {
 		    height: 100%;  /* sau o valoare specifică suficient de mare */
+		    overflow-y: hidden;
 		}
-		.main-content {
-		    overflow: hidden;  /* Ascunde scroll bars */
-		}
-		.main-content, iframe {
-		    overflow: hidden;  /* Ascunde scrollbar-ul */
-		}
-		.main-content {
-		    height: 100%; /* asigură că înălțimea nu depășește viewport-ul */
-		    overflow-y: hidden; /* permite scroll doar când este necesar în interiorul .main-content */
-		}
-		.main-content {
-		    overflow: hidden; /* Ascunde orice conținut care depășește dimensiunile setate */
-		}
-		body, html {
-		    overflow-y: hidden; /* Ascunde scrollbar-ul vertical dacă totul încap */
-		}
-			html, body {
-		    margin: 0;
-		    padding: 0;
-		    height: 100%;
-		}
-		.container {
-		    height: 100%; /* înălțimea maximă este 100% din înălțimea viewport-ului */
-		    overflow-y: hidden; /* permite scroll doar când este necesar */
-		}
+		
 		
 
     </style>
@@ -707,7 +684,7 @@
             </div>
         </ul>
     </div>
-    <div style="margin: 0; padding: 0; overflow: auto;" class="main-content">
+    <div style="margin: 0; padding: 0; " class="main-content">
         <iframe name="iframe" id='iframe' src="homedir.jsp"></iframe>
     </div>
     <script src="main.js"></script>

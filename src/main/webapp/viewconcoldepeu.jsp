@@ -74,11 +74,13 @@
     margin: 0;
     padding: 0;
     overflow: auto;
+    height: 100%;
 }
 
 .container {
     padding-top: 120px; /* Adjust as needed */
     overflow: auto;
+    height: 100%;
      
 }
     </style>
