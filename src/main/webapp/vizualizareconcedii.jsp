@@ -65,7 +65,7 @@ if (sesi != null) {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        
+        overflow-y: auto;
     }
     body, html {
         background: <%= clr %>;
@@ -74,6 +74,7 @@ if (sesi != null) {
         overflow: auto;
         width: 100%;
         height: 100%;
+        overflow-y: auto;
     }
     nav {
         width: 100%;
@@ -132,7 +133,7 @@ if (sesi != null) {
 		}
 </style>
 </head>
-<body>
+<body style="overflow: auto">
 
 <nav>
     <a class="nav a active-tab" id="unu" onclick="setActiveTab('unu')" href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
@@ -164,7 +165,7 @@ window.onload = function() {
     }
 };
 </script>
-<iframe style=" padding: 0; margin: 0;" name="contentFrame" src="viewconcoldepeu.jsp"></iframe>
+<iframe style="overflow: auto; padding: 0; margin: 0;" name="contentFrame" src="viewconcoldepeu.jsp"></iframe>
 <% }
             
             }catch(Exception e) {

@@ -107,7 +107,7 @@
         <div class="header">
          </div>
         <div style="border-radius:2rem;" class="content">
-             <div class="intro" style="border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">       	
+             <div class="intro" style="position: fixed; top: 2rem; left: 15%; border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">       	
                     	<%
                         
                         PreparedStatement stm = connection.prepareStatement("SELECT nume_dep from departament WHERE id_dep = ?");

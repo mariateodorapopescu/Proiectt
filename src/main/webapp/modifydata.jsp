@@ -140,10 +140,10 @@
 
         	 <div class="flex-container">
              
-             <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+             <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
           
 
-                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifusr2.jsp" method="post" class="login__form">
+                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifusr2.jsp" method="post" class="login__form">
                      <div>
                          <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Modificare date personale</span></h1>
                          
@@ -153,13 +153,13 @@
                         
                          <div>
                              <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Cod</label>
-                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
+                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
                          </div>
                         
                        
                          <div class="login__buttons">
-                             <input style="backgroundColor:<%out.println(sidebar);%>; color:<%out.println(accent);%>; border-color:<%out.println(accent);%>" type="submit" value="Modificare" class="login__button login__button-ghost">
-                         </div>
+                             <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    type="submit" value="Mai departe" class="login__button"></div>
                      </form>
                      <%
                      out.println("</div>");

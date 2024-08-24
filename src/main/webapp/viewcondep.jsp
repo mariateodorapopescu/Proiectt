@@ -67,7 +67,8 @@
 
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
     <title>Vizualizare concedii</title>
      <style>
        body, html {
@@ -79,14 +80,107 @@
     padding-top: 120px; /* Adjust as needed */
      
 }
+
+/* Hover Effect on Date Buttons */
+.pika-button:hover, .pika-button:active {
+    background: <%=accent%>;
+    color: #fff; /* White text for hover */
+}
+
+/* Styling for the navigation header */
+.pika-label {
+    color: <%=accent%>; /* Light grey color for the month and year */
+    font-size: 16px; /* Larger font size */
+    background: <%=sidebar%>;
+}
+
+/* Navigation buttons */
+.pika-prev, .pika-next {
+    cursor: pointer;
+    color: <%=text%>;
+    background: <%=sidebar%>;
+    border: none;
+}
+
+/* Table cells */
+.pika-button {
+    border: none; /* Remove default borders */
+    padding: 5px; /* Padding for the date numbers */
+    color: <%=text%>; /* Default date color */
+    background: <%=sidebar%>;
+}
+
+/* Hover effect on date cells */
+.pika-button:hover {
+    background: <%=clr%>; /* Darker background on hover */
+    color: <%=text%>; /* White text on hover */
+}
+
+/* Special styles for today */
+.pika-single .is-today .pika-button {
+    color: <%=accent%>; /* Green color for today's date */
+    font-weight: bold; /* Make it bold */
+}
+
+/* Styles for the selected date */
+.pika-single .is-selected .pika-button {
+    background: <%=accent%>; /* Bright color for selection */
+    color: #fff; /* White text for selected date */
+}
+
+/* Weekday labels */
+.pika-weekday {
+    /* color: #aaa; */ /* Light gray for weekdays */
+    font-weight: normal;
+}
+
+/* Styling for the Selected Date */
+.pika-single .is-selected {
+    background: <%=accent%>;
+    color: #fff; /* White text for selected date */
+}
+
+/* Styling for Today's Date */
+.pika-single .is-today {
+    border: 2px solid <%=accent%> /* White border for today */
+    color: <%=accent%> /* White text for today */
+}
+.pika-title {
+    background: <%=sidebar%>; /* Darker shade for the header */
+    color: <%=accent%>; /* White text for clarity */
+    text-align: center; /* Center the month and year */
+    padding: 5px 0; /* Padding for better spacing */
+    border-top-left-radius: 8px; /* Rounded corners at the top */
+    border-top-right-radius: 8px;
+}
+/* If you use dropdowns for month/year selection, style them too */
+.pika-month, .pika-year {
+    color: <%=accent%>; /* Matching text color */
+    background: <%=sidebar%>; /* Transparent background to blend in with the header */
+    border: none; /* Remove borders for a cleaner look */
+}
+.pika-single {
+    background: <%=sidebar%>; /* Change to your desired color */
+    border-radius: 1rem;
+}
+
+table.picka-table tr {
+    background-color: <%=accent%>; /* Golden color for the header */
+}
+
+
+.pika-single .pika-week {
+    background:  <%=clr%>; /* Change week numbers background */
+}
+
     </style>
 </head>
 <body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-                        <div class="container" style="position: fixed; top:0; left: 35%; border-radius: 2rem; padding: 0;  margin: 0; background: <%out.println(clr);%>">
+                        <div class="container" style="position: fixed; top:0; left: 28%; border-radius: 2rem; padding: 0;  margin: 0; background: <%out.println(clr);%>">
                             <div class="login__content" style="position: fixed; top: 0; border-radius: 2rem; margin: 0; height: 100vh; border-radius: 2rem; margin: 0; padding: 0; background:<%out.println(clr);%>; color:<%out.println(text);%> ">
                                 
-                                <form style="position: fixed; top: 4rem;  border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
+                                <form style="position: fixed; top: 6rem;  border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
                                     <div>
                                         <h1 class="login__title"><span style="color:<%out.println(accent);%> ">Vizualizare concedii dintr-un departament</span></h1>
                                     </div>
@@ -162,14 +256,17 @@
                                             <label style="color:<%out.println(text);%> " for="an" class="login__check-label">An</label>
                                         </div>
 
-                                        <div id="start">
+                                       <div id="start">
                                             <label style="color:<%out.println(text);%> " class="login__label">Inceput</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="date" id="start" name="start" min="1954-01-01" max="2036-12-31" class="login__input"/>
+                                            
+    <input type="hidden" id="start-hidden" name="start">
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="text" id="start" name="start" min="1954-01-01" max="2036-12-31" class="login__input"/>
                                         </div>
 
                                         <div id="end">
                                             <label style="color:<%out.println(text);%> " class="login__label">Final</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="date" id="end" name="end" min="1954-01-01" max="2036-12-31" class="login__input"/>
+                                             <input type="hidden" id="end-hidden" name="end">
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="text" id="end" name="end" min="1954-01-01" max="2036-12-31" class="login__input"/>
                                         </div>
                                     </div>
 
@@ -202,6 +299,78 @@
                                 setInterval(toggleDateInputs, 100); // Call every 100 milliseconds
                             });
                         </script>
+                        <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+	var picker = new Pikaday({
+	    field: document.getElementById('start'),
+	    format: 'YYYY-MM-DD', // Make sure this format is supported by your version of Pikaday or Moment.js
+	    minDate: new Date(2000, 0, 1), // Minimum date
+	    maxDate: new Date(2025, 12, 31), // Maximum date
+	    yearRange: [2000, 2025],
+	    disableWeekends: false,
+	    showWeekNumber: true,
+	    isRTL: false, // Right-to-left languages
+	    theme: 'current',
+	    i18n: {
+	        previousMonth: 'Luna precedentă',
+	        nextMonth: 'Luna următoare',
+	        months: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
+	        weekdays: ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
+	        weekdaysShort: ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm']
+	    },
+	    
+	    firstDay: 1,
+	    onSelect: function() {
+	        var date = this.getDate();
+	        date.setDate(date.getDate() + 1);
+	        // console.log(date); // Check what you get here
+	        if (date) {
+	            var formattedDate = date.toISOString().substring(0, 10);
+	            console.log(formattedDate); // Ensure format is correct
+	            document.getElementById('start-hidden').value = formattedDate;
+	        } else {
+	            console.error('No date returned from date picker');
+	        }
+	    }
+	});
+	var picker2 = new Pikaday({
+	    field: document.getElementById('end'),
+	    format: 'YYYY-MM-DD', // Make sure this format is supported by your version of Pikaday or Moment.js
+	    minDate: new Date(2000, 0, 1), // Minimum date
+	    maxDate: new Date(2025, 12, 31), // Maximum date
+	    yearRange: [2000, 2025],
+	    disableWeekends: false,
+	    showWeekNumber: true,
+	    isRTL: false, // Right-to-left languages
+	    theme: 'current', // This class will be added to the root Pikaday element
+	    i18n: {
+	        previousMonth: 'Luna precedentă',
+	        nextMonth: 'Luna următoare',
+	        months: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
+	        weekdays: ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
+	        weekdaysShort: ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm']
+	    },
+	    firstDay: 1,
+	    onSelect: function() {
+	        var date = this.getDate();
+	        date.setDate(date.getDate() + 1);
+	        // console.log(date); // Check what you get here
+	        if (date) {
+	            var formattedDate = date.toISOString().substring(0, 10);
+	            console.log(formattedDate); // Ensure format is correct
+	            document.getElementById('end-hidden').value = formattedDate;
+	        } else {
+	            console.error('No date returned from date picker');
+	        }
+	    }
+	});
+});
+</script>
                         <%
                     }
                 } else {

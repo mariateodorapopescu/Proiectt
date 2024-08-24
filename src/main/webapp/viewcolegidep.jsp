@@ -109,13 +109,13 @@
         a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
     </style>
 </head>
-<body style="overflow: hidden; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
                     	
-                    	<div style="width:1vw; height:1vh; margin: 0; position: relative; padding-left:1rem; padding-right:1rem;" class="main-content">
+                    	<div style="position: fixed; top: 0; left: 25%; margin: 0; position: relative; padding-left:1rem; padding-right:1rem;" class="main-content">
                     	<!--  Cum scap de scroll aici?? -->
-         <div style="overflow: hidden; border-radius: 2rem;" class="content">
-            <div class="intro" style="overflow: hidden; border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+         <div style=" border-radius: 2rem;" class="content">
+            <div class="intro" style=" border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
             
                
                  <div class="events"  style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">

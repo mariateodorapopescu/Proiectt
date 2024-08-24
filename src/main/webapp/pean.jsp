@@ -101,13 +101,13 @@ if (sesi != null) {
 
 
 <body>
-<div style="margin-top: 1em;" class="container" id="content">
-    <h3 id="chartHeader" style="color: <%=accent%>;"></h3>
+<div style="position: fixed; top: 8rem; left: 33%; margin-top: 1em;" class="container" id="content">
+    <h3 id="chartHeader" style="position: fixed; top: 5rem; color: <%=accent%>;"></h3>
     <div id="myChart"></div>
 </div>
-<div class="container">
+<div style="position: fixed; top: 10rem;" class="container">
                 
-                    <div id="myChart"></div>
+                    <div style="position: fixed; top: 10rem;" id="myChart"></div>
                 </div>
                 <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
                     <form id="statusForm" method="post" onsubmit="return false;">

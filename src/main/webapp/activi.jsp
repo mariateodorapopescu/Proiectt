@@ -154,7 +154,7 @@
     </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
-     <div class="main-content">
+     <div style="position: fixed; top: 0; left: 25%; " class="main-content">
         <div class="header"></div>
         <div style=" border-radius: 2rem;" class="content">
             <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>;">

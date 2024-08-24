@@ -176,7 +176,7 @@
           
           
                 try (Connection connn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                    PreparedStatement stmt2 = connection.prepareStatement("SELECT count(*) as total FROM useri");
+                    PreparedStatement stmt2 = connection.prepareStatement("SELECT count(*) as total FROM useri where id <> 38");
                    
                         ResultSet rs2 = stmt2.executeQuery();
                         if (rs2.next()) {

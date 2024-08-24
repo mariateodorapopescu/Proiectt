@@ -73,7 +73,7 @@ if (sesi != null) {
             --clr: <%=clr%>;
             --sd: <%=sidebar%>;
             --text: <%=text%>;
-            background: <%=sidebar%>;
+            background: <%=clr%>;
         }
         .container {
             width: 100%;
@@ -92,24 +92,27 @@ if (sesi != null) {
             width: 100%;
             height: 900px;
         }
+        .zc-img, .zc-svg, .zc-rel .zc-top{
+        background-color: transparent;
+        }
     </style>
 </head>
 <body>
-<div style="margin-top: 1em;" class="container" id="content">
-    <h3 id="chartHeader" style="color: <%=accent%>;"></h3>
+<div style="position: fixed; top: 8rem; left: 33%; margin-top: 1em;" class="container" id="content">
+    <h3 id="chartHeader" style="position: fixed; top: 5rem; color: <%=accent%>;"></h3>
     <p>*Nu au fost inlcuse si zilele in care niciun angajat nu este plecat in concediu</p>
     <div id="myChart"></div>
 </div>
-<div class="container" id="content">
+<div style="position: fixed; top: 10rem;" class="container">
                 
-                    <div id="myChart"></div>
+                    <div style="position: fixed; top: 10rem;" id="myChart"></div>
                 </div>
                 <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
                     <form id="statusForm" method="post" onsubmit="return false;">
                     
                     <div>
 						    <label style="color:<%out.println(text);%>" class="login__label">Luna</label>
-						    <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="month" class="login__input" >
+						    <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name="month" class="login__input" >
 						        <option value="1">Ianuarie</option>
 						        <option value="2">Februarie</option>
 						        <option value="3">Martie</option>
@@ -127,7 +130,7 @@ if (sesi != null) {
                     
                         <div>
                             <label style="color:<%out.println(text);%>" class="login__label">Status</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="status" class="login__input" >
+                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name="status" class="login__input" >
                                 <option value="3" >Oricare</option>
                                 <%
                                 try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
@@ -271,9 +274,9 @@ $(document).ready(function() {
             id: 'myChart',
             data: {
                 type: 'bar',
-                backgroundColor: clear, // Sets the background color of the chart area
+                backgroundColor: 'transparent', // Sets the background color of the chart area
                 title: {
-                    text: 'Numar angajati / luna'
+                    text: 'Numar angajati / zi'
                 },
                 scaleX: {
                     values: data.months.map(month => month.toString())

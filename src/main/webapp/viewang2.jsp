@@ -65,11 +65,16 @@ if (sesi != null) {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+        overflow-y: auto;
     }
     body, html {
         background: <%= clr %>;
         font-family: Arial, sans-serif;
         overflow-x: hidden;
+        overflow: auto;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
     }
     nav {
         width: 100%;
@@ -80,6 +85,7 @@ if (sesi != null) {
         top: 0;
         z-index: 1000;
         padding: 10px 0;
+        overflow: auto;
     }
     nav a {
         padding: 12px 6px; /* Reduced padding for smaller screens */
@@ -95,12 +101,18 @@ if (sesi != null) {
     }
     iframe {
         width: 100%;
-        height: calc(100vh - 50px); /* Adjusted for nav height */
-        border: none;
-        position: relative;
-        top: 50px; /* Height of nav */
-        overflow-y: auto;
-    }
+         border: none;
+         transition: height 0.5s ease;
+         overflow: auto; /* Hide scrollbars */
+         overflow-y: auto; /* Hide vertical scrollbar */
+         /* Hide scrollbar for Chrome, Safari and Opera */
+          -ms-overflow-style: none;  /* IE and Edge */
+		  scrollbar-width: none;  /* Firefox */
+		height: 100%;
+		border-radius: 2em;
+		margin: 0;
+		padding: 0;
+		    }
 
     @media (max-width: 600px) {
         nav a {
@@ -112,6 +124,13 @@ if (sesi != null) {
         background-color: <%= accent %>; 
         color: white; /* White text for active tab */
     }
+    
+    ::-webkit-scrollbar {
+		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
+		}
+		iframe::-webkit-scrollbar {
+		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
+		}
 </style>
 </head>
 <body>
@@ -147,7 +166,7 @@ window.onload = function() {
     }
 };
 </script>
-<iframe name="contentFrame" src="about:blank"></iframe>
+<iframe style="overflow: auto; padding: 0; margin: 0;" name="contentFrame" src="viewconcoldepeu.jsp"></iframe>
 <% }
             
             }catch(Exception e) {

@@ -571,14 +571,19 @@
 		.sidebar ul li a .sitextt {
 		    color: <%=text%>;  
 		}
-		.content, .main-content {
+		.content{
 		    overflow-y: hidden; /* Permite scroll-ul orizontal */
+		    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
+		    height: 100%;
+		}
+		.main-content {
+		    overflow: auto; /* Permite scroll-ul orizontal */
 		    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
 		    height: 100%;
 		}
 		iframe {
 		    height: 100%;  /* sau o valoare specifică suficient de mare */
-		    overflow-y: hidden;
+		    overflow: hidden;
 		}
 		
 		
@@ -685,7 +690,7 @@
         </ul>
     </div>
     <div style="margin: 0; padding: 0; " class="main-content">
-        <iframe name="iframe" id='iframe' src="homedir.jsp"></iframe>
+        <iframe style="overflow: hidden;" name="iframe" id='iframe' src="homedir.jsp"></iframe>
     </div>
     <script src="main.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>

@@ -118,7 +118,7 @@
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
                     	
-                    	<div style="border-radius:2rem;" class="main-content">
+                    	<div style="border-radius:2rem; position: fixed; top: 0; left: 28%;" class="main-content">
         <div style="border-radius:2rem;" class="header">
             
         </div>

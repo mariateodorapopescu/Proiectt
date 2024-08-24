@@ -113,7 +113,7 @@
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
                     	
-                    	<div class="main-content" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
+                    	<div class="main-content" style="position: fixed; top: 0; left: 15%; background:<%out.println(clr);%>; color:<%out.println(text);%>">
                     	
         <div class="header">
             

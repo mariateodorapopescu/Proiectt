@@ -439,7 +439,7 @@ public class ModifConServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
-		    out.println("window.location.href = 'concediinoieu.jsp';");
+		    out.println("window.location.href = 'concediinoisef.jsp?pag=1';");
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {

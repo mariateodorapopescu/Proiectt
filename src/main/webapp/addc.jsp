@@ -162,9 +162,10 @@ input[type="date"]:focus {
     .highlight {
         color: white;
     }
-       /* Hover Effect on Date Buttons */
+    
+/* Hover Effect on Date Buttons */
 .pika-button:hover, .pika-button:active {
-    background-color: <%=accent%>;
+    background: <%=accent%>;
     color: #fff; /* White text for hover */
 }
 
@@ -172,14 +173,14 @@ input[type="date"]:focus {
 .pika-label {
     color: <%=accent%>; /* Light grey color for the month and year */
     font-size: 16px; /* Larger font size */
-    background-color: <%=sidebar%>;
+    background: <%=sidebar%>;
 }
 
 /* Navigation buttons */
 .pika-prev, .pika-next {
     cursor: pointer;
     color: <%=text%>;
-    background-color: <%=sidebar%>;
+    background: <%=sidebar%>;
     border: none;
 }
 
@@ -188,12 +189,12 @@ input[type="date"]:focus {
     border: none; /* Remove default borders */
     padding: 5px; /* Padding for the date numbers */
     color: <%=text%>; /* Default date color */
-    background-color: <%=sidebar%>;
+    background: <%=sidebar%>;
 }
 
 /* Hover effect on date cells */
 .pika-button:hover {
-    background-color: <%=clr%>; /* Darker background on hover */
+    background: <%=clr%>; /* Darker background on hover */
     color: <%=text%>; /* White text on hover */
 }
 
@@ -205,7 +206,7 @@ input[type="date"]:focus {
 
 /* Styles for the selected date */
 .pika-single .is-selected .pika-button {
-    background-color: <%=accent%>; /* Bright color for selection */
+    background: <%=accent%>; /* Bright color for selection */
     color: #fff; /* White text for selected date */
 }
 
@@ -217,7 +218,7 @@ input[type="date"]:focus {
 
 /* Styling for the Selected Date */
 .pika-single .is-selected {
-    background-color: <%=accent%>;
+    background: <%=accent%>;
     color: #fff; /* White text for selected date */
 }
 
@@ -227,7 +228,7 @@ input[type="date"]:focus {
     color: <%=accent%> /* White text for today */
 }
 .pika-title {
-    background-color: transparent; /* Darker shade for the header */
+    background: <%=sidebar%>; /* Darker shade for the header */
     color: <%=accent%>; /* White text for clarity */
     text-align: center; /* Center the month and year */
     padding: 5px 0; /* Padding for better spacing */
@@ -237,8 +238,21 @@ input[type="date"]:focus {
 /* If you use dropdowns for month/year selection, style them too */
 .pika-month, .pika-year {
     color: <%=accent%>; /* Matching text color */
-    background-color: <%=sidebar%>; /* Transparent background to blend in with the header */
+    background: <%=sidebar%>; /* Transparent background to blend in with the header */
     border: none; /* Remove borders for a cleaner look */
+}
+.pika-single {
+    background: <%=sidebar%>; /* Change to your desired color */
+    border-radius: 1rem;
+}
+
+table.picka-table tr {
+    background-color: <%=accent%>; /* Golden color for the header */
+}
+
+
+.pika-single .pika-week {
+    background:  <%=clr%>; /* Change week numbers background */
 }
 
     </style>
@@ -290,7 +304,7 @@ input[type="date"]:focus {
                                         <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Data sosire</label>
                                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='text' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
-                                        	<input type="hidden" id="start-hidden" name="start">
+                                        	<input type="hidden" id="end-hidden" name="end">
                                         </div>
                                         <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Motiv</label>

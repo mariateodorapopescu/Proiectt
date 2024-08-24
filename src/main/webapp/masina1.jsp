@@ -167,13 +167,13 @@ int pag = -1;
                     	PreparedStatement stmtt2 = null;
                     	%>
                     	
-                    	<div class="main-content" style="background:<%out.println(sidebar);%>; ">
+                    	<div class="main-content" style="background:<%out.println(clr);%>; ">
         <div class="header">
          </div>
         <div class="content" style="border-radius: 2rem; margin-top:5%; ">
-            <div class="intro" style="border-radius: 2rem; background:<%out.println(clr);%>; color:<%out.println(text);%> ">             	
+            <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%> ">             	
                     	
-                 <div class="events"  style="border-radius: 2rem; background:<%out.println(clr);%>; color:<%out.println(text);%>" id="content">
+                 <div class="events"  style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
                  <%
                     	
                     	if (pag == 3) {
@@ -241,22 +241,22 @@ int pag = -1;
                     <th style="color:white">Nr.crt</th>
                     <th style="color:white">Nume</th>
                     <th style="color:white">Prenume</th>
-                    <th style="color:white">Fct</th>
-                    <th style="color:white">Dep</th>
+                    <th style="color:white">Functie</th>
+                    <th style="color:white">Departament</th>
                     <th style="color:white">Inceput</th>
                     <th style="color:white">Final</th>
                     <th style="color:white">Motiv</th>
                     <th style="color:white">Locatie</th>
                     <th style="color:white">Tip</th>
                     <th style="color:white">Adaugat</th>
-                    <th style="color:white">Modif</th>
-                     <th style="color:white">Acc/Res</th>
+                    <th style="color:white">Modificat</th>
+                     <th style="color:white">Vazut</th>
                     <th style="color:white">Status</th>
                     
                      
                 </tr>
             </thead>
-             <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+             <tbody style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
                    <% 	
                    sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
                            "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
@@ -478,7 +478,7 @@ int pag = -1;
                               nr++;
                           }
                           if (!found) {
-                              out.println("<tr><td colspan='11'>Nu exista date.</td></tr>");
+                              out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
                           }
                           rss1.close();
                           stmtt2.close();

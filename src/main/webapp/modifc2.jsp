@@ -4,75 +4,6 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<html>
-<head>
-    <title>Modificare concediu</title>
-     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
-    
-    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    
-    <style>
-        .flex-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 2rem;
-            margin: 2rem;
-        }
-        
-        .calendar-container, .form-container {
-            background-color: #2a2a2a;
-            padding: 1rem;
-            border-radius: 8px;
-           
-        }
-        
-        .calendar-container {
-            max-width: 300px;
-        }
-         th.calendar, td.calendar {
-            border: 1px solid #1a1a1a;
-            text-align: center;
-            padding: 8px;
-            font-size: 12px;
-        }
-        th.calendar {
-            background-color: #333;
-        }
-        .highlight {
-            background-color: var(--bg);
-            color: white;
-        }
-        :root{
-          --first-color: #2a2a2a;
-  --second-color: hsl(249, 64%, 47%);
-  --title-color-light: hsl(244, 12%, 12%);
-  --text-color-light: hsl(244, 4%, 36%);
-  --body-color-light: hsl(208, 97%, 85%);
-  --title-color-dark: hsl(0, 0%, 95%);
-  --text-color-dark: hsl(0, 0%, 80%);
-  --body-color-dark: #1a1a1a;
-  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
-  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
-  --form-bg-color-dark: #333;
-  --form-border-color-dark: #3a3a3a;
-  /*========== Font and typography ==========*/
-  --body-font: "Poppins", sans-serif;
-  --h2-font-size: 1.25rem;
-  --small-font-size: .813rem;
-  --smaller-font-size: .75rem;
-  /*========== Font weight ==========*/
-  --font-medium: 500;
-  --font-semi-bold: 600;
-        }
-        
-    </style>
-</head>
-
 <% 
 HttpSession sesi = request.getSession(false);
 if (sesi != null) {
@@ -141,6 +72,207 @@ if (sesi != null) {
            int tip = rs1.getInt("tip"); 
                 
 %>
+<html>
+<head>
+    <title>Modificare concediu</title>
+     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <style>
+         @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+     input[type="date"] {
+     background-color: <%=accent%>; 
+    color: <%=accent%>; 
+    border: 2px solid <%=accent%>; 
+    
+   
+}
+.pika-single {
+    background-color: <%=sidebar%>;
+    color: <%=text%>;
+}
+
+input[type="date"]:focus {
+    border-color: <%=accent%>; 
+    box-shadow: 0 0 8px 0 <%=accent%>; 
+}
+     
+	* {
+	    margin: 0;
+	    padding: 0;
+	    box-sizing: border-box;
+	    font-family: 'Poppins', sans-serif;
+		}
+	
+     :root{
+     /*========== culori de baza ==========*/
+      --first-color: #2a2a2a;
+	  --second-color: hsl(249, 64%, 47%);
+	  /*========== cuulori text ==========*/
+	  --title-color-light: hsl(244, 12%, 12%);
+	  --text-color-light: hsl(244, 4%, 36%);
+	  --title-color-dark: hsl(0, 0%, 95%);
+	  --text-color-dark: hsl(0, 0%, 80%);
+	  /*========== cuulori corp ==========*/
+	  --body-color-light: hsl(208, 97%, 85%);
+	  --body-color-dark: #1a1a1a;
+	  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
+	  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
+	  --form-bg-color-dark: #333;
+	  --form-border-color-dark: #3a3a3a;
+	  /*========== Font ==========*/
+	  --body-font: "Poppins", sans-serif;
+	  --h2-font-size: 1.25rem;
+	  --small-font-size: .813rem;
+	  --smaller-font-size: .75rem;
+	  --font-medium: 500;
+	  --font-semi-bold: 600;
+	 }
+		        
+	::placeholder {
+	  color: var(--text);
+	  opacity: 1; /* Firefox */
+	}
+	
+	::-ms-input-placeholder { /* Edge 12-18 */
+	  color: var(--text);
+	}
+	       
+    .flex-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 2rem;
+        margin: 2rem;
+    }
+    
+    .calendar-container, .form-container {
+        background-color: #2a2a2a;
+        padding: 1rem;
+        border-radius: 8px;
+       
+    }
+    
+    .calendar-container {
+        max-width: 300px;
+    }
+    
+     th.calendar, td.calendar {
+        border: 1px solid #1a1a1a;
+        text-align: center;
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    th.calendar {
+        background-color: #333;
+    }
+    
+    .highlight {
+        color: white;
+    }
+      
+/* Hover Effect on Date Buttons */
+.pika-button:hover, .pika-button:active {
+    background: <%=accent%>;
+    color: #fff; /* White text for hover */
+}
+
+/* Styling for the navigation header */
+.pika-label {
+    color: <%=accent%>; /* Light grey color for the month and year */
+    font-size: 16px; /* Larger font size */
+    background: <%=sidebar%>;
+}
+
+/* Navigation buttons */
+.pika-prev, .pika-next {
+    cursor: pointer;
+    color: <%=text%>;
+    background: <%=sidebar%>;
+    border: none;
+}
+
+/* Table cells */
+.pika-button {
+    border: none; /* Remove default borders */
+    padding: 5px; /* Padding for the date numbers */
+    color: <%=text%>; /* Default date color */
+    background: <%=sidebar%>;
+}
+
+/* Hover effect on date cells */
+.pika-button:hover {
+    background: <%=clr%>; /* Darker background on hover */
+    color: <%=text%>; /* White text on hover */
+}
+
+/* Special styles for today */
+.pika-single .is-today .pika-button {
+    color: <%=accent%>; /* Green color for today's date */
+    font-weight: bold; /* Make it bold */
+}
+
+/* Styles for the selected date */
+.pika-single .is-selected .pika-button {
+    background: <%=accent%>; /* Bright color for selection */
+    color: #fff; /* White text for selected date */
+}
+
+/* Weekday labels */
+.pika-weekday {
+    /* color: #aaa; */ /* Light gray for weekdays */
+    font-weight: normal;
+}
+
+/* Styling for the Selected Date */
+.pika-single .is-selected {
+    background: <%=accent%>;
+    color: #fff; /* White text for selected date */
+}
+
+/* Styling for Today's Date */
+.pika-single .is-today {
+    border: 2px solid <%=accent%> /* White border for today */
+    color: <%=accent%> /* White text for today */
+}
+.pika-title {
+    background: <%=sidebar%>; /* Darker shade for the header */
+    color: <%=accent%>; /* White text for clarity */
+    text-align: center; /* Center the month and year */
+    padding: 5px 0; /* Padding for better spacing */
+    border-top-left-radius: 8px; /* Rounded corners at the top */
+    border-top-right-radius: 8px;
+}
+/* If you use dropdowns for month/year selection, style them too */
+.pika-month, .pika-year {
+    color: <%=accent%>; /* Matching text color */
+    background: <%=sidebar%>; /* Transparent background to blend in with the header */
+    border: none; /* Remove borders for a cleaner look */
+}
+.pika-single {
+    background: <%=sidebar%>; /* Change to your desired color */
+    border-radius: 1rem;
+}
+
+table.picka-table tr {
+    background-color: <%=accent%>; /* Golden color for the header */
+}
+
+
+.pika-single .pika-week {
+    background:  <%=clr%>; /* Change week numbers background */
+}
+</style>
+</head>
+
+
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
                     <div class="flex-container">
@@ -182,12 +314,16 @@ if (sesi != null) {
                             <div class="login__inputs" style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>">
                                 <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Data plecare</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='date' id='start' name='start' min='1954-01-01' max='2036-12-31' required value=<% out.println(data_s);%> onchange='highlightDate()'/>
-                                </div>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='text' id='start' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()' value=<%out.println(data_s);%> >
+    
+    <input type="hidden" id="start-hidden" name="start" value=<%out.println(data_s);%>>
+                                            </div>
                                 <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Data sosire</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='date' id='end' name='end' min='1954-01-01' max='2036-12-31' required value=<% out.println(data_e);%> onchange='highlightDate()'/>
-                                </div>
+                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='text' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()' value=<%out.println(data_s);%>/>
+                                        	<input type="hidden" id="end-hidden" name="end" value=<%out.println(data_e);%>>
+                                        
+                                            </div>
                                 <div>
                                             <label style=" color:<%out.println(text);%>" class="login__label">Motiv</label>
                                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" required class="login__input" name='motiv' value = <% out.println(motiv);%>/>
@@ -258,8 +394,77 @@ if (sesi != null) {
     response.sendRedirect("login.jsp");
 }
 %>
+
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+	var picker = new Pikaday({
+	    field: document.getElementById('start'),
+	    format: 'YYYY-MM-DD', // Make sure this format is supported by your version of Pikaday or Moment.js
+	    minDate: new Date(2000, 0, 1), // Minimum date
+	    maxDate: new Date(2025, 12, 31), // Maximum date
+	    yearRange: [2000, 2025],
+	    disableWeekends: false,
+	    showWeekNumber: true,
+	    isRTL: false, // Right-to-left languages
+	    theme: 'current',
+	    i18n: {
+	        previousMonth: 'Luna precedentă',
+	        nextMonth: 'Luna următoare',
+	        months: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
+	        weekdays: ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
+	        weekdaysShort: ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm']
+	    },
+	    
+	    firstDay: 1,
+	    onSelect: function() {
+	        var date = this.getDate();
+	        date.setDate(date.getDate() + 1);
+	        // console.log(date); // Check what you get here
+	        if (date) {
+	            var formattedDate = date.toISOString().substring(0, 10);
+	            console.log(formattedDate); // Ensure format is correct
+	            document.getElementById('start-hidden').value = formattedDate;
+	        } else {
+	            console.error('No date returned from date picker');
+	        }
+	    }
+	});
+	var picker2 = new Pikaday({
+	    field: document.getElementById('end'),
+	    format: 'YYYY-MM-DD', // Make sure this format is supported by your version of Pikaday or Moment.js
+	    minDate: new Date(2000, 0, 1), // Minimum date
+	    maxDate: new Date(2025, 12, 31), // Maximum date
+	    yearRange: [2000, 2025],
+	    disableWeekends: false,
+	    showWeekNumber: true,
+	    isRTL: false, // Right-to-left languages
+	    theme: 'current', // This class will be added to the root Pikaday element
+	    i18n: {
+	        previousMonth: 'Luna precedentă',
+	        nextMonth: 'Luna următoare',
+	        months: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
+	        weekdays: ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
+	        weekdaysShort: ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm']
+	    },
+	    firstDay: 1,
+	    onSelect: function() {
+	        var date = this.getDate();
+	        date.setDate(date.getDate() + 1);
+	        // console.log(date); // Check what you get here
+	        if (date) {
+	            var formattedDate = date.toISOString().substring(0, 10);
+	            console.log(formattedDate); // Ensure format is correct
+	            document.getElementById('end-hidden').value = formattedDate;
+	        } else {
+	            console.error('No date returned from date picker');
+	        }
+	    }
+	});
+	
+	//new Pikaday({ field: document.getElementById('start') });
 	// declarare si initializare variabile
     const dp1 = document.getElementById("start");
     const dp2 = document.getElementById("end");

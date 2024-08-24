@@ -46,6 +46,11 @@ if (sesi != null) {
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <style>
+       .fc-day-number {
+    color: <%=accent%> !important;
+}
+
+    
         body {
             margin: 0;
             padding: 0;
@@ -57,17 +62,19 @@ if (sesi != null) {
             max-height: 700px;
             padding: 0;
             margin: 20px auto;
-           
+           text: <%=accent%>; !important;
+			color: <%=accent%>; !important;
         }
         
 		table, 
 		td,
 		thead,
 		tbody,
-		.fc-row {
+		.fc-row, .fc-column {
 			border-color: <%=clr%> !important;
 			background: <%=sidebar%> !important;
 			text: <%=accent%>; !important;
+			color: <%=accent%>; !important;
 		}
 		
 		th, hr{
@@ -78,8 +85,8 @@ if (sesi != null) {
 		
     </style>
 </head>
-<body>
-    <div id='calendar'></div>
+<body style="background:<%=clr%>">
+    <div style="position: fixed; top: 5rem; left:25%;" id='calendar'></div>
     <script>
         $(document).ready(function() {
             var calendar = $('#calendar').fullCalendar({

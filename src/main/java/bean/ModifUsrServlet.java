@@ -29,6 +29,7 @@ public class ModifUsrServlet extends HttpServlet {
 		String idd = request.getParameter("id");
 		System.out.println(idd);
     	int id = Integer.valueOf(request.getParameter("id"));
+    	int id2 = Integer.valueOf(idd);
         String newUsername = request.getParameter("username");
         String nume = request.getParameter("nume");
         String prenume = request.getParameter("prenume");
@@ -68,9 +69,9 @@ public class ModifUsrServlet extends HttpServlet {
       	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 0 and id != ? group by id_dep having id_dep = ?;");
         		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 3 and id != ? group by id_dep having id_dep = ?;")) {
         	preparedStatement.setInt(2, departament);
-        	preparedStatement.setInt(1, id);
+        	preparedStatement.setInt(1, id2);
         	stmt.setInt(2, departament);
-        	stmt.setInt(1, id);
+        	stmt.setInt(1, id2);
                   ResultSet rs = preparedStatement.executeQuery();
                   ResultSet res = stmt.executeQuery();
                while (rs.next()) {
@@ -93,12 +94,12 @@ public class ModifUsrServlet extends HttpServlet {
 		       
 		    }
         
-        if (tip == 3 && nrsef == 1) {
+        if (tip == 3 && nrsef == 2) {
             response.sendRedirect("modifdel.jsp?pms=true");
             return;
         }
         
-        if (tip == 0 && nrdir == 1) {
+        if (tip == 0 && nrdir == 2) {
             response.sendRedirect("modifdel.jsp?pmd=true");
             return;
         }

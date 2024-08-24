@@ -84,12 +84,13 @@
     
     <title>Definire departament</title>
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+<body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-<div class="container" >
-        <div class="login__content" style="border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
-    <%
-                        out.print("<form style=\"border-radius: 2rem; border-color: " + sidebar + "; background: " + sidebar + "; color: " + text + "\" class=\"login__form\" action=\"");
+<div class="container" style="position: fixed; top:0; left: 28%; border-radius: 2rem; padding: 0;  margin: 0; background: <%out.println(clr);%>">
+        <div class="login__content" style="position: fixed; top: 0; border-radius: 2rem; margin: 0; height: 100vh; justify-content: center; border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+  
+  <%
+                        out.print("<form style=\"position: fixed; top: 1rem;  border-radius: 2rem; margin: 0; border-radius: 2rem; border-color: " + sidebar + "; background: " + sidebar + "; color: " + text + "\" class=\"login__form\" action=\"");
                         request.getContextPath();
                         out.println("AddDepServlet\" method=\"post\" class=\"login__form\">");
                         %>

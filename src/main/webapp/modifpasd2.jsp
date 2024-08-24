@@ -108,7 +108,7 @@ userId = id;
                         <td style="color:  <%=text%>;">Parola noua:</td>
                         <td><input style="background:  <%=clr%>; color: <%=text%>; border-color: <%=accent%>;" type='password' name='password' placeholder="Introduceti parola" required class='login__input'/></td>
                     </tr>
-                    <tr><td>  <a style="color:  <%=accent%>;" href='login.jsp' class='login__forgot'>Inapoi</a></td></tr>
+                    <tr><td>  <a style="color:  <%=accent%>;" href='modifdel.jsp' class='login__forgot'>Inapoi</a></td></tr>
                     <tr>
                   
                         <td colspan='2'><input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
