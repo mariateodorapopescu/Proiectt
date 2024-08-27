@@ -53,10 +53,31 @@
                                 stmt.setInt(7, id);
                                 stmt.executeUpdate();
                                 response.getWriter().println(
-                                	    "<html><head><title>Upload Status</title></head>" +
-                                	    "<body onload='window.top.location.reload();'>" + // Folosește eventul onload
-                                	    
-                                	    "</body></html>"
+                                		"<html><head><title>Upload Status</title></head>" +
+                                				 "<body onload='window.top.location.reload(); window.location.href = 'setari.jsp';'>" + 
+                                		"<script> " +
+									   " window.onload = function() { " +
+									        // Verifică dacă este necesară redirecționarea iframe-ului
+									        "if (localStorage.getItem('redirectIframe') === 'true') { " +
+									            // Redirecționează iframe-ul
+									            // "document.getElementById('myIframe').src = 'setari.jsp'; " +
+									            // Curăță flag-ul pentru a preveni redirecționări multiple
+									            "localStorage.removeItem('redirectIframe'); " +
+									        "} else {" +
+									            // Setează flag-ul pentru redirecționare la următoarea încărcare
+									            "localStorage.setItem('redirectIframe', 'true'); " +
+									            // Reîncarcă pagina părinte
+									            "window.top.location.reload(true); " +
+									           // "document.getElementById('myIframe').src = 'setari.jsp'; " +
+									        "} " +
+									    "} " +
+									"</script>" + "</body></html>" 
+                                		
+                                		
+                                	   // "<html><head><title>Upload Status</title></head>" +
+                                	    // "<body onload='window.top.location.reload(); window.location.href = 'setari.jsp';'>" + // Folosește eventul onload
+                                	    // "<script> window.location.href = 'setari.jsp'; </script>" +
+                                	    // "</body></html>" 
                                 	);
                             } catch (SQLException e) {
                                 out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");

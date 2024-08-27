@@ -207,6 +207,47 @@
                         </div>
                         </div>
                         <%
+                        if ("true".equals(request.getParameter("n"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('Nume scris incorect!');");
+                            out.println("</script>");
+                        }
+
+                        if ("true".equals(request.getParameter("pn"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('Prenume scris incorect!');");
+                            out.println("</script>");
+                        }
+
+                        if ("true".equals(request.getParameter("t"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('Telefon scris incorect!');");
+                            out.println("</script>");
+                        }
+
+                        if ("true".equals(request.getParameter("e"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('E-mail scris incorect!');");
+                            out.println("</script>");
+                        }
+
+                        if ("true".equals(request.getParameter("dn"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('Utilizatorul trebuie sa aiba minim 18 ani!');");
+                            out.println("</script>");
+                        }   
+
+                        if ("true".equals(request.getParameter("pms"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('Poate fi maxim un sef / departament!');");
+                            out.println("</script>");
+                        }   
+
+                        if ("true".equals(request.getParameter("pmd"))) {
+                            out.println("<script type='text/javascript'>");
+                            out.println("alert('Poate fi maxim un director / departament!');");
+                            out.println("</script>");
+                        }  
                     }
                 }
             } catch (Exception e) {

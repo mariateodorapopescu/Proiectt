@@ -91,7 +91,36 @@ if (sesi != null) {
     <style>
     
     
-    
+  
+/* Hover Effect on Date Buttons */
+.pika-button:hover, .pika-button:active {
+    background: <%=accent%>;
+    color: #fff; /* White text for hover */
+}
+
+/* Styling for the navigation header */
+.pika-label {
+    color: <%=accent%>; /* Light grey color for the month and year */
+    font-size: 16px; /* Larger font size */
+    background: <%=sidebar%>;
+}
+
+/* Navigation buttons */
+.pika-prev, .pika-next {
+    cursor: pointer;
+    color: <%=text%>;
+    background: <%=sidebar%>;
+    border: none;
+}
+
+/* Table cells */
+.pika-button {
+    border: none; /* Remove default borders */
+    padding: 5px; /* Padding for the date numbers */
+    color: <%=text%>; /* Default date color */
+    background: <%=sidebar%>;
+}
+
 /* Hover effect on date cells */
 .pika-button:hover {
     background: <%=clr%>; /* Darker background on hover */
@@ -154,6 +183,7 @@ table.picka-table tr {
 .pika-single .pika-week {
     background:  <%=clr%>; /* Change week numbers background */
 }
+
     </style>
 </head>
                 <body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">

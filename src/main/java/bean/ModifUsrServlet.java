@@ -41,25 +41,45 @@ public class ModifUsrServlet extends HttpServlet {
         int tip = Integer.valueOf(request.getParameter("tip"));
         
         if (!NameValidator.validateName(nume)) {
-            response.sendRedirect("signin.jsp?n=true");
+        	if (tip != 4) {
+        		response.sendRedirect("despr.jsp?n=true");
+		    } else {
+		    	response.sendRedirect("signin.jsp?n=true");
+		    }
             return;
         }
         if (!NameValidator.validateName(prenume)) {
-            response.sendRedirect("signin.jsp?pn=true");
+        	if (tip != 4) {
+        		response.sendRedirect("despr.jsp?pn=true");
+		    } else {
+		    	response.sendRedirect("signin.jsp?pn=true");
+		    }
             return;
         }
         if (!EmailValidator.validare(email)) {
-            response.sendRedirect("signin.jsp?e=true");
+        	if (tip != 4) {
+        		response.sendRedirect("despr.jsp?e=true");
+		    } else {
+		    	response.sendRedirect("signin.jsp?e=true");
+		    }
             return;
         }
 
         if (!PhoneNumberValidator.validatePhoneNumber(telefon)) {
-            response.sendRedirect("signin.jsp?t=true");
+        	if (tip != 4) {
+        		response.sendRedirect("despr.jsp?t=true");
+		    } else {
+		    	response.sendRedirect("signin.jsp?t=true");
+		    }
             return;
         }
 
         if (!CheckerDataNasterii.valideaza(data_nasterii)) {
-            response.sendRedirect("signin.jsp?dn=true");
+        	if (tip != 4) {
+        		response.sendRedirect("despr.jsp?dn=true");
+		    } else {
+		    	response.sendRedirect("signin.jsp?dn=true");
+		    }
             return;
         }
         
@@ -86,7 +106,11 @@ public class ModifUsrServlet extends HttpServlet {
 				 PrintWriter out1 = response.getWriter();
 				    out1.println("<script type='text/javascript'>");
 				    out1.println("alert('Eroare la baza de date - debug only!');");
+				    if (tip != 4) {
+				    	out1.println("window.location.href = 'despr.jsp';");
+				    } else {
 				    out1.println("window.location.href = 'modifdel.jsp';");
+				    }
 				    out1.println("</script>");
 				    out1.close();
 				    e.printStackTrace();
@@ -95,12 +119,12 @@ public class ModifUsrServlet extends HttpServlet {
 		    }
         
         if (tip == 3 && nrsef == 2) {
-            response.sendRedirect("modifdel.jsp?pms=true");
+        	response.sendRedirect("despr.jsp?pms=true");
             return;
         }
         
         if (tip == 0 && nrdir == 2) {
-            response.sendRedirect("modifdel.jsp?pmd=true");
+        	response.sendRedirect("despr.jsp?pmd=true");
             return;
         }
 
@@ -128,7 +152,11 @@ public class ModifUsrServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Modificare cu succes!');");
+		    if (tip != 4) {
+		    	out.println("window.location.href = 'despr.jsp';");
+		    } else {
 		    out.println("window.location.href = 'modifdel.jsp';");
+		    }
 		    out.println("</script>");
 		    out.close();
         } catch (Exception e) {
@@ -136,7 +164,11 @@ public class ModifUsrServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
+		    if (tip != 4) {
+		    	out.println("window.location.href = 'despr.jsp';");
+		    } else {
 		    out.println("window.location.href = 'modifdel.jsp';");
+		    }
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();

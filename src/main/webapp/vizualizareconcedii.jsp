@@ -136,7 +136,7 @@ if (sesi != null) {
 <body style="overflow: auto">
 
 <nav>
-    <a class="nav a active-tab" id="unu" onclick="setActiveTab('unu')" href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
+    <a class="nav a" id="unu" onclick="setActiveTab('unu')" href="viewconcoldepeu.jsp" target="contentFrame">Coleg</a>
     <a class="nav a" id="doi" onclick="setActiveTab('doi')" href="viewcol.jsp" target="contentFrame">Angajat</a>
     <a class="nav a" id="trei" onclick="setActiveTab('trei')" href="viewp.jsp" target="contentFrame">Personale</a>
     <a class="nav a" id="patru" onclick="setActiveTab('patru')" href="viewdepeu.jsp" target="contentFrame">Dept. meu</a>
@@ -147,24 +147,57 @@ if (sesi != null) {
     <a class="nav a" id="noua" onclick="setActiveTab('noua')" href="testviewpers.jsp" target="contentFrame">Calendar</a>
 </nav>
 <script>
-
 function setActiveTab(tabId) {
     // Remove active class from all tabs
     document.querySelectorAll('nav a').forEach(tab => tab.classList.remove('active-tab'));
+
+    // Get the element and check if it exists
+    const tabElement = document.getElementById(tabId);
+    if (!tabElement) {
+        console.error('Tab with ID ' + tabId + ' does not exist.');
+        return;
+    }
+
     // Add active class to clicked tab
-    document.getElementById(tabId).classList.add('active-tab');
-    // Store the active tab in sessionStorage
-    sessionStorage.setItem('activeTab', tabId);
+    tabElement.classList.add('active-tab');
+
+    // Check if the tab element is an anchor with an href
+    if (tabElement.tagName === 'A' && tabElement.href) {
+        var ceva = tabElement.href; 
+        // Store the active tab and current page in sessionStorage
+        sessionStorage.setItem('lastPage', ceva);
+        sessionStorage.setItem('activeTab', tabId);
+    } else {
+        console.error('Active tab is not a link or missing href attribute');
+    }
 }
 
 // Event listener to maintain the active state on page reload
 window.onload = function() {
     const activeTab = sessionStorage.getItem('activeTab');
-    if (activeTab) {
+    var ceva = sessionStorage.getItem('lastPage');
+    var iframe = document.getElementById('iframe');
+
+    if (!iframe) {
+        console.error('Iframe with specified ID not found.');
+        return;
+    }
+
+    if (activeTab && ceva) {
+        // If there is an active tab and a URL, set them as active and load the URL
         setActiveTab(activeTab);
+        iframe.src = ceva;
+    } else {
+        // If no active tab is set, use a default tab ID, e.g., 'unu'
+        setActiveTab('unu'); // Assuming 'unu' is the ID of the default tab
+        // Ensure 'unu' has a corresponding href you want to load in iframe
+        // I tried
+        // acum hai sa pun comentarii prin cod =))
     }
 };
 </script>
+
+
 <iframe style="overflow: auto; padding: 0; margin: 0;" name="contentFrame" src="viewconcoldepeu.jsp"></iframe>
 <% }
             

@@ -64,28 +64,60 @@ if (sesi != null) {
       <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     
     <title>Schimbare imagine de profil</title>
+    <style>
+    .container {
+        position: fixed;
+        top: 1rem;
+        left: 28%;
+        border-radius: 2rem;
+        background: <%=clr%>;
+    }
+    .login__content {
+        overflow: auto;
+        position: fixed;
+        top: 1rem;
+        height: 100vh;
+        border-radius: 2rem;
+        background:  <%=clr%>;
+    }
+    .login__form {
+        overflow: auto;
+        position: fixed;
+        top: 6rem;
+        border-radius: 2rem;
+        background:  <%=sidebar%>;
+        border-color: <%=sidebar%>;
+    }
+    .login__title {
+        color: <%=accent%>;
+    }
+    .login__label, .login__input, .login__forgot {
+        color: <%=text%>;
+    }
+    .login__button {
+        box-shadow: 0 6px 24px <%=accent%>;
+        background: <%=accent%>;
+    }
+</style>
+    
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --text:<%out.println(text);%>; --sd:<%out.println(sidebar);%>">
+<body style="background: <%=clr%>; position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0 1rem; margin: 0;">
+<div class="container">
+<div class="login__content">
+    <form class="login__form" action="UploadImageServlet" enctype="multipart/form-data" method='post'>
+        <h3 class='login__title'>Modificare imagine de profil</h3>
+        <div class='login__inputs'>
+            <label for="imageUpload" class='login__label'>Imagine JPG/JPEG</label>
+            <input style="border-color: <%=sidebar%>; background: <%=sidebar%>" id="imageUpload" type="file" name="image" required class='login__input'>
+        </div>
+        <a href='adminok.jsp' style="color: <%=accent%>" class='login__forgot'>Inapoi</a>
+        <div class='login__buttons'>
+            <input type="submit" value="Modificare" class="login__button">
+        </div>
+    </form>
+</div>
+</div>
 <%
-//..................
-                    out.println("<div style=\"background:" + sidebar + "\" class=\"container\">");
-                    out.println("<div style=\"border-radius: 2rem; background:" +  clr + "\" class=\"login__content\">");
-                    out.println("<form style=\"border-color: " + accent + "; border-radius: 2rem; background:" + sidebar + "\" action=\"UploadImageServlet\" enctype=\"multipart/form-data\" method='post' class='login__form'>");
-                    out.println("<h3 style=\"color:" + accent + "\" class='login__title'>Modificare imagine de profil</h3>");
-                    out.println("<div class='login__inputs'>");
-                    out.println("<div>");
-                    out.println("<label style=\"color:" + text + "\" for='' class='login__label'>Imagine JPG/JPEG</label>");
-                    out.println("<input style=\"color:" + text + "\" type=\"file\" name=\"image\" required>");
-                    out.println("</div>");
-                    out.println("</div>");
-                    out.println("<a style=\"color:" + accent + "\" href ='adminok.jsp' class='login__forgot''>Inapoi</a>");
-                    out.println("<div class='login__buttons'>");
-                    // out.println("<input type='submit' value='Submit' class='login__button' />");
-                    %> <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Modificare" class="login__button"> <%
-                    out.println("</div>");
-                    out.println("</form>");
-                    out.println("</div>");
-                    out.println("</div>");
                 }
             
         } catch (Exception e) {

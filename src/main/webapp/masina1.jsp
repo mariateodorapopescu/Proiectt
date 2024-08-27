@@ -78,9 +78,8 @@ int pag = -1;
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
     <style>
         
-        a, a:visited, a:hover, a:active{color:white !important; text-decoration: none;}
-    
-    
+        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+  
         .status-icon {
             display: inline-block;
             width: 20px;
@@ -91,6 +90,7 @@ int pag = -1;
             color: white;
             font-size: 14px;
         }
+        
         .status-neaprobat { background-color: #88aedb; }
         .status-dezaprobat-sef { background-color: #b37142; }
         .status-dezaprobat-director { background-color: #873931; }
@@ -98,42 +98,36 @@ int pag = -1;
         .status-aprobat-sef { background-color: #ccc55e; }
         .status-pending { background-color: #e0a800; }
        
-       .tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-}
-
-/* Tooltip text */
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: rgba(0,0,0,0.5);
-  color: white;
-  text-align: center;
-  padding: 5px 0;
-  border-radius: 6px;
- 
-  /* Position the tooltip text - see examples below! */
-  position: absolute;
-  z-index: 1;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-
-.content, .main-content {
-    overflow-x: auto; /* Permite scroll-ul orizontal */
+       /* Tooltip */
+       	.tooltip {
+		  position: relative; 
+		  border-bottom: 1px dotted black; 
+		}
+		
+		.tooltip .tooltiptext {
+		  visibility: hidden;
+		  width: 120px;
+		  background-color: rgba(0,0,0,0.5);
+		  color: white;
+		  text-align: center;
+		  padding: 5px 0;
+		  border-radius: 6px;
+		  position: absolute;
+		  z-index: 1;
+		}
+		
+		.tooltip:hover .tooltiptext {
+		  visibility: visible;
+		}
+       .content, .main-content {
+    overflow: auto; /* Permite scroll-ul orizontal */
     width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
 }
-
-		::-webkit-scrollbar {
+       
+::-webkit-scrollbar {
 		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
 		}
-
-       
+		       
     </style>
 </head>
 
@@ -268,7 +262,7 @@ int pag = -1;
                            "JOIN tipcon ct ON c.tip = ct.tip ";
                     	if (pag == 3 || pag == 4 || pag == 5) {
                     		// aici se adauga id_ang pentru ca: personal, angajat, coleg de departament
-                    		sql = sql + " where c.id_ang = ? ";
+                    		sql = sql + " where c.id_ang = ? and u.username <> " + "\"test\"";
                     		
                     		int nr = 1;
                     		int nrt = -1;
@@ -322,7 +316,15 @@ int pag = -1;
                     	
                     	if (pag == 6 || pag == 7) {
                     		// aici adaug departamentul
-							sql = sql + " where u.id_dep = ? ";
+							sql = sql + " where u.id_dep = ? and u.tip <> 4 ";
+                    		
+                    		if (pag == 6) {
+                    			sql = sql + " and c.id_ang <> " + userId;
+                    		}
+                    		
+                    		if (pag == 7 && dep == userDep) {
+                    			sql = sql + " and c.id_ang <> " + userId;
+                    		}
                     		
                     		int nr = 1;
                     		int nrt = -1;
@@ -376,6 +378,9 @@ int pag = -1;
                     	}
                     	if (pag == 8) {
                     		// aici e pe toata institutia
+                    		
+                    		sql = sql + " and u.id <> " + userId; 
+                    		
                     		int nr = 0;
                     		int nrt = -1;
                     		int nrs = -1;
@@ -457,22 +462,23 @@ int pag = -1;
                                         "<td data-label='Acc/Res'>" + accres + "</td>");
 
                               if (rss1.getString("status").compareTo("neaprobat") == 0) {
-                                  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
+                                
                               }
                               if (rss1.getString("status").compareTo("dezaprobat sef") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
                                   //out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("dezaprobat director") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
                                   //out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("aprobat director") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
                                   //out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
                               }
                               if (rss1.getString("status").compareTo("aprobat sef") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
+                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
                                   //out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
                               }
                               nr++;

@@ -20,12 +20,8 @@
                     int userType = rs.getInt("tip");
                     int userdep = rs.getInt("id_dep");
                     if (userType == 4) {
-                        switch (userType) {
-                            case 1: response.sendRedirect("tip1ok.jsp"); break;
-                            case 2: response.sendRedirect("tip2ok.jsp"); break;
-                            case 3: response.sendRedirect("sefok.jsp"); break;
-                            case 4: response.sendRedirect("adminok.jsp"); break;
-                        }
+                        response.sendRedirect("homeadmin.jsp"); 
+                        
                     } else {
                     	 String accent = null;
                       	 String clr = null;
@@ -85,7 +81,99 @@
     height: 100%;
      
 }
+ @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+     input[type="date"] {
+     background-color: <%=accent%>; 
+    color: <%=accent%>; 
+    border: 2px solid <%=accent%>; 
+    
+   
+}
+.pika-single {
+    background-color: <%=sidebar%>;
+    color: <%=text%>;
+}
 
+input[type="date"]:focus {
+    border-color: <%=accent%>; 
+    box-shadow: 0 0 8px 0 <%=accent%>; 
+}
+     
+	* {
+	    margin: 0;
+	    padding: 0;
+	    box-sizing: border-box;
+	    font-family: 'Poppins', sans-serif;
+		}
+	
+     :root{
+     /*========== culori de baza ==========*/
+      --first-color: #2a2a2a;
+	  --second-color: hsl(249, 64%, 47%);
+	  /*========== cuulori text ==========*/
+	  --title-color-light: hsl(244, 12%, 12%);
+	  --text-color-light: hsl(244, 4%, 36%);
+	  --title-color-dark: hsl(0, 0%, 95%);
+	  --text-color-dark: hsl(0, 0%, 80%);
+	  /*========== cuulori corp ==========*/
+	  --body-color-light: hsl(208, 97%, 85%);
+	  --body-color-dark: #1a1a1a;
+	  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
+	  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
+	  --form-bg-color-dark: #333;
+	  --form-border-color-dark: #3a3a3a;
+	  /*========== Font ==========*/
+	  --body-font: "Poppins", sans-serif;
+	  --h2-font-size: 1.25rem;
+	  --small-font-size: .813rem;
+	  --smaller-font-size: .75rem;
+	  --font-medium: 500;
+	  --font-semi-bold: 600;
+	 }
+		        
+	::placeholder {
+	  color: var(--text);
+	  opacity: 1; /* Firefox */
+	}
+	
+	::-ms-input-placeholder { /* Edge 12-18 */
+	  color: var(--text);
+	}
+	       
+    .flex-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 2rem;
+        margin: 2rem;
+    }
+    
+    .calendar-container, .form-container {
+        background-color: #2a2a2a;
+        padding: 1rem;
+        border-radius: 8px;
+       
+    }
+    
+    .calendar-container {
+        max-width: 300px;
+    }
+    
+     th.calendar, td.calendar {
+        border: 1px solid #1a1a1a;
+        text-align: center;
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    th.calendar {
+        background-color: #333;
+    }
+    
+    .highlight {
+        color: white;
+    }
+    
 /* Hover Effect on Date Buttons */
 .pika-button:hover, .pika-button:active {
     background: <%=accent%>;
@@ -195,8 +283,9 @@ table.picka-table tr {
                                             <label style="color:<%out.println(text);%> " class="login__label">Utilizator (Nume, Prenume, Username)</label>
                                             <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " name="id" class="login__input">
                                                 <%
-                                                try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri where id_dep = ?")) {
+                                                try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri where id_dep = ? and tip <> 4 and id <> ? and username <> \"test\"")) {
                                                     stm.setInt(1, userdep);
+                                                    stm.setInt(2, userId);
                                                     ResultSet rs1 = stm.executeQuery();
                                                     while (rs1.next()) {
                                                         int id = rs1.getInt("id");
@@ -258,21 +347,26 @@ table.picka-table tr {
                                             <input type="checkbox" id="an" name="an" class="login__check-input"/>
                                             <label style="color:<%out.println(text);%> " for="an" class="login__check-label">An</label>
                                         </div>
-
-                                        <div id="start">
+                                           
+			<div class="date-input-container" style="position: relative;">
+                                        <div id="startt">
                                             <label style="color:<%out.println(text);%> " class="login__label">Inceput</label>
                                             
     <input type="hidden" id="start-hidden" name="start">
                                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="text" id="start" name="start" min="1954-01-01" max="2036-12-31" class="login__input"/>
                                         </div>
-
-                                        <div id="end">
+                                        </div>
+				 
+                                           
+			<div class="date-input-container" style="position: relative;">
+                                        <div id="endd">
                                             <label style="color:<%out.println(text);%> " class="login__label">Final</label>
                                              <input type="hidden" id="end-hidden" name="end">
                                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="text" id="end" name="end" min="1954-01-01" max="2036-12-31" class="login__input"/>
                                         </div>
                                     </div>
-
+                                    
+                                    
                                     <input type="hidden" name="userId" value="<%= userId %>"/>
                                     <input type="hidden" name="dep" value="<%= userdep %>"/>
                                     <input type="hidden" name="pag" value="5"/>
@@ -358,8 +452,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         <script>
                             function toggleDateInputs() {
                                 var radioPer = document.getElementById('an');
-                                var startInput = document.getElementById('start');
-                                var endInput = document.getElementById('end');
+                                var startInput = document.getElementById('startt');
+                                var endInput = document.getElementById('endd');
                                 if (radioPer.checked) {
                                     startInput.style.display = 'none';
                                     endInput.style.display = 'none';

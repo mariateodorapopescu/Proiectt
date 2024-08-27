@@ -192,7 +192,8 @@ table.picka-table tr {
                                             <label style="color:<%out.println(text);%> " class="login__label">Utilizator (Nume, Prenume, Username)</label>
                                             <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="id" class="login__input">
                                                 <%
-                                                try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri")) {
+                                                try (PreparedStatement stm = connection.prepareStatement("SELECT id, nume, prenume, username FROM useri where tip <> 4 and id <> ? and username <> \"test\"")) {
+                                                	 stm.setInt(1, userId);
                                                     ResultSet rs1 = stm.executeQuery();
                                                     while (rs1.next()) {
                                                         int id = rs1.getInt("id");
@@ -255,14 +256,18 @@ table.picka-table tr {
                                             <label style="color:<%out.println(text);%> " for="an" class="login__check-label">An</label>
                                         </div>
 
-                                        <div id="start">
+                                       <div class="date-input-container" style="position: relative;">
+                                        <div id="startt">
                                             <label style="color:<%out.println(text);%> " class="login__label">Inceput</label>
                                             
     <input type="hidden" id="start-hidden" name="start">
                                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="text" id="start" name="start" min="1954-01-01" max="2036-12-31" class="login__input"/>
                                         </div>
-
-                                        <div id="end">
+                                        </div>
+				 
+                                           
+			<div class="date-input-container" style="position: relative;">
+                                        <div id="endd">
                                             <label style="color:<%out.println(text);%> " class="login__label">Final</label>
                                              <input type="hidden" id="end-hidden" name="end">
                                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%> " type="text" id="end" name="end" min="1954-01-01" max="2036-12-31" class="login__input"/>
@@ -355,8 +360,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         <script>
                             function toggleDateInputs() {
                                 var radioPer = document.getElementById('an');
-                                var startInput = document.getElementById('start');
-                                var endInput = document.getElementById('end');
+                                var startInput = document.getElementById('startt');
+                                var endInput = document.getElementById('endd');
                                 if (radioPer.checked) {
                                     startInput.style.display = 'none';
                                     endInput.style.display = 'none';
