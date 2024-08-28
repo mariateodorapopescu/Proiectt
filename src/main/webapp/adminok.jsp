@@ -663,7 +663,7 @@
         </ul>
     </div>
     <div style="margin: 0; padding: 0; " class="main-content">
-        <iframe style="overflow: hidden;" name="iframe" id='iframe' src="homedir.jsp"></iframe>
+        <iframe style="overflow: hidden;" name="iframe" id='iframe' src="homeadmin.jsp"></iframe>
     </div>
     <script src="main.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>

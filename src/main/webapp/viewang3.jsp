@@ -60,7 +60,6 @@
                     	int id = rs.getInt("id");
                     	 int cate = -1;
                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             // Check for upcoming leaves in 3 days
                              String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 <= CURDATE() AND id_ang = ?";
                              try (PreparedStatement stmt = connection.prepareStatement(query)) {
                                  stmt.setInt(1, id);
@@ -71,9 +70,7 @@
                                  }
                              }
                             
-                             // Display the user dashboard or related information
-                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                             // Add additional user-specific content here
+                             
                          } catch (SQLException e) {
                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                              e.printStackTrace();

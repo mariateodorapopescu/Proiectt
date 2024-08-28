@@ -8,85 +8,69 @@
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Locale" %>
 <%
-// structura unei pagini suna cam asa
-// verificare daca exista sesiune activa, utilizator logat(curent), 
-// extragere date despre user cum ar fi tipul ca sa se stie ce pagina 
-// sa deschida, temele de culoare ale fiecarui utilizator
-// apoi se incarca pagina in sine
-// in ceea ce priveste gruparea de pagini concediinoieu, concediinoisef, concediinoidir, e cam asa
-// header cu titlu si data curenta
-// cap de tabel: partea comuna la toti 3 e de la nr crt la status, apoi la sef si la dir e in plus aprobati/respingeti
-// nrcrt, nume, preume, functie, departament, inceput, sfarsit, motiv, locatie, tip, adaugat, modificat, acceptat/respins, status
-// masina2?
-// apoi vine sql ul comun SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c,
-// c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep 
-// JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ?
-// la care in plus depinzand de user se adauga: and c.status = 0 (sef) and c.status = 1 (director), c.id_ang sau id = uid pentru concediinoieu
-// exista 2 tipuri de concediinoieu, unul care permite modificarea -> si aici ai cazuri: and c.status = 0 pentru tip1,tip2, and c.status = 1 pentru director si sef 
-// -> la fel, la partea comuna din capul de tabel adaugi coloanele de modificati/stergeti
-// apoi vin ultimele coloane: status, aprobati,respingeti/modificati,stergeti cu iconitele:  if (rs1.getString("status").compareTo("neaprobat") == 0) {
-// out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
-// out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='aprobsef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
-// out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='ressef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>"); }
-// deci, hai sa pregatim teren pentru masina2 care le contine pe astea: deci in loc de 4 o sa am 1 =)
-    
-	HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
-        if (currentUser != null) {
-            String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                	// extrag date despre userul curent
-                    int id = rs.getInt("id");
-                    int userType = rs.getInt("tip");
-                    int userdep = rs.getInt("id_dep");
-                    if (userType == 0 || userType == 3) {  
-                    	// aflu data curenta, tot ca o interogare bd =(
-                    	String today = "";
-                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
-                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                               try (ResultSet rs2 = stmt.executeQuery()) {
-                                    if (rs2.next()) {
-                                      today =  rs2.getString("today");
-                                    }
-                                }
-                            }
-                        } catch (SQLException e) {
-                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                            e.printStackTrace();
-                        }
-                   	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
-                   	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
-                  	 String clr = "#d8d9e1";
-                  	 String sidebar = "#ECEDFA";
-                  	 String text = "#333";
-                  	 String card = "#ECEDFA";
-                  	 String hover = "#ECEDFA";
-                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                         String query = "SELECT * from teme where id_usr = ?";
-                         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                             stmt.setInt(1, id);
+//structura unei pagini este astfel
+//verificare daca exista sesiune activa, utilizator conectat, 
+//extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
+//se mai extrag temele de culoare ale fiecarui utilizator
+//apoi se incarca pagina in sine
+
+  HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
+  if (sesi != null) {
+      MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
+      if (currentUser != null) {
+          String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
+          Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
+          try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+              preparedStatement.setString(1, username);
+              ResultSet rs = preparedStatement.executeQuery();
+              if (rs.next()) {
+              	// extrag date despre userul curent
+                  int id = rs.getInt("id");
+                  int userType = rs.getInt("tip");
+                  int userdep = rs.getInt("id_dep");
+                  if (userType != 4) {  
+                  	// aflu data curenta, tot ca o interogare bd =(
+                  	String today = "";
+                 	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                          String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                          try (PreparedStatement stmt = connection.prepareStatement(query)) {
                              try (ResultSet rs2 = stmt.executeQuery()) {
-                                 if (rs2.next()) {
-                                   accent =  rs2.getString("accent");
-                                   clr =  rs2.getString("clr");
-                                   sidebar =  rs2.getString("sidebar");
-                                   text = rs2.getString("text");
-                                   card =  rs2.getString("card");
-                                   hover = rs2.getString("hover");
-                                 }
-                             }
-                         }
-                    } catch (SQLException e) {
-                         out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                         e.printStackTrace();
-                     }
+                                  if (rs2.next()) {
+                                    today =  rs2.getString("today");
+                                  }
+                              }
+                          }
+                      } catch (SQLException e) {
+                          out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                          e.printStackTrace();
+                      }
+                 	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                 	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                	 String clr = "#d8d9e1";
+                	 String sidebar = "#ECEDFA";
+                	 String text = "#333";
+                	 String card = "#ECEDFA";
+                	 String hover = "#ECEDFA";
+                	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                       String query = "SELECT * from teme where id_usr = ?";
+                       try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                           stmt.setInt(1, id);
+                           try (ResultSet rs2 = stmt.executeQuery()) {
+                               if (rs2.next()) {
+                                 accent =  rs2.getString("accent");
+                                 clr =  rs2.getString("clr");
+                                 sidebar =  rs2.getString("sidebar");
+                                 text = rs2.getString("text");
+                                 card =  rs2.getString("card");
+                                 hover = rs2.getString("hover");
+                               }
+                           }
+                       }
+                  } catch (SQLException e) {
+                       out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                       e.printStackTrace();
+                   }
                         %>
 <html>
 <head>
@@ -94,7 +78,6 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <meta charset="UTF-8">
     
     <!--=============== REMIXICONS ===============-->
@@ -102,12 +85,9 @@
 
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
    
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
-      <style>
-        
+   <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <style>
         a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
   
         .status-icon {
@@ -149,8 +129,20 @@
 		.tooltip:hover .tooltiptext {
 		  visibility: visible;
 		}
-       
     </style>
+   <!--=============== icon ===============-->
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <!--=============== scripts ===============-->
+      <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+      <script>
+    function generate() {
+        const element = document.getElementById("content");
+        html2pdf()
+        .from(element)
+        .save();
+    }
+</script>
     </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
@@ -160,58 +152,54 @@
             <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>;">
                  <div class="events" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
                   <h1>Utilizatori activi</h1>
-                <table>
-                    <thead>
-                        <tr>
-                  <th style="color:white">Nr.crt</th>
-                    <th style="color:white">Nume</th>
-                    <th style="color:white">Prenume</th>
-                    <th style="color:white">Functie</th>
-                    <th style="color:white">Departament</th>
-                    
-                      </tr>
-                    </thead>
-                   <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                	<table>
+                    	<thead>
+                        		<tr>
+                  					<th style="color:white">Nr.crt</th>
+                    				<th style="color:white">Nume</th>
+                    				<th style="color:white">Prenume</th>
+                    				<th style="color:white">Functie</th>
+                    				<th style="color:white">Departament</th> 
+                   				</tr>
+                    	</thead>
+                   		<tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
   
-                    <%
-                    // interogare de baza
-                    String sql = "SELECT d.nume_dep AS departament, u.nume, u.prenume, " +
-                            "t.denumire AS functie " +
-                            "FROM useri u " +
-                            "JOIN tipuri t ON u.tip = t.tip " +
-                            "JOIN departament d ON u.id_dep = d.id_dep " +
-                            "WHERE u.activ = 1 and u.id <> " + id;
-                   if (userType == 3) {
-                	   sql = sql + " and u.id_dep = " + userdep; 
-                			   
-                   }
-                    
-                    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                    	ResultSet rs1 = stmt.executeQuery();
-                        boolean found = false;
-                        int nr = 1;
-                        while (rs1.next()) {
-                            found = true;
-                            out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
-                                    rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Fct'>" + rs1.getString("functie") + "</td><td data-label='Dep'>" + rs1.getString("departament") + "</td></tr>");                                   
-                         nr++; 
-                        }
-                        if (!found) {
-                            out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
-                        }
-                    }
-                         %>
+                   			<%
+			                    // interogare de baza
+			                    String sql = "SELECT d.nume_dep AS departament, u.nume, u.prenume, " +
+			                            "t.denumire AS functie " +
+			                            "FROM useri u " +
+			                            "JOIN tipuri t ON u.tip = t.tip " +
+			                            "JOIN departament d ON u.id_dep = d.id_dep " +
+			                            "WHERE u.activ = 1 and u.id <> " + id;
+			                    
+			                   if (userType == 3) {
+			                	   sql = sql + " and u.id_dep = " + userdep; 	   
+			                   }
+			                    
+			                    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+			                    	ResultSet rs1 = stmt.executeQuery();
+			                        boolean found = false;
+			                        int nr = 1;
+			                        while (rs1.next()) {
+			                            found = true;
+			                            out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
+			                                    rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Fct'>" + rs1.getString("functie") + "</td><td data-label='Dep'>" + rs1.getString("departament") + "</td></tr>");                                   
+			                         	nr++; 
+			                        }
+			                        if (!found) {
+			                            out.println("<tr><td colspan='5'>Nu exista date.</td></tr>");
+			                        }
+			                    }
+                         	%>
                           </tbody>
-                </table> 
-                              
+                	</table>        
                 </div>
                 <div class="into">
                   <button id="generate" onclick="generate()" >Descarcati PDF</button>
                    <% if(userType == 0)  out.println("<button><a href='viewang.jsp'>Inapoi</a></button></div>"); %>
-                
-                <% if(userType == 3)  out.println("<button><a href='viewang4.jsp'>Inapoi</a></button></div>"); %>
+                	<% if(userType == 3)  out.println("<button><a href='viewang4.jsp'>Inapoi</a></button></div>"); %>
                 </div>
-                
                 <%
         			} else {
                     	switch (userType) {
@@ -244,13 +232,5 @@
         response.sendRedirect("login.jsp");
     }
 %>
-<script>
-    function generate() {
-        const element = document.getElementById("content");
-        html2pdf()
-        .from(element)
-        .save();
-    }
-</script>
 </body>
 </html>

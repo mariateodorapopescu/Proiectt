@@ -10,48 +10,69 @@
 // apoi pe baza a ceea ce am stocat in utilizator, selectez si fac alte interogari ca sa aflu alte lucruri
 // in mare, daca am sesiune activa, utilizator in sesiune (adica e cineva conectat) 
 // se afiseaza pagina in functie de tipul si de utilizatorul in sine (tematica, tipul de dashboard, alte functionalitati)
-    HttpSession sesiune = request.getSession(false); // selectez sesiunea fara a crea alta
-    if (sesiune != null) {
-        MyUser utilizatorcurent = (MyUser) sesiune.getAttribute("currentUser"); // selectez atributul de user stocat la conectare
-        if (utilizatorcurent != null) {
-            String numeutilizator = utilizatorcurent.getUsername(); // aflu numele de utilizator, caci acesta este unic si deci pot incepe prin a face interogari pe baza sa
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                PreparedStatement stmt = conexiune.prepareStatement("select * from useri where username = ?")) {
-                stmt.setString(1, numeutilizator);
-                ResultSet rezultat = stmt.executeQuery();
-                if (rezultat.next()) {
-                    int id = rezultat.getInt("id");
-                    int tip1 = rezultat.getInt("tip");
-                    if (tip1 == 4) {
-                        response.sendRedirect("adminok.jsp"); 
-                    } else {
-                    	// selectez culorile pentru tema/schema de culoare
-                    	 String accent = null;
-                      	 String clr = null;
-                      	 String sidebar = null;
-                      	 String text = null;
-                      	 String card = null;
-                      	 String hover = null;
-                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             String query = "SELECT * from teme where id_usr = ?";
-                             try (PreparedStatement stmt2 = conexiune.prepareStatement(query)) {
-                                 stmt2.setInt(1, id);
-                                 try (ResultSet rezultat2 = stmt2.executeQuery()) {
-                                     if (rezultat2.next()) {
-                                       accent =  rezultat2.getString("accent");
-                                       clr =  rezultat2.getString("clr");
-                                       sidebar =  rezultat2.getString("sidebar");
-                                       text = rezultat2.getString("text");
-                                       card =  rezultat2.getString("card");
-                                       hover = rezultat2.getString("hover");
-                                     }
-                                 }
-                             }
-                         } catch (SQLException e) {
-                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                             e.printStackTrace();
-                         }
+//structura unei pagini este astfel
+//verificare daca exista sesiune activa, utilizator conectat, 
+//extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
+//se mai extrag temele de culoare ale fiecarui utilizator
+//apoi se incarca pagina in sine
+
+  HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
+  if (sesi != null) {
+      MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
+      if (currentUser != null) {
+          String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
+          Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
+          try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+              preparedStatement.setString(1, username);
+              ResultSet rs = preparedStatement.executeQuery();
+              if (rs.next()) {
+              	// extrag date despre userul curent
+                  int id = rs.getInt("id");
+                  int userType = rs.getInt("tip");
+                  int userdep = rs.getInt("id_dep");
+                  if (userType != 4) {  
+                  	// aflu data curenta, tot ca o interogare bd =(
+                  	String today = "";
+                 	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                          String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                          try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                             try (ResultSet rs2 = stmt.executeQuery()) {
+                                  if (rs2.next()) {
+                                    today =  rs2.getString("today");
+                                  }
+                              }
+                          }
+                      } catch (SQLException e) {
+                          out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                          e.printStackTrace();
+                      }
+                 	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                 	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                	 String clr = "#d8d9e1";
+                	 String sidebar = "#ECEDFA";
+                	 String text = "#333";
+                	 String card = "#ECEDFA";
+                	 String hover = "#ECEDFA";
+                	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                       String query = "SELECT * from teme where id_usr = ?";
+                       try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                           stmt.setInt(1, id);
+                           try (ResultSet rs2 = stmt.executeQuery()) {
+                               if (rs2.next()) {
+                                 accent =  rs2.getString("accent");
+                                 clr =  rs2.getString("clr");
+                                 sidebar =  rs2.getString("sidebar");
+                                 text = rs2.getString("text");
+                                 card =  rs2.getString("card");
+                                 hover = rs2.getString("hover");
+                               }
+                           }
+                       }
+                  } catch (SQLException e) {
+                       out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                       e.printStackTrace();
+                   }
                         %>
 <html>
 <head>
@@ -65,36 +86,14 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+    
     <!--=============== icon ===============-->
     <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     
     <!--=============== alt CSS ===============-->
     <style>
      @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
-     input[type="date"] {
-     background-color: <%=accent%>; 
-    color: <%=accent%>; 
-    border: 2px solid <%=accent%>; 
     
-   
-}
-.pika-single {
-    background-color: <%=sidebar%>;
-    color: <%=text%>;
-}
-
-input[type="date"]:focus {
-    border-color: <%=accent%>; 
-    box-shadow: 0 0 8px 0 <%=accent%>; 
-}
-     
-	* {
-	    margin: 0;
-	    padding: 0;
-	    box-sizing: border-box;
-	    font-family: 'Poppins', sans-serif;
-		}
-	
      :root{
      /*========== culori de baza ==========*/
       --first-color: #2a2a2a;
@@ -119,6 +118,13 @@ input[type="date"]:focus {
 	  --font-medium: 500;
 	  --font-semi-bold: 600;
 	 }
+	 
+	 * {
+	    margin: 0;
+	    padding: 0;
+	    box-sizing: border-box;
+	    font-family: 'Poppins', sans-serif;
+		}
 		        
 	::placeholder {
 	  color: var(--text);
@@ -127,6 +133,22 @@ input[type="date"]:focus {
 	
 	::-ms-input-placeholder { /* Edge 12-18 */
 	  color: var(--text);
+	}
+     
+     input[type="date"] {
+     background-color: <%=accent%>; 
+	    color: <%=accent%>; 
+	    border: 2px solid <%=accent%>; 
+	}
+	
+	.pika-single {
+	    background-color: <%=sidebar%>;
+	    color: <%=text%>;
+	}
+	
+	input[type="date"]:focus {
+	    border-color: <%=accent%>; 
+	    box-shadow: 0 0 8px 0 <%=accent%>; 
 	}
 	       
     .flex-container {
@@ -141,7 +163,6 @@ input[type="date"]:focus {
         background-color: #2a2a2a;
         padding: 1rem;
         border-radius: 8px;
-       
     }
     
     .calendar-container {
@@ -162,184 +183,165 @@ input[type="date"]:focus {
     .highlight {
         color: white;
     }
-    
-/* Hover Effect on Date Buttons */
-.pika-button:hover, .pika-button:active {
-    background: <%=accent%>;
-    color: #fff; /* White text for hover */
-}
-
-/* Styling for the navigation header */
-.pika-label {
-    color: <%=accent%>; /* Light grey color for the month and year */
-    font-size: 16px; /* Larger font size */
-    background: <%=sidebar%>;
-}
-
-/* Navigation buttons */
-.pika-prev, .pika-next {
-    cursor: pointer;
-    color: <%=text%>;
-    background: <%=sidebar%>;
-    border: none;
-}
-
-/* Table cells */
-.pika-button {
-    border: none; /* Remove default borders */
-    padding: 5px; /* Padding for the date numbers */
-    color: <%=text%>; /* Default date color */
-    background: <%=sidebar%>;
-}
-
-/* Hover effect on date cells */
-.pika-button:hover {
-    background: <%=clr%>; /* Darker background on hover */
-    color: <%=text%>; /* White text on hover */
-}
-
-/* Special styles for today */
-.pika-single .is-today .pika-button {
-    color: <%=accent%>; /* Green color for today's date */
-    font-weight: bold; /* Make it bold */
-}
-
-/* Styles for the selected date */
-.pika-single .is-selected .pika-button {
-    background: <%=accent%>; /* Bright color for selection */
-    color: #fff; /* White text for selected date */
-}
-
-/* Weekday labels */
-.pika-weekday {
-    /* color: #aaa; */ /* Light gray for weekdays */
-    font-weight: normal;
-}
-
-/* Styling for the Selected Date */
-.pika-single .is-selected {
-    background: <%=accent%>;
-    color: #fff; /* White text for selected date */
-}
-
-/* Styling for Today's Date */
-.pika-single .is-today {
-    border: 2px solid <%=accent%> /* White border for today */
-    color: <%=accent%> /* White text for today */
-}
-.pika-title {
-    background: <%=sidebar%>; /* Darker shade for the header */
-    color: <%=accent%>; /* White text for clarity */
-    text-align: center; /* Center the month and year */
-    padding: 5px 0; /* Padding for better spacing */
-    border-top-left-radius: 8px; /* Rounded corners at the top */
-    border-top-right-radius: 8px;
-}
-/* If you use dropdowns for month/year selection, style them too */
-.pika-month, .pika-year {
-    color: <%=accent%>; /* Matching text color */
-    background: <%=sidebar%>; /* Transparent background to blend in with the header */
-    border: none; /* Remove borders for a cleaner look */
-}
-.pika-single {
-    background: <%=sidebar%>; /* Change to your desired color */
-    border-radius: 1rem;
-}
-
-table.picka-table tr {
-    background-color: <%=accent%>; /* Golden color for the header */
-}
-
-
-.pika-single .pika-week {
-    background:  <%=clr%>; /* Change week numbers background */
-}
-
+	    
+	.pika-button:hover, .pika-button:active {
+	    background: <%=accent%>;
+	    color: #fff; 
+	}
+	
+	.pika-label {
+	    color: <%=accent%>;
+	    font-size: 16px;
+	    background: <%=sidebar%>;
+	}
+	
+	.pika-prev, .pika-next {
+	    cursor: pointer;
+	    color: <%=text%>;
+	    background: <%=sidebar%>;
+	    border: none;
+	}
+	
+	.pika-button {
+	    border: none;
+	    padding: 5px; 
+	    color: <%=text%>;
+	    background: <%=sidebar%>;
+	}
+	
+	.pika-button:hover {
+	    background: <%=clr%>;
+	    color: <%=text%>; 
+	}
+	
+	.pika-single .is-today .pika-button {
+	    color: <%=accent%>;
+	    font-weight: bold;
+	}
+	
+	.pika-single .is-selected .pika-button {
+	    background: <%=accent%>; 
+	    color: #fff; 
+	}
+	
+	.pika-weekday {
+	    font-weight: normal;
+	}
+	
+	.pika-single .is-selected {
+	    background: <%=accent%>;
+	    color: #fff; 
+	}
+	
+	.pika-single .is-today {
+	    border: 2px solid <%=accent%> ;
+	    color: <%=accent%>;
+	}
+	.pika-title {
+	    background: <%=sidebar%>; 
+	    color: <%=accent%>; 
+	    text-align: center; 
+	    padding: 5px 0; 
+	    border-top-left-radius: 8px; 
+	    border-top-right-radius: 8px;
+	}
+	
+	.pika-month, .pika-year {
+	    color: <%=accent%>; 
+	    background: <%=sidebar%>; 
+	    border: none; 
+	}
+	
+	.pika-single {
+	    background: <%=sidebar%>; 
+	    border-radius: 1rem;
+	}
+	
+	table.picka-table tr {
+	    background-color: <%=accent%>; 
+	}
+	
+	.pika-single .pika-week {
+	    background:  <%=clr%>; 
+	}
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
-
-                        <div class="flex-container">
-                        <!-- Calendar + formular -->
-                            <div class="calendar-container" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="calendar">
-                                <div class="navigation">
-                                    <button class='prev' onclick="previousMonth()">❮</button>
-                                    <div class="month-year" id="monthYear"></div>
-                                    <button class='next' onclick="nextMonth()">❯</button>
-                                </div>
-                                <table class="calendar" id="calendar">
-                                    <thead >
-                                        <tr >
-                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar">Lu.</th>
-                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Ma.</th>
-                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Mi.</th>
-                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Jo.</th>
-                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Vi.</th>
-                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Sâ.</th>
-                                            <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Du.</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="calendar" id="calendar-body" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
-                                        <!-- Aici se va genera calendarul -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!-- Abia acum vine formularul -->
-                            <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
-                                <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
-                                    <div>
-                                        <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Adaugare concediu</span></h1>
-                                        
-                                    </div>
-                                    
-                                    <div class="login__inputs" style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>">
-                                        <div>
-                                            <label style=" color:<%out.println(text);%>" class="login__label">Data plecare</label>
-                                        			 <div class="date-input-container" style="position: relative;">
-                                       			 		 
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='text' id='start' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()' >
-    
-    <input type="hidden" id="start-hidden" name="start">
-                                        </div>
-                                        <div>
-                                            <label style=" color:<%out.println(text);%>" class="login__label">Data sosire</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='text' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
-                                        	<input type="hidden" id="end-hidden" name="end">
-                                        </div>
-                                        <div>
-                                            <label style=" color:<%out.println(text);%>" class="login__label">Motiv</label>
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti motivul" required class="login__input" name='motiv'/>
-                                        </div>
-                                        <div>
-                                            <label style=" color:<%out.println(text);%>" class="login__label">Tip concediu</label>
-                                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name='tip' class="login__input">
-                                            <%
-                                            try (PreparedStatement stmt3 = conexiune.prepareStatement("SELECT tip, motiv FROM tipcon")) {
-                                                ResultSet rezultat1 = stmt3.executeQuery();
-                                                while (rezultat1.next()) {
-                                                    int tip = rezultat1.getInt("tip");
-                                                    String motiv = rezultat1.getString("motiv");
-                                                    out.println("<option value='" + tip + "'>" + motiv + "</option>");
-                                                }
-                                            }
-                                            out.println("</select></div>");
-                                            %>
-                                            <div>
-                                                <label style=" color:<%out.println(text);%>" class="login__label">Locatie</label>
-                                                <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
-                                            </div>
-                                        </div>
-                                       <% out.println("<input type='hidden' name='userId' value='" + id + "'/>"); %> 
-                                        <%  out.println("            <a href=\"actiuni.jsp\" style=\"color:" + accent + "\" class=\"login__forgot\">Inapoi</a>"); %>
-                                        <div class="login__buttons">
-                                            <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Adaugare" class="login__button">
-                                        </div>
-                                    </form>
-                                   
-                                </div>
-                               
-                            </div>
-                        </div>
+<div class="flex-container">
+<!-- Calendar + formular -->
+<div class="calendar-container" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" class="calendar">
+    <div class="navigation">
+        <button class='prev' onclick="previousMonth()">❮</button>
+        <div class="month-year" id="monthYear"></div>
+        <button class='next' onclick="nextMonth()">❯</button>
+    </div>
+    <table class="calendar" id="calendar">
+        <thead>
+            <tr>
+                <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar">Lu.</th>
+                <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Ma.</th>
+                <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Mi.</th>
+                <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Jo.</th>
+                <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Vi.</th>
+                <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Sâ.</th>
+                <th style="background:<%out.println(accent);%>; color:<%out.println("white");%>" class="calendar" class="calendar">Du.</th>
+            </tr>
+        </thead>
+        <tbody class="calendar" id="calendar-body" style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
+            <!-- Aici se va genera calendarul -->
+        </tbody>
+    </table>
+</div>
+<!-- Abia acum este formularul -->
+<div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+    <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/addcon" method="post" class="login__form">
+        <div>
+            <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Adaugare concediu</span></h1>
+        </div>
+        
+        <div class="login__inputs" style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>">
+            <div>
+                <label style=" color:<%out.println(text);%>" class="login__label">Data plecare</label>
+            			 <div class="date-input-container" style="position: relative;">
+			                <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='text' id='start' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()' >
+							<input type="hidden" id="start-hidden" name="start">
+                          </div>
+             <div>
+                <label style=" color:<%out.println(text);%>" class="login__label">Data sosire</label>
+                <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" type='text' id='end' name='end' min='1954-01-01' max='2036-12-31' required onchange='highlightDate()'/>
+            	<input type="hidden" id="end-hidden" name="end">
+            </div>
+            <div>
+                <label style=" color:<%out.println(text);%>" class="login__label">Motiv</label>
+                <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti motivul" required class="login__input" name='motiv'/>
+            </div>
+            <div>
+                <label style=" color:<%out.println(text);%>" class="login__label">Tip concediu</label>
+                <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name='tip' class="login__input">
+                <%
+                try (PreparedStatement stmt3 = connection.prepareStatement("SELECT tip, motiv FROM tipcon")) {
+                    ResultSet rezultat1 = stmt3.executeQuery();
+                    while (rezultat1.next()) {
+                        int tip = rezultat1.getInt("tip");
+                        String motiv = rezultat1.getString("motiv");
+                        out.println("<option value='" + tip + "'>" + motiv + "</option>");
+                    }
+                }
+                out.println("</select></div>");
+                %>
+                <div>
+                    <label style=" color:<%out.println(text);%>" class="login__label">Locatie</label>
+                    <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
+                </div>
+            </div>
+           	<% out.println("<input type='hidden' name='userId' value='" + id + "'/>"); %> 
+            <%  out.println("            <a href=\"actiuni.jsp\" style=\"color:" + accent + "\" class=\"login__forgot\">Inapoi</a>"); %>
+            <div class="login__buttons">
+                <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Adaugare" class="login__button">
+            </div>
+        </form>
+    </div>
+</div>
                         <%
                     }
                 } else {
@@ -371,9 +373,7 @@ table.picka-table tr {
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-
 <script>
-
 document.addEventListener("DOMContentLoaded", function() {
 	var picker = new Pikaday({
 	    field: document.getElementById('start'),
@@ -439,8 +439,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	    }
 	});
 	
-	//new Pikaday({ field: document.getElementById('start') });
-	
 	// declarare si initializare variabile
     const dp1 = document.getElementById("start-hidden");
     const dp2 = document.getElementById("end");
@@ -487,12 +485,12 @@ document.addEventListener("DOMContentLoaded", function() {
         let adjustedDate = parsedDate.toISOString().split('T')[0];
         // daca nu e completat dp1, se pune valoarea in dp1, altfel in dp2
         if (dp1.value !== '') {
-            dp2.value = adjustedDate;  // Set end date if start date is already set
+            dp2.value = adjustedDate;  
         } else {
-            dp1.value = adjustedDate;  // Set start date if not already set
-            dp2.value = '';  // Clear end date to allow for new selection
+            dp1.value = adjustedDate;  
+            dp2.value = '';  
         }
-        updateCalendarToSelectedDate(parsedDate);  // se randeaza calendarul din nou (ca sa fie si cu ce s-a marcat)
+        updateCalendarToSelectedDate(parsedDate);  
         highlightDates();  // se marcheaza datele selectate in calendar
     }
 
@@ -520,7 +518,7 @@ document.addEventListener("DOMContentLoaded", function() {
             td.style.backgroundColor = defaultBg;
         	// daca data curenta din for e intre start si end atunci se adauga un nou atribut de stil de culoare la acea celula
             if (startDate && endDate && currentDate >= addDays(startDate, 1) && currentDate < endDate) {
-                td.style.backgroundColor = bg; // Highlight range
+                td.style.backgroundColor = bg; 
             }
         });
     }
@@ -530,7 +528,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let firstDay = new Date(year, month).getDay();
         calendarBody.innerHTML = ''; // se goleste tot si se construieste de la capat
         monthYear.textContent = monthNames[month] + ' ' + year; // se seteaza data curenta (incrementata/decrementata, 
-        		// dar mai intai la incarcarea paginii apare data curenta care se modifica in functie de sageti)
+        // dar mai intai la incarcarea paginii apare data curenta care se modifica in functie de sageti)
         let date = 1;
         for (let i = 0; i < 6; i++) {
             let row = document.createElement('tr');
