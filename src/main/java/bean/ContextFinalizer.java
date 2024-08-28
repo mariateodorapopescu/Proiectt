@@ -1,4 +1,4 @@
-package Servlet;
+package bean;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
