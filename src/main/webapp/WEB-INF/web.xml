@@ -396,7 +396,7 @@
     <servlet-name>ImageServlet</servlet-name>
     <url-pattern>/ImageServlet</url-pattern>
   </servlet-mapping>
-  <listener>
+</web-app>r>
     <listener-class>bean.SessionTimeoutListener</listener-class>
   </listener>
 </web-app>
