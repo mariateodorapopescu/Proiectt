@@ -105,7 +105,7 @@
     
    
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
     <title>Concedii</title>
     <style>
           iframe {
@@ -659,7 +659,7 @@ body {
     <div class="main-content">
         <iframe name="iframe" id='iframe' src="homedir.jsp"></iframe>
     </div>
-    <script src="main.js"></script>
+    <script src="./responsive-login-form-main/assets/js/index.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -80,7 +80,7 @@
 
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
     <style>
         a, a:visited, a:hover, a:active{color:white !important}
     </style>
@@ -102,7 +102,7 @@
       </div>
    </div>
    
-    <script src="main.js"></script>
+    <script src="./responsive-login-form-main/assets/js/index.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
     
     <script>
