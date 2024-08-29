@@ -8,7 +8,7 @@
     <description></description>
     <display-name>MyUserServlet</display-name>
     <servlet-name>MyUserServlet</servlet-name>
-    <servlet-class>bean.MyUserServlet</servlet-class>
+    <servlet-class>Servlet.MyUserServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>MyUserServlet</servlet-name>
@@ -18,7 +18,7 @@
     <description></description>
     <display-name>LoginServlet</display-name>
     <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>bean.LoginServlet</servlet-class>
+    <servlet-class>Servlet.LoginServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
@@ -28,7 +28,7 @@
     <description></description>
     <display-name>UserViewServlet</display-name>
     <servlet-name>UserViewServlet</servlet-name>
-    <servlet-class>bean.UserViewServlet</servlet-class>
+    <servlet-class>Servlet.UserViewServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>UserViewServlet</servlet-name>
@@ -38,7 +38,7 @@
     <description></description>
     <display-name>UserDepServlet</display-name>
     <servlet-name>UserDepServlet</servlet-name>
-    <servlet-class>bean.UserDepServlet</servlet-class>
+    <servlet-class>Servlet.UserDepServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>UserDepServlet</servlet-name>
@@ -54,7 +54,7 @@
     <description></description>
     <display-name>LogOutServlet</display-name>
     <servlet-name>LogOutServlet</servlet-name>
-    <servlet-class>bean.LogOutServlet</servlet-class>
+    <servlet-class>Servlet.LogOutServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LogOutServlet</servlet-name>
@@ -64,7 +64,7 @@
     <description></description>
     <display-name>ModifUsrServlet</display-name>
     <servlet-name>ModifUsrServlet</servlet-name>
-    <servlet-class>bean.ModifUsrServlet</servlet-class>
+    <servlet-class>Servlet.ModifUsrServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -75,7 +75,7 @@
     <description></description>
     <display-name>ModifPasdServlet</display-name>
     <servlet-name>ModifPasdServlet</servlet-name>
-    <servlet-class>bean.ModifPasdServlet</servlet-class>
+    <servlet-class>Servlet.ModifPasdServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ModifPasdServlet</servlet-name>
@@ -85,7 +85,7 @@
     <description></description>
     <display-name>DelUsrServlet</display-name>
     <servlet-name>DelUsrServlet</servlet-name>
-    <servlet-class>bean.DelUsrServlet</servlet-class>
+    <servlet-class>Servlet.DelUsrServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -96,7 +96,7 @@
     <description></description>
     <display-name>AddDepServlet</display-name>
     <servlet-name>AddDepServlet</servlet-name>
-    <servlet-class>bean.AddDepServlet</servlet-class>
+    <servlet-class>Servlet.AddDepServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -107,7 +107,7 @@
     <description></description>
     <display-name>ModifDepServlet</display-name>
     <servlet-name>ModifDepServlet</servlet-name>
-    <servlet-class>bean.ModifDepServlet</servlet-class>
+    <servlet-class>Servlet.ModifDepServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -118,7 +118,7 @@
     <description></description>
     <display-name>DelDepServlet</display-name>
     <servlet-name>DelDepServlet</servlet-name>
-    <servlet-class>bean.DelDepServlet</servlet-class>
+    <servlet-class>Servlet.DelDepServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -129,7 +129,7 @@
     <description></description>
     <display-name>AddConServlet</display-name>
     <servlet-name>AddConServlet</servlet-name>
-    <servlet-class>bean.AddConServlet</servlet-class>
+    <servlet-class>Servlet.AddConServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -140,7 +140,7 @@
     <description></description>
     <display-name>ModifConServlet</display-name>
     <servlet-name>ModifConServlet</servlet-name>
-    <servlet-class>bean.ModifConServlet</servlet-class>
+    <servlet-class>Servlet.ModifConServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -151,7 +151,7 @@
     <description></description>
     <display-name>DelConServlet</display-name>
     <servlet-name>DelConServlet</servlet-name>
-    <servlet-class>bean.DelConServlet</servlet-class>
+    <servlet-class>Servlet.DelConServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -162,7 +162,7 @@
     <description></description>
     <display-name>AprobDirServlet</display-name>
     <servlet-name>AprobDirServlet</servlet-name>
-    <servlet-class>bean.AprobDirServlet</servlet-class>
+    <servlet-class>Servlet.AprobDirServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -173,7 +173,7 @@
     <description></description>
     <display-name>ResDirServlet</display-name>
     <servlet-name>ResDirServlet</servlet-name>
-    <servlet-class>bean.ResDirServlet</servlet-class>
+    <servlet-class>Servlet.ResDirServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -184,7 +184,7 @@
     <description></description>
     <display-name>ResSefServlet</display-name>
     <servlet-name>ResSefServlet</servlet-name>
-    <servlet-class>bean.ResSefServlet</servlet-class>
+    <servlet-class>Servlet.ResSefServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -195,7 +195,7 @@
     <description></description>
     <display-name>AprobSefServlet</display-name>
     <servlet-name>AprobSefServlet</servlet-name>
-    <servlet-class>bean.AprobSefServlet</servlet-class>
+    <servlet-class>Servlet.AprobSefServlet</servlet-class>
     <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
@@ -206,7 +206,7 @@
     <description></description>
     <display-name>PeanServlet</display-name>
     <servlet-name>PeanServlet</servlet-name>
-    <servlet-class>bean.PeanServlet</servlet-class>
+    <servlet-class>Servlet.PeanServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>PeanServlet</servlet-name>
@@ -216,7 +216,7 @@
     <description></description>
     <display-name>JsonServlet</display-name>
     <servlet-name>JsonServlet</servlet-name>
-    <servlet-class>bean.JsonServlet</servlet-class>
+    <servlet-class>Servlet.JsonServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>JsonServlet</servlet-name>
@@ -226,7 +226,7 @@
     <description></description>
     <display-name>JsonServlet2</display-name>
     <servlet-name>JsonServlet2</servlet-name>
-    <servlet-class>bean.JsonServlet2</servlet-class>
+    <servlet-class>Servlet.JsonServlet2</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>JsonServlet2</servlet-name>
@@ -236,7 +236,7 @@
     <description></description>
     <display-name>JsonServlet3</display-name>
     <servlet-name>JsonServlet3</servlet-name>
-    <servlet-class>bean.JsonServlet3</servlet-class>
+    <servlet-class>Servlet.JsonServlet3</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>JsonServlet3</servlet-name>
@@ -246,7 +246,7 @@
     <description></description>
     <display-name>LeaveDataServlet</display-name>
     <servlet-name>LeaveDataServlet</servlet-name>
-    <servlet-class>bean.LeaveDataServlet</servlet-class>
+    <servlet-class>Servlet.LeaveDataServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LeaveDataServlet</servlet-name>
@@ -256,7 +256,7 @@
     <description></description>
     <display-name>LeaveDataServlet2</display-name>
     <servlet-name>LeaveDataServlet2</servlet-name>
-    <servlet-class>bean.LeaveDataServlet</servlet-class>
+    <servlet-class>Servlet.LeaveDataServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LeaveDataServlet2</servlet-name>
@@ -266,7 +266,7 @@
     <description></description>
     <display-name>decenulvede</display-name>
     <servlet-name>decenulvede</servlet-name>
-    <servlet-class>bean.decenulvede</servlet-class>
+    <servlet-class>Servlet.decenulvede</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>decenulvede</servlet-name>
@@ -276,7 +276,7 @@
     <description></description>
     <display-name>GMailServlet</display-name>
     <servlet-name>GMailServlet</servlet-name>
-    <servlet-class>bean.GMailServlet</servlet-class>
+    <servlet-class>Servlet.GMailServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>GMailServlet</servlet-name>
@@ -286,7 +286,7 @@
     <description></description>
     <display-name>OTP</display-name>
     <servlet-name>OTP</servlet-name>
-    <servlet-class>bean.OTP</servlet-class>
+    <servlet-class>mail.OTP</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>OTP</servlet-name>
@@ -296,7 +296,7 @@
     <description></description>
     <display-name>OTP2</display-name>
     <servlet-name>OTP2</servlet-name>
-    <servlet-class>bean.OTP2</servlet-class>
+    <servlet-class>mail.OTP2</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>OTP2</servlet-name>
@@ -306,7 +306,7 @@
     <description></description>
     <display-name>OTP3</display-name>
     <servlet-name>OTP3</servlet-name>
-    <servlet-class>bean.OTP3</servlet-class>
+    <servlet-class>mail.OTP3</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>OTP3</servlet-name>
@@ -316,7 +316,7 @@
     <description></description>
     <display-name>addImageServlet</display-name>
     <servlet-name>addImageServlet</servlet-name>
-    <servlet-class>bean.addImageServlet</servlet-class>
+    <servlet-class>Servlet.addImageServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>addImageServlet</servlet-name>
@@ -326,7 +326,7 @@
     <description></description>
     <display-name>addImage</display-name>
     <servlet-name>addImage</servlet-name>
-    <servlet-class>bean.addImage</servlet-class>
+    <servlet-class>Servlet.addImage</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>addImage</servlet-name>
@@ -336,7 +336,7 @@
     <description></description>
     <display-name>DisplayImage</display-name>
     <servlet-name>DisplayImage</servlet-name>
-    <servlet-class>bean.DisplayImage</servlet-class>
+    <servlet-class>Servlet.DisplayImage</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>DisplayImage</servlet-name>
@@ -346,7 +346,7 @@
     <description></description>
     <display-name>test</display-name>
     <servlet-name>test</servlet-name>
-    <servlet-class>bean.PeanServlet</servlet-class>
+    <servlet-class>Servlet.PeanServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>test</servlet-name>
@@ -363,7 +363,7 @@
   </servlet>
   <servlet>
     <servlet-name>UploadImageServlet</servlet-name>
-    <servlet-class>bean.UploadImageServlet</servlet-class>
+    <servlet-class>Servlet.UploadImageServlet</servlet-class>
     <multipart-config>
       <location>C:\Users\Popi\Desktop</location>
       <max-file-size>10485760</max-file-size>
@@ -377,7 +377,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>ImageServlet</servlet-name>
-    <servlet-class>bean.ImageServlet</servlet-class>
+    <servlet-class>Servlet.ImageServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ImageServlet</servlet-name>
