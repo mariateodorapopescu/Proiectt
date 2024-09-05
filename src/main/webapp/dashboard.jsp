@@ -5,6 +5,14 @@
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <%
+//fisier per tabela (schmea, insert)
+	// cum se salveaza o bd
+	// !! clean code!
+    // interogare de baza
+    // primire/cerere adeverinta, incarcare acte, adeverinte
+    // cv/date personale
+    // salarii + fluturas
+    // hosting: infr comp -> domeniu (=local) sau se poate face prin servicii cloud prn furnizori (public, privat, hibrid, local, remote)
     HttpSession sesi = request.getSession(false);
 
     if (sesi != null) {
