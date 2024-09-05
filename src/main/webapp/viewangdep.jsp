@@ -88,7 +88,7 @@
                         <div class="container" style="position: fixed; top:0; left: 25%; border-radius: 2rem; padding: 0;  margin: 0; background: <%out.println(clr);%>">
                             <div class="login__content" style="position: fixed; top: 0; border-radius: 2rem; margin: 0; height: 100vh; border-radius: 2rem; margin: 0; padding: 0; background:<%out.println(clr);%>; color:<%out.println(text);%> ">
                                 
-                                <form style="position: fixed; top: 4rem; border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/viewangdep2.jsp" method="post" class="login__form">
+                                <form style="position: fixed; top: 4rem; border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/viewangdep2.jsp" method="post" class="login__form">
                                     <div>
                                         <h1 class="login__title" ><span style="color:<%out.println(accent);%>">Selectati departamentul pe care doriti sa il vizualizati</span></h1>
                                     </div>
@@ -96,7 +96,7 @@
                                     <div class="login__inputs">
                                         <div>
                                             <label class="login__label" style="color:<%out.println(text);%>">Status</label>
-                                            <select style="color:<%out.println(text);%>; border-color:<%out.println(accent);%>; background: <%out.println(clr);%>" name="iddep" class="login__input">
+                                            <select style="color:<%out.println(text);%>; border-color:<%out.println(accent);%>; background: <%out.println(sidebar);%>" name="iddep" class="login__input">
                                                 <option value="3">Oricare</option>
                                                 <%
                                                

@@ -73,7 +73,7 @@ if (sesi != null) {
             --clr: <%=clr%>;
             --sd: <%=sidebar%>;
             --text: <%=text%>;
-            background: <%=sidebar%>;
+            background: <%=clr%>;
         }
         .container {
             width: 100%;
@@ -92,20 +92,20 @@ if (sesi != null) {
             width: 100%;
             height: 900px;
         }
-         ::-webkit-scrollbar {
-		    display: none; /* Ascunde scrollbar pentru Chrome, Safari È™i Opera */
-		}
+        .zc-img, .zc-svg, .zc-rel .zc-top{
+        background-color: transparent;
+        }
     </style>
 </head>
-<body style="background: <%=clr%>">
-<div style="margin-top: 4em;" class="container" id="content">
-    <h3 id="chartHeader" style="color: <%=accent%>;"></h3>
+<body>
+<div style="position: fixed; top: 8rem; left: 33%; margin-top: 1em;" class="container" id="content">
+    <h3 id="chartHeader" style="position: fixed; top: 5rem; color: <%=accent%>;"></h3>
     <p>*Nu au fost inlcuse si zilele in care niciun angajat nu este plecat in concediu</p>
     <div id="myChart"></div>
 </div>
-<div class="container" id="content">
+<div style="position: fixed; top: 10rem;" class="container">
                 
-                    <div id="myChart"></div>
+                    <div style="position: fixed; top: 10rem;" id="myChart"></div>
                 </div>
                 <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
                     <form id="statusForm" method="post" onsubmit="return false;">
@@ -221,7 +221,7 @@ if (sesi != null) {
                     }
                    
                 </script>
-  </div>
+                </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 var clear = document.getElementById("ceva1").innerText;
@@ -274,9 +274,9 @@ $(document).ready(function() {
             id: 'myChart',
             data: {
                 type: 'bar',
-                backgroundColor: clear, // Sets the background color of the chart area
+                backgroundColor: 'transparent', // Sets the background color of the chart area
                 title: {
-                    text: 'Numar angajati / luna'
+                    text: 'Numar angajati / zi'
                 },
                 scaleX: {
                     values: data.months.map(month => month.toString())
