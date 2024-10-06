@@ -1,0 +1,1248 @@
+use test;
+create table useri(id int, username varchar(25), password varchar(25), id_dep int, tip int);
+alter table useri add constraint primary key(id);
+alter table useri add constraint unique(id, username);
+alter table useri modify id int not null;
+alter table useri modify username varchar(25) not null;
+alter table useri modify password varchar(25) not null;
+alter table useri modify id_dep int not null;
+alter table useri modify tip int not null;
+insert into useri values (1, 'ceva', 'altceva', 2, 1);
+insert into useri values (2, 'cevaa', 'altceva', 1, 1);
+select * from useri;
+create table concedii(id int, id_ang int, start_c date, end_c date);
+alter table concedii add constraint primary key(id);
+alter table concedii add constraint unique(id);
+alter table concedii modify id int not null;
+alter table concedii modify id_ang int not null;
+alter table concedii modify start_c date not null;
+alter table concedii modify end_c date not null;
+insert into concedii values (1, 1, '2024-07-01', '2024-07-02');
+select * from concedii;
+create table plecati(zi date, nr int, id_dep int);
+alter table plecati modify zi date not null;
+alter table plecati modify id_dep int not null;
+insert into plecati values ('2024-07-01', 0, 1);
+select * from plecati;
+create table departament(id int, nume_dep varchar(25));
+alter table departament add constraint primary key(id);
+alter table departament add constraint unique(id);
+alter table departament add constraint unique(nume_dep);
+alter table departament modify id int not null;
+alter table departament modify nume_dep varchar(25) not null;
+insert into departament values (1, 'test');
+insert into departament values (2, 'testt');
+select * from departament;
+create table tipuri(tip int, denumire varchar(25));
+alter table tipuri add constraint primary key(tip);
+alter table tipuri add constraint unique(tip);
+alter table tipuri add constraint unique(denumire);
+alter table tipuri modify tip int not null;
+alter table tipuri modify denumire varchar(25) not null;
+insert into tipuri values (1, 'test');
+select * from tipuri;
+alter table departament rename column id to id_dep;
+alter table useri add constraint fk1 foreign key (id_dep) references departament(id_dep);
+alter table tipuri add constraint fk2 foreign key (tip) references tipuri(tip);
+alter table concedii add constraint fk3 foreign key (id_ang) references useri(id);
+alter table plecati add constraint fk4 foreign key (id_dep) references departament(id_dep);
+select * from useri;
+create table testt (id int not null, first_name varchar(25) default null, last_name varchar(25) default null, username varchar(25) default null, password varchar(25) default null, address varchar(45) default null, contact varchar(25) default null, primary key (id)) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_0900_ai_ci;
+select * from test.testt;
+CREATE TABLE `login` (
+  `username` varchar(45) NOT NULL,
+  `password` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+INSERT INTO `test`.`login` (`username`, `password`) VALUES ("Ramesh", "Ramesh");
+INSERT INTO `test`.`login` (`username`, `password`) VALUES ("bunaa", "tuuu");
+select * from test.testt;
+ALTER TABLE useri AUTO_INCREMENT = 1;
+DROP TABLE IF EXISTS useri;
+CREATE TABLE useri (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    id_dep INT NOT NULL,
+    tip INT NOT NULL
+);
+select * from useri;
+alter table useri modify password varchar(255) not null;
+SET SQL_SAFE_UPDATES = 0;
+DELETE FROM useri WHERE username="test";
+alter table useri add constraint unique(username);
+select * from departament;
+select * from tipuri;
+insert into departament values(3, 'ceva');
+insert into tipuri values(2, 'cevaa');
+select username, denumire as tip, nume_dep as departament from useri natural join departament natural join tipuri;
+alter table concedii drop constraint fk3;
+create table useri(id int auto_increment not null primary key, nume varchar(45) not null, prenume varchar(45) not null, data_nasterii date not null, adresa varchar(256) not null, email varchar(56) not null, telefon varchar(25) not null, username varchar(25) not null, password varchar(25) not null, id_dep int not null, tip int not null);
+alter table useri add constraint unique(id, username, email, telefon);
+insert into useri values (1, 'ceva', 'altceva', '2001-10-20', 'adresa','email@email.com', '+40700000000', 'username','parola',1,1);
+insert into useri (nume, prenume, data_nasterii, adresa, email, telefon, username, password, id_dep, tip) values ('ceva', 'altceva', '2001-10-20', 'adresa','email@example.com', '+40700000001', 'username1','parola',1,1);
+select * from useri;
+alter table concedii add constraint fk3 foreign key (id_ang) references useri(id);
+create table restrictii(tip int not null primary key, decl_dep int, modif_d int, del_d int, decl_usr int, modif_u int, del_u int, auth int, viz_d int, introd_c int, modif_c int, del_c int, viz_c_t_an int, viz_c_t_per int, viz_c_d_an int, viz_c_d_per int, viz_c_a_an int, viz_c_a_per int, viz_a_t int, viz_a_d int, raport int);
+alter table restrictii add constraint fk5 foreign key (tip) references tipuri(tip);
+DROP TABLE IF EXISTS restrictii;
+create table restrictii(tip int not null primary key, decl_dep int, modif_d int, del_d int, decl_usr int, modif_u int, del_u int, auth int, viz_d int, introd_c int, modif_c int, del_c int, viz_c_t_an int, viz_c_t_per int, viz_c_d_an int, viz_c_d_per int, viz_c_a_an int, viz_c_a_per int, viz_a_t int, viz_a_d int, raport int, asoc_tip int, asoc_dep int);
+DROP TABLE IF EXISTS restrictii;
+create table restrictii(tip int not null primary key, decl_dep int, modif_d int, del_d int, decl_usr int, modif_u int, del_u int, auth int, viz_d int, introd_c int, modif_c int, del_c int, viz_c_t_an int, viz_c_t_per int, viz_c_d_an int, viz_c_d_per int, viz_c_a_an int, viz_c_a_per int, viz_a_t int, viz_a_d int, raport int, asoc_tip int, asoc_dep int);
+alter table restrictii add constraint fk5 foreign key (tip) references tipuri(tip);
+alter table restrictii drop constraint fk5;
+delete from restrictii where tip=0;
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_d, viz_a_t, viz_c_t_an, viz_c_t_per, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per, raport) values (0,1,1,1,1,1,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, viz_d, viz_a_t, viz_a_d, decl_dep, decl_usr, modif_d, modif_u, del_d, del_u, auth, asoc_dep, asoc_tip) values (4,1,1,1,1,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_a_d, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per, raport) values (3,1,1,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per) values (2,1,1,1,1,1,1,1,1);
+insert into restrictii(tip, auth, introd_c, modif_c, del_c, viz_c_d_an, viz_c_d_per, viz_c_a_an, viz_c_a_per) values (1,1,1,1,1,1,1,1,1);
+alter table tipuri drop constraint fk2;
+delete from tipuri where tip=1;
+delete from tipuri where tip=2;
+insert into tipuri values (0, 'Director');
+insert into tipuri values (1, 'Tip1');
+insert into tipuri values (2, 'Tip2');
+insert into tipuri values (3, 'Sef');
+insert into tipuri values (4, 'Administrator');
+alter table tipuri add constraint fk2 foreign key (tip) references restrictii(tip);
+select * from tipuri;
+select * from restrictii;
+select nume, prenume, denumire, nume_dep from useri natural join tipuri natural join departament;
+delete from useri where username='username';
+select * from useri;
+alter table useri modify password varchar(255) not null;
+describe concedii;
+select * from tipuri;
+ALTER TABLE concedii AUTO_INCREMENT = 1;
+ALTER TABLE concedii ADD COLUMN motiv varchar(256) not null;
+ALTER TABLE concedii ADD COLUMN locatie varchar(256) not null;
+create table appearance(accent_color varchar(25), body_color varchar(25));
+create table colors(red int, orange int, yellow int, green int, blue int, indigo int, violet int, pink int, teal int, brown int, grey int, black int, white int);
+DROP TABLE IF EXISTS appearance;
+DROP TABLE IF EXISTS colors;
+create table appearance(id_usr int primary key not null, accent_color varchar(25), body_color varchar(25));
+alter table appearance add constraint fk5 foreign key (id_usr) references useri(id);
+alter table appearance drop constraint fk5;
+DROP TABLE IF EXISTS appearance;
+create table appearance(id_usr int primary key not null, red int default 0, orange int default 0, yellow int default 0, green int default 0, blue int default 1, indigo int default 0, violet int default 0, pink int default 0, teal int default 0, brown int default 0, grey int default 0, black int default 0, white int default 0, body_color varchar(25) default 1);
+alter table appearance add constraint fk5 foreign key (id_usr) references useri(id);
+insert into appearance (id_usr) values(4);
+select * from appearance;
+select * from useri;
+DELETE FROM useri WHERE id=1;
+alter table useri add constraint unique(id, email, telefon, username);
+alter table useri add constraint unique(username);
+select * from departament;
+select * from concedii;
+select * from restrictii;
+select * from tipuri;
+select nume, prenume, denumire, nume_dep from useri natural join tipuri natural join departament where id_dep = (select id_dep from useri where username="test");
+select nume, prenume, denumire, nume_dep from useri natural join tipuri natural join departament;
+DROP TABLE IF EXISTS `myTable`;
+CREATE TABLE `myTable` (
+  `id` mediumint(8) unsigned NOT NULL auto_increment,
+  `nume` varchar(255) default NULL,
+  `telefon` varchar(100) default NULL,
+  `email` varchar(255) default NULL,
+  `adresa` varchar(255) default NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+INSERT INTO `myTable` (`nume`,`telefon`,`email`,`adresa`)
+VALUES
+  ("Jason Cotton","(553) 316-2792","elit.pellentesque@outlook.org","P.O. Box 543, 4585 Ac Av."),
+  ("Malcolm Reyes","1-514-484-1362","fermentum@google.net","8800 Turpis Street"),
+  ("Ian Frank","1-227-246-7729","dapibus.ligula@icloud.couk","903-5129 Condimentum. Street"),
+  ("Silas Cabrera","(774) 386-4678","parturient.montes.nascetur@hotmail.com","Ap #832-2337 Quam. Road"),
+  ("Fritz Sharp","(267) 874-2166","nec.urna@icloud.net","3984 Massa Rd.");
+UPDATE useri SET nume = "ala", prenume = "bala" WHERE username="oadresa";
+select * from departament;
+select * from useri;
+SELECT u.id_dep, d.nume_dep FROM useri u join departament d on u.id_dep = d.id_dep WHERE username = "test";
+CREATE TABLE `tichete` (
+  `id` mediumint(8) unsigned NOT NULL auto_increment,
+  `subiect` varchar(255) default NULL,
+  `continut` varchar(512) default NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+INSERT INTO `tichete` (`subiect`,`continut`) values ("test", "test");
+select * from tichete;
+ALTER TABLE departament MODIFY id_dep int AUTO_INCREMENT;
+delete from departament where id_dep = 19;
+UPDATE departament SET nume_dep = "brooo" WHERE nume_dep = "testt";
+-- ALTER TABLE table_name ADD COLUMN column_name data_type [constraint];
+ALTER TABLE concedii ADD COLUMN status int;
+select * from concedii;
+delete from concedii where id_ang = 1;
+ALTER TABLE concedii AUTO_INCREMENT = 1;
+-- ALTER TABLE your_table AUTO_INCREMENT = <initial_value>;
+CREATE TABLE statusuri (
+	status int not null unique,
+	nume_status varchar(56) not null unique,
+  PRIMARY KEY (status)
+);
+select * from departament;
+insert into statusuri values (-2, 'dezaprobat director');
+insert into statusuri values (-1, 'dezaprobat sef');
+insert into statusuri values (0, 'neaprobat');
+insert into statusuri values (1, 'aprobat sef');
+insert into statusuri values (2, 'aprobat director');
+alter table concedii add constraint fk6 foreign key (status) references statusuri(status);
+ALTER TABLE useri ADD COLUMN cnp int unique;
+select * from useri;
+-- ALTER TABLE {TABLENAME} ADD {COLUMNNAME} {TYPE} {NULL|NOT NULL} CONSTRAINT {CONSTRAINT_NAME} DEFAULT {DEFAULT_VALUE} WITH VALUES;
+-- ALTER TABLE Employee ADD CONSTRAINT DF_SomeName DEFAULT N'SANDNES' FOR CityBorn;
+ALTER TABLE concedii alter column status set default 0;
+insert into concedii values (1, 1, '2024-07-01', '2024-07-02');
+insert into concedii(id_ang, start_c, end_c, motiv, locatie) values (18, '2024-07-10', '2024-07-11','bla','bla');
+DESCRIBE concedii;
+-- ALTER TABLE table_name MODIFY COLUMN column_name new_data_type;
+ALTER TABLE concedii MODIFY COLUMN start_c date not null;
+ALTER TABLE concedii MODIFY COLUMN end_c date not null;
+ALTER TABLE concedii MODIFY COLUMN motiv varchar(255) not null;
+ALTER TABLE concedii MODIFY COLUMN locatie varchar(255) not null;
+ALTER TABLE concedii AUTO_INCREMENT = 1;
+ALTER TABLE concedii MODIFY id INT AUTO_INCREMENT;
+-- UPDATE useri SET nume = "ala", prenume = "bala" WHERE username="oadresa";
+delete from concedii where id = 4;
+select * from statusuri;
+select * from concedii join useri on id_ang = useri.id;
+SELECT concedii.id, nume_dep as departament, nume, prenume, denumire as functie, start_c, end_c, motiv, locatie, 
+	nume_status as status FROM useri NATURAL JOIN tipuri NATURAL JOIN departament join concedii 
+		on concedii.id_ang = useri.id join statusuri on concedii.status = statusuri.status;
+select count(*) from concedii join useri on concedii.id_ang = useri. id where username = "aaaa";
+-- SELECT DATEDIFF('2021-12-25', '2021-01-01') AS 'Days';
+SELECT count(*)
+FROM concedii
+JOIN useri ON concedii.id_ang = useri.id
+WHERE username = 'aaaa'
+  AND MONTH(start_c) >= 6
+  AND MONTH(start_c) <= 8;
+select count(*) from useri where tip = 0;
+select count(*) from concedii join useri on useri.id = concedii.id_ang group by tip having tip = 0;
+select count(*) as total from useri group by id_dep having id_dep = 3;
+select count(*) as total from concedii join useri on useri.id = concedii.id_ang 
+	where day(start_c) >= 1 and month(start_c) = 7 and day(start_c) <= 31 group by id_dep having id_dep = 3;
+select count(*) as total from concedii join useri on useri.id = concedii.id_ang where day(start_c) >= 1 and month(start_c) = 7 and day(start_c) <= 31 and month(start_c) <= 7 group by tip having tip = 0;
+select * from concedii;
+select id, nume, prenume, data_nasterii, adresa, email, telefon, username, nume_dep, denumire, cnp from useri join departament on useri.id_dep = departament.id_dep join tipuri on useri.tip = tipuri.tip;
+delete from concedii where motiv = "ce";
+select * from appearance;
+select * from useri;
+ALTER TABLE concedii ADD COLUMN tip int not null;
+CREATE TABLE tipcon (
+  tip int unsigned NOT NULL auto_increment,
+  motiv varchar(255) default NULL,
+  PRIMARY KEY (tip)
+) AUTO_INCREMENT=1;
+select * from tipcon;
+insert into tipcon values (1, "concediu odihna");
+insert into tipcon(motiv) values ("concediu formare profesionala");
+alter table tipcon add constraint unique(tip, motiv);
+insert into tipcon(motiv) values ("concediu formare profesionala");
+insert into tipcon(motiv) values ("concediu fara plata");
+insert into tipcon(motiv) values ("concediu medical");
+insert into tipcon(motiv) values ("concediu risc maternal");
+insert into tipcon(motiv) values ("concediu maternal");
+insert into tipcon(motiv) values ("concediu paternal");
+insert into tipcon(motiv) values ("concediu crestere copil");
+insert into tipcon(motiv) values ("concediu ingrijire copil");
+insert into tipcon(motiv) values ("concediu casatorie");
+insert into tipcon(motiv) values ("concediu casatorie copil");
+insert into tipcon(motiv) values ("concediu deces grad I");
+insert into tipcon(motiv) values ("concediu deces grad II");
+insert into tipcon(motiv) values ("concediu donare sange");
+insert into tipcon(motiv) values ("concediu carantina");
+insert into tipcon(motiv) values ("concediu adoptie copil");
+insert into tipcon(motiv) values ("concediu ajutor ingrijitor");
+insert into tipcon(motiv) values ("concediu schimbare sediu munca alt oras");
+SELECT 
+    concedii.id as nr_crt, 
+    departament.nume_dep as departament, 
+    nume, 
+    prenume, 
+    tipuri.denumire as functie, 
+    start_c, 
+    end_c, 
+    motiv, 
+    locatie, 
+    statusuri.nume_status as status 
+FROM 
+    useri 
+NATURAL JOIN tipuri 
+NATURAL JOIN departament 
+JOIN concedii ON concedii.id_ang = useri.id
+JOIN statusuri ON concedii.status = statusuri.status
+WHERE 
+    YEAR(start_c) = YEAR(CURDATE()) OR 
+    YEAR(start_c) = YEAR(CURDATE()) + 1;
+UPDATE departament SET nume_dep = "brooo" WHERE nume_dep = "testt";
+select * from useri;
+update concedii set tip = 1 where id_ang = 3;
+update concedii set tip = 1 where id_ang = 4;
+update concedii set tip = 1 where id_ang = 13;
+update concedii set tip = 1 where id_ang = 14;
+update concedii set tip = 1 where id_ang = 15;
+update concedii set tip = 1 where id_ang = 18;
+update concedii set tip = 1 where id_ang = 22;
+update concedii set tip = 1 where id_ang = 24;
+-- ALTER TABLE <table_name> 2 DROP [COLUMN] <column_name>
+ALTER TABLE concedii ADD COLUMN durata int not null default 0;
+UPDATE concedii SET durata = DATEDIFF(end_c, start_c) + 1;
+ALTER TABLE useri ADD COLUMN zilecons int not null default 0;
+ALTER TABLE useri MODIFY COLUMN zileramase int DEFAULT 0;
+UPDATE useri u SET u.zilecons = (
+    SELECT SUM(c.durata)
+    FROM concedii c
+    WHERE c.id_ang = u.id
+);
+select * from concedii where id_ang = 22;
+select * from useri where id = 22;
+SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = 22 and concedii.status > 0;
+DROP TRIGGER IF EXISTS after_insert;
+DELIMITER $$
+CREATE TRIGGER after_insert
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    UPDATE useri u
+    SET u.zilecons = (SELECT SUM(c.durata) FROM concedii c WHERE c.id_ang = NEW.id_ang)
+    WHERE u.id = NEW.id_ang;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS afterinsert;
+DELIMITER $$
+CREATE TRIGGER afterinsert
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    SET NEW.durata = DATEDIFF(NEW.end_c, NEW.start_c) + 1;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_insert2;
+DELIMITER $$
+CREATE TRIGGER after_insert2
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    SELECT tip INTO userType FROM useri WHERE id = NEW.id_ang;
+    UPDATE useri
+	SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+    WHERE id = NEW.id_ang;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS before_insert_concedii;
+DELIMITER $$
+CREATE TRIGGER before_insert_concedii
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.end_c < NEW.start_c THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data de final nu poate fi inaintea celei de inceput.';
+        update concedii set durata = 0;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS negativestatus;
+delimiter $$
+CREATE TRIGGER negativestatus
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+	DECLARE userType INT;
+    DECLARE newZilecons INT;
+    SELECT tip INTO userType FROM useri WHERE id = OLD.id_ang;
+    IF NEW.status < 0 THEN
+        SET NEW.durata = 0;
+        SELECT SUM(durata) INTO newZilecons FROM concedii WHERE id_ang = NEW.id_ang AND id != NEW.id;
+        UPDATE useri
+        SET zilecons = newZilecons
+        WHERE id = NEW.id_ang;
+        IF userType = 2 THEN
+            UPDATE useri
+            SET zileramase = 30 - newZilecons, 
+				conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+				conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+            WHERE id = NEW.id_ang;
+        ELSE
+            UPDATE useri
+            SET zileramase = 40 - newZilecons
+            WHERE id = NEW.id_ang;
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_delete;
+DELIMITER $$
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    UPDATE useri
+    SET zilecons = (select sum(durata) from concedii where id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = old.id_ang;
+    IF old.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = old.id_ang;
+    END IF;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (select sum(durata) from concedii where id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (select sum(durata) from concedii where id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+select id, status, durata from concedii where id_ang = 22;
+update useri set conluate = 0;
+update useri set conramase = 3;
+update useri set zileramase = 40 where id = 22;
+update useri set zilecons = 0;
+delete from concedii where id_ang = 22;
+set @concedii_luate = (select count(*) from concedii where id_ang = 22 and status = 2);
+set @concedii_ramase = (3 - (select @concedii_luate));
+select @concedii_luate;
+select @concedii_ramase;
+ALTER TABLE useri ADD COLUMN conluate int not null default 0;
+ALTER TABLE useri MODIFY COLUMN conluate int DEFAULT 0;
+ALTER TABLE useri ADD COLUMN conramase int not null default 3;
+ALTER TABLE useri MODIFY COLUMN conramase int DEFAULT 3;
+DROP TRIGGER IF EXISTS status2;
+DELIMITER $$
+CREATE TRIGGER status2
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 2 and new.status != old.status THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+-- ALTER TABLE <table_name> 2 DROP [COLUMN] <column_name>;
+describe useri;
+select * from useri;
+update useri set cnp = 92155969 where id = 3;
+update useri set cnp = 25274426 where id = 4;
+update useri set cnp = 15039590 where id = 13;
+update useri set cnp = 87491947 where id = 14;
+update useri set cnp = 15058158 where id = 15;
+update useri set cnp = 68736822 where id = 18;
+update useri set cnp = 81829942 where id = 22;
+update useri set cnp = 93668090 where id = 24;
+select count(*) from useri where tip = 3 group by id_dep having id_dep = 1;
+select count(*) from useri where tip = 0 group by id_dep having id_dep = 3;
+select * from useri where id_dep = 3;
+update useri set tip = 3 where username = "username2";
+DROP TRIGGER IF EXISTS after_ins;
+DELIMITER $$
+CREATE TRIGGER after_ins
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    SET NEW.zilecons = 0;
+    SET NEW.conluate = 0;
+    SET NEW.conramase = 3;
+    IF NEW.tip = 2 THEN
+        SET NEW.zileramase = 30;
+    ELSE
+        SET NEW.zileramase = 40;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_mod;
+DELIMITER $$
+CREATE TRIGGER after_mod
+BEFORE UPDATE ON useri
+FOR EACH ROW
+BEGIN
+    IF NEW.tip = 2 and new.tip != old.tip THEN
+        SET NEW.zileramase = 30;
+    ELSE 
+		if new.tip != old.tip and new.tip != 2 then
+			SET NEW.zileramase = 40;
+		END IF;
+    END IF;
+END$$
+DELIMITER ;
+select * from useri;
+delete from departament where id_dep = 4;
+select * from concedii;
+delete from concedii where id = 100;
+select id, status, durata from concedii where id_ang = 3;
+select id, zilecons, zileramase, conluate, conramase from useri where id = 3;
+delete from concedii;
+update useri set zilecons = 0, conluate = 0, conramase = 3;
+update useri set zileramase = 30 where tip = 2;
+update useri set zileramase = 40 where tip != 2;
+select * from statusuri;
+update useri set conramase = 2 where id = 25;
+SELECT CURRENT_TIMESTAMP AS "CURRENTTIMESTAMP"; 
+SELECT CURRENT_DATE();
+SELECT conramase FROM useri WHERE useri.id = 22;
+create table date_logs (date_checked date);
+select * from date_logs;
+drop table date_logs;
+DROP event IF EXISTS checkCurrentDate;
+DELIMITER $$
+CREATE EVENT checkCurrentDate
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO
+BEGIN
+    INSERT INTO date_logs (date_checked) VALUES (CURRENT_DATE());
+END$$
+DELIMITER ;
+select * from useri ORDER BY id DESC LIMIT 1;
+select date_checked from date_logs ORDER BY date_checked DESC LIMIT 1;
+select count(*) from concedii where start_c + 3 <= (select date_checked from date_logs ORDER BY date_checked DESC LIMIT 1) and id_ang = 14;
+SELECT
+	DATEDIFF(start_c, 
+		(SELECT date_checked 
+			FROM date_logs 
+            ORDER BY date_checked 
+            DESC LIMIT 1))
+	AS days_diff
+FROM concedii
+WHERE start_c + 3 <= (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)
+AND id_ang = 22;
+SELECT
+    CASE 
+        WHEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) between 0 and 4 THEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1))
+        ELSE -1
+    END AS dif
+FROM concedii
+WHERE id_ang = 22 order by dif desc limit 1;
+select * from date_logs;
+insert into date_logs values('2024-07-22');
+select * from concedii;
+SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1;
+insert into date_logs(date_checked) values ("2024-07-19");
+SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 <= CURDATE() AND id_ang = 22;
+-- select nume, prenume from useri join concedii on useri.id = concedii.id_ang where start_c <= ? and end_c >= ?;
+select nume, prenume from useri join concedii on useri.id = concedii.id_ang where start_c <= "2024-07-17" and end_c >= "2024-07-17";
+select monthname(start_c), count(*) from concedii group by monthname(start_c); 
+SELECT monthname(month_dates) AS month, count(*) AS numar_concedii
+FROM (
+    SELECT start_c AS month_dates
+    FROM concedii
+    UNION ALL
+    SELECT end_c
+    FROM concedii
+) AS combined_dates
+GROUP BY monthname(month_dates);
+
+select * from useri;
+select * from concedii;
+SELECT monthname(month_dates) AS month, CEIL(COUNT(*) / 2) AS numar_concedii
+FROM (
+    SELECT start_c AS month_dates
+    FROM concedii
+    JOIN useri ON id_ang = useri.id
+    JOIN departament ON useri.id_dep = departament.id_dep
+    WHERE departament.id_dep = 3 and status = 2
+    UNION ALL
+    SELECT end_c
+    FROM concedii
+    JOIN useri ON id_ang = useri.id
+    JOIN departament ON useri.id_dep = departament.id_dep
+    WHERE departament.id_dep = 3 and status = 2
+    UNION ALL
+    SELECT LAST_DAY(start_c) + INTERVAL 1 DAY
+    FROM concedii
+    JOIN useri ON id_ang = useri.id
+    JOIN departament ON useri.id_dep = departament.id_dep
+    WHERE departament.id_dep = 3 AND MONTH(start_c) <> MONTH(end_c)
+) AS combined_dates
+GROUP BY monthname(month_dates), MONTH(month_dates)
+ORDER BY MONTH(month_dates);
+
+drop table numbers;
+CREATE TABLE numbers (
+    n INT
+);
+INSERT INTO numbers (n) VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9);
+INSERT INTO numbers (n) SELECT n + 10 FROM numbers;
+INSERT INTO numbers (n) SELECT n + 20 FROM numbers;
+insert into numbers (n) values (40);
+select * from numbers;
+SELECT 
+    day(leave_date),
+    COUNT(*) AS plecati
+FROM (
+    SELECT 
+        start_c + INTERVAL n DAY AS leave_date
+    FROM 
+        concedii
+    JOIN 
+        numbers ON n <= DATEDIFF(end_c, start_c)
+    where status = 2) AS all_dates
+WHERE 
+    MONTH(leave_date) = 7
+GROUP BY 
+    leave_date
+ORDER BY 
+    leave_date;
+
+SELECT 
+    leave_date,
+    COUNT(*) AS plecati
+FROM (
+    SELECT 
+        start_c + INTERVAL n DAY AS leave_date
+    FROM 
+        concedii
+    JOIN 
+        numbers ON n <= DATEDIFF(end_c, start_c)
+    JOIN 
+        useri ON concedii.id_ang = useri.id
+    JOIN 
+        departament ON useri.id_dep = departament.id_dep
+    WHERE 
+        departament.id_dep = 1
+) AS all_dates
+GROUP BY 
+    leave_date
+ORDER BY 
+    leave_date;
+SELECT email FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE DATEDIFF(start_c, CURDATE()) <= 3;
+update useri set email = "popescumariateodora@yahoo.com" where email = "hmmasaceva@yahoo.com";
+update useri set email = "iamelsapop@gmail.com" where email = "aaaa@gmail.com";
+update useri set email = "liviaaamp@gmail.com" where email = "testtt@yahoo.com";
+select * from concedii where id_ang = 22;
+SELECT date(NOW());
+select * from concedii;
+SELECT DATE_FORMAT(NOW(), '%d/%m/%Y');
+SELECT CASE WHEN DATEDIFF(start_c, date(NOW())) between 0 and 4 THEN DATEDIFF(start_c, date(NOW())) ELSE -1 END AS dif FROM concedii WHERE id_ang = 22 order by dif desc limit 1;
+SELECT zilecons, zileramase, conluate, conramase FROM useri NATURAL JOIN tipuri NATURAL JOIN departament where id = 22;
+select * from useri;
+update useri set conramase = 2 where id = 3;
+SELECT COUNT(*) AS total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE useri.id = 3 and concedii.id <> 111 and status >= 0;
+select * from plecati;
+select month(date(now())) + interval 1 month;
+select count(*) from concedii join useri on useri.id = concedii.id_ang where month(concedii.start_c) >= month(date(now())) or concedii.end_c <= month(date(now())) group by useri.id_dep;
+SELECT 
+  all_dates.date AS day,
+  d.nume_dep AS department,
+  COALESCE(COUNT(DISTINCT u.id), 0) AS num_employees_on_leave
+FROM 
+  (
+    SELECT 
+      ADDDATE(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL t4.i*100 + t3.i*10 + t2.i DAY) AS date
+    FROM 
+      (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t1,
+      (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t2,
+      (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t3,
+      (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t4
+    WHERE 
+      ADDDATE(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL t4.i*100 + t3.i*10 + t2.i DAY) <= LAST_DAY(NOW())
+  ) AS all_dates
+LEFT JOIN 
+  concedii c ON DATE(c.start_c) <= all_dates.date AND DATE(c.end_c) >= all_dates.date
+LEFT JOIN 
+  useri u ON c.id_ang = u.id
+LEFT JOIN 
+  departament d ON u.id_dep = d.id_dep
+GROUP BY 
+  all_dates.date, d.nume_dep
+ORDER BY 
+  all_dates.date, d.nume_dep;
+  
+SELECT 
+  DATE(cal.date) AS day,
+  COUNT(DISTINCT u.id) AS nr,
+  d.id_dep as departament
+FROM 
+  (
+    SELECT DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL num DAY) AS date
+    FROM 
+      (SELECT a.N + b.N * 10 + c.N * 100 AS num
+       FROM 
+         (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+         (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b,
+         (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c
+       ) nums
+    WHERE num <= LAST_DAY(NOW()) - DATE_FORMAT(NOW(), '%Y-%m-01')
+  ) cal
+JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+JOIN useri u ON c.id_ang = u.id
+join departament d ON u.id_dep = d.id_dep
+GROUP BY 
+  day, departament
+ORDER BY 
+  day;
+DROP trigger IF EXISTS update_daily_leave_summary;
+DELIMITER $$
+CREATE TRIGGER update_daily_leave_summary
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    -- Insert or update daily counts in the 'plecati' table directly using a range-based selection
+    INSERT INTO plecati (zi, nr, id_dep)
+    SELECT 
+        cal.date AS day, 
+        COUNT(DISTINCT c.id_ang) AS num_employees, 
+        departament.id_dep
+    FROM (
+        SELECT ADDDATE(NEW.start_c, INTERVAL num DAY) AS date
+        FROM (SELECT a.N + b.N * 10 + 0 * 100 AS num
+              FROM 
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+             ) nums
+        WHERE num <= DATEDIFF(NEW.end_c, NEW.start_c)
+    ) cal
+    JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+    JOIN useri u ON c.id_ang = u.id
+    WHERE u.id_dep = departament.id_dep
+    GROUP BY cal.date
+    ON DUPLICATE KEY UPDATE nr = VALUES(nr);
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS update_daily_leave_summary2;
+DELIMITER $$
+CREATE TRIGGER update_daily_leave_summary2
+AFTER update ON concedii
+FOR EACH ROW
+BEGIN
+    -- Insert or update daily counts in the 'plecati' table directly using a range-based selection
+    INSERT INTO plecati (zi, nr, id_dep)
+    SELECT 
+        cal.date AS day, 
+        COUNT(DISTINCT c.id_ang) AS num_employees, 
+        departament.id_dep
+    FROM (
+        SELECT ADDDATE(NEW.start_c, INTERVAL num DAY) AS date
+        FROM (SELECT a.N + b.N * 10 + 0 * 100 AS num
+              FROM 
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+             ) nums
+        WHERE num <= DATEDIFF(NEW.end_c, NEW.start_c)
+    ) cal
+    JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+    JOIN useri u ON c.id_ang = u.id
+    WHERE u.id_dep = departament.id_dep
+    GROUP BY cal.date
+    ON DUPLICATE KEY UPDATE nr = VALUES(nr);
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS update_daily_leave_summary3;
+DELIMITER $$
+CREATE TRIGGER update_daily_leave_summary3
+AFTER delete ON concedii
+FOR EACH ROW
+BEGIN
+    -- Insert or update daily counts in the 'plecati' table directly using a range-based selection
+    INSERT INTO plecati (zi, nr, id_dep)
+    SELECT 
+        cal.date AS day, 
+        COUNT(DISTINCT c.id_ang) AS num_employees, 
+        departament.id_dep
+    FROM (
+        SELECT ADDDATE(old.start_c, INTERVAL num DAY) AS date
+        FROM (SELECT a.N + b.N * 10 + 0 * 100 AS num
+              FROM 
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+             ) nums
+        WHERE num <= DATEDIFF(old.end_c, old.start_c)
+    ) cal
+    JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+    JOIN useri u ON c.id_ang = u.id
+    WHERE u.id_dep = departament.id_dep
+    GROUP BY cal.date
+    ON DUPLICATE KEY UPDATE nr = VALUES(nr);
+END$$
+DELIMITER ;
+INSERT INTO plecati (zi, nr, id_dep)
+SELECT 
+    cal.date AS day,
+    COUNT(DISTINCT u.id) AS nr,
+    d.id_dep
+FROM 
+    (
+        SELECT DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL num DAY) AS date
+        FROM 
+            (SELECT a.N + b.N * 10 + c.N * 100 AS num
+             FROM 
+                 (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                 (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b,
+                 (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c
+            ) nums
+        WHERE num <= DATEDIFF(LAST_DAY(NOW()), DATE_FORMAT(NOW(), '%Y-%m-01'))
+    ) cal
+JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+JOIN useri u ON c.id_ang = u.id
+JOIN departament d ON u.id_dep = d.id_dep
+GROUP BY 
+    cal.date, d.id_dep
+ORDER BY 
+    cal.date;
+select * from plecati;
+delete from plecati where zi="2024-07-01";
+select * from appearance;
+select * from colors order by culoare;
+insert into appearance(id_usr) select id from useri where id <> 3 and id <> 4;
+drop table colors;
+create table colors(culoare varchar(25) not null, cod varchar(25) not null, primary key (culoare));
+insert into colors values("red", "#C63C51");
+insert into colors values("orange", "#FF8225");
+insert into colors values("yellow", "#FFDE4D");
+insert into colors values("green", "#88D66C");
+insert into colors values("blue", "#6EACDA");
+-- insert into colors values("indigo", "#3F48CC");
+insert into colors values("indigo", "#03346E");
+insert into colors values("violet", "#B692C2");
+insert into colors values("pink", "#E3A5C7");
+insert into colors values("teal", "#36C2CE");
+insert into colors values("brown", "#74512D");
+insert into colors values("grey", "#686D76");
+insert into colors values("black", "#151515");
+insert into colors values("white", "#EEF7FF");
+insert into colors values("beige", "#FFF2D7");
+insert into colors values ("magenta", "#E90074");
+insert into colors values("card_l", "#ECEDFA");
+insert into colors values("card_d", "#2a2a2a");
+insert into colors values ("text_l", "#333");
+insert into colors values ("text_d", "#ececec");
+insert into colors values("hover_s_l", "#ECEDFA");
+insert into colors values("hover_s_d", "#2a2a2a");
+insert into colors values("clr_l", "#d8d9e1");
+insert into colors values("clr_d", "#1a1a1a");
+insert into colors values("sidebar_l", "#ECEDFA");
+insert into colors values("sidebar_d", "#2a2a2a");
+insert into colors values("searchbar_l", "#eaeaea;");
+insert into colors values("button_hover", "#000");
+select * from departament;
+drop table teme;
+create table teme(id_ang int not null, accent varchar(25) not null, sidebar varchar(25) not null, clr varchar(25) not  null, card varchar(25) not null);
+alter table teme add constraint fk8 foreign key (id_usr) references useri(id);
+-- create table appearance(id_usr int primary key not null, accent_color varchar(25), body_color varchar(25));
+insert into teme(id_usr) select id from useri; 
+create table teme(id_usr int not null, accent varchar(25) default "#10439F", clr varchar(25) default "#d8d9e1", 
+sidebar varchar(25) default "#ECEDFA", card varchar(25) default "#ECEDFA", text varchar(25) default "#333", hover varchar(25) default "#ECEDFA");
+-- ALTER TABLE Orders DROP CONSTRAINT FK_PersonOrder;
+ALTER TABLE concedii DROP CONSTRAINT fk3;
+ALTER TABLE teme DROP CONSTRAINT fk8;
+select * from concedii;
+insert into departament values(3, "tehnic");
+select * from useri where id_dep = 1;
+update useri set tip = 2 where username="username2nou";
+CREATE TABLE image_store (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image_name VARCHAR(255) NOT NULL,
+    image_data LONGBLOB NOT NULL
+);
+drop table image_store;
+CREATE TABLE image (
+    imageId INT AUTO_INCREMENT PRIMARY KEY,
+    imageFilename VARCHAR(50)
+);
+SELECT * FROM concedii;
+SELECT MONTH(month_dates) AS month, CEIL(COUNT(*) / 2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep UNION ALL SELECT end_c FROM concedii JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c) AND YEAR(start_c) = YEAR(CURRENT_DATE())) AS combined_dates GROUP BY MONTH(month_dates);
+SELECT MONTH(month_dates) AS month, CEIL(COUNT(*) / 2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE status = 1 AND departament.id_dep = 1 UNION ALL SELECT end_c FROM concedii JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE status = 3 AND departament.id_dep = 3 UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c) AND YEAR(start_c) = YEAR(CURRENT_DATE())) AS combined_dates GROUP BY MONTH(month_dates);
+SELECT MONTH(month_dates) AS month, CEIL(COUNT(*) / 2) AS numar_concedii FROM (SELECT start_c AS month_dates FROM concedii JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE YEAR(start_c) = YEAR(CURRENT_DATE()) and status = -2 AND departament.id_dep = 1 UNION ALL SELECT end_c FROM concedii JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep WHERE status = -2 AND departament.id_dep = 1 UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) FROM concedii WHERE MONTH(start_c) <> MONTH(end_c) and YEAR(start_c) = YEAR(CURRENT_DATE())) AS combined_dates GROUP BY MONTH(month_dates);
+SELECT DAY(leave_date) AS day, COUNT(*) AS count FROM (SELECT start_c + INTERVAL n DAY AS leave_date FROM concedii JOIN numbers ON n <= DATEDIFF(end_c, start_c) JOIN useri ON concedii.id_ang = useri.id WHERE MONTH(start_c) = ? AND YEAR(start_c) = YEAR(CURRENT_DATE()) GROUP BY leave_date) AS result GROUP BY DAY(leave_date);
+SELECT DAY(leave_date) AS day, COUNT(*) AS count 
+FROM (
+    SELECT DATE_ADD(start_c, INTERVAL n DAY) AS leave_date 
+    FROM concedii 
+    JOIN numbers ON n <= DATEDIFF(end_c, start_c)
+    JOIN useri ON concedii.id_ang = useri.id 
+    WHERE MONTH(start_c) = ? AND YEAR(start_c) = YEAR(CURDATE())
+) AS result 
+GROUP BY DAY(leave_date);
+select * from useri;
+SELECT accent, nume, prenume, start_c, end_c FROM concedii join useri on concedii.id_ang = useri.id join teme on useri.id = teme.id_usr;
+select count(*) as total from useri where tip = 0 and username != "lucian.ionescu" group by id_dep having id_dep = 3;
+SELECT RefCons.constraint_schema, RefCons.table_name, RefCons.referenced_table_name, RefCons.constraint_name, KeyCol.column_name
+FROM information_schema.referential_constraints RefCons
+JOIN information_schema.key_column_usage KeyCol ON RefCons.constraint_schema = KeyCol.table_schema
+     AND RefCons.table_name = KeyCol.table_name
+     AND RefCons.constraint_name = KeyCol.constraint_name
+WHERE RefCons.constraint_schema = 'test';
+alter table useri add constraint fk1 foreign key (id_dep) references departament(id_dep);
+alter table useri add constraint fk3 foreign key (tip) references tipuri(tip);
+alter table concedii add constraint fk4 foreign key (id_ang) references useri(id);
+alter table teme add constraint fk8 foreign key (id_usr) references useri(id);
+select * from teme right join useri on teme.id_usr = useri.id;
+select * from teme;
+DROP trigger IF EXISTS teme1;
+DELIMITER $$
+CREATE TRIGGER teme1
+AFTER INSERT ON useri
+FOR EACH ROW
+BEGIN
+    INSERT INTO teme (id_usr) VALUES (NEW.id);
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS teme2;
+DELIMITER $$
+CREATE TRIGGER teme2
+before delete ON useri
+FOR EACH ROW
+BEGIN
+    delete from teme where id_usr = old.id;
+END$$
+DELIMITER ;
+select trigger_schema, trigger_name, action_statement
+from information_schema.triggers where trigger_schema = "test";
+select id_usr from teme;
+delete from concedii where id = 107;
+insert into teme(id_usr) values(33);
+select count(*) from teme;
+select id_ang from concedii;
+DROP trigger IF EXISTS aftrdel;
+DELIMITER $$
+CREATE TRIGGER aftrdel
+before delete ON useri
+FOR EACH ROW
+BEGIN
+    delete from concedii where id_ang = old.id;
+END$$
+DELIMITER ;
+select * from concedii;
+ALTER TABLE tipuri
+DROP CONSTRAINT fk3;
+select * from tipcon;
+describe departament;
+ALTER TABLE tipcon MODIFY tip int NOT NULL;
+alter table concedii add constraint fk2 foreign key (tip) references tipcon(tip);
+describe departament;
+SHOW TRIGGERS WHERE `Table` = 'concedii';
+DROP trigger IF EXISTS update_daily_leave_summary3;
+select * from information_schema.triggers where 
+information_schema.triggers.trigger_name like 'after_del' and 
+information_schema.triggers.trigger_schema like 'test';
+
+select LOWER(concat('delimiter |', '\n', 'create trigger test.', TRIGGER_NAME, '\n', 
+'    ', ACTION_TIMING, ' ', EVENT_MANIPULATION, ' on test.', EVENT_OBJECT_TABLE, ' for each row', '\n',
+ACTION_STATEMENT, '\n',
+'|')) AS TablaTriggers from information_schema.triggers where 
+information_schema.triggers.trigger_schema like 'test' and 
+information_schema.triggers.trigger_name like 'after_delete';
+
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_user_deleted$$
+CREATE TRIGGER before_user_deleted
+BEFORE DELETE ON useri
+FOR EACH ROW
+BEGIN
+    DELETE FROM concedii WHERE id_ang = OLD.id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_dep_deleted$$
+CREATE TRIGGER before_dep_deleted
+BEFORE DELETE ON departament
+FOR EACH ROW
+BEGIN
+    DELETE FROM useri WHERE id_dep = OLD.id_dep;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_del;
+select * from useri;
+update useri set zileramase = 29 where id=3;
+
+DROP TRIGGER IF EXISTS after_delete;
+DELIMITER $$
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    -- Selecting user type and current total duration of leaves
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    -- Update the total duration of leaves
+    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
+    -- Update useri table for leave details
+    UPDATE useri
+    SET zilecons = totalDuration,
+        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
+        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    -- Additional check if the leave was approved
+    IF OLD.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+select * from concedii; -- de ceeee
+select sum(durata) from concedii where id_ang = 4;
+select count(*) from concedii where status >= 0;
+ROLLBACK;
+DROP TRIGGER IF EXISTS after_update;
+DELIMITER $$
+CREATE TRIGGER after_update
+AFTER update ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    -- Selecting user type and current total duration of leaves
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    -- Update the total duration of leaves
+    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
+    -- Update useri table for leave details
+    UPDATE useri
+    SET zilecons = totalDuration,
+        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
+        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    -- Additional check if the leave was approved
+    IF OLD.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+            conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF new.status = -1 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF OLD.status = 1 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF OLD.status = -2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+update useri set conramase = 0 where id = 4;
+select * from useri where id = 4;
+update useri set email="popescumariateodora@yahoo.com" where id=4;
+select * from tipcon;
+SELECT DATE_FORMAT(start_c,'%d/%m/%Y') from concedii;
+SELECT DATE_FORMAT(start_c, '%W %d %M %Y') as startt, DATE_FORMAT(end_c, '%W %d %M %Y') as endd, locatie, concedii.motiv as motivv, tipcon.motiv as motif FROM concedii join tipcon on concedii.tip = tipcon.tip WHERE id_ang = 4;
+select distinct email from useri join concedii on useri.id = concedii.id_ang where start_c - 3 >= day(current_date()) and status = 2;
+SELECT DATE_FORMAT(start_c, '%W %d %M %Y'), DATE_FORMAT(end_c, '%W %d %M %Y') from concedii;
+SELECT nume, prenume FROM useri where day(data_nasterii) + 1 = day(current_date());
+-- ALTER TABLE table_name ADD column_name datatype;
+ALTER TABLE useri ADD profil mediumblob default null;
+select * from useri;
+update useri set email = "popescumariateodora@yahoo.com" where useri.username = "lucian.ionescu";
+select ang.nume as nume_ang, ang.prenume as prenume_ang, sef.nume as nume_sef, sef.prenume as prenume_sef from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3;
+select ang.email as email_ang, sef.email as email_sef from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3;
+select ang.email as email_ang, dir.email as email_dir from useri as ang join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0;
+select nume, prenume, nume_dep from useri join departament on useri.id_dep = departament.id_dep;
+update useri set email = "p.m.t28.12.2001@gmail.com" where tip = 1;
+select sef.email as email_sef from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 where ang.id = 4;
+select * from concedii;
+select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.email as email_ang, sef.email as email_sef, dir.email as email_dir from useri as ang join useri as sef on ang.id_dep = sef.id_dep and sef.tip = 3 join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = 4;
+ALTER TABLE concedii ADD added date default null;
+ALTER TABLE concedii ADD modified date default null;
+ALTER TABLE concedii ADD acc_res date default null;
+update concedii set added = (select current_date()) where id=95;
+select * from useri where id = 14;
+select * from concedii where id_ang = 14;
+update useri set conluate=1 where id= 14;
+select count(*) from concedii where status >= 0;
+select * from teme;
+select dep.nume_dep, dep.id_dep, count(*) as total from useri ang join departament dep on ang.id_dep = dep.id_dep group by dep.id_dep;
+create table libere(zi date, nume varchar(255));
+describe tipcon;
+ALTER TABLE tipcon ADD nr_zile int default 0;
+drop table libere;
+create table sarbatori(zi date, nume varchar(255));
+INSERT INTO sarbatori (zi, nume) VALUES
+('2024-12-25', 'Hanukkah'),
+('2024-10-31', 'Diwali'),
+('2024-10-31', 'Halloween'),
+('2024-02-28', 'Ramadanul'),
+('2024-03-29', 'Eid'),
+('2024-03-08', 'Ziua Internațională a Femeii'),
+('2024-04-22', 'Ziua Pământului'),
+('2024-05-01', 'Ziua Internațională a Muncii'),
+('2024-12-10', 'Ziua Internațională a Drepturilor Omului'),
+('2024-08-13', 'Ziua Fondării Companiei'),
+('2024-08-08', 'team-building'),
+('2024-10-12', 'Conferința Anuală de Leadership și Inovație'),
+('2024-04-23', 'Ziua de Plantare a Arborilor'),
+('2024-04-24', 'Ziua de Curățenie a Parcurilor'),
+('2024-03-09', 'Ziua de Voluntariat în Căminele de Bătrâni'),
+('2024-10-16', 'Ziua Mondială a Alimentației'),
+('2024-05-15', 'Marșul pentru Sănătate Mentală'),
+('2024-06-05', 'Campania de Strângere de Fonduri pentru Educație'),
+('2024-03-08', 'Ziua Roz - Lupta împotriva Cancerului la Sân'),
+('2024-04-04', 'Campanie pentru Drepturile Animalelor'),
+('2024-05-22', 'Campania de Conștientizare și Sprijin pentru Refugiați'),
+('2024-04-02', 'Ziua in pijamale'),
+('2024-05-02', 'Gratar'),
+('2024-04-01', 'Ziua glumelor'),
+('2024-04-14', 'Ziua norocului'),
+('2024-09-03', 'Ziua yoga'),
+('2024-09-09', 'Ziua fotbal'),
+('2024-09-12', 'Ziua tenis');
+INSERT INTO libere (zi, nume) VALUES
+('2024-01-01', 'Anul Nou'),
+('2024-01-02', 'A doua zi de Anul Nou'),
+('2024-01-06', 'Ziua de Bobotează'),
+('2024-01-07', 'Ziua Ortodoxă de Crăciun'),
+('2024-01-24', 'Ziua Principatelor Unite'),
+('2024-05-01', 'Ziua Internațională a Muncii'),
+('2024-06-01', 'Ziua Copilului'),
+('2024-08-15', 'Adormirea Maicii Domnului'),
+('2024-11-30', 'Sfântul Andrei'),
+('2024-12-01', 'Ziua Națională a României'),
+('2024-12-25', 'Crăciunul'),
+('2024-12-26', 'A doua zi de Crăciun');
+insert into libere(zi, nume) values ('2024-08-12', 'test');
+delete from libere where nume = "test";
+select * from tipcon;
+UPDATE tipcon
+SET nr_zile = CASE
+    WHEN tip = 1 THEN 21  -- concediu odihna
+    WHEN tip = 2 THEN 5   -- concediu formare profesionala
+    WHEN tip = 3 THEN 10  -- concediu formare profesionala platit
+    WHEN tip = 4 THEN 182 -- concediu medical (maxim 6 luni)
+    WHEN tip = 5 THEN 126 -- concediu risc maternal
+    WHEN tip = 6 THEN 126 -- concediu maternal
+    WHEN tip = 7 THEN 15  -- concediu paternal
+    WHEN tip = 8 THEN 2   -- concediu casatorie
+    WHEN tip = 9 THEN 730 -- concediu crestere copil (maxim 2 ani)
+    WHEN tip = 10 THEN 5  -- concediu ingrijire copil pentru situatii medicale
+    WHEN tip = 11 THEN 3  -- concediu deces grad I
+    WHEN tip = 12 THEN 2  -- concediu deces grad II
+    WHEN tip = 13 THEN 1  -- concediu donare sange
+    WHEN tip = 14 THEN 14 -- concediu carantina
+    WHEN tip = 15 THEN 30 -- concediu adoptie copil
+    WHEN tip = 16 THEN 5  -- concediu ajutor ingrijitor
+    WHEN tip = 17 THEN 2  -- concediu schimbare sediu munca
+     WHEN tip = 18 THEN 5  
+      WHEN tip = 19 THEN 7 
+END
+WHERE tip BETWEEN 1 AND 19;
+SELECT email from useri where day(data_nasterii) = day(current_date() + 1) and month(data_nasterii) = (current_date() + 1);
+SELECT sarbatori.nume, libere.nume from sarbatori join libere where day(sarbatori.zi) = day(current_date() + 1) and month(sarbatori.zi) = month(current_date() + 1) and day(libere.zi) = day(current_date() + 1) and month(libere.zi) = month(current_date() + 1);
+SELECT CONCAT(sarbatori.nume, '; ', libere.nume) AS nume
+FROM sarbatori
+JOIN libere ON day(sarbatori.zi) = day(libere.zi) AND month(sarbatori.zi) = month(libere.zi)
+WHERE day(sarbatori.zi - 1) = day(current_date()) 
+  AND month(sarbatori.zi - 1) = month(current_date());
+select nume from sarbatori where day(zi-1) = day(current_date()) and month(zi) = month(current_date());
+select nume from libere where day(zi-1) = day(current_date()) and month(zi) = month(current_date());
+  select * from concedii;
+  select * from useri where tip != 4 and conramase <> 0;
+  ALTER TABLE useri ADD status int default 0;
+  ALTER TABLE useri ADD platit int default 1;
+  select * from concedii where status >= 0;
+  update useri set conramase=1 where id=22;
+  select * from concedii;
+-- ALTER TABLE table_name RENAME COLUMN old_column_name1 TO new_col_name1;
+ALTER TABLE useri RENAME COLUMN status TO activ;
+drop table image;
+create table image(imageId int primary key auto_increment, imageFileName varchar(50));
+update sarbatori set zi='2024-08-14' where nume="Ziua Fondării Companiei";
+update useri set data_nasterii='1977-08-13' where username="cecilia.rebreanu";
+select * from useri;
+select * from sarbatori;
+select current_date();
+SELECT nume 
+FROM sarbatori 
+WHERE DAY(zi - INTERVAL 1 DAY) = DAY(CURRENT_DATE()) 
+  AND MONTH(zi) = MONTH(CURRENT_DATE())
+
+UNION
+
+SELECT nume 
+FROM libere 
+WHERE DAY(zi - INTERVAL 1 DAY) = DAY(CURRENT_DATE()) 
+  AND MONTH(zi) = MONTH(CURRENT_DATE());
+  select start_c from concedii;
+  select tipcon.motiv from tipcon;
+select useri.id, useri.email, concedii.start_c, concedii.end_c, locatie, concedii.motiv, DATEDIFF(concedii.start_c, CURRENT_DATE()) AS days_until_start from useri join concedii on concedii.id_ang = useri.id where day(start_c) = day(current_date() - 1) and month(start_c) = month(current_date());
+SELECT id, nume, prenume, id_dep from useri where day(data_nasterii) = day(current_date()) and month(data_nasterii) = (current_date());
+alter table concedii add mentiuni varchar(255) default null;
+select * from useri;
+use test;
+drop table image;
+CREATE TABLE image
+(
+id int NOT NULL AUTO_INCREMENT,
+firstname varchar(50),
+lastname varchar(50),
+email varchar(50),
+image blob,
+PRIMARY KEY (id)
+);
+select * from teme;
+describe useri;
+select status, useri.tip, id_ang, departament.id_dep from concedii join useri on concedii.id_ang = useri.id join departament on useri.id_dep = departament.id_dep;
+alter table useri add culoare varchar(25) not null default "#333";
+select * from useri;
+insert into useri(nume, prenume, data_nasterii, adresa, email, telefon, username, password, id_dep, tip, cnp, profil) values("test", "test", "2001-01-01", "test", "popescumariateodora@yahoo.com", "+40700000000", "test", "$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq", 1, 0, 12345678, LOAD_FILE('C:\Users\Popi\Desktop\person.jpg'));
+describe useri;
+update useri set culoare = "#679B2F" where id = 33;
+create table data (id int not null auto_increment, image longblob not null, primary key (id));
+select email from useri where day(current_date())=21 and month(current_date())=8 and prenume like "%Monica%";
+CREATE TABLE users ( id int(11) NOT NULL AUTO_INCREMENT, first_name varchar(45) DEFAULT NULL, last_name varchar(45) DEFAULT NULL, photo mediumblob, PRIMARY KEY (`id`) );
+delete from useri where username="test";
+update useri set email="popescumariateodora@yahoo.com" where username="default";
+select * from useri;
+DELIMITER $$
+CREATE TRIGGER before_insert_useri
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    IF NEW.profil IS NULL THEN
+        SET NEW.profil = (SELECT profil FROM useri WHERE username = 'test');
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS before_insert_useri;
+SELECT profil'C:\Users\Popi\Desktop\output.jpg' FROM useri WHERE id = 3;
+select * from useri;
+update useri set activ = 0 where username<>"lucian.ionescu";
+alter table concedii add comm_sef varchar(255) not null default "N/A";
+alter table concedii add comm_dir varchar(255) not null default "N/A";
+select * from useri;
+update useri set zileramase = 17 where username="anemona.lacramioara";
+-- ALTER TABLE [table_name] RENAME COLUMN [old_column_name] TO [new_column_name];
+-- ALTER TABLE useri RENAME COLUMN [old_column_name] TO [new_column_name];
+-- ALTER TABLE <table_name> 2 DROP [COLUMN] <column_name>;
+ALTER TABLE concedii DROP COLUMN comm_dir;
+select * from useri;
+update useri set tip=0 where username="lucian.ionescu";
+select * from departament;
+select * from concedii join useri on useri.id=concedii.id_ang where year(start_c) = year(current_date()) and id_dep = 3;
