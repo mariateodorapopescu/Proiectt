@@ -1246,3 +1246,4 @@ select * from useri;
 update useri set tip=0 where username="lucian.ionescu";
 select * from departament;
 select * from concedii join useri on useri.id=concedii.id_ang where year(start_c) = year(current_date()) and id_dep = 3;
+-- test
