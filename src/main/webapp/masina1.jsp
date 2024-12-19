@@ -447,6 +447,13 @@ int pag = -1;
                     	  ResultSet rss1 = stmtt2.executeQuery();
                           boolean found = false;
 							int nr = 1;
+							if (!rss1.next()) {
+								 
+		                              out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
+		        
+		                          rss1.close();
+		                          stmtt2.close();
+							} else {
                           while (rss1.next()) {
                               found = true;
                               
@@ -483,6 +490,7 @@ int pag = -1;
                               }
                               nr++;
                           }
+							}
                           if (!found) {
                               out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
                           }

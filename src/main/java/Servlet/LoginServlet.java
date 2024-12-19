@@ -31,13 +31,19 @@ public class LoginServlet extends HttpServlet {
     	    MyUser validatedUser = loginDao.validate(loginBean);
     	    if (validatedUser != null) {
     	        HttpSession session = request.getSession(false); // Get the existing session
+    	        
+    	        
     	        if (session != null) {
     	            session.invalidate(); // Invalidate the existing session if it exists
     	        }
     	        session = request.getSession(true); // Create a new session
-    	        session.setAttribute("currentUser", validatedUser);
+    	        // session.setAttribute("currentUser", validatedUser);
     	        session.setAttribute("username", username); // Store username in session
-    	        response.sendRedirect("/Proiect/OTP?username=" + username); // Redirect to an intermediary page or dashboard
+    	        session.setAttribute("currentUser", validatedUser);
+    	        // session.setAttribute("username", validatedUser.getUsername());
+    	        // response.sendRedirect("/Proiect/OTP?username=" + username); // Redirect to an intermediary page or dashboard
+    	        // response.sendRedirect(request.getContextPath() + "/OTP?username=" + java.net.URLEncoder.encode(username, "UTF-8")); // Redirect to an intermediary page or dashboard
+    	        response.sendRedirect(request.getContextPath() + "/OTP?username=" + username); // Redirect to an intermediary page or dashboard
     	    } else {
     	    	
     	    	 Integer loginAttempts = (Integer) request.getSession(true).getAttribute("loginAttempts");

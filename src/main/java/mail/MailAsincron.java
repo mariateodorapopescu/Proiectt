@@ -8,6 +8,13 @@ import java.sql.SQLException;
 import jakarta.servlet.ServletException;
 // clasa ce se ocupa asincron de mailuri
 public class MailAsincron {
+	
+	private static boolean isValidEmail(String email) {
+	    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+	    return email != null && email.matches(emailRegex);
+	}
+
+	
 	/**
 	 * functie ce pregateste si trimmite mail in mod asincron pentru adaugarea unui concediu
 	 * @param id
@@ -75,13 +82,55 @@ public class MailAsincron {
 		    String message16 = "<br><p>Va dorim toate cele bune! &#x1F607;</p>";
 		    
 		    String message1 = message11 + message12 + message13 + message14 + message16 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
-		   
+		    if (!isValidEmail(angajat)) {
+		        throw new IllegalArgumentException("Adresa de e-mail a angajatului este invalidă: " + angajat);
+		    }
+		    if (angajat == null || angajat.isEmpty()) {
+		        System.err.println("Adresa de e-mail a angajatului este null sau goală.");
+		        return; // Sau aruncați o excepție
+		    }
+		    System.out.println("Email angajat: " + angajat);
+		    System.out.println("Email sef: " + sef);
+		    System.out.println("Email director: " + director);
+
+		    try (Connection conexiune1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		    	     PreparedStatement stmt1 = conexiune1.prepareStatement(
+		    	         "select ang.nume as nume_ang, ang.prenume as prenume_ang, ang.tip as tip, " +
+		    	         "ang.email as email_ang, sef.email as email_sef, dir.email as email_dir " +
+		    	         "from useri as ang join useri as sef " +
+		    	         "on ang.id_dep = sef.id_dep and sef.tip = 3 " +
+		    	         "join useri as dir on ang.id_dep = dir.id_dep and dir.tip = 0 where ang.id = ?;")) {
+
+		    	    stmt1.setInt(1, id);
+
+		    	    try (ResultSet rezultat = stmt1.executeQuery()) {
+		    	        if (rezultat.next()) {
+		    	            sef = rezultat.getString("email_sef");
+		    	            angajat = rezultat.getString("email_ang");
+		    	            director = rezultat.getString("email_dir");
+		    	            nume = rezultat.getString("nume_ang");
+		    	            prenume = rezultat.getString("prenume_ang");
+		    	            tip2 = rezultat.getInt("tip");
+		    	        }
+		    	    }
+		    	} catch (SQLException e) {
+		    	    if (e.getSQLState().equals("42S22")) { // Check for SQLSyntaxErrorException (missing column)
+		    	        System.err.println("Column departament.id_dep not found. Continuing without this data.");
+		    	        sef = ""; // Optional: Set default or empty values
+		    	        director = "";
+		    	    } else {
+		    	        throw new ServletException("Database error occurred", e); // Re-throw other exceptions
+		    	    }
+		    	}
+
+		    /*
 		    // trimitere propriu-zisa
 		    try {
 		        sender.send(subject1, message1, "liviaaamp@gmail.com", angajat);
 		    } catch (Exception e) {
 		        e.printStackTrace();
 		    }  
+		    */
 	    }
 	    if (tip2 != 3 || tip2 != 0) {
 		 // trimit notificare la sef
@@ -215,6 +264,8 @@ public class MailAsincron {
 	 	   
 	 	    String message1 = message11 + message12 + message13 + message14 + message15 + message16 + message17 + "<br><b><i>&#x2757;Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
 	 	
+	 	    
+	 	    
 	 	    // trimitere propriu-zisa
 	 	    try {
 	 	        sender.send(subject1, message1, "liviaaamp@gmail.com", toa); 

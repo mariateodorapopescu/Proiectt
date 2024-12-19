@@ -1,0 +1,391 @@
+-- Dezactivează constrângerile FOREIGN KEY
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Șterge toate tabelele
+DROP TABLE IF EXISTS plecati;
+DROP TABLE IF EXISTS restrictii;
+DROP TABLE IF EXISTS libere;
+DROP TABLE IF EXISTS statusuri;
+DROP TABLE IF EXISTS teme;
+DROP TABLE IF EXISTS sarbatori;
+DROP TABLE IF EXISTS testt;
+DROP TABLE IF EXISTS tipcon;
+DROP TABLE IF EXISTS tipuri;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS useri;
+DROP TABLE IF EXISTS angajati;
+DROP TABLE IF EXISTS appearance;
+DROP TABLE IF EXISTS image;
+DROP TABLE IF EXISTS mytable;
+DROP TABLE IF EXISTS login;
+DROP TABLE IF EXISTS concedii;
+DROP TABLE IF EXISTS tari;
+DROP TABLE IF EXISTS regiuni;
+DROP TABLE IF EXISTS locatii;
+DROP TABLE IF EXISTS departament;
+DROP TABLE IF EXISTS data;
+DROP TABLE IF EXISTS date_logs;
+DROP TABLE IF EXISTS numb;
+DROP TABLE IF EXISTS ticete;
+
+-- Reactivează constrângerile FOREIGN KEY
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+-- SHOW DATABASES;
+-- CREATE DATABASE test;
+
+use test;
+
+-- 1. Eliminarea tuturor constrângerilor FOREIGN KEY în mod dinamic
+SET @sql = '';
+
+-- Generăm comenzi de eliminare pentru fiecare constrângere FOREIGN KEY
+SELECT GROUP_CONCAT(CONCAT('ALTER TABLE ', TABLE_NAME, ' DROP FOREIGN KEY ', CONSTRAINT_NAME, ';'))
+INTO @sql
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_NAME IS NOT NULL
+AND TABLE_SCHEMA = DATABASE();
+
+-- Mesaj pentru confirmare
+-- SELECT 'Toate constrângerile FOREIGN KEY au fost eliminate.' AS Status;
+
+
+-- 2. Ștergerea tuturor tabelelor existente
+DROP TABLE IF EXISTS aplicari;
+DROP TABLE IF EXISTS istoric_aici;
+DROP TABLE IF EXISTS pozitii;
+DROP TABLE IF EXISTS adeverinte;
+DROP TABLE IF EXISTS experienta;
+DROP TABLE IF EXISTS studii;
+DROP TABLE IF EXISTS limbi;
+DROP TABLE IF EXISTS taskuri;
+DROP TABLE IF EXISTS evenimente;
+DROP TABLE IF EXISTS useri;
+DROP TABLE IF EXISTS departament;
+DROP TABLE IF EXISTS tip_poz;
+DROP TABLE IF EXISTS tipcon;
+DROP TABLE IF EXISTS tipuri;
+DROP TABLE IF EXISTS joburi;
+DROP TABLE IF EXISTS statusuri;
+DROP TABLE IF EXISTS stare;
+DROP TABLE IF EXISTS locatii;
+DROP TABLE IF EXISTS tari;
+DROP TABLE IF EXISTS regiuni;
+DROP TABLE IF EXISTS libere;
+DROP TABLE IF EXISTS numbers;
+DROP TABLE IF EXISTS sarbatori;
+DROP TABLE IF EXISTS ciclu;
+
+-- 3. Crearea tabelelor de bază fără dependențe
+CREATE TABLE tipuri (
+    tip INT PRIMARY KEY,
+    denumire VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE tipcon (
+    tip INT AUTO_INCREMENT PRIMARY KEY,
+    motiv VARCHAR(255) DEFAULT NULL
+);
+
+CREATE TABLE tip_poz (
+    id INT PRIMARY KEY,
+    semnificatie VARCHAR(12)
+);
+
+CREATE TABLE stare (
+    status INT PRIMARY KEY,
+    nume VARCHAR(18)
+);
+
+CREATE TABLE regiuni (
+    id_regiune INT PRIMARY KEY NOT NULL,
+    nume_regiune VARCHAR(25)
+);
+
+CREATE TABLE libere (
+    zi DATE,
+    nume VARCHAR(255)
+);
+
+CREATE TABLE numbers (
+    n INT
+);
+
+CREATE TABLE sarbatori (
+    zi DATE,
+    nume VARCHAR(255)
+);
+
+-- 4. Crearea tabelelor dependente de bază
+
+CREATE TABLE tari (
+    id_tara CHAR(2) PRIMARY KEY NOT NULL,
+    nume_tara VARCHAR(40) NOT NULL,
+    id_regiune INT NOT NULL,
+    FOREIGN KEY (id_regiune) REFERENCES regiuni(id_regiune)
+);
+
+CREATE TABLE locatii (
+    id_locatie INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    strada VARCHAR(40) NOT NULL,
+    longitudine DOUBLE,
+    latitudine DOUBLE,
+    cod VARCHAR(12) NOT NULL,
+    oras VARCHAR(30) NOT NULL,
+    judet VARCHAR(25) NOT NULL,
+    id_tara CHAR(2) NULL,
+    FOREIGN KEY (id_tara) REFERENCES tari(id_tara)
+);
+
+CREATE TABLE departament (
+    id_dep INT PRIMARY KEY AUTO_INCREMENT,
+    nume_dep VARCHAR(50) NOT NULL,
+    id_locatie INT NOT NULL,
+    adresa VARCHAR(256),
+    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie)
+);
+
+CREATE TABLE joburi (
+    job_id VARCHAR(10) PRIMARY KEY NOT NULL,
+    nume_job VARCHAR(35) NOT NULL,
+    salmin INT NOT NULL,
+    salmax INT NOT NULL
+);
+
+CREATE TABLE useri (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nume VARCHAR(50),
+    prenume VARCHAR(50),
+    data_nasterii DATE,
+    email VARCHAR(50),
+    telefon VARCHAR(50),
+    username VARCHAR(50),
+    password varchar(255),
+    id_dep INT,
+    tip INT,
+    sporuri INT,
+    CNP BIGINT,
+    cod INT,
+    zile_ramase INT,
+    zile_consumate INT,
+    salariu_brut INT,
+    data_ang DATE,
+    data_modif DATE,
+    CV LONGBLOB,
+    profil LONGBLOB,
+    scor INT,
+    id_locatie INT NOT NULL,
+    adresa VARCHAR(256),
+    job_id VARCHAR(10) NOT NULL,
+    comision FLOAT NOT NULL,
+    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
+    FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
+    FOREIGN KEY (tip) REFERENCES tipuri(tip),
+    FOREIGN KEY (job_id) REFERENCES joburi(job_id)
+);
+
+CREATE TABLE istoric_aici (
+    id_job INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    start DATE NOT NULL,
+    endd DATE NOT NULL,
+    id_dep INT NOT NULL,
+    job_id VARCHAR(10) NOT NULL,
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
+    FOREIGN KEY (job_id) REFERENCES joburi(job_id)
+);
+
+CREATE TABLE experienta (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    den_job VARCHAR(50),
+    firma VARCHAR(50),
+    pozitie INT,
+    departament INT,
+    start DATE,
+    data_sfarsit DATE,
+    descriere VARCHAR(1000),
+    id_ang INT,
+    id_locatie INT NOT NULL,
+    adresa VARCHAR(256),
+    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+CREATE TABLE taskuri (
+    id_task INT PRIMARY KEY AUTO_INCREMENT,
+    titlu VARCHAR(50),
+    descriere VARCHAR(255),
+    id_exp INT,
+    id_dest INT,
+    start DATE,
+    data_sfarsit DATE,
+    status INT,
+    puncte INT,
+    id_locatie INT,
+    adresa VARCHAR(256),
+    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
+    FOREIGN KEY (id_exp) REFERENCES useri(id),
+    FOREIGN KEY (id_dest) REFERENCES useri(id),
+    FOREIGN KEY (status) REFERENCES stare(status)
+);
+
+CREATE TABLE evenimente (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nume VARCHAR(50),
+    descriere VARCHAR(255),
+    id_ang INT,
+    puncte INT,
+    id_locatie INT NOT NULL,
+    adresa VARCHAR(256),
+    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+CREATE TABLE studii (
+    id_studii INT PRIMARY KEY AUTO_INCREMENT,
+    facultate VARCHAR(50),
+    universitate VARCHAR(50),
+    ciclu VARCHAR(50),
+    start DATE,
+    data_sfarsit DATE,
+    id_ang INT,
+    id_locatie INT NOT NULL,
+    adresa VARCHAR(256),
+    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+CREATE TABLE limbi (
+    id_limba INT PRIMARY KEY AUTO_INCREMENT,
+    limba VARCHAR(50),
+    nivel INT,
+    id_ang INT,
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+CREATE TABLE pozitii (
+    id_poz INT PRIMARY KEY AUTO_INCREMENT,
+    titlu VARCHAR(50),
+    descriere VARCHAR(50),
+    rol INT,
+    departament INT,
+    start DATE,
+    data_sfarsit DATE,
+    tip_poz INT,
+    activ BIT,
+    id_locatie INT NOT NULL,
+    adresa VARCHAR(256),
+    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
+    FOREIGN KEY (tip_poz) REFERENCES tip_poz(id)
+);
+
+CREATE TABLE aplicari (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    pozitie INT,
+    data_apl DATE,
+    id_ang INT,
+    id_poz INT,
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    FOREIGN KEY (id_poz) REFERENCES pozitii(id_poz)
+);
+
+
+CREATE TABLE teme (
+    id_usr INT NOT NULL,
+    accent VARCHAR(25) DEFAULT '#10439F',
+    clr VARCHAR(25) DEFAULT '#d8d9e1',
+    sidebar VARCHAR(25) DEFAULT '#ECEDFA',
+    card VARCHAR(25) DEFAULT '#ECEDFA',
+    text VARCHAR(25) DEFAULT '#333',
+    hover VARCHAR(25) DEFAULT '#ECEDFA',
+    PRIMARY KEY (id_usr),
+    CONSTRAINT fk_id_usr FOREIGN KEY (id_usr) REFERENCES useri (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE statusuri (
+    status INT NOT NULL UNIQUE, -- Codul de status (-2, -1, 0, 1, 2)
+    nume_status VARCHAR(56) NOT NULL UNIQUE, -- Semnificația statusului
+    PRIMARY KEY (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE concedii (
+    id INT NOT NULL AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    start_c DATE NOT NULL,
+    end_c DATE NOT NULL,
+    motiv VARCHAR(255) DEFAULT NULL,
+    locatie VARCHAR(255) DEFAULT NULL,
+    status INT DEFAULT 1,
+    tip INT DEFAULT NULL,
+    added DATE NOT NULL,
+    added_date DATE NOT NULL,
+    ack_res DATE DEFAULT NULL,
+    menuni VARCHAR(255) DEFAULT NULL,
+    id_locatie INT DEFAULT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_ang) REFERENCES useri (id),
+    FOREIGN KEY (tip) REFERENCES tipuri (tip),
+    FOREIGN KEY (id_locatie) REFERENCES locatii (id_locatie),
+    FOREIGN KEY (status) REFERENCES statusuri (status) -- Adăugăm relația către statusuri
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+INSERT INTO tipuri (tip, denumire) VALUES (1, 'Director');
+INSERT INTO tipuri (tip, denumire) VALUES (2, 'Sef');
+INSERT INTO tipuri (tip, denumire) VALUES (3, 'Administrator');
+INSERT INTO tipuri (tip, denumire) VALUES (4, 'Angajat');
+
+INSERT INTO statusuri (status, nume_status) VALUES (-2, 'Dezaprobat director');
+INSERT INTO statusuri (status, nume_status) VALUES (-1, 'Dezaprobat sef');
+INSERT INTO statusuri (status, nume_status) VALUES (0, 'Neaprobat');
+INSERT INTO statusuri (status, nume_status) VALUES (1, 'Aprobat sef');
+INSERT INTO statusuri (status, nume_status) VALUES (2, 'Aprobat director');
+
+INSERT INTO tipcon (motiv) VALUES ('Concediu odihnă');
+INSERT INTO tipcon (motiv) VALUES ('Concediu formare profesională');
+INSERT INTO tipcon (motiv) VALUES ('Concediu medical');
+INSERT INTO tipcon (motiv) VALUES ('Concediu risc maternal');
+INSERT INTO tipcon (motiv) VALUES ('Concediu maternitate');
+
+INSERT INTO tip_poz (id, semnificatie) VALUES (1, 'Manager');
+INSERT INTO tip_poz (id, semnificatie) VALUES (2, 'Angajat');
+
+INSERT INTO regiuni (id_regiune, nume_regiune)
+VALUES (1, 'Europa de Est');
+
+INSERT INTO tari (id_tara, nume_tara, id_regiune)
+VALUES ('RO', 'România', 1);
+
+INSERT INTO locatii (id_locatie, strada, longitudine, latitudine, cod, oras, judet, id_tara)
+VALUES 
+(1, 'Strada Unirii', 45.7489, 21.2087, '300500', 'Timișoara', 'Timiș', 'RO'),
+(2, 'Strada Libertății', 44.4268, 26.1025, '050500', 'București', 'Ilfov', 'RO');
+
+INSERT INTO departament (nume_dep, id_locatie, adresa) 
+VALUES ('IT', 1, 'Strada Principală nr. 1');
+INSERT INTO departament (nume_dep, id_locatie, adresa) 
+VALUES ('HR', 2, 'Strada Principală nr. 2');
+
+INSERT INTO joburi (job_id, nume_job, salmin, salmax)
+VALUES 
+('IT1', 'Manager IT', 5000, 10000),
+('HR1', 'Manager HR', 4000, 9000),
+('IT2', 'Administrator IT', 4500, 9500),
+('HR2', 'Administrator HR', 3500, 8500),
+('IT3', 'Programator IT', 4000, 8000);
+
+INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, id_locatie, adresa, job_id, comision)
+VALUES 
+('Popescu', 'Ion', '1990-05-12', 'popescu.ion@example.com', '0700000000', 'ipopescu', 'parola123', 1, 1, 1, 'Strada Unirii', 'IT1', 0.1),
+('Ionescu', 'Maria', '1985-10-20', 'ionescu.maria@example.com', '0700000001', 'mariai', 'parola456', 2, 2, 2, 'Strada Libertății', 'HR1', 0.2),
+('Georgescu', 'Elena', '1992-07-08', 'elena.georgescu@example.com', '0700000002', 'elena.g', 'parola789', 1, 3, 1, 'Strada Unirii', 'IT2', 0.15),
+('Radu', 'Andrei', '1988-02-15', 'andrei.radu@example.com', '0700000003', 'andrei.r', 'parola000', 2, 4, 2, 'Strada Libertății', 'HR2', 0.25),
+('Petrescu', 'Alexandru', '1996-06-05', 'alex.petrescu@example.com', '0758000003', 'alex.p', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4, 2, 'Strada Libertății', 'IT3', 0.25),
+('Dumitru', 'Alina', '1995-12-01', 'alina.dumitru@example.com', '0700000004', 'alina.d', 'parola555', 1, 2, 1, 'Strada Unirii', 'IT3', 0.12);
+
+select * from useri;
+
+
+select * from statusuri;

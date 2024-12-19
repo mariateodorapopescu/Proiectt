@@ -383,4 +383,34 @@
     <servlet-name>ImageServlet</servlet-name>
     <url-pattern>/ImageServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetLocationsServlet</display-name>
+    <servlet-name>GetLocationsServlet</servlet-name>
+    <servlet-class>mix.GetLocationsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetLocationsServlet</servlet-name>
+    <url-pattern>/getLocations</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>SaveLocationServlet</display-name>
+    <servlet-name>SaveLocationServlet</servlet-name>
+    <servlet-class>mix.SaveLocationServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SaveLocationServlet</servlet-name>
+    <url-pattern>/SaveLocationServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ServletUpdateAddress</display-name>
+    <servlet-name>ServletUpdateAddress</servlet-name>
+    <servlet-class>mix.ServletUpdateAddress</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletUpdateAddress</servlet-name>
+    <url-pattern>/Project/ServletUpdateAddress</url-pattern>
+  </servlet-mapping>
 </web-app>

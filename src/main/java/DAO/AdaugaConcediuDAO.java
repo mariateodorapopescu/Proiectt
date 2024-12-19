@@ -16,34 +16,38 @@ public class AdaugaConcediuDAO {
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 */
-	public int incarca(Concediu concediu) throws ClassNotFoundException, SQLException {
-		// declarare si initializare variabile
-	    String sql = "INSERT INTO concedii" +
-	        "  (id_ang, start_c, end_c, motiv, locatie, status, concedii.tip, durata, added, modified, acc_res) VALUES " +
-	        " (?, ?, ?, ?, ?, ?, ?, ?, (select current_date()), (select current_date()), (select current_date()));";
-	    int rezultat = 0;
-	    // initializare driver pentru comunicarea cu baza de date
-	    Class.forName("com.mysql.cj.jdbc.Driver");
-	    // crearea conexiunii cu baza de date
-	    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-	    		// pregatirea interogarii
-	        PreparedStatement stmt = conexiune.prepareStatement(sql)) {
-	    	// se adauga parametrii dati ca wildcards ce depind de obiectul primit, obiect facut de servlet, in functie de ce a primit de la formular
-	        stmt.setInt(1, concediu.getId_ang());
-	        stmt.setString(2, concediu.getInceput());
-	        stmt.setString(3, concediu.getSfarsit());
-	        stmt.setString(4, concediu.getMotiv());
-	        stmt.setString(5, concediu.getLocatie());
-	        stmt.setInt(6, concediu.getStatus());
-	        stmt.setInt(7, concediu.getTip());
-	        stmt.setInt(8, concediu.getDurata());
-	        rezultat = stmt.executeUpdate();
-
-	    } catch (SQLException e) {
-	        printSQLException(e);
-	    }
-	    return rezultat;
-	}
+	 public int incarca(Concediu concediu) throws ClassNotFoundException, SQLException {
+		    String sql = "INSERT INTO concedii " +
+		        "(id_ang, start_c, end_c, motiv, locatie, status, tip, durata, added, modified, acc_res) VALUES " +
+		        "(?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), CURDATE(), CURDATE())";
+		    
+		    System.out.println("Încercare inserare concediu pentru angajatul: " + concediu.getId_ang());
+		    
+		    Class.forName("com.mysql.cj.jdbc.Driver");
+		    
+		    try (Connection conexiune = DriverManager.getConnection(
+		            "jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		         PreparedStatement stmt = conexiune.prepareStatement(sql)) {
+		        
+		        stmt.setInt(1, concediu.getId_ang());
+		        stmt.setString(2, concediu.getInceput());
+		        stmt.setString(3, concediu.getSfarsit());
+		        stmt.setString(4, concediu.getMotiv());
+		        stmt.setString(5, concediu.getLocatie());
+		        stmt.setInt(6, concediu.getStatus());
+		        stmt.setInt(7, concediu.getTip());
+		        stmt.setInt(8, concediu.getDurata());
+		        
+		        System.out.println("Executing SQL: " + stmt.toString());
+		        int rezultat = stmt.executeUpdate();
+		        System.out.println("Rezultat inserare: " + rezultat);
+		        return rezultat;
+		    } catch (SQLException e) {
+		        System.out.println("Eroare la inserare concediu:");
+		        printSQLException(e);
+		        throw e; // Retransmitem excepția
+		    }
+		} 
 	
 	/**
 	 * Afiseaza frumos / Pretty print o eroare dintr-o baza de date

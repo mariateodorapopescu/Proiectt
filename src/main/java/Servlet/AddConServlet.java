@@ -399,79 +399,48 @@ public class AddConServlet extends HttpServlet {
 	    
 	    // cum la neindeplinirea unei reguli de verificare a concediului se intampla redirectare si return, 
 	    // daca a ajuns in acest punct inseamna ca concediul este valid si, deci, se poate incarca in baza de date
+	   
 	    
-        try {
-            concediu.incarca(concediul);
-            
-            // aici vine partea asincrona
-            // incercare 1
-            /*
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executorService.submit(() -> {
-            	// public void send(int uid, int tip, String start, String end, String motiv, String locatie, int durata) throws ServletException {
-                try {
-					Async1.send(uid, tip, start, end, motiv, locatie, durataa);
-				} catch (ServletException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            });
-            executorService.shutdown();  // Oprește executorul după trimiterea emailului
-            */
-            
-            // se doreste varianta cu servlet asincron, nu cu mai multe thread-uri.
-            // daca ar fi mai multe thread-uri, server-ul s-ar incarca prea mult si ar deveni indisponibil -> neok
-            // jakarta este javax nou
-            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            // asyncContext.setTimeout(1000); 
-            // get timeout, dispatch
-            // java6
-            
-            asyncContext.start(() -> {
-                try {
-                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
-                    MailAsincron.send(id, tip, inceput, sfarsit, motiv, locatie, durata2);
-                    asyncContext.complete();  // Completarea actiunii asincrone
-                } catch (Exception e) {
-                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
-                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
-                    response.setContentType("text/html;charset=UTF-8");
-        	        PrintWriter out = null;
-					try {
-						out = response.getWriter();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-        	        out.println("<script type='text/javascript'>");
-        	        out.println("alert('eroare din cauze necunoscute!');");
-        	        out.println("window.location.href = 'actiuni.jsp';");
-        	        out.println("</script>");
-        	        out.close();
-        	        return; 
-                    
-                }
-            });
-            
-            // abia dupa ce trimit mail-ul trec mai departe , adica se face redirectare la pagina de vizualizare a concediilor personale, ca sa poata vedea ca acel concediu a fost adaugat
-            response.setContentType("text/html;charset=UTF-8");
-            PrintWriter out = response.getWriter();
-		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Adaugare cu succes!');");
-		    out.println("window.location.href = 'concediinoisef.jsp?pag=1';");
-		    out.println("</script>");
-		    out.close();
-        } catch (Exception e) {
-        	// adica se face redirectare la pagina de actiuni ca sa adauge inca o data
-        	response.setContentType("text/html;charset=UTF-8");
-		    PrintWriter out = response.getWriter();
-		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Nu s-a putut adauga concediul din motive necunoscute.');");
-		    out.println("window.location.href = 'actiuni.jsp';");
-		    out.println("</script>");
-		    out.close();
-			e.printStackTrace();
-        }
+	    try {
+	        int result = concediu.incarca(concediul);
+	        
+	        if (result > 0) {
+	            // Concediul a fost inserat cu succes, acum trimitem email-ul asincron
+	            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
+	            
+	            asyncContext.start(() -> {
+	                try {
+	                    MailAsincron.send(id, tip, inceput, sfarsit, motiv, locatie, durata2);
+	                    asyncContext.complete();
+	                    
+	                    // Redirectare după trimiterea email-ului
+	                    response.setContentType("text/html;charset=UTF-8");
+	                    PrintWriter out = response.getWriter();
+	                    out.println("<script type='text/javascript'>");
+	                    out.println("alert('Adaugare cu succes!');");
+	                    out.println("window.location.href = 'concediinoisef.jsp?pag=1';");
+	                    out.println("</script>");
+	                    out.close();
+	                    
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                    asyncContext.complete();
+	                    System.out.println("Eroare la trimiterea email-ului: " + e.getMessage());
+	                }
+	            });
+	        } else {
+	            throw new SQLException("Nu s-a putut adăuga concediul în baza de date");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Eroare la adăugarea concediului: " + e.getMessage() + "');");
+	        out.println("window.location.href = 'actiuni.jsp';");
+	        out.println("</script>");
+	        out.close();
+	    } 
 	}
 	
 	/**
@@ -730,58 +699,45 @@ public class AddConServlet extends HttpServlet {
 		 * @throws ClassNotFoundException
 		 * @throws IOException
 		 */
-		public static boolean preamulti(Concediu concediu, HttpServletRequest request) throws ClassNotFoundException, IOException {
-			// declarare si initializare date
-		    int nr = -1;
-		    int total = -1;
-		    int depid = -1;
-		    Data inceput = stringToDate(concediu.getInceput());
-	        Data sfarsit = stringToDate(concediu.getSfarsit());
-		    
-		    int id = Integer.parseInt(request.getParameter("userId"));
-		    
-		    String sql = "SELECT id_dep FROM useri WHERE id = ?";
-		    String sql2 = "SELECT COUNT(*) AS total FROM useri WHERE id_dep = ?";
-		    String sql3 = "SELECT COUNT(*) AS total FROM concedii JOIN useri ON useri.id = concedii.id_ang " +
-		        "WHERE useri.id_dep = ? AND start_c >= ? AND end_c <= ? and status > 0";
-	
-		    Class.forName("com.mysql.cj.jdbc.Driver");
 
-		    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-		        PreparedStatement stmt = conexiune.prepareStatement(sql);  
-		    	PreparedStatement stmt2 = conexiune.prepareStatement(sql2);
-		    	PreparedStatement stmt3 = conexiune.prepareStatement(sql3)){
-
-		        stmt.setInt(1, id);
-		        try (ResultSet rezultat = stmt.executeQuery()) {
-		            if (rezultat.next()) {
-		                depid = rezultat.getInt("id_dep");
+		private boolean preamulti(Concediu concediu, HttpServletRequest request) throws ClassNotFoundException, IOException {
+		    String sql = "SELECT u.id_dep, " +
+		                 "COUNT(DISTINCT c.id_ang) as plecati, " +
+		                 "(SELECT COUNT(*) FROM useri WHERE id_dep = u.id_dep) as total " +
+		                 "FROM useri u " +
+		                 "LEFT JOIN concedii c ON u.id = c.id_ang " +
+		                 "WHERE u.id = ? " +
+		                 "AND c.start_c <= ? " +
+		                 "AND c.end_c >= ? " +
+		                 "AND c.status >= 0 " +
+		                 "GROUP BY u.id_dep";
+		
+		    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+		         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		
+		        pstmt.setInt(1, concediu.getId_ang());
+		        pstmt.setString(2, concediu.getSfarsit());
+		        pstmt.setString(3, concediu.getInceput());
+		
+		        try (ResultSet rs = pstmt.executeQuery()) {
+		            if (rs.next()) {
+		                int plecati = rs.getInt("plecati");
+		                int total = rs.getInt("total");
+		                
+		                System.out.println("Angajați plecați: " + plecati);
+		                System.out.println("Total angajați în departament: " + total);
+		                
+		                // Verificăm dacă mai mult de jumătate sunt plecați
+		                return plecati < (total / 2);
 		            }
 		        }
-		        
-		        stmt2.setInt(1, depid);
-		        try (ResultSet rsTotalUsers = stmt2.executeQuery()) {
-		            if (rsTotalUsers.next()) {
-		                total = rsTotalUsers.getInt("total");
-		            }
-		        }
-
-		        stmt3.setInt(1, depid);
-		        stmt3.setDate(2, java.sql.Date.valueOf(inceput.getAn() + "-" + inceput.getLuna() + "-" + inceput.getZi()));
-		        stmt3.setDate(3, java.sql.Date.valueOf(sfarsit.getAn() + "-" + sfarsit.getLuna() + "-" + sfarsit.getZi()));
-		        try (ResultSet rsTotalLeaves = stmt3.executeQuery()) {
-		            if (rsTotalLeaves.next()) {
-		                nr = rsTotalLeaves.getInt("total");
-		            }
-		        }
-			        
 		    } catch (SQLException e) {
-		        printSQLException(e);
-		        throw new IOException("Eroare la baza de date", e);
+		        e.printStackTrace();
+		        throw new IOException("Eroare la baza de date: " + e.getMessage());
 		    }
-		    
-		    return nr < (total / 2);
-		}
+		
+		    return true;
+		} 
 		
 		/**
 		 * Verificare daca mai mult de 2 directori sunt plecati in concediu

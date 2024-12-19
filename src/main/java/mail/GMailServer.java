@@ -12,6 +12,7 @@ import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -59,8 +60,16 @@ public class GMailServer extends javax.mail.Authenticator
         return new PasswordAuthentication(user, password);
     }  
     
+    private static boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email != null && email.matches(emailRegex);
+    }
+    
     // Metoda pentru trimiterea unui email cu atasament
     public synchronized void sendattach(String subject, String body, String sender, String recipients, String filepath) throws Exception {
+    	if (!isValidEmail(recipients)) {
+		    throw new AddressException("Adresa de e-mail este invalidă: " + recipients);
+		}
     	MimeMessage m = new MimeMessage(session);
 
 		  try {
@@ -110,6 +119,10 @@ public class GMailServer extends javax.mail.Authenticator
     
     // Metoda pentru trimiterea unui email simplu
 	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
+		if (!isValidEmail(recipients)) {
+		    throw new AddressException("Adresa de e-mail este invalidă: " + recipients);
+		}
+
 		  try {
 	          Email email = new Email(user, password);
 	          email.setFrom("liviaaamp@gmail.com", "Firma XYZ");

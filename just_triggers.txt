@@ -1,0 +1,391 @@
+DROP TRIGGER IF EXISTS after_insert;
+DELIMITER $$
+CREATE TRIGGER after_insert
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    UPDATE useri u
+    SET u.zilecons = (SELECT SUM(c.durata) FROM concedii c WHERE c.id_ang = NEW.id_ang)
+    WHERE u.id = NEW.id_ang;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS afterinsert;
+DELIMITER $$
+CREATE TRIGGER afterinsert
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    SET NEW.durata = DATEDIFF(NEW.end_c, NEW.start_c) + 1;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_insert2;
+DELIMITER $$
+CREATE TRIGGER after_insert2
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    SELECT tip INTO userType FROM useri WHERE id = NEW.id_ang;
+    UPDATE useri
+	SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+    WHERE id = NEW.id_ang;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS before_insert_concedii;
+DELIMITER $$
+CREATE TRIGGER before_insert_concedii
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.end_c < NEW.start_c THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data de final nu poate fi inaintea celei de inceput.';
+        update concedii set durata = 0;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS negativestatus;
+delimiter $$
+CREATE TRIGGER negativestatus
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+	DECLARE userType INT;
+    DECLARE newZilecons INT;
+    SELECT tip INTO userType FROM useri WHERE id = OLD.id_ang;
+    IF NEW.status < 0 THEN
+        SET NEW.durata = 0;
+        SELECT SUM(durata) INTO newZilecons FROM concedii WHERE id_ang = NEW.id_ang AND id != NEW.id;
+        UPDATE useri
+        SET zilecons = newZilecons
+        WHERE id = NEW.id_ang;
+        IF userType = 2 THEN
+            UPDATE useri
+            SET zileramase = 30 - newZilecons, 
+				conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+				conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+            WHERE id = NEW.id_ang;
+        ELSE
+            UPDATE useri
+            SET zileramase = 40 - newZilecons
+            WHERE id = NEW.id_ang;
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_delete;
+DELIMITER $$
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    UPDATE useri
+    SET zilecons = (select sum(durata) from concedii where id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = old.id_ang;
+    IF old.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = old.id_ang;
+    END IF;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (select sum(durata) from concedii where id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (select sum(durata) from concedii where id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS status2;
+DELIMITER $$
+CREATE TRIGGER status2
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 2 and new.status != old.status THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS after_ins;
+DELIMITER $$
+CREATE TRIGGER after_ins
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    SET NEW.zilecons = 0;
+    SET NEW.conluate = 0;
+    SET NEW.conramase = 3;
+    IF NEW.tip = 2 THEN
+        SET NEW.zileramase = 30;
+    ELSE
+        SET NEW.zileramase = 40;
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_mod;
+DELIMITER $$
+CREATE TRIGGER after_mod
+BEFORE UPDATE ON useri
+FOR EACH ROW
+BEGIN
+    IF NEW.tip = 2 and new.tip != old.tip THEN
+        SET NEW.zileramase = 30;
+    ELSE 
+		if new.tip != old.tip and new.tip != 2 then
+			SET NEW.zileramase = 40;
+		END IF;
+    END IF;
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS update_daily_leave_summary;
+DELIMITER $$
+CREATE TRIGGER update_daily_leave_summary
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    -- Insert or update daily counts in the 'plecati' table directly using a range-based selection
+    INSERT INTO plecati (zi, nr, id_dep)
+    SELECT 
+        cal.date AS day, 
+        COUNT(DISTINCT c.id_ang) AS num_employees, 
+        departament.id_dep
+    FROM (
+        SELECT ADDDATE(NEW.start_c, INTERVAL num DAY) AS date
+        FROM (SELECT a.N + b.N * 10 + 0 * 100 AS num
+              FROM 
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+             ) nums
+        WHERE num <= DATEDIFF(NEW.end_c, NEW.start_c)
+    ) cal
+    JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+    JOIN useri u ON c.id_ang = u.id
+    WHERE u.id_dep = departament.id_dep
+    GROUP BY cal.date
+    ON DUPLICATE KEY UPDATE nr = VALUES(nr);
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS update_daily_leave_summary2;
+DELIMITER $$
+CREATE TRIGGER update_daily_leave_summary2
+AFTER update ON concedii
+FOR EACH ROW
+BEGIN
+    -- Insert or update daily counts in the 'plecati' table directly using a range-based selection
+    INSERT INTO plecati (zi, nr, id_dep)
+    SELECT 
+        cal.date AS day, 
+        COUNT(DISTINCT c.id_ang) AS num_employees, 
+        departament.id_dep
+    FROM (
+        SELECT ADDDATE(NEW.start_c, INTERVAL num DAY) AS date
+        FROM (SELECT a.N + b.N * 10 + 0 * 100 AS num
+              FROM 
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+             ) nums
+        WHERE num <= DATEDIFF(NEW.end_c, NEW.start_c)
+    ) cal
+    JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+    JOIN useri u ON c.id_ang = u.id
+    WHERE u.id_dep = departament.id_dep
+    GROUP BY cal.date
+    ON DUPLICATE KEY UPDATE nr = VALUES(nr);
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS update_daily_leave_summary3;
+DELIMITER $$
+CREATE TRIGGER update_daily_leave_summary3
+AFTER delete ON concedii
+FOR EACH ROW
+BEGIN
+    -- Insert or update daily counts in the 'plecati' table directly using a range-based selection
+    INSERT INTO plecati (zi, nr, id_dep)
+    SELECT 
+        cal.date AS day, 
+        COUNT(DISTINCT c.id_ang) AS num_employees, 
+        departament.id_dep
+    FROM (
+        SELECT ADDDATE(old.start_c, INTERVAL num DAY) AS date
+        FROM (SELECT a.N + b.N * 10 + 0 * 100 AS num
+              FROM 
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+                (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+             ) nums
+        WHERE num <= DATEDIFF(old.end_c, old.start_c)
+    ) cal
+    JOIN concedii c ON cal.date BETWEEN c.start_c AND c.end_c
+    JOIN useri u ON c.id_ang = u.id
+    WHERE u.id_dep = departament.id_dep
+    GROUP BY cal.date
+    ON DUPLICATE KEY UPDATE nr = VALUES(nr);
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS teme1;
+DELIMITER $$
+CREATE TRIGGER teme1
+AFTER INSERT ON useri
+FOR EACH ROW
+BEGIN
+    INSERT INTO teme (id_usr) VALUES (NEW.id);
+END$$
+DELIMITER ;
+DROP trigger IF EXISTS teme2;
+DELIMITER $$
+CREATE TRIGGER teme2
+before delete ON useri
+FOR EACH ROW
+BEGIN
+    delete from teme where id_usr = old.id;
+END$$
+DELIMITER ;
+select trigger_schema, trigger_name, action_statement
+from information_schema.triggers where trigger_schema = "test";
+select id_usr from teme;
+delete from concedii where id = 107;
+insert into teme(id_usr) values(33);
+select count(*) from teme;
+select id_ang from concedii;
+DROP trigger IF EXISTS aftrdel;
+DELIMITER $$
+CREATE TRIGGER aftrdel
+before delete ON useri
+FOR EACH ROW
+BEGIN
+    delete from concedii where id_ang = old.id;
+END$$
+DELIMITER ;
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_user_deleted$$
+CREATE TRIGGER before_user_deleted
+BEFORE DELETE ON useri
+FOR EACH ROW
+BEGIN
+    DELETE FROM concedii WHERE id_ang = OLD.id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_dep_deleted$$
+CREATE TRIGGER before_dep_deleted
+BEFORE DELETE ON departament
+FOR EACH ROW
+BEGIN
+    DELETE FROM useri WHERE id_dep = OLD.id_dep;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_del;
+select * from useri;
+update useri set zileramase = 29 where id=3;
+
+DROP TRIGGER IF EXISTS after_delete;
+DELIMITER $$
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    -- Selecting user type and current total duration of leaves
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    -- Update the total duration of leaves
+    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
+    -- Update useri table for leave details
+    UPDATE useri
+    SET zilecons = totalDuration,
+        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
+        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    -- Additional check if the leave was approved
+    IF OLD.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+ROLLBACK;
+DROP TRIGGER IF EXISTS after_update;
+DELIMITER $$
+CREATE TRIGGER after_update
+AFTER update ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    -- Selecting user type and current total duration of leaves
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    -- Update the total duration of leaves
+    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
+    -- Update useri table for leave details
+    UPDATE useri
+    SET zilecons = totalDuration,
+        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
+        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    -- Additional check if the leave was approved
+    IF OLD.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+            conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF new.status = -1 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF OLD.status = 1 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF OLD.status = -2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER before_insert_useri
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    IF NEW.profil IS NULL THEN
+        SET NEW.profil = (SELECT profil FROM useri WHERE username = 'test');
+    END IF;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS before_insert_useri;
