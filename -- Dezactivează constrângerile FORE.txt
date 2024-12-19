@@ -2,124 +2,142 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- Șterge toate tabelele
-DROP TABLE IF EXISTS plecati;
+DROP TABLE IF EXISTS useri;
+DROP TABLE IF EXISTS departament;
+DROP TABLE IF EXISTS tipuri;
+DROP TABLE IF EXISTS concedii;
+DROP TABLE IF EXISTS tipcon;
 DROP TABLE IF EXISTS restrictii;
-DROP TABLE IF EXISTS libere;
 DROP TABLE IF EXISTS statusuri;
 DROP TABLE IF EXISTS teme;
-DROP TABLE IF EXISTS sarbatori;
-DROP TABLE IF EXISTS testt;
-DROP TABLE IF EXISTS tipcon;
-DROP TABLE IF EXISTS tipuri;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS useri;
-DROP TABLE IF EXISTS angajati;
 DROP TABLE IF EXISTS appearance;
-DROP TABLE IF EXISTS image;
-DROP TABLE IF EXISTS mytable;
-DROP TABLE IF EXISTS login;
-DROP TABLE IF EXISTS concedii;
-DROP TABLE IF EXISTS tari;
+DROP TABLE IF EXISTS sarbatori;
+DROP TABLE IF EXISTS libere;
+DROP TABLE IF EXISTS numbers;
 DROP TABLE IF EXISTS regiuni;
+DROP TABLE IF EXISTS tari;
 DROP TABLE IF EXISTS locatii;
-DROP TABLE IF EXISTS departament;
-DROP TABLE IF EXISTS data;
-DROP TABLE IF EXISTS date_logs;
-DROP TABLE IF EXISTS numb;
-DROP TABLE IF EXISTS tichet;
 
 -- Reactivează constrângerile FOREIGN KEY
 SET FOREIGN_KEY_CHECKS = 1;
 
--- SHOW DATABASES;
--- CREATE DATABASE test;
+-- Creare tabele
+CREATE TABLE departament (
+   id_dep INT AUTO_INCREMENT PRIMARY KEY,
+   nume_dep VARCHAR(25) NOT NULL UNIQUE
+);
 
-use test;
-
--- 1. Eliminarea tuturor constrângerilor FOREIGN KEY în mod dinamic
-SET @sql = '';
-
--- Generăm comenzi de eliminare pentru fiecare constrângere FOREIGN KEY
-SELECT GROUP_CONCAT(CONCAT('ALTER TABLE ', TABLE_NAME, ' DROP FOREIGN KEY ', CONSTRAINT_NAME, ';'))
-INTO @sql
-FROM information_schema.KEY_COLUMN_USAGE
-WHERE REFERENCED_TABLE_NAME IS NOT NULL
-AND TABLE_SCHEMA = DATABASE();
-
--- Mesaj pentru confirmare
--- SELECT 'Toate constrângerile FOREIGN KEY au fost eliminate.' AS Status;
-
-
--- 2. Ștergerea tuturor tabelelor existente
-DROP TABLE IF EXISTS aplicari;
-DROP TABLE IF EXISTS istoric_aici;
-DROP TABLE IF EXISTS pozitii;
-DROP TABLE IF EXISTS adeverinte;
-DROP TABLE IF EXISTS experienta;
-DROP TABLE IF EXISTS studii;
-DROP TABLE IF EXISTS limbi;
-DROP TABLE IF EXISTS taskuri;
-DROP TABLE IF EXISTS evenimente;
-DROP TABLE IF EXISTS useri;
-DROP TABLE IF EXISTS departament;
-DROP TABLE IF EXISTS tip_poz;
-DROP TABLE IF EXISTS tipcon;
-DROP TABLE IF EXISTS tipuri;
-DROP TABLE IF EXISTS joburi;
-DROP TABLE IF EXISTS statusuri;
-DROP TABLE IF EXISTS stare;
-DROP TABLE IF EXISTS locatii;
-DROP TABLE IF EXISTS tari;
-DROP TABLE IF EXISTS regiuni;
-DROP TABLE IF EXISTS libere;
-DROP TABLE IF EXISTS numbers;
-DROP TABLE IF EXISTS sarbatori;
-DROP TABLE IF EXISTS ciclu;
-drop table if exists tichet;
-
--- 3. Crearea tabelelor de bază fără dependențe
 CREATE TABLE tipuri (
-    tip INT PRIMARY KEY,
-    denumire VARCHAR(255) NOT NULL
+   tip INT PRIMARY KEY,
+   denumire VARCHAR(25) NOT NULL UNIQUE
+);
+
+CREATE TABLE useri (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   nume VARCHAR(45) NOT NULL,
+   prenume VARCHAR(45) NOT NULL,
+   data_nasterii DATE NOT NULL,
+   adresa VARCHAR(256),
+   email VARCHAR(56) NOT NULL,
+   telefon VARCHAR(25) NOT NULL,
+   username VARCHAR(25) NOT NULL UNIQUE,
+   password VARCHAR(255) NOT NULL,
+   id_dep INT NOT NULL,
+   tip INT NOT NULL,
+   zilecons INT DEFAULT 0,
+   zileramase INT DEFAULT 40,
+   conluate INT DEFAULT 0,
+   conramase INT DEFAULT 3,
+   cnp INT UNIQUE,
+   culoare VARCHAR(25) NOT NULL DEFAULT '#333',
+   activ INT DEFAULT 0,
+   profil MEDIUMBLOB,
+   FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
+   FOREIGN KEY (tip) REFERENCES tipuri(tip)
 );
 
 CREATE TABLE tipcon (
-    tip INT AUTO_INCREMENT PRIMARY KEY,
-    motiv VARCHAR(255) DEFAULT NULL,
-    nr_zile int
+   tip INT AUTO_INCREMENT PRIMARY KEY,
+   motiv VARCHAR(255) DEFAULT NULL,
+   nr_zile INT DEFAULT 0
 );
 
-CREATE TABLE tip_poz (
-    id INT PRIMARY KEY,
-    semnificatie VARCHAR(12)
+CREATE TABLE concedii (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   id_ang INT NOT NULL,
+   start_c DATE NOT NULL,
+   end_c DATE NOT NULL,
+   motiv VARCHAR(256) NOT NULL,
+   locatie VARCHAR(256) NOT NULL,
+   status INT DEFAULT 0,
+   tip INT NOT NULL,
+   durata INT NOT NULL DEFAULT 0,
+   added DATE,
+   modified DATE,
+   acc_res DATE,
+   FOREIGN KEY (id_ang) REFERENCES useri(id),
+   FOREIGN KEY (tip) REFERENCES tipcon(tip)
 );
 
-CREATE TABLE stare (
-    status INT PRIMARY KEY,
-    nume VARCHAR(18)
+CREATE TABLE restrictii (
+   tip INT PRIMARY KEY,
+   decl_dep INT,
+   modif_d INT,
+   del_d INT,
+   decl_usr INT,
+   modif_u INT,
+   del_u INT,
+   auth INT,
+   viz_d INT,
+   introd_c INT,
+   modif_c INT,
+   del_c INT,
+   viz_c_t_an INT,
+   viz_c_t_per INT,
+   viz_c_d_an INT,
+   viz_c_d_per INT,
+   viz_c_a_an INT,
+   viz_c_a_per INT,
+   viz_a_t INT,
+   viz_a_d INT,
+   raport INT,
+   asoc_tip INT,
+   asoc_dep INT
 );
+
+CREATE TABLE statusuri (
+   status INT NOT NULL UNIQUE PRIMARY KEY,
+   nume_status VARCHAR(56) NOT NULL UNIQUE
+);
+
+CREATE TABLE teme (
+   id_usr INT NOT NULL PRIMARY KEY,
+   accent VARCHAR(25) DEFAULT '#10439F',
+   clr VARCHAR(25) DEFAULT '#d8d9e1',
+   sidebar VARCHAR(25) DEFAULT '#ECEDFA',
+   card VARCHAR(25) DEFAULT '#ECEDFA',
+   text VARCHAR(25) DEFAULT '#333',
+   hover VARCHAR(25) DEFAULT '#ECEDFA',
+   FOREIGN KEY (id_usr) REFERENCES useri(id)
+);
+
+CREATE TABLE sarbatori (
+	zi DATE,
+	nume VARCHAR(255)
+);
+
+CREATE TABLE libere (
+	zi DATE,
+	nume VARCHAR(255)
+);
+
 
 CREATE TABLE regiuni (
     id_regiune INT PRIMARY KEY NOT NULL,
     nume_regiune VARCHAR(25)
 );
 
-CREATE TABLE libere (
-    zi DATE,
-    nume VARCHAR(255)
-);
-
-CREATE TABLE numbers (
-    n INT
-);
-
-CREATE TABLE sarbatori (
-    zi DATE,
-    nume VARCHAR(255)
-);
-
--- 4. Crearea tabelelor dependente de bază
-
+-- Crearea tabelelor cu dependențe
 CREATE TABLE tari (
     id_tara CHAR(2) PRIMARY KEY NOT NULL,
     nume_tara VARCHAR(40) NOT NULL,
@@ -127,355 +145,499 @@ CREATE TABLE tari (
     FOREIGN KEY (id_regiune) REFERENCES regiuni(id_regiune)
 );
 
-CREATE TABLE locatii (
-    id_locatie INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    strada VARCHAR(40) NOT NULL,
-    longitudine DOUBLE,
-    latitudine DOUBLE,
-    cod VARCHAR(12) NOT NULL,
-    oras VARCHAR(30) NOT NULL,
-    judet VARCHAR(25) NOT NULL,
-    id_tara CHAR(2) NULL,
-    FOREIGN KEY (id_tara) REFERENCES tari(id_tara)
+create table locatii (
+id int,
+ref int,
+strada VARCHAR(40) NOT NULL,
+longitudine DOUBLE,
+latitudine DOUBLE,
+cod VARCHAR(12) NOT NULL,
+oras VARCHAR(30) NOT NULL,
+judet VARCHAR(25) NOT NULL,
+id_tara CHAR(2) NULL,
+FOREIGN KEY (id_tara) REFERENCES tari(id_tara), 
+FOREIGN KEY (ref) REFERENCES departament(id_dep), 
+FOREIGN KEY (ref) REFERENCES useri(id), 
+FOREIGN KEY (ref) REFERENCES concedii(id)
 );
 
-CREATE TABLE departament (
-    id_dep INT PRIMARY KEY AUTO_INCREMENT,
-    nume_dep VARCHAR(50) NOT NULL,
-    id_locatie INT NOT NULL,
-    adresa VARCHAR(256),
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie)
-);
 
-CREATE TABLE joburi (
-    job_id VARCHAR(10) PRIMARY KEY NOT NULL,
-    nume_job VARCHAR(35) NOT NULL,
-    salmin INT NOT NULL,
-    salmax INT NOT NULL
-);
+-- Trigger pentru a adăuga intrare implicită în teme la crearea unui user
+DELIMITER $$
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON useri
+FOR EACH ROW
+BEGIN
+    INSERT INTO teme (id_usr) VALUES (NEW.id);
+END$$
+DELIMITER ;
 
-CREATE TABLE useri (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nume VARCHAR(50),
-    prenume VARCHAR(50),
-    data_nasterii DATE,
-    adresa VARCHAR(256),
-    email VARCHAR(50),
-    telefon VARCHAR(50),
-    username VARCHAR(50),
-    password varchar(255),
-    id_dep INT,
-    tip INT,
-    cnp iNT,
-    zilecons INT,
-    zileramase INT,
-    conluate int,
-    conramase int,
-	profil mediumblob,
-    activ int,
-    salariu int,
-    platit int,
-    culoare varchar(25),
-    sporuri INT,
-    cod INT,
-    data_ang DATE,
-    data_modif DATE,
-    CV LONGBLOB,
-    scor INT,
-    id_locatie INT NOT NULL,
-    job_id VARCHAR(10) NOT NULL,
-    comision FLOAT NOT NULL,
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
-    FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
-    FOREIGN KEY (tip) REFERENCES tipuri(tip),
-    FOREIGN KEY (job_id) REFERENCES joburi(job_id)
-);
+-- Inserarea datelor inițiale
+INSERT INTO departament (id_dep, nume_dep) VALUES 
+(1, 'HR'),
+(2, 'Finante'),
+(3, 'IT'),
+(4, 'Juridic');
 
-CREATE TABLE istoric_aici (
-    id_job INT PRIMARY KEY AUTO_INCREMENT,
-    id_ang INT NOT NULL,
-    start DATE NOT NULL,
-    endd DATE NOT NULL,
-    id_dep INT NOT NULL,
-    job_id VARCHAR(10) NOT NULL,
-    FOREIGN KEY (id_ang) REFERENCES useri(id),
-    FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
-    FOREIGN KEY (job_id) REFERENCES joburi(job_id)
-);
+INSERT INTO tipuri (tip, denumire) VALUES 
+(0, 'Director'),
+(1, 'Tip1'),
+(2, 'Tip2'),
+(3, 'Sef'),
+(4, 'Administrator');
 
-CREATE TABLE experienta (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    den_job VARCHAR(50),
-    firma VARCHAR(50),
-    pozitie INT,
-    departament INT,
-    start DATE,
-    data_sfarsit DATE,
-    descriere VARCHAR(1000),
-    id_ang INT,
-    id_locatie INT NOT NULL,
-    adresa VARCHAR(256),
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
+INSERT INTO statusuri (status, nume_status) VALUES 
+(-2, 'Dezaprobat director'),
+(-1, 'Dezaprobat sef'),
+(0, 'Neaprobat'),
+(1, 'Aprobat sef'),
+(2, 'Aprobat director');
 
-CREATE TABLE taskuri (
-    id_task INT PRIMARY KEY AUTO_INCREMENT,
-    titlu VARCHAR(50),
-    descriere VARCHAR(255),
-    id_exp INT,
-    id_dest INT,
-    start DATE,
-    data_sfarsit DATE,
-    status INT,
-    puncte INT,
-    id_locatie INT,
-    adresa VARCHAR(256),
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
-    FOREIGN KEY (id_exp) REFERENCES useri(id),
-    FOREIGN KEY (id_dest) REFERENCES useri(id),
-    FOREIGN KEY (status) REFERENCES stare(status)
-);
+INSERT INTO tipcon (motiv, nr_zile) VALUES 
+('Concediu odihnă', 14),
+('Concediu formare profesională', 21),
+('Concediu medical', 21),
+('Concediu risc maternal', 90),
+('Concediu maternitate', 720);
 
-CREATE TABLE evenimente (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nume VARCHAR(50),
-    descriere VARCHAR(255),
-    id_ang INT,
-    puncte INT,
-    id_locatie INT NOT NULL,
-    adresa VARCHAR(256),
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
+INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa) VALUES 
+('Vasile', 'Fabian', '1996-09-19', 'vasile.fabian@example.com', '0700000000', 'fvasile', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 0, 'Strada Unirii'),
+('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății'),
+('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii'),
+('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab'),
+('Petrescu', 'Alexandru', '1996-06-05', 'alex.petrescu@example.com', '0758000003', 'alex.p', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății'),
+('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei'),
+('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei'),
+('Popescu', 'Teodor', '1997-04-04', 'teo.p@example.com', '0700000006', 'teodor.p', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei'),
+('Ionescu', 'Lucian', '1989-04-18', 'lucion@example.com', '0700000007', 'lucian.i', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 3, 'Strada Alunului'),
+('Rebreanu', 'Monica', '1992-05-07', 'monica.reb@example.com', '0700000008', 'monica.reb', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 4, 'Strada Izvorului')
+;
 
-CREATE TABLE studii (
-    id_studii INT PRIMARY KEY AUTO_INCREMENT,
-    facultate VARCHAR(50),
-    universitate VARCHAR(50),
-    ciclu VARCHAR(50),
-    start DATE,
-    data_sfarsit DATE,
-    id_ang INT,
-    id_locatie INT NOT NULL,
-    adresa VARCHAR(256),
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
+SELECT * FROM teme;
 
-CREATE TABLE limbi (
-    id_limba INT PRIMARY KEY AUTO_INCREMENT,
-    limba VARCHAR(50),
-    nivel INT,
-    id_ang INT,
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
+DROP TRIGGER IF EXISTS after_insert;
+DELIMITER $$
+CREATE TRIGGER after_insert
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    UPDATE useri u
+    SET u.zilecons = (SELECT SUM(c.durata) FROM concedii c WHERE c.id_ang = NEW.id_ang)
+    WHERE u.id = NEW.id_ang;
+END$$
+DELIMITER ;
 
-CREATE TABLE pozitii (
-    id_poz INT PRIMARY KEY AUTO_INCREMENT,
-    titlu VARCHAR(50),
-    descriere VARCHAR(50),
-    rol INT,
-    departament INT,
-    start DATE,
-    data_sfarsit DATE,
-    tip_poz INT,
-    activ BIT,
-    id_locatie INT NOT NULL,
-    adresa VARCHAR(256),
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie),
-    FOREIGN KEY (tip_poz) REFERENCES tip_poz(id)
-);
+DROP TRIGGER IF EXISTS afterinsert;
+DELIMITER $$
+CREATE TRIGGER afterinsert
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    SET NEW.durata = DATEDIFF(NEW.end_c, NEW.start_c) + 1;
+END$$
+DELIMITER ;
 
-CREATE TABLE aplicari (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    pozitie INT,
-    data_apl DATE,
-    id_ang INT,
-    id_poz INT,
-    FOREIGN KEY (id_ang) REFERENCES useri(id),
-    FOREIGN KEY (id_poz) REFERENCES pozitii(id_poz)
-);
+DROP TRIGGER IF EXISTS after_insert2;
+DELIMITER $$
+CREATE TRIGGER after_insert2
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    SELECT tip INTO userType FROM useri WHERE id = NEW.id_ang;
+    UPDATE useri
+	SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+    WHERE id = NEW.id_ang;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
 
-CREATE TABLE teme (
-    id_usr INT NOT NULL,
-    accent VARCHAR(25) DEFAULT '#10439F',
-    clr VARCHAR(25) DEFAULT '#d8d9e1',
-    sidebar VARCHAR(25) DEFAULT '#ECEDFA',
-    card VARCHAR(25) DEFAULT '#ECEDFA',
-    text VARCHAR(25) DEFAULT '#333',
-    hover VARCHAR(25) DEFAULT '#ECEDFA',
-    PRIMARY KEY (id_usr),
-    CONSTRAINT fk_id_usr FOREIGN KEY (id_usr) REFERENCES useri (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+DROP TRIGGER IF EXISTS before_insert_concedii;
+DELIMITER $$
+CREATE TRIGGER before_insert_concedii
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.end_c < NEW.start_c THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data de final nu poate fi inaintea celei de inceput.';
+        update concedii set durata = 0;
+    END IF;
+END$$
+DELIMITER ;
 
-CREATE TABLE statusuri (
-    status INT NOT NULL UNIQUE, -- Codul de status (-2, -1, 0, 1, 2)
-    nume_status VARCHAR(56) NOT NULL UNIQUE, -- Semnificația statusului
-    PRIMARY KEY (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+DROP TRIGGER IF EXISTS negativestatus;
+delimiter $$
+CREATE TRIGGER negativestatus
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+	DECLARE userType INT;
+    DECLARE newZilecons INT;
+    SELECT tip INTO userType FROM useri WHERE id = OLD.id_ang;
+    IF NEW.status < 0 THEN
+        SET NEW.durata = 0;
+        SELECT SUM(durata) INTO newZilecons FROM concedii WHERE id_ang = NEW.id_ang AND id != NEW.id;
+        UPDATE useri
+        SET zilecons = newZilecons
+        WHERE id = NEW.id_ang;
+        IF userType = 2 THEN
+            UPDATE useri
+            SET zileramase = 30 - newZilecons, 
+				conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+				conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+            WHERE id = NEW.id_ang;
+        ELSE
+            UPDATE useri
+            SET zileramase = 40 - newZilecons
+            WHERE id = NEW.id_ang;
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
 
-CREATE TABLE concedii (
-    id INT NOT NULL AUTO_INCREMENT,
-    id_ang INT NOT NULL,
-    start_c DATE NOT NULL,
-    end_c DATE NOT NULL,
-    motiv VARCHAR(255) DEFAULT NULL,
-    locatie VARCHAR(255) DEFAULT NULL,
-    status INT DEFAULT 0,
-    tip INT DEFAULT NULL,
-    durata int,
-    added DATE NOT NULL,
-    modified date,
-    acc_res DATE DEFAULT NULL,
-    menuni VARCHAR(255) DEFAULT NULL,
-    id_locatie INT DEFAULT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (id_ang) REFERENCES useri (id),
-    FOREIGN KEY (tip) REFERENCES tipuri (tip),
-    FOREIGN KEY (id_locatie) REFERENCES locatii (id_locatie),
-    FOREIGN KEY (status) REFERENCES statusuri (status) -- Adăugăm relația către statusuri
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+DROP TRIGGER IF EXISTS after_delete;
+DELIMITER $$
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    UPDATE useri
+    SET zilecons = (select sum(durata) from concedii where id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = old.id_ang;
+    IF old.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = old.id_ang;
+    END IF;
+    IF userType = 2 THEN
+        UPDATE useri
+        SET zileramase = 30 - (select sum(durata) from concedii where id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    ELSE
+        UPDATE useri
+        SET zileramase = 40 - (select sum(durata) from concedii where id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
 
--- Creare tabel image
-CREATE TABLE image (
-    id INT PRIMARY KEY,
-    firstname VARCHAR(50),
-    lastname VARCHAR(50),
-    email VARCHAR(50),
-    image BLOB
-);
+DROP TRIGGER IF EXISTS status2;
+DELIMITER $$
+CREATE TRIGGER status2
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 2 and new.status != old.status THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
+        WHERE id = NEW.id_ang;
+    END IF;
+END$$
+DELIMITER ;
 
--- Creare tabel login
-CREATE TABLE login (
-    username VARCHAR(45),
-    password VARCHAR(45)
-);
+DROP TRIGGER IF EXISTS after_ins;
+DELIMITER $$
+CREATE TRIGGER after_ins
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    SET NEW.zilecons = 0;
+    SET NEW.conluate = 0;
+    SET NEW.conramase = 3;
+    IF NEW.tip = 2 THEN
+        SET NEW.zileramase = 30;
+    ELSE
+        SET NEW.zileramase = 40;
+    END IF;
+END$$
+DELIMITER ;
 
--- Creare tabel date_logs
-CREATE TABLE date_logs (
-    date_checked DATE
-);
+DROP TRIGGER IF EXISTS after_mod;
+DELIMITER $$
+CREATE TRIGGER after_mod
+BEFORE UPDATE ON useri
+FOR EACH ROW
+BEGIN
+    IF NEW.tip = 2 and new.tip != old.tip THEN
+        SET NEW.zileramase = 30;
+    ELSE 
+		if new.tip != old.tip and new.tip != 2 then
+			SET NEW.zileramase = 40;
+		END IF;
+    END IF;
+END$$
+DELIMITER ;
 
--- Creare tabel tichet
-CREATE TABLE tichet (
-    id MEDIUMINT PRIMARY KEY,
-    subiect VARCHAR(255),
-    continut VARCHAR(51),
-    id_locatie INT,
-    FOREIGN KEY (id_locatie) REFERENCES locatii(id_locatie)
-);
+DROP trigger IF EXISTS teme1;
+DELIMITER $$
+CREATE TRIGGER teme1
+AFTER INSERT ON useri
+FOR EACH ROW
+BEGIN
+    INSERT INTO teme (id_usr) VALUES (NEW.id);
+END$$
+DELIMITER ;
 
--- Creare tabel appearance
-CREATE TABLE appearance (
-    id_usr INT PRIMARY KEY,
-    red INT,
-    orange INT,
-    yellow INT,
-    green INT,
-    blue INT,
-    indigo INT,
-    violet INT,
-    pink INT,
-    teal INT,
-    brown INT,
-    grey INT,
-    black INT,
-    white INT,
-    body_color VARCHAR(25),
-    FOREIGN KEY (id_usr) REFERENCES useri(id)
-);
+DROP trigger IF EXISTS teme2;
+DELIMITER $$
+CREATE TRIGGER teme2
+before delete ON useri
+FOR EACH ROW
+BEGIN
+    delete from teme where id_usr = old.id;
+END$$
+DELIMITER ;
 
--- Creare tabel mytable
-CREATE TABLE mytable (
-    id MEDIUMINT PRIMARY KEY,
-    nume VARCHAR(255),
-    telefon VARCHAR(10),
-    email VARCHAR(255),
-    adresa VARCHAR(255)
-);
+select
+	trigger_schema
+    ,trigger_name
+    ,action_statement
+from
+	information_schema.triggers
+where
+	trigger_schema = "test";
 
--- Creare tabel restrictii
-CREATE TABLE restrictii (
-    tip INT,
-    decl_dep INT,
-    modif_d INT,
-    del_d INT,
-    decl_usr INT,
-    modif_usr INT,
-    del_usr INT,
-    auth INT,
-    viz_d INT,
-    introd_c INT,
-    modif_c INT,
-    del_c INT,
-    viz_c_s_an INT,
-    viz_c_s_per INT,
-    viz_c_d_an INT,
-    viz_c_d_per INT,
-    viz_c_a_an INT,
-    viz_c_a_per INT,
-    viz_a_i INT,
-    viz_a_d INT,
-    report INT,
-    asoc_tip INT,
-    asoc_dep INT
-);
+DROP trigger IF EXISTS aftrdel;
+DELIMITER $$
+CREATE TRIGGER aftrdel
+before delete ON useri
+FOR EACH ROW
+BEGIN
+    delete from concedii where id_ang = old.id;
+END$$
+DELIMITER ;
 
-INSERT INTO tipuri (tip, denumire) VALUES (1, 'Director');
-INSERT INTO tipuri (tip, denumire) VALUES (2, 'Sef');
-INSERT INTO tipuri (tip, denumire) VALUES (3, 'Administrator');
-INSERT INTO tipuri (tip, denumire) VALUES (4, 'Angajat');
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_user_deleted$$
+CREATE TRIGGER before_user_deleted
+BEFORE DELETE ON useri
+FOR EACH ROW
+BEGIN
+    DELETE FROM concedii WHERE id_ang = OLD.id;
+END$$
+DELIMITER ;
 
-INSERT INTO statusuri (status, nume_status) VALUES (-2, 'Dezaprobat director');
-INSERT INTO statusuri (status, nume_status) VALUES (-1, 'Dezaprobat sef');
-INSERT INTO statusuri (status, nume_status) VALUES (0, 'Neaprobat');
-INSERT INTO statusuri (status, nume_status) VALUES (1, 'Aprobat sef');
-INSERT INTO statusuri (status, nume_status) VALUES (2, 'Aprobat director');
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_dep_deleted$$
+CREATE TRIGGER before_dep_deleted
+BEFORE DELETE ON departament
+FOR EACH ROW
+BEGIN
+    DELETE FROM useri WHERE id_dep = OLD.id_dep;
+END$$
+DELIMITER ;
+DROP TRIGGER IF EXISTS after_del;
 
-INSERT INTO tipcon (motiv) VALUES ('Concediu odihnă');
-INSERT INTO tipcon (motiv) VALUES ('Concediu formare profesională');
-INSERT INTO tipcon (motiv) VALUES ('Concediu medical');
-INSERT INTO tipcon (motiv) VALUES ('Concediu risc maternal');
-INSERT INTO tipcon (motiv) VALUES ('Concediu maternitate');
+DROP TRIGGER IF EXISTS after_delete;
+DELIMITER $$
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    -- Selecting user type and current total duration of leaves
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    -- Update the total duration of leaves
+    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
+    -- Update useri table for leave details
+    UPDATE useri
+    SET zilecons = totalDuration,
+        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
+        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    -- Additional check if the leave was approved
+    IF OLD.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
 
-INSERT INTO tip_poz (id, semnificatie) VALUES (1, 'Manager');
-INSERT INTO tip_poz (id, semnificatie) VALUES (2, 'Angajat');
+-- ROLLBACK;
 
-INSERT INTO regiuni (id_regiune, nume_regiune)
-VALUES (1, 'Europa de Est');
+DROP TRIGGER IF EXISTS after_update;
+DELIMITER $$
+CREATE TRIGGER after_update
+AFTER update ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    DECLARE totalDuration INT;
+    -- Selecting user type and current total duration of leaves
+    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
+    -- Update the total duration of leaves
+    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
+    -- Update useri table for leave details
+    UPDATE useri
+    SET zilecons = totalDuration,
+        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
+        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+    WHERE id = OLD.id_ang;
+    -- Additional check if the leave was approved
+    IF OLD.status = 2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
+            conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF new.status = -1 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF OLD.status = 1 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+    IF OLD.status = -2 THEN
+        UPDATE useri
+        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
+			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+        WHERE id = OLD.id_ang;
+    END IF;
+END$$
+DELIMITER ;
 
-INSERT INTO tari (id_tara, nume_tara, id_regiune)
-VALUES ('RO', 'România', 1);
+DELIMITER $$
+CREATE TRIGGER before_insert_useri
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    IF NEW.profil IS NULL THEN
+        SET NEW.profil = (SELECT profil FROM useri WHERE username = 'test');
+    END IF;
+END$$
+DELIMITER ;
 
-INSERT INTO locatii (id_locatie, strada, longitudine, latitudine, cod, oras, judet, id_tara)
-VALUES 
-(1, 'Strada Unirii', 45.7489, 21.2087, '300500', 'Timișoara', 'Timiș', 'RO'),
-(2, 'Strada Libertății', 44.4268, 26.1025, '050500', 'București', 'Ilfov', 'RO');
+ -- Triggeri pentru useri
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_insert_useri;
+CREATE TRIGGER before_insert_useri
+BEFORE INSERT ON useri
+FOR EACH ROW
+BEGIN
+    SET NEW.zilecons = 0;
+    SET NEW.conluate = 0;
+    SET NEW.conramase = 3;
+    SET NEW.zileramase = IF(NEW.tip = 2, 30, 40);
+END$$
+DELIMITER ;
 
-INSERT INTO departament (nume_dep, id_locatie, adresa) 
-VALUES ('IT', 1, 'Strada Principală nr. 1');
-INSERT INTO departament (nume_dep, id_locatie, adresa) 
-VALUES ('HR', 2, 'Strada Principală nr. 2');
+-- Triggeri pentru concedii
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_insert_concedii;
+CREATE TRIGGER before_insert_concedii
+BEFORE INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.end_c < NEW.start_c THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data de final nu poate fi inaintea celei de inceput.';
+    END IF;
+    SET NEW.durata = DATEDIFF(NEW.end_c, NEW.start_c) + 1;
+    SET NEW.added = CURDATE();
+    SET NEW.modified = CURDATE();
+    SET NEW.acc_res = CURDATE();
+END$$
+DELIMITER ;
 
-INSERT INTO joburi (job_id, nume_job, salmin, salmax)
-VALUES 
-('IT1', 'Manager IT', 5000, 10000),
-('HR1', 'Manager HR', 4000, 9000),
-('IT2', 'Administrator IT', 4500, 9500),
-('HR2', 'Administrator HR', 3500, 8500),
-('IT3', 'Programator IT', 4000, 8000);
+DELIMITER $$ -- ?
+DROP TRIGGER IF EXISTS after_insert_concedii;
+CREATE TRIGGER after_insert_concedii
+AFTER INSERT ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    SELECT tip INTO userType FROM useri WHERE id = NEW.id_ang;
+    
+    UPDATE useri u 
+    SET 
+        u.zilecons = COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0), 0),
+        u.conluate = (SELECT COUNT(*) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0),
+        u.conramase = 3 - (SELECT COUNT(*) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0),
+        u.zileramase = IF(userType = 2, 
+                         30 - COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0), 0),
+                         40 - COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0), 0))
+    WHERE u.id = NEW.id_ang;
+END$$
+DELIMITER ;
 
-INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, id_locatie, adresa, job_id, comision)
-VALUES 
-('Popescu', 'Ion', '1990-05-12', 'popescu.ion@example.com', '0700000000', 'ipopescu', 'parola123', 1, 1, 1, 'Strada Unirii', 'IT1', 0.1),
-('Ionescu', 'Maria', '1985-10-20', 'ionescu.maria@example.com', '0700000001', 'mariai', 'parola456', 2, 2, 2, 'Strada Libertății', 'HR1', 0.2),
-('Georgescu', 'Elena', '1992-07-08', 'elena.georgescu@example.com', '0700000002', 'elena.g', 'parola789', 1, 3, 1, 'Strada Unirii', 'IT2', 0.15),
-('Radu', 'Andrei', '1988-02-15', 'andrei.radu@example.com', '0700000003', 'andrei.r', 'parola000', 2, 4, 2, 'Strada Libertății', 'HR2', 0.25),
-('Petrescu', 'Alexandru', '1996-06-05', 'alex.petrescu@example.com', '0758000003', 'alex.p', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4, 2, 'Strada Libertății', 'IT3', 0.25),
-('Dumitru', 'Alina', '1995-12-01', 'alina.dumitru@example.com', '0700000004', 'alina.d', 'parola555', 1, 2, 1, 'Strada Unirii', 'IT3', 0.12);
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_update_concedii;
+CREATE TRIGGER before_update_concedii
+BEFORE UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+    IF NEW.status < 0 THEN
+        SET NEW.durata = 0;
+    END IF;
+    SET NEW.modified = CURDATE();
+END$$
+DELIMITER ;
 
-select * from useri;
+DELIMITER $$
+DROP TRIGGER IF EXISTS after_update_concedii;
+CREATE TRIGGER after_update_concedii
+AFTER UPDATE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    SELECT tip INTO userType FROM useri WHERE id = NEW.id_ang;
+    
+    UPDATE useri u 
+    SET 
+        u.zilecons = COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0), 0),
+        u.conluate = (SELECT COUNT(*) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0),
+        u.conramase = 3 - (SELECT COUNT(*) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0),
+        u.zileramase = IF(userType = 2, 
+                         30 - COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0), 0),
+                         40 - COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang AND status >= 0), 0))
+    WHERE u.id = NEW.id_ang;
+END$$
+DELIMITER ;
 
-
-select * from statusuri;
+DELIMITER $$
+DROP TRIGGER IF EXISTS after_delete_concedii;
+CREATE TRIGGER after_delete_concedii
+AFTER DELETE ON concedii
+FOR EACH ROW
+BEGIN
+    DECLARE userType INT;
+    SELECT tip INTO userType FROM useri WHERE id = OLD.id_ang;
+    
+    UPDATE useri u 
+    SET 
+        u.zilecons = COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = OLD.id_ang AND status >= 0), 0),
+        u.conluate = (SELECT COUNT(*) FROM concedii WHERE id_ang = OLD.id_ang AND status >= 0),
+        u.conramase = 3 - (SELECT COUNT(*) FROM concedii WHERE id_ang = OLD.id_ang AND status >= 0),
+        u.zileramase = IF(userType = 2, 
+                         30 - COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = OLD.id_ang AND status >= 0), 0),
+                         40 - COALESCE((SELECT SUM(durata) FROM concedii WHERE id_ang = OLD.id_ang AND status >= 0), 0))
+    WHERE u.id = OLD.id_ang;
+END$$
+DELIMITER ; 
