@@ -413,4 +413,14 @@
     <servlet-name>ServletUpdateAddress</servlet-name>
     <url-pattern>/Project/ServletUpdateAddress</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ServletUpdateAddressDep</display-name>
+    <servlet-name>ServletUpdateAddressDep</servlet-name>
+    <servlet-class>mix.ServletUpdateAddressDep</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletUpdateAddressDep</servlet-name>
+    <url-pattern>/ServletUpdateAddressDep</url-pattern>
+  </servlet-mapping>
 </web-app>
