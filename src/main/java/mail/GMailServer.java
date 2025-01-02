@@ -1,5 +1,6 @@
 package mail;
 import java.io.ByteArrayInputStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +19,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
+//import javax.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import com.email.durgesh.Email;
 
