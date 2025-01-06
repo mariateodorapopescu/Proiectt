@@ -394,10 +394,6 @@ table.picka-table tr {
                     
                 </div>
                  <div>
-                        <label style="color:<%=text%>" class="login__label">Locație</label>
-                        <div id="mapDiv"></div>
-                        <input type="hidden" name="latitude" id="latitude">
-                        <input type="hidden" name="longitude" id="longitude">
                     </div>
                 </td></tr>
 </table>
@@ -408,11 +404,8 @@ table.picka-table tr {
                 </div>
                 
             </form>
- <div id="viewDiv"></div>
-  <button id="searchButton">Căutare</button>
-  <div id="searchPane"></div>
 
-           
+    
         </div>
     </div>
      <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>

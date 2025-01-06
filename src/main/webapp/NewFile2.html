@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adaugare Adresa</title>
+  <title>Adaugare Adresa Departament</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.30/"></script>
   <style>
@@ -122,12 +122,12 @@
 	      const country = document.getElementById("country").value;
 		  // const county = document.getElementById("county").value;
 	      const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
-	      const idDep = new URLSearchParams(window.location.search).get("id_dep");
+	      const userId = new URLSearchParams(window.location.search).get("id");
 
-	      if (!idDep) {
-	    	  document.getElementById("addressOutput").textContent = "ID-ul departamentului este lipsa!";
-	    	  return;
-	    	}
+	      if (!userId) {
+	        document.getElementById("addressOutput").textContent = "ID-ul utilizatorului este lipsa!";
+	        return;
+	      }
 
 	      document.getElementById("addressOutput").textContent = `Adresa formata: ${address}`;
 
@@ -155,11 +155,11 @@
 	          view.zoom = 14;
 
 	          // Trimite datele către servlet
-	          fetch("ServletUpdateAddressDep", {
+	          fetch("ServletUpdateAddress", {
 	            method: "POST",
 	            headers: { "Content-Type": "application/json" },
 	            body: JSON.stringify({
-	              id_dep: idDep,
+	              userId: userId,
 	              adresa: address,
 	              strada: street,
 	              oras: city,
@@ -179,7 +179,7 @@
 	            }
 	          })
 	          .then((data) => {
-	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru utilizatorul cu ID-ul ${idDep}.`;
+	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru utilizatorul cu ID-ul ${userId}.`;
 	          })
 	          .catch((error) => {
 	            console.error("Eroare la trimiterea datelor catre servlet:", error);

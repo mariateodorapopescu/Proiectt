@@ -578,6 +578,7 @@
 		}
 		.sidebar ul li a .sitextt {
 		    color: <%=text%>;  
+		    
 		}
 		.content{
 		    overflow-y: hidden; /* Permite scroll-ul orizontal */
