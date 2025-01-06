@@ -18,7 +18,7 @@ public class ServletUpdateAddressDep extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        System.out.println("A primit cererea POST");
+        // System.out.println("A primit cererea POST");
 
         // Citește corpul cererii o singură dată
         StringBuilder sb = new StringBuilder();
@@ -29,14 +29,15 @@ public class ServletUpdateAddressDep extends HttpServlet {
             }
         }
         String rawJson = sb.toString();
-        System.out.println("Raw JSON received: " + rawJson);
-
+        // System.out.println("Raw JSON received: " + rawJson);
+        int ok = 0;
+        System.out.println(ok);    
         JSONObject json;
         try {
             json = new JSONObject(rawJson);
-            System.out.println("JSON parsare reușită: " + json);
+            //System.out.println("JSON parsare reușită: " + json);
         } catch (Exception e) {
-            System.err.println("Eroare la parsarea JSON: " + e.getMessage());
+            //System.err.println("Eroare la parsarea JSON: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Eroare: Datele JSON sunt invalide.");
             return;
@@ -59,37 +60,92 @@ public class ServletUpdateAddressDep extends HttpServlet {
             response.getWriter().write("Eroare: Parametrii lipsesc sau sunt invalizi.");
             return;
         }
-
-        // Conectare la baza de date și actualizare adresă
-
+       
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-             PreparedStatement stmt = conn.prepareStatement("insert into locatii_departamente(id_dep, strada, longitudine, latitudine, cod, oras, judet, tara) values (?,?,?,?,?,?,?,?);")) {
+             PreparedStatement stmt = conn.prepareStatement("select id_dep from locatii_departamente where id_dep = ?")) {
 
            
             stmt.setString(1, idDep); 
-            stmt.setString(2, adresa);
-            stmt.setDouble(3, latitudine);
-            stmt.setDouble(4, longitudine);
-            stmt.setString(5, cod);
-            stmt.setString(6, oras);
-            stmt.setString(7, judet);
-            stmt.setString(8, tara);
+            
             int rowsUpdated = stmt.executeUpdate();
 
             if (rowsUpdated > 0) {
-                System.out.println("Adresa actualizată cu succes pentru departamentul cu ID-ul: " + idDep);
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("Adresa a fost actualizată cu succes.");
-            } else {
-                System.err.println("Departamentul cu ID-ul " + idDep + " nu a fost găsit.");
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write("Departamentul specificat nu a fost găsit.");
+                ok = 1;
             }
         } catch (Exception e) {
             System.err.println("Eroare la actualizarea adresei în baza de date: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Eroare la actualizarea adresei.");
         }
+        
+        System.out.println(ok);        
+        if (ok == 0) {
+        
+	        // Conectare la baza de date și actualizare adresă
+	
+	        try (Connection conn = DriverManager.getConnection(
+	                "jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+	             PreparedStatement stmt = conn.prepareStatement("insert into locatii_departamente(id_dep, strada, longitudine, latitudine, cod, oras, judet, tara) values (?,?,?,?,?,?,?,?);")) {
+	
+	            stmt.setString(1, idDep); 
+	            stmt.setString(2, adresa);
+	            stmt.setDouble(3, latitudine);
+	            stmt.setDouble(4, longitudine);
+	            stmt.setString(5, cod);
+	            stmt.setString(6, oras);
+	            stmt.setString(7, judet);
+	            stmt.setString(8, tara);
+	            int rowsUpdated = stmt.executeUpdate();
+	
+	            if (rowsUpdated > 0) {
+	                System.out.println("Adresa actualizată cu succes pentru departamentul cu ID-ul: " + idDep);
+	                response.setStatus(HttpServletResponse.SC_OK);
+	                response.getWriter().write("Adresa a fost actualizată cu succes.");
+	            } else {
+	                System.err.println("Departamentul cu ID-ul " + idDep + " nu a fost găsit.");
+	                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	                response.getWriter().write("Departamentul specificat nu a fost găsit.");
+	            }
+	        } catch (Exception e) {
+	            System.err.println("Eroare la actualizarea adresei în baza de date: " + e.getMessage());
+	            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	            response.getWriter().write("Eroare la actualizarea adresei.");
+	        }
+    } else {
+    	  try (Connection conn = DriverManager.getConnection(
+	                "jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+	             PreparedStatement stmt = conn.prepareStatement("update locatii_departamente set id_dep = ?, strada = ?, longitudine = ?, latitudine = ?, cod = ?, oras = ?, judet = ?, tara = ? where id_dep = ?;")) {
+	
+	           
+	            stmt.setString(8, idDep); 
+	            stmt.setString(1, adresa);
+	            stmt.setDouble(2, latitudine);
+	            stmt.setDouble(3, longitudine);
+	            stmt.setString(4, cod);
+	            stmt.setString(5, oras);
+	            stmt.setString(6, judet);
+	            stmt.setString(7, tara);
+	            int rowsUpdated = stmt.executeUpdate();
+	
+	            if (rowsUpdated > 0) {
+	                System.out.println("Adresa actualizată cu succes pentru departamentul cu ID-ul: " + idDep);
+	                response.setStatus(HttpServletResponse.SC_OK);
+	                response.getWriter().write("Adresa a fost actualizată cu succes.");
+	            } else {
+	                System.err.println("Departamentul cu ID-ul " + idDep + " nu a fost găsit.");
+	                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	                response.getWriter().write("Departamentul specificat nu a fost găsit.");
+	            }
+	        } catch (Exception e) {
+	            System.err.println("Eroare la actualizarea adresei în baza de date: " + e.getMessage());
+	            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	            response.getWriter().write("Eroare la actualizarea adresei.");
+	        }
+	    }
+    }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+    	doPost(request, response);
     }
 }
