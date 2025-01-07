@@ -172,14 +172,7 @@
                                 found = true;
                                 out.print("<tr>" + "<td data-label='Nume departament'>" +
                                         rs1.getString("nume_dep") + "</td>");
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='NewFile1.html?id_dep=" + rs1.getInt("id_dep")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
-                           
-=======
->>>>>>> parent of 7f4d593 (isim2)
-=======
->>>>>>> parent of 7f4d593 (isim2)
+
                                 out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifdep2.jsp?username=" + rs1.getString("nume_dep")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='DelDepServlet?username=" + rs1.getString("nume_dep")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                             	// System.out.println(rs1.getInt("nr_crt"));
