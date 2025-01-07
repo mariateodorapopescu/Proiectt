@@ -365,7 +365,7 @@
     <servlet-name>UploadImageServlet</servlet-name>
     <servlet-class>Servlet.UploadImageServlet</servlet-class>
     <multipart-config>
-      <location>C:\Users\Claudia Girnita\OneDrive\Desktop\Facultate\Popi\usrprofile</location>
+      <location>C:\Users\Popi\Desktop</location>
       <max-file-size>10485760</max-file-size>
       <max-request-size>15728640</max-request-size>
       <file-size-threshold>102400</file-size-threshold>
@@ -412,5 +412,15 @@
   <servlet-mapping>
     <servlet-name>ServletUpdateAddress</servlet-name>
     <url-pattern>/Project/ServletUpdateAddress</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ServletUpdateAddressDep</display-name>
+    <servlet-name>ServletUpdateAddressDep</servlet-name>
+    <servlet-class>mix.ServletUpdateAddressDep</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletUpdateAddressDep</servlet-name>
+    <url-pattern>/ServletUpdateAddressDep</url-pattern>
   </servlet-mapping>
 </web-app>
