@@ -155,7 +155,7 @@
 	          view.zoom = 14;
 
 	          // Trimite datele către servlet
-	          fetch("ServletUpdateAddressDep", {
+	          fetch("/Proiect/ServletUpdateAddressDep", {
 	            method: "POST",
 	            headers: { "Content-Type": "application/json" },
 	            body: JSON.stringify({
@@ -179,7 +179,7 @@
 	            }
 	          })
 	          .then((data) => {
-	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru utilizatorul cu ID-ul ${idDep}.`;
+	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru departamentul cu ID-ul ${idDep}.`;
 	          })
 	          .catch((error) => {
 	            console.error("Eroare la trimiterea datelor catre servlet:", error);
