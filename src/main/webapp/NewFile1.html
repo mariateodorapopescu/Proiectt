@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adaugare Adresa Departament</title>
+  <title>Adaugare Adresa</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.30/"></script>
   <style>
@@ -46,133 +46,158 @@
 <body>
   <div id="viewDiv"></div>
   <div class="form-container">
-    <h3>Adaugare Adresa Departament</h3>
+    <h3>AAAAAAA</h3>
     <input type="text" id="street" placeholder="Strada">
     <input type="text" id="number" placeholder="Numarul">
     <input type="text" id="code" placeholder="Cod postal">
     <input type="text" id="sector" placeholder="Sector (optional)">
     <input type="text" id="city" placeholder="Oras">
     <input type="text" id="country" placeholder="Tara">
-    <button id="addAddress">Adaugare Adresa</button>
+    <button id="addAddress">AAAAAAAAAA</button>
     <p id="addressOutput"></p>
     <p id="locationOutput"></p>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      require([
-        "esri/config",
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/Graphic",
-        "esri/rest/locator"
-      ], function (esriConfig, Map, MapView, Graphic, locator) {
-        esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
+ <script>
+ document.addEventListener('DOMContentLoaded', function () {
+	  require([
+	    "esri/config",
+	    "esri/Map",
+	    "esri/views/MapView",
+	    "esri/Graphic",
+	    "esri/rest/locator"
+	  ], function (esriConfig, Map, MapView, Graphic, locator) {
+	    esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
-        const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+	    const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
 
-        const map = new Map({ basemap: "arcgis/topographic" });
-        const view = new MapView({
-          container: "viewDiv",
-          map: map,
-          center: [0, 20],
-          zoom: 2
-        });
+	    const map = new Map({
+	      basemap: "arcgis/topographic"
+	    });
 
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const { latitude, longitude } = position.coords;
-            view.center = [longitude, latitude];
-            view.zoom = 14;
+	    const view = new MapView({
+	      container: "viewDiv",
+	      map: map,
+	      center: [0, 20],
+	      zoom: 2
+	    });
 
-            const userLocation = new Graphic({
-              geometry: { type: "point", longitude: longitude, latitude: latitude },
-              symbol: {
-                type: "simple-marker",
-                color: "red",
-                size: "10px",
-                outline: { color: "white", width: 1 }
-              }
-            });
+	    navigator.geolocation.getCurrentPosition(
+	      function (position) {
+	        const { latitude, longitude } = position.coords;
+	        view.center = [longitude, latitude];
+	        view.zoom = 14;
 
-            view.graphics.add(userLocation);
-            document.getElementById("locationOutput").textContent = `Locatia curenta: Latitudine ${latitude.toFixed(6)}, Longitudine ${longitude.toFixed(6)}`;
-          },
-          function (error) {
-            console.error("Eroare la detectarea locatiei utilizatorului:", error);
-            document.getElementById("locationOutput").textContent = "Eroare la detectarea locatiei.";
-          }
-        );
+	        const userLocation = new Graphic({
+	          geometry: {
+	            type: "point",
+	            longitude: longitude,
+	            latitude: latitude
+	          },
+	          symbol: {
+	            type: "simple-marker",
+	            color: "red",
+	            size: "10px",
+	            outline: {
+	              color: "white",
+	              width: 1
+	            }
+	          }
+	        });
 
-        document.getElementById("addAddress").addEventListener("click", function () {
-          const street = document.getElementById("street").value;
-          const number = document.getElementById("number").value;
-          const code = document.getElementById("code").value;
-          const sector = document.getElementById("sector").value;
-          const city = document.getElementById("city").value;
-          const country = document.getElementById("country").value;
+	        view.graphics.add(userLocation);
+	        document.getElementById("locationOutput").textContent = `Locatia curenta: Latitudine ${latitude.toFixed(6)}, Longitudine ${longitude.toFixed(6)}`;
+	      },
+	      function (error) {
+	        console.error("Eroare la detectarea locatiei utilizatorului:", error);
+	        document.getElementById("locationOutput").textContent = "Eroare la detectarea locatiei.";
+	      }
+	    );
 
-          const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
-          const departmentId = new URLSearchParams(window.location.search).get("id");
+	    document.getElementById("addAddress").addEventListener("click", function () {
+	      const street = document.getElementById("street").value;
+	      const number = document.getElementById("number").value;
+	      const code = document.getElementById("code").value;
+	      const sector = document.getElementById("sector").value;
+	      const city = document.getElementById("city").value;
+	      const country = document.getElementById("country").value;
+		  // const county = document.getElementById("county").value;
+	      const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
+	      const idDep = new URLSearchParams(window.location.search).get("id");
 
-          if (!departmentId) {
-            document.getElementById("addressOutput").textContent = "ID-ul departamentului este lipsa!";
-            return;
-          }
+	      if (!idDep) {
+	    	  document.getElementById("addressOutput").textContent = "ID-ul departamentului este lipsa!";
+	    	  return;
+	    	}
 
-          document.getElementById("addressOutput").textContent = `Adresa formata: ${address}`;
+	      document.getElementById("addressOutput").textContent = `Adresa formata: ${address}`;
 
-          locator.addressToLocations(locatorUrl, {
-            address: { SingleLine: address }
-          })
-          .then(function (results) {
-            if (results.length > 0) {
-              const location = results[0].location;
+	      locator.addressToLocations(locatorUrl, {
+	        address: { SingleLine: address }
+	      })
+	      .then(function (results) {
+	        if (results.length > 0) {
+	          const location = results[0].location;
+	          const latitude = location.y;
+	          const longitude = location.x;
 
-              const marker = new Graphic({
-                geometry: location,
-                symbol: {
-                  type: "simple-marker",
-                  color: "blue",
-                  size: "10px",
-                  outline: { color: "white", width: 1 }
-                }
-              });
+	          const marker = new Graphic({
+	            geometry: location,
+	            symbol: {
+	              type: "simple-marker",
+	              color: "blue",
+	              size: "10px",
+	              outline: { color: "white", width: 1 }
+	            }
+	          });
 
-              view.graphics.add(marker);
-              view.center = [location.x, location.y];
-              view.zoom = 14;
+	          view.graphics.add(marker);
+	          view.center = [longitude, latitude];
+	          view.zoom = 14;
 
-              fetch("/ServletUpdateDepartmentAddress", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ departmentId: departmentId, address: address })
-              })
-              .then((response) => {
-                if (response.ok) {
-                  return response.text();
-                } else {
-                  throw new Error("Eroare la actualizarea adresei in baza de date.");
-                }
-              })
-              .then((data) => {
-                document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru departamentul cu ID-ul ${departmentId}.`;
-              })
-              .catch((error) => {
-                console.error("Eroare la trimiterea datelor catre servlet:", error);
-                document.getElementById("addressOutput").textContent = "Eroare la salvarea adresei.";
-              });
+	          // Trimite datele către servlet
+	          fetch("/Proiect/ServletUpdateAddressDep", {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify({
+	              id_dep: idDep,
+	              adresa: address,
+	              strada: street,
+	              oras: city,
+	              judet: sector,
+	              cod: code,
+	              nr: number,
+	              tara: country,
+	              latitudine: latitude,
+	              longitudine: longitude
+	            })
+	          })
+	          .then((response) => {
+	            if (response.ok) {
+	              return response.text();
+	            } else {
+	              throw new Error("Eroare la actualizarea adresei în baza de date.");
+	            }
+	          })
+	          .then((data) => {
+	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru departamentul cu ID-ul ${idDep}.`;
+	          })
+	          .catch((error) => {
+	            console.error("Eroare la trimiterea datelor catre servlet:", error);
+	            document.getElementById("addressOutput").textContent = "Eroare la salvarea adresei.";
+	          });
 
-            } else {
-              document.getElementById("locationOutput").textContent = "Adresa nu a fost gasita.";
-            }
-          })
-          .catch(function (error) {
-            console.error("Eroare la geocodare:", error);
-            document.getElementById("locationOutput").textContent = "Eroare la geocodarea adresei.";
-          });
-        });
-      });
-    });
-  </script>
+	        } else {
+	          document.getElementById("locationOutput").textContent = "Adresa nu a fost gasita.";
+	        }
+	      })
+	      .catch(function (error) {
+	        console.error("Eroare la geocodare:", error);
+	        document.getElementById("locationOutput").textContent = "Eroare la geocodarea adresei.";
+	      });
+	    });
+	  });
+	});
+
+</script>
 </body>
 </html>
