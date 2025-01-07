@@ -157,7 +157,6 @@
                     <thead>
                         <tr style="color:<%out.println("white");%>">
                 	<th>Nume departament</th>
-                	<th>Adaugare adresa</th>
                      <th>Modificati numele</th>
                      <th>Stergeti</th>
                 </tr>
@@ -173,8 +172,6 @@
                                 found = true;
                                 out.print("<tr>" + "<td data-label='Nume departament'>" +
                                         rs1.getString("nume_dep") + "</td>");
-                                out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='NewFile1.html?id=" + rs1.getInt("id_dep")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
-                           
                                 out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifdep2.jsp?username=" + rs1.getString("nume_dep")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='DelDepServlet?username=" + rs1.getString("nume_dep")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
                             	// System.out.println(rs1.getInt("nr_crt"));
