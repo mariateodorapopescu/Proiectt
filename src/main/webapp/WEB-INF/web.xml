@@ -481,4 +481,14 @@
     <servlet-name>AddLeaveLocation</servlet-name>
     <url-pattern>/AddLeaveLocation</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetVacationDetailsServlet</display-name>
+    <servlet-name>GetVacationDetailsServlet</servlet-name>
+    <servlet-class>mix.GetVacationDetailsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetVacationDetailsServlet</servlet-name>
+    <url-pattern>/GetVacationDetailsServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
