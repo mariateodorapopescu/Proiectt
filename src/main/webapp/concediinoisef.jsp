@@ -256,6 +256,7 @@
                     if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1")==0) {
                      
                      %>
+                     <th style="color:white">Localizare</th>
                      <th style="color:white">Modificati</th>
                      <th style="color:white">Stergeti</th>
                      <%} %>
@@ -266,16 +267,18 @@
   
                     <%
                     // interogare de baza
-                    String sql = "SELECT c.id_ang, u.id, c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                            "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon, " +
-                            "CONCAT('Str.', l.strada, ', loc. ', l.oras, ', jud. ', l.judet, ', ', l.tara) as adresa " +
-                            "FROM useri u " +
-                            "JOIN tipuri t ON u.tip = t.tip " +
-                            "JOIN departament d ON u.id_dep = d.id_dep " +
-                            "JOIN concedii c ON c.id_ang = u.id " +
-                            "JOIN statusuri s ON c.status = s.status " +
-                            "JOIN tipcon ct ON c.tip = ct.tip " +
-                            "join locatii_concedii l on c.id = l.id_concediu " +
+                    String sql = "SELECT c.id_ang, u.id, c.acc_res, c.added, c.modified, c.id AS nr_crt, "+
+                    	      "d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, "+
+                    	       "c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, "+
+                    	       "ct.motiv as tipcon, "+
+                    	       "CONCAT('Str.', l.strada, ', loc. ', l.oras, ', jud. ', l.judet, ', ', l.tara) as adresa " +
+                    	"FROM concedii c "+
+                    	"JOIN useri u ON u.id = c.id_ang "+
+                    	"JOIN tipuri t ON u.tip = t.tip "+
+                    	"JOIN departament d ON u.id_dep = d.id_dep "+ 
+                    	"JOIN statusuri s ON c.status = s.status "+
+                    	"JOIN tipcon ct ON c.tip = ct.tip "+
+                    	"LEFT JOIN locatii_concedii l ON c.id = l.id_concediu " +
                             "WHERE YEAR(c.start_c) = YEAR(CURDATE())";
                     
                     // daca e sef
@@ -309,6 +312,7 @@
                     }
                     // System.out.println(sql);
                     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    	System.out.println(stmt);
                     	ResultSet rs1 = stmt.executeQuery();
                         boolean found = false;
                         int nr = 1;
@@ -365,11 +369,13 @@
                         	}
                           
                         // apoi pentru cine vrea sa modifice concediul
-                           if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1")==0) {
+                           if (request.getParameter("pag")!=null) {
                             //if (Integer.parseInt(request.getParameter("pag")) == 1) {
  							    if ((rs1.getString("status").compareTo("Neaprobat") == 0 && (userType == 1 || userType == 2)) || 
  							        (rs1.getString("status").compareTo("Aprobat sef") == 0 && (userType == 3 || userType == 0))) {
- 							        
+ 							    	 out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
+							                   "<a href='NewFile2.html?idcon=" + rs1.getInt("nr_crt") + 
+							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
  							        out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
  							                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 
  							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
