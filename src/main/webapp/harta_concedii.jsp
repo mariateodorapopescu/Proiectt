@@ -73,8 +73,9 @@
 
         <label for="locationSelect">Localitatea</label>
         <select id="locationSelect"></select>
+		<button id="locateMeBtn">Localizează-mă</button>
 		
-		<button id="toggleLayerBtn">Activează layer-ul</button>
+		<button id="toggleLayerBtn">Activează layer-ul de atractii turistice</button>
         <button id="generatePdfBtn">Generare PDF</button>
     </div>
 
@@ -86,8 +87,9 @@
                 "esri/views/MapView",
                 "esri/Graphic",
                 "esri/rest/locator",
-                "esri/layers/FeatureLayer"
-            ], function (esriConfig, Map, MapView, Graphic, locator, FeatureLayer) {
+                "esri/layers/FeatureLayer",
+                "esri/geometry/Point"
+            ], function (esriConfig, Map, MapView, Graphic, locator, FeatureLayer, Point) {
             	esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
                 const map = new Map({
@@ -108,22 +110,64 @@
                 });
              	
                 let layerAdded = false;
+                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+
+                const locationSelect = document.getElementById("locationSelect");
                 
+                const locateMeBtn = document.getElementById("locateMeBtn");
+
                 document.getElementById("toggleLayerBtn").addEventListener("click", function () {
                     if (layerAdded) {
                         map.remove(attractionsLayer);
-                        this.textContent = "Activează layer-ul";
+                        this.textContent = "Activează layer-ul de atractii turistice";
                     } else {
                         map.add(attractionsLayer);
-                        this.textContent = "Dezactivează layer-ul";
+                        this.textContent = "Dezactivează layer-ul de atractii turistice";
                     }
                     layerAdded = !layerAdded;
                 });
                 
-                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+             	// Eveniment pentru localizarea poziției actuale
+                locateMeBtn.addEventListener("click", function () {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            function (position) {
+                                const longitude = position.coords.longitude;
+                                const latitude = position.coords.latitude;
 
-                const locationSelect = document.getElementById("locationSelect");
+                                // Creăm un punct pentru poziția curentă
+                                const point = new Point({
+                                    longitude: longitude,
+                                    latitude: latitude
+                                });
 
+                                // Adăugăm un marker pentru poziția curentă
+                                const pointGraphic = new Graphic({
+                                    geometry: point,
+                                    symbol: {
+                                        type: "simple-marker",
+                                        color: "green",
+                                        size: "12px"
+                                    }
+                                });
+
+                                view.graphics.removeAll(); // Eliminăm marker-ii anteriori
+                                view.graphics.add(pointGraphic); // Adăugăm marker-ul pentru poziția curentă
+
+                                // Facem zoom și centrăm harta pe poziția curentă
+                                view.goTo({
+                                    center: [longitude, latitude],
+                                    zoom: 14
+                                });
+                            },
+                            function (error) {
+                                alert("Eroare la obținerea poziției: " + error.message);
+                            }
+                        );
+                    } else {
+                        alert("Geolocația nu este suportată de acest browser.");
+                    }
+                });
                 // Încarcă localitățile din servlet
                 fetch("LoadVacationLocationsServlet")
                     .then(response => response.json())
