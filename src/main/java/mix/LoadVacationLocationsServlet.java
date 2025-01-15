@@ -38,7 +38,7 @@ public class LoadVacationLocationsServlet extends HttpServlet {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 
             // Interogare pentru a obține localitățile unice din tabelul locatii_useri
-            //String query = "SELECT DISTINCT oras FROM locatii_concedii";
+            // String query = "SELECT DISTINCT oras FROM locatii_concedii";
             String query = "SELECT DISTINCT oras, judet FROM locatii_useri ORDER BY oras";
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
