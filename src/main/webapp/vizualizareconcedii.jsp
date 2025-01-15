@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+ <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
 <%@ page import="javax.sql.DataSource" %>
@@ -145,6 +145,8 @@ if (sesi != null) {
     <a class="nav a" id="sapte" onclick="setActiveTab('sapte')" href="pean.jsp" target="contentFrame">Anual</a>
     <a class="nav a" id="opt" onclick="setActiveTab('opt')" href="sometest.jsp" target="contentFrame">Lunar</a>
     <a class="nav a" id="noua" onclick="setActiveTab('noua')" href="testviewpers.jsp" target="contentFrame">Calendar</a>
+    <a class="nav a" id="zece" onclick="setActiveTab('zece')" href="harta_concedii.jsp" target="contentFrame">Harta</a>
+    
 </nav>
 <script>
 function setActiveTab(tabId) {

@@ -46,7 +46,7 @@
 <body>
   <div id="viewDiv"></div>
   <div class="form-container">
-    <h3>Adaugare locatie departament</h3>
+    <h3>Adaugare locatie concediu</h3>
     <input type="text" id="street" placeholder="Strada">
     <input type="text" id="number" placeholder="Numarul">
     <input type="text" id="code" placeholder="Cod postal">
@@ -122,8 +122,8 @@
 	      const country = document.getElementById("country").value;
 		  // const county = document.getElementById("county").value;
 	      const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
-	      const idDep = new URLSearchParams(window.location.search).get("id");
-
+	      const idDep = new URLSearchParams(window.location.search).get("idcon");
+	      console.log(idDep);
 	      if (!idDep) {
 	    	  document.getElementById("addressOutput").textContent = "ID-ul departamentului este lipsa!";
 	    	  return;
@@ -155,7 +155,7 @@
 	          view.zoom = 14;
 
 	          // Trimite datele către servlet
-	          fetch("/Proiect/ServletUpdateAddressDep", {
+	          fetch("/Proiect/aaaa", {
 	            method: "POST",
 	            headers: { "Content-Type": "application/json" },
 	            body: JSON.stringify({

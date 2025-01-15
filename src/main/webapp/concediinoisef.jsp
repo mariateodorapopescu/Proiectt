@@ -41,8 +41,11 @@
                 if (rs.next()) {
                 	// extrag date despre userul curent
                     int id = rs.getInt("id");
+                	System.out.println(id);
                     int userType = rs.getInt("tip");
+                    System.out.println(userType);
                     int userdep = rs.getInt("id_dep");
+                    System.out.println(userdep);
                     if (userType != 4) {  
                     	// aflu data curenta, tot ca o interogare bd =(
                     	String today = "";
@@ -236,6 +239,7 @@
                      <!--  Aparent o sa reziliez concediinoieu si concediinoieu2 si fac una singura -->
                      <!--  Ar trebui sa am un parametru de pagina =( -->
                      <% if (request.getParameter("pag")!=null) { %>
+                      <th style="color:white">Addaugati Locatie</th>
                      <th style="color:white">Modificati</th>
                      <th style="color:white">Stergeti</th>
                      <% } %>
@@ -271,9 +275,10 @@
                     	sql = sql + " and u.id_dep = " + userdep + " and c.status = 1 ";
                     }
                     // deci cand vreau eu sa modific lucruri la mine... oh well.. in plus tre sa tin cont de status
-                    if (request.getParameter("pag")!=null) {
+                    if (request.getParameter("pag")!=null) { // tre sa vad ce tip de pagina e
                     	sql = sql + " and u.id = " + id;
                     	// pun concediile lui
+                    	
                     	if (request.getParameter("pag").compareTo("1") == 0) {
 	                    	if (userType == 1 || userType == 2) {
 	                    		sql = sql + " and c.status = 0";
@@ -288,7 +293,7 @@
                     if (userType == 1 || userType == 2) {
                     	sql = sql + " and u.id = " + id;
                     }
-                    
+                    System.out.println(sql);
                     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                     	ResultSet rs1 = stmt.executeQuery();
                         boolean found = false;
@@ -338,16 +343,31 @@
 									}
                         	}
                           // apoi pentru cine vrea sa modifice concediul
-                           if (request.getParameter("pag")!=null) {
-                        	   if ((rs1.getString("status").compareTo("neaprobat") == 0 && (userType == 1 || userType == 2)) || (rs1.getString("status").compareTo("aprobat sef") == 0 && (userType == 3 || userType == 0))) {
-	                        	   out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
-	                               out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delcon?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
-	                           	} else 
-	                           	{
-	                           		out.println("<td data-label='Status'>N/A</td>");
-	                           		out.println("<td data-label='Status'>N/A</td>");  	
-	                           	}
-                        	}
+                          if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1")==0) {
+                           //if (Integer.parseInt(request.getParameter("pag")) == 1) {
+							    if ((rs1.getString("status").compareTo("neaprobat") == 0 && (userType == 1 || userType == 2)) || 
+							        (rs1.getString("status").compareTo("aprobat sef") == 0 && (userType == 3 || userType == 0))) {
+							        
+							        out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
+							                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 
+							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
+							        out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'>" +
+							                   "<a href='delcon?idcon=" + rs1.getInt("nr_crt") + 
+							                   "'><i class='ri-close-line'></i></a></span></td></tr>");
+							    //}
+                           }
+							    out.println("<td data-label='Status'>N/A</td>");
+						        
+							} 
+                           out.println("<td data-label='Adaugati locatie concediu'><span class='status-icon status-neaprobat'>" +
+				                   "<a href='NewFile2.html?idcon=" + rs1.getInt("nr_crt") + 
+				                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
+                           out.println("<td data-label='Modificati'><span class='status-icon status-neaprobat'>" +
+				                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 
+				                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
+				        out.println("<td data-label='Stergeti'><span class='status-icon status-dezaprobat-director'>" +
+				                   "<a href='delcon?idcon=" + rs1.getInt("nr_crt") + 
+				                   "'><i class='ri-close-line'></i></a></span></td></tr>");
                          nr++; 
                         }
                         if (!found) {

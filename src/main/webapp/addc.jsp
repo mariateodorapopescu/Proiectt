@@ -330,8 +330,8 @@
                 out.println("</select></div>");
                 %>
                 <div>
-                    <label style=" color:<%out.println(text);%>" class="login__label">Locatie</label>
-                    <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti locatia" required class="login__input" name='locatie'/>
+                    <label style=" color:<%out.println(text);%>" class="login__label">Scurte observatii</label>
+                    <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti ce aveti de adaugat..." required class="login__input" name='locatie'/>
                 </div>
             </div>
            	<% out.println("<input type='hidden' name='userId' value='" + id + "'/>"); %> 

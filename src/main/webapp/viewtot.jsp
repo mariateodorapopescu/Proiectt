@@ -184,7 +184,7 @@ table.picka-table tr {
                                 
                                 <form style="position: fixed; top: 6rem; border-radius: 2rem; margin: 0; border-radius: 2rem; border-color:<%out.println(sidebar);%>; background:<%out.println(sidebar);%>; color:<%out.println(accent);%> " action="<%= request.getContextPath() %>/masina1.jsp" method="post" class="login__form">
                                     <div>
-                                        <h1 class="login__title"><span style="color:<%out.println(accent);%> ">Vizualizare concedii dintr-un departament</span></h1>
+                                        <h1 class="login__title"><span style="color:<%out.println(accent);%> ">Vizualizare concedii din toata institutia</span></h1>
                                     </div>
                                     
                                     <div class="login__inputs">

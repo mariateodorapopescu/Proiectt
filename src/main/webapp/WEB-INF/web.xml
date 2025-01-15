@@ -423,4 +423,44 @@
     <servlet-name>ServletUpdateAddressDep</servlet-name>
     <url-pattern>/ServletUpdateAddressDep</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>LoadVacationLocationsServlet</display-name>
+    <servlet-name>LoadVacationLocationsServlet</servlet-name>
+    <servlet-class>mix.LoadVacationLocationsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoadVacationLocationsServlet</servlet-name>
+    <url-pattern>/LoadVacationLocationsServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ServletIUpdateAddressLeave</display-name>
+    <servlet-name>ServletIUpdateAddressLeave</servlet-name>
+    <servlet-class>mix.ServletIUpdateAddressLeave</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletIUpdateAddressLeave</servlet-name>
+    <url-pattern>/ServletIUpdateAddressLeave</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>decenulvedema</display-name>
+    <servlet-name>decenulvedema</servlet-name>
+    <servlet-class>mix.decenulvedema</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>decenulvedema</servlet-name>
+    <url-pattern>/decenulvedema</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>aaaa</display-name>
+    <servlet-name>aaaa</servlet-name>
+    <servlet-class>mix.aaaa</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>aaaa</servlet-name>
+    <url-pattern>/aaaa</url-pattern>
+  </servlet-mapping>
 </web-app>

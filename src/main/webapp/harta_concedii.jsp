@@ -1,0 +1,133 @@
+ <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harta Concedii</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.30/"></script>
+    <style>
+        html, body, #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        .sidebar {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            z-index: 100;
+            background-color: #3366cc;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar select,
+        .sidebar button {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .sidebar button {
+            background-color: #0044cc;
+            color: white;
+            cursor: pointer;
+        }
+        .sidebar button:hover {
+            background-color: #002a80;
+        }
+        view.ui.add(zoom, "top-right");
+        view.ui.add(zoom, {
+		  position: "bottom-right",
+		  index: 1
+		});
+		        
+    </style>
+</head>
+<body>
+    <div id="viewDiv"></div>
+    <div class="sidebar">
+        <label for="periodSelect">Perioada</label>
+        <select id="periodSelect">
+            <option value="ianuarie">Ianuarie</option>
+            <option value="februarie">Februarie</option>
+            <option value="martie">Martie</option>
+            <option value="aprilie">Aprilie</option>
+            <option value="mai">Mai</option>
+            <option value="iunie">Iunie</option>
+            <option value="iulie">Iulie</option>
+            <option value="august">August</option>
+            <option value="septembrie">Septembrie</option>
+            <option value="octombrie">Octombrie</option>
+            <option value="noiembrie">Noiembrie</option>
+            <option value="decembrie">Decembrie</option>
+        </select>
+
+        <label for="locationSelect">Localitatea</label>
+        <select id="locationSelect"></select>
+
+        <button id="generatePdfBtn">Generare PDF</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            require([
+                "esri/config",
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/Graphic",
+                "esri/rest/locator"
+            ], function (esriConfig, Map, MapView, Graphic, locator) {
+                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
+
+                const map = new Map({
+                    basemap: "arcgis/topographic"
+                });
+
+                const view = new MapView({
+                    container: "viewDiv",
+                    map: map,
+                    center: [25, 45], // Centru aproximativ pe Romania
+                    zoom: 6
+                });
+
+                // Încarcă localitățile din servlet
+                fetch("LoadVacationLocationsServlet")
+                    .then(response => response.json())
+                    .then(data => {
+                        const locationSelect = document.getElementById("locationSelect");
+                        data.forEach(location => {
+                            const option = document.createElement("option");
+                            option.value = location;
+                            option.textContent = location;
+                            locationSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Eroare la încărcarea localităților:", error);
+                    });
+
+                // Eveniment pentru generarea PDF-ului
+                document.getElementById("generatePdfBtn").addEventListener("click", function () {
+                    const selectedPeriod = document.getElementById("periodSelect").value;
+                    const selectedLocation = document.getElementById("locationSelect").value;
+
+                    if (selectedLocation) {
+                        window.open(`GeneratePdfServlet?period=${selectedPeriod}&location=${selectedLocation}`, "_blank");
+                    } else {
+                        alert("Selectează o localitate!");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -99,7 +99,7 @@
 		<h3>Ce doriti sa faceti?</h3>
 		<button > <a href = "addc.jsp" style="text-decoration:none;">Adaugare concediu</a></button>
 		<button ><a href = "concediinoisef.jsp?pag=1" style="text-decoration:none;">Modificare si stergere concedii</a></button>
-		<button ><a href = "NewFile.jsp" style="text-decoration:none;">Vizualizare harta interactiva</a></button>
+		<button ><a href = "NewFile2.jsp" style="text-decoration:none;">Adaugare locatie concediu personal</a></button>
       </div>
    </div>
    
