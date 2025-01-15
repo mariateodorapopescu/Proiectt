@@ -1,4 +1,4 @@
- package mix;
+package mix;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import org.json.JSONArray;
 
-// @WebServlet("/LoadVacationLocationsServlet")
+@WebServlet("/LoadVacationLocationsServlet")
 public class LoadVacationLocationsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -38,13 +38,17 @@ public class LoadVacationLocationsServlet extends HttpServlet {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 
             // Interogare pentru a obține localitățile unice din tabelul locatii_useri
-            String query = "SELECT DISTINCT oras FROM locatii_concedii";
+            //String query = "SELECT DISTINCT oras FROM locatii_concedii";
+            String query = "SELECT DISTINCT oras, judet FROM locatii_useri ORDER BY oras";
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 
             ArrayList<String> locations = new ArrayList<>();
             while (resultSet.next()) {
-                locations.add(resultSet.getString("oras"));
+                //locations.add(resultSet.getString("oras"));
+            	String oras = resultSet.getString("oras");
+                String judet = resultSet.getString("judet");
+                locations.add(oras + ", " + judet);
             }
 
             // Conversie a listei în JSON și trimitere ca răspuns
