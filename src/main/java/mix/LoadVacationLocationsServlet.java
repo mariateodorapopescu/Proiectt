@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import org.json.JSONArray;
 
-@WebServlet("/LoadVacationLocationsServlet")
+// @WebServlet("/LoadVacationLocationsServlet")
 public class LoadVacationLocationsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
