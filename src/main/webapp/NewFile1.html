@@ -122,7 +122,7 @@
 	      const country = document.getElementById("country").value;
 		  // const county = document.getElementById("county").value;
 	      const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
-	      const idDep = new URLSearchParams(window.location.search).get("id_dep");
+	      const idDep = new URLSearchParams(window.location.search).get("id");
 
 	      if (!idDep) {
 	    	  document.getElementById("addressOutput").textContent = "ID-ul departamentului este lipsa!";

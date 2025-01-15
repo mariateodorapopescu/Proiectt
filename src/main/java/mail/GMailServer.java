@@ -19,8 +19,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-// import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
-// import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
 
 import com.email.durgesh.Email;
 
@@ -119,8 +118,7 @@ public class GMailServer extends javax.mail.Authenticator
 }
     
     // Metoda pentru trimiterea unui email simplu
-	/*
-	
+	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
 		if (!isValidEmail(recipients)) {
 		    throw new AddressException("Adresa de e-mail este invalidă: " + recipients);
 		}
@@ -136,31 +134,7 @@ public class GMailServer extends javax.mail.Authenticator
 	          e.printStackTrace();    
 	      }
 	}
-	*/
-    
-    public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
-        if (!isValidEmail(recipients)) {
-            throw new AddressException("Adresa de e-mail este invalidă: " + recipients);
-        }
-
-        try {
-            Email email = new Email(user, password);
-            email.setFrom("liviaaamp@gmail.com", "Firma XYZ");
-            email.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
-            
-            // Înlocuire `StringEscapeUtils.unescapeJava`
-            body = body.replace("\\n", "\n").replace("\\t", "\t");
-            
-            email.setContent(body, "text/html; charset=UTF-8");
-            email.addRecipient(recipients);
-            email.send();
-        } catch (Exception e) {
-            e.printStackTrace();    
-        }
-    }
-
-    
-    
+	
     // Metoda pentru trimiterea unui email cu mai multi destinatari
     public synchronized void sendMail(String subject, String body, String sender, String recipients) throws Exception
     {

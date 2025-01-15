@@ -183,7 +183,7 @@
                                 found = true;
                                 out.print("<tr>" + "<td data-label='Nume'>" +
                                         rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Nume de utilizator'>" + rs1.getString("usernamee") + "</td><td data-label='Functie'>" + rs1.getString("functie")  + "<td data-label='Departament'>" + rs1.getString("departament") + "</td>");
-                                out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='/Proiect/NewFile.html?id=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
+                                out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='NewFile.html?id=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-neaprobat'><a href='modifusr2.jsp?id=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='modifpasd2.jsp?idd=" + rs1.getInt("nr_crt")+ "'><i class='ri-edit-circle-line'></i></a></span></td>");
                                 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='delusr?id=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>");
