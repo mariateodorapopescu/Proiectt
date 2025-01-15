@@ -73,7 +73,8 @@
 
         <label for="locationSelect">Localitatea</label>
         <select id="locationSelect"></select>
-
+		
+		<button id="toggleLayerBtn">Activează layer-ul</button>
         <button id="generatePdfBtn">Generare PDF</button>
     </div>
 
@@ -84,9 +85,10 @@
                 "esri/Map",
                 "esri/views/MapView",
                 "esri/Graphic",
-                "esri/rest/locator"
-            ], function (esriConfig, Map, MapView, Graphic, locator) {
-                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
+                "esri/rest/locator",
+                "esri/layers/FeatureLayer"
+            ], function (esriConfig, Map, MapView, Graphic, locator, FeatureLayer) {
+            	esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
                 const map = new Map({
                     basemap: "arcgis/topographic"
@@ -98,12 +100,35 @@
                     center: [25, 45], // Centru aproximativ pe Romania
                     zoom: 6
                 });
+                
+             	// Layer de atracții turistice
+                const attractionsLayer = new FeatureLayer({
+                    url: "https://services-eu1.arcgis.com/zci5bUiJ8olAal7N/arcgis/rest/services/OSM_Tourism_EU/FeatureServer",
+                    title: "Atracții turistice"
+                });
+             	
+                let layerAdded = false;
+                
+                document.getElementById("toggleLayerBtn").addEventListener("click", function () {
+                    if (layerAdded) {
+                        map.remove(attractionsLayer);
+                        this.textContent = "Activează layer-ul";
+                    } else {
+                        map.add(attractionsLayer);
+                        this.textContent = "Dezactivează layer-ul";
+                    }
+                    layerAdded = !layerAdded;
+                });
+                
+                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+
+                const locationSelect = document.getElementById("locationSelect");
 
                 // Încarcă localitățile din servlet
                 fetch("LoadVacationLocationsServlet")
                     .then(response => response.json())
                     .then(data => {
-                        const locationSelect = document.getElementById("locationSelect");
+                        locationSelect.innerHTML = '<option value="" selected disabled>Selectează o localitate</option>';
                         data.forEach(location => {
                             const option = document.createElement("option");
                             option.value = location;
@@ -115,6 +140,56 @@
                         console.error("Eroare la încărcarea localităților:", error);
                     });
 
+                // Eveniment pentru selectarea localității și geocodarea acesteia
+                locationSelect.addEventListener("change", function () {
+                    const selectedLocation = this.value;
+                    if (selectedLocation) {
+                        geocodeLocation(selectedLocation);
+                    }
+                });
+
+                // Funcție pentru geocodarea localității selectate
+                function geocodeLocation(location) {
+                    locator.addressToLocations(locatorUrl, {
+                        address: {
+                            "SingleLine": location
+                        },
+                        countryCode: "RO",
+                        maxLocations: 1
+                    }).then(function (results) {
+                        if (results.length > 0) {
+                            const result = results[0].location;
+
+                            // Facem zoom și centrăm harta pe localitatea selectată
+                            view.goTo({
+                                center: [result.x, result.y],
+                                zoom: 12
+                            });
+
+                            // Adăugăm un marker pe hartă
+                            const pointGraphic = new Graphic({
+                                geometry: {
+                                    type: "point",
+                                    longitude: result.x,
+                                    latitude: result.y
+                                },
+                                symbol: {
+                                    type: "simple-marker",
+                                    color: "red",
+                                    size: "12px"
+                                }
+                            });
+
+                            view.graphics.removeAll(); // Eliminăm marker-ii anteriori
+                            view.graphics.add(pointGraphic); // Adăugăm marker-ul nou
+                        } else {
+                            alert("Nu s-au găsit coordonatele pentru localitatea selectată.");
+                        }
+                    }).catch(function (error) {
+                        console.error("Eroare la geocodare:", error);
+                    });
+                }
+             
                 // Eveniment pentru generarea PDF-ului
                 document.getElementById("generatePdfBtn").addEventListener("click", function () {
                     const selectedPeriod = document.getElementById("periodSelect").value;
