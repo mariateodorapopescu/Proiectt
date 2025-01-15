@@ -73,7 +73,8 @@
 
         <label for="locationSelect">Localitatea</label>
         <select id="locationSelect"></select>
-
+		
+		<button id="toggleLayerBtn">Activează layer-ul</button>
         <button id="generatePdfBtn">Generare PDF</button>
     </div>
 
@@ -84,8 +85,9 @@
                 "esri/Map",
                 "esri/views/MapView",
                 "esri/Graphic",
-                "esri/rest/locator"
-            ], function (esriConfig, Map, MapView, Graphic, locator) {
+                "esri/rest/locator",
+                "esri/layers/FeatureLayer"
+            ], function (esriConfig, Map, MapView, Graphic, locator, FeatureLayer) {
                 esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
                 const map = new Map({
@@ -98,7 +100,26 @@
                     center: [25, 45], // Centru aproximativ pe Romania
                     zoom: 6
                 });
+				
+             	// Layer de atracții turistice
+                const attractionsLayer = new FeatureLayer({
+                    url: "https://services-eu1.arcgis.com/zci5bUiJ8olAal7N/arcgis/rest/services/OSM_Tourism_EU/FeatureServer",
+                    title: "Atracții turistice"
+                });
 
+                let layerAdded = false;
+
+                document.getElementById("toggleLayerBtn").addEventListener("click", function () {
+                    if (layerAdded) {
+                        map.remove(attractionsLayer);
+                        this.textContent = "Activează layer-ul";
+                    } else {
+                        map.add(attractionsLayer);
+                        this.textContent = "Dezactivează layer-ul";
+                    }
+                    layerAdded = !layerAdded;
+                });
+                
                 // Încarcă localitățile din servlet
                 fetch("LoadVacationLocationsServlet")
                     .then(response => response.json())
