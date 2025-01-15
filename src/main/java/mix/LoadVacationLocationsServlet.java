@@ -1,4 +1,4 @@
-package mix;
+ package mix;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -74,4 +74,4 @@ public class LoadVacationLocationsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
     }
-}
+} 

@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+ <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,21 +73,28 @@
 
         <label for="locationSelect">Localitatea</label>
         <select id="locationSelect"></select>
+		<button id="locateMeBtn">Localizează-mă</button>
 		
-		<button id="toggleLayerBtn">Activează layer-ul</button>
+		<button id="toggleLayerBtn">Activează layer-ul de atractii turistice</button>
+        <button id="generateRouteBtn">Generează rută</button>
         <button id="generatePdfBtn">Generare PDF</button>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            require([
+        	require([
                 "esri/config",
                 "esri/Map",
                 "esri/views/MapView",
                 "esri/Graphic",
                 "esri/rest/locator",
-                "esri/layers/FeatureLayer"
-            ], function (esriConfig, Map, MapView, Graphic, locator, FeatureLayer) {
+                "esri/layers/FeatureLayer",
+                "esri/geometry/Point",
+                "esri/rest/route",
+                "esri/rest/support/RouteParameters",
+                "esri/rest/support/FeatureSet"
+            ], function (esriConfig, Map, MapView, Graphic, locator, FeatureLayer, Point, route, RouteParameters, FeatureSet) {
+
             	esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
                 const map = new Map({
@@ -109,21 +116,27 @@
              	
                 let layerAdded = false;
                 
+                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+
+                const locateMeBtn = document.getElementById("locateMeBtn");
+                const locationSelect = document.getElementById("locationSelect");
+                const generateRouteBtn = document.getElementById("generateRouteBtn");
+                
+                let currentLocation = null;
+                const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+
                 document.getElementById("toggleLayerBtn").addEventListener("click", function () {
                     if (layerAdded) {
                         map.remove(attractionsLayer);
-                        this.textContent = "Activează layer-ul";
+                        this.textContent = "Activează layer-ul de atractii turistice";
                     } else {
                         map.add(attractionsLayer);
-                        this.textContent = "Dezactivează layer-ul";
+                        this.textContent = "Dezactivează layer-ul de atractii turistice";
                     }
                     layerAdded = !layerAdded;
                 });
                 
-                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
-
-                const locationSelect = document.getElementById("locationSelect");
-
+             	
                 // Încarcă localitățile din servlet
                 fetch("LoadVacationLocationsServlet")
                     .then(response => response.json())
@@ -139,7 +152,129 @@
                     .catch(error => {
                         console.error("Eroare la încărcarea localităților:", error);
                     });
+             	
+                /// Funcție pentru localizarea utilizatorului
+				locateMeBtn.addEventListener("click", function () {
+				    if (navigator.geolocation) {
+				        navigator.geolocation.getCurrentPosition(
+				            function (position) {
+				                const longitude = position.coords.longitude;
+				                const latitude = position.coords.latitude;
+				
+				                currentLocation = new Point({
+				                    longitude: longitude,
+				                    latitude: latitude
+				                });
+				
+				                const pointGraphic = new Graphic({
+				                    geometry: currentLocation,
+				                    symbol: {
+				                        type: "simple-marker",
+				                        color: "green",
+				                        size: "12px"
+				                    }
+				                });
+				
+				                view.graphics.removeAll();
+				                view.graphics.add(pointGraphic);
+				
+				                view.goTo({
+				                    center: [longitude, latitude],
+				                    zoom: 14
+				                });
+				            },
+				            function (error) {
+				                alert("Eroare la obținerea poziției: " + error.message);
+				            }
+				        );
+				    } else {
+				        alert("Geolocația nu este suportată de acest browser.");
+				    }
+				});
+				
+				// Eveniment pentru generarea rutei
+				generateRouteBtn.addEventListener("click", function () {
+				    if (!currentLocation) {
+				        alert("Te rog să te localizezi mai întâi.");
+				        return;
+				    }
 
+				    const selectedLocation = locationSelect.value;
+				    if (!selectedLocation) {
+				        alert("Selectează o localitate!");
+				        return;
+				    }
+
+				    locator.addressToLocations(locatorUrl, {
+				        address: { "SingleLine": selectedLocation },
+				        countryCode: "RO",
+				        maxLocations: 1
+				    }).then(function (results) {
+				        if (results.length > 0) {
+				            const destinationPoint = new Point({
+				                longitude: results[0].location.x,
+				                latitude: results[0].location.y
+				            });
+
+				            const destinationGraphic = new Graphic({
+				                geometry: destinationPoint,
+				                symbol: {
+				                    type: "simple-marker",
+				                    color: "red",
+				                    size: "12px"
+				                }
+				            });
+
+				            view.graphics.add(destinationGraphic);
+
+				            const routeParams = new RouteParameters({
+				                stops: new FeatureSet({
+				                    features: [
+				                        new Graphic({ geometry: currentLocation }), // Punctul de plecare
+				                        new Graphic({ geometry: destinationPoint }) // Punctul de destinație
+				                    ]
+				                }),
+				                returnDirections: true
+				            });
+
+				            route.solve(routeUrl, routeParams)
+				                .then(function (data) {
+				                    data.routeResults.forEach(function (result) {
+				                        result.route.symbol = {
+				                            type: "simple-line",
+				                            color: [0, 0, 255],
+				                            width: 4
+				                        };
+				                        view.graphics.add(result.route);
+				                    });
+
+				                    if (data.routeResults.length > 0) {
+				                        const directions = document.createElement("ol");
+				                        directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
+				                        directions.style.marginTop = "10px";
+				                        directions.style.padding = "15px 15px 15px 30px";
+
+				                        data.routeResults[0].directions.features.forEach(function (result, i) {
+				                            const direction = document.createElement("li");
+				                            direction.innerHTML = result.attributes.text + " (" + result.attributes.length.toFixed(2) + " km)";
+				                            directions.appendChild(direction);
+				                        });
+
+				                        view.ui.empty("top-right");
+				                        view.ui.add(directions, "top-right");
+				                    }
+				                })
+				                .catch(function (error) {
+				                    console.error("Eroare la generarea rutei:", error);
+				                });
+				        } else {
+				            alert("Nu s-au găsit coordonatele pentru localitatea selectată.");
+				        }
+				    }).catch(function (error) {
+				        console.error("Eroare la geocodare:", error);
+				    });
+				});
+				                
                 // Eveniment pentru selectarea localității și geocodarea acesteia
                 locationSelect.addEventListener("change", function () {
                     const selectedLocation = this.value;
@@ -205,4 +340,4 @@
         });
     </script>
 </body>
-</html>
+</html> 
