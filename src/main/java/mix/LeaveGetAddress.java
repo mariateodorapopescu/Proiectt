@@ -1,7 +1,6 @@
  package mix;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,11 +13,10 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import org.json.JSONArray;
 
-// @WebServlet("/LoadVacationLocationsServlet")
-public class LoadVacationLocationsServlet extends HttpServlet {
+public class LeaveGetAddress extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    public LoadVacationLocationsServlet() {
+    public LeaveGetAddress() {
         super();
     }
 

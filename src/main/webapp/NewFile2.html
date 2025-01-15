@@ -122,10 +122,10 @@
 	      const country = document.getElementById("country").value;
 		  // const county = document.getElementById("county").value;
 	      const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
-	      const idDep = new URLSearchParams(window.location.search).get("idcon");
-	      console.log(idDep);
-	      if (!idDep) {
-	    	  document.getElementById("addressOutput").textContent = "ID-ul departamentului este lipsa!";
+	      const idCon = new URLSearchParams(window.location.search).get("idcon");
+
+	      if (!idCon) {
+	    	  document.getElementById("addressOutput").textContent = "ID-ul concediului lipseste!";
 	    	  return;
 	    	}
 
@@ -155,11 +155,11 @@
 	          view.zoom = 14;
 
 	          // Trimite datele către servlet
-	          fetch("/Proiect/aaaa", {
+	          fetch("/Proiect/AddLeaveLocation", {
 	            method: "POST",
 	            headers: { "Content-Type": "application/json" },
 	            body: JSON.stringify({
-	              id_dep: idDep,
+	              id_con: idCon,
 	              adresa: address,
 	              strada: street,
 	              oras: city,
@@ -179,7 +179,7 @@
 	            }
 	          })
 	          .then((data) => {
-	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru departamentul cu ID-ul ${idDep}.`;
+	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru concediul cu ID-ul ${idCon}.`;
 	          })
 	          .catch((error) => {
 	            console.error("Eroare la trimiterea datelor catre servlet:", error);

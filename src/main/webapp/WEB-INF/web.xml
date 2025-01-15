@@ -431,7 +431,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>LoadVacationLocationsServlet</servlet-name>
-    <url-pattern>/LoadVacationLocationsServlet</url-pattern>
+    <url-pattern>/LoadVacationLocationsServlet2</url-pattern>
   </servlet-mapping>
   <servlet>
     <description></description>
@@ -462,5 +462,23 @@
   <servlet-mapping>
     <servlet-name>aaaa</servlet-name>
     <url-pattern>/aaaa</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>LeaveGetAddress</servlet-name>
+    <servlet-class>mix.LeaveGetAddress</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LeaveGetAddress</servlet-name>
+    <url-pattern>/LeaveGetAddress</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AddLeaveLocation</display-name>
+    <servlet-name>AddLeaveLocation</servlet-name>
+    <servlet-class>mix.AddLeaveLocation</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddLeaveLocation</servlet-name>
+    <url-pattern>/AddLeaveLocation</url-pattern>
   </servlet-mapping>
 </web-app>

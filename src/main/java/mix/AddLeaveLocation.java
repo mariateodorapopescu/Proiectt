@@ -7,19 +7,16 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 
- @WebServlet("/aaaa")
-public class aaaa extends HttpServlet {
+public class AddLeaveLocation extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        System.out.println("A primit cererea POSTbraaaaaa");
 
         // Citește corpul cererii o singură dată
         StringBuilder sb = new StringBuilder();
@@ -30,12 +27,11 @@ public class aaaa extends HttpServlet {
             }
         }
         String rawJson = sb.toString();
-        System.out.println("Raw JSON received: " + rawJson);
 
         JSONObject json;
         try {
             json = new JSONObject(rawJson);
-            System.out.println("JSON parsare reușită: " + json);
+           
         } catch (Exception e) {
             System.err.println("Eroare la parsarea JSON: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -44,7 +40,7 @@ public class aaaa extends HttpServlet {
         }
 
         // Extrage parametrii din JSON
-        int idDep = json.optInt("id_dep");
+        int idCon = json.optInt("id_con");
         String strada = json.optString("strada", "");
         double latitudine = json.optDouble("latitudine");
         double longitudine = json.optDouble("longitudine");
@@ -53,8 +49,8 @@ public class aaaa extends HttpServlet {
         String judet = json.optString("judet", "");
         String tara = json.optString("tara", "");
 
-        if (idDep == 0) {
-            System.err.println("Parametrul idDep lipsește sau este invalid: idDep=" + idDep);
+        if (idCon == 0) {
+            System.err.println("Parametrul idDep lipsește sau este invalid: idCon=" + idCon);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Eroare: Parametrul idDep lipsește sau este invalid.");
             return;
@@ -66,8 +62,8 @@ public class aaaa extends HttpServlet {
             // Verifică dacă există deja o înregistrare pentru acest id_dep
             boolean exists = false;
             try (PreparedStatement checkStmt = conn.prepareStatement(
-                    "SELECT 1 FROM locatii_departamente WHERE id_dep = ?")) {
-                checkStmt.setInt(1, idDep);
+                    "SELECT 1 FROM locatii_concedii WHERE id_concediu = ?")) {
+                checkStmt.setInt(1, idCon);
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     exists = rs.next();
                 }
@@ -77,8 +73,8 @@ public class aaaa extends HttpServlet {
             if (exists) {
                 // Update existing record
                 stmt = conn.prepareStatement(
-                    "UPDATE locatii_departamente SET strada = ?, longitudine = ?, latitudine = ?, " +
-                    "cod = ?, oras = ?, judet = ?, tara = ? WHERE id_dep = ?");
+                    "UPDATE locatii_concedii SET strada = ?, longitudine = ?, latitudine = ?, " +
+                    "cod = ?, oras = ?, judet = ?, tara = ? WHERE id_concediu = ?");
                 
                 stmt.setString(1, strada);
                 stmt.setDouble(2, longitudine);
@@ -87,14 +83,14 @@ public class aaaa extends HttpServlet {
                 stmt.setString(5, oras);
                 stmt.setString(6, judet);
                 stmt.setString(7, tara);
-                stmt.setInt(8, idDep);
+                stmt.setInt(8, idCon);
             } else {
                 // Insert new record
                 stmt = conn.prepareStatement(
-                    "INSERT INTO locatii_departamente (id_dep, strada, longitudine, latitudine, " +
+                    "INSERT INTO locatii_concedii (id_concediu, strada, longitudine, latitudine, " +
                     "cod, oras, judet, tara) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 
-                stmt.setInt(1, idDep);
+                stmt.setInt(1, idCon);
                 stmt.setString(2, strada);
                 stmt.setDouble(3, longitudine);
                 stmt.setDouble(4, latitudine);
@@ -108,11 +104,11 @@ public class aaaa extends HttpServlet {
             stmt.close();
 
             if (rowsAffected > 0) {
-                System.out.println("Operațiune reușită pentru departamentul cu ID-ul: " + idDep);
+                // System.out.println("Operațiune reușită pentru departamentul cu ID-ul: " + idCon);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Operațiunea a fost efectuată cu succes.");
             } else {
-                System.err.println("Nu s-a putut efectua operațiunea pentru departamentul cu ID-ul " + idDep);
+                System.err.println("Nu s-a putut efectua operațiunea pentru departamentul cu ID-ul " + idCon);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("Nu s-a putut efectua operațiunea.");
             }

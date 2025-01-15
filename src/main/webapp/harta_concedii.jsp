@@ -138,7 +138,7 @@
                 
              	
                 // Încarcă localitățile din servlet
-                fetch("LoadVacationLocationsServlet")
+                fetch("LeaveGetAddress")
                     .then(response => response.json())
                     .then(data => {
                         locationSelect.innerHTML = '<option value="" selected disabled>Selectează o localitate</option>';
