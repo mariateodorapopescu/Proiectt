@@ -97,12 +97,12 @@
 	<div class="main-content">
 	 <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
 		<h3>Ce doriti sa faceti?</h3>
-		<button > <a href = "addc.jsp" style="text-decoration:none;">Vizualizare ruta acasa - munca</a></button>
-		<button > <a href = "addc.jsp" style="text-decoration:none;">Vizualizare ruta acasa - concediu</a></button>
-		<button > <a href = "addc.jsp" style="text-decoration:none;">Vizualizare ruta munca - concediu</a></button>
-		<button > <a href = "addc.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - concediu</a></button>
-		<button > <a href = "addc.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - munca</a></button>
-		<button > <a href = "addc.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - acasa</a></button>
+		<button > <a href = "harta_concedii.jsp" style="text-decoration:none;">Vizualizare ruta acasa - munca</a></button>
+		<button > <a href = "harta_concedii.jsp" style="text-decoration:none;">Vizualizare ruta acasa - concediu</a></button>
+		<button > <a href = "harta_concedii.jsp" style="text-decoration:none;">Vizualizare ruta munca - concediu</a></button>
+		<button > <a href = "harta_concedii.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - concediu</a></button>
+		<button > <a href = "harta_concedii.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - munca</a></button>
+		<button > <a href = "harta_concedii.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - acasa</a></button>
       </div>
    </div>
    
