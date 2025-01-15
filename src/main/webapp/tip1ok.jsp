@@ -603,19 +603,7 @@ body {
                         <div class="sitextt">Notificari</div>
                     </a>
                 </li>
-                <li style="--bg: <%out.println(accent); %>">
-                     <a href="NewFile.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="today"></ion-icon>
-                        </div>
-                        <div class="sitextt">Directii</div>
-                        <!-- angajatul normal: vede locatia lui (actuala sau cea declrataa la firma), vede drumul de la el la birou si drumul de la el pana la unul dintre concedii -->
-                        <!-- sef: vede ca la angajatul normal, dar, in plus, vede locatiile si celorlatlti (concedii) -->
-                        <!-- director: vede ca la angajatul normal, dar, in plus, vede locatiile si celorlatlti (concedii + angajati) -->
-                        <!-- admin: vede numai locatiile angajatilor -->
-                    </a>
-                </li>
-               
+                               
                 <li style="--bg: <%out.println(accent); %>">
                      <a href="viewang2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -631,6 +619,15 @@ body {
                             <ion-icon name="apps"></ion-icon>
                         </div>
                         <div  class="sitextt">Actiuni</div>
+                    </a>
+                </li>
+                
+                <li style="--bg: <%out.println(accent); %>">
+                    <a href="actiuni_harti.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                           <ion-icon name="globe"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Directii</div>
                     </a>
                 </li>
                 

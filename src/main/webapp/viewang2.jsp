@@ -145,6 +145,7 @@ if (sesi != null) {
     <a id="sapte" onclick="setActiveTab('sapte')" href="pean2.jsp" target="contentFrame">Anual</a>
     <a id="opt" onclick="setActiveTab('opt')" href="sometest2.jsp" target="contentFrame">Lunar</a>
     <a id="noua" onclick="setActiveTab('noua')" href="testviewpers2.jsp" target="contentFrame">Calendar</a>
+    <a class="nav a" id="zece" onclick="setActiveTab('zece')" href="harta_concedii.jsp" target="contentFrame">Harta</a>
     
 </nav>
 <script>

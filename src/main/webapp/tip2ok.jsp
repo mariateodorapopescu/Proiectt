@@ -640,7 +640,14 @@
                         <div  class="sitextt">Actiuni</div>
                     </a>
                 </li>
-                
+                <li style="--bg: <%out.println(accent); %>">
+                    <a href="actiuni_harti.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                           <ion-icon name="globe"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Directii</div>
+                    </a>
+                </li>
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="setari.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -681,6 +688,7 @@
     </div>
     <script src="./responsive-login-form-main/assets/js/index.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+  
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const iframe = document.getElementById('iframe');

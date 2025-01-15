@@ -41,11 +41,11 @@
                 if (rs.next()) {
                 	// extrag date despre userul curent
                     int id = rs.getInt("id");
-                	System.out.println(id);
+                	// System.out.println(id);
                     int userType = rs.getInt("tip");
-                    System.out.println(userType);
+                    // System.out.println(userType);
                     int userdep = rs.getInt("id_dep");
-                    System.out.println(userdep);
+                    // System.out.println(userdep);
                     if (userType != 4) {  
                     	// aflu data curenta, tot ca o interogare bd =(
                     	String today = "";
@@ -215,7 +215,13 @@
         <div style=" border-radius: 2rem;" class="content">
             <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>;">
                  <div class="events" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+                 <%
+                    if (request.getParameter("pag")!=null || (request.getParameter("pag")== null && userType != 3 || userType != 0)) {
+                    %>
+                     <h1>Concedii personale</h1>
+                     <% } else {%>
                   <h1>Cereri noi de concedii</h1>
+                  <%} %>
                 <h3><%out.println(today); %></h3>
                 <table>
                     <thead>
@@ -238,18 +244,21 @@
                     <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
                      <!--  Aparent o sa reziliez concediinoieu si concediinoieu2 si fac una singura -->
                      <!--  Ar trebui sa am un parametru de pagina =( -->
-                     <% if (request.getParameter("pag")!=null) { %>
-                      <th style="color:white">Addaugati Locatie</th>
-                     <th style="color:white">Modificati</th>
-                     <th style="color:white">Stergeti</th>
-                     <% } %>
+                     
                      <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
                     <%
-                    if ((userType == 3 || userType == 0) && (request.getParameter("pag")==null)) {
+                    
+                    if (request.getParameter("pag")== null && (userType == 3 || userType == 0)) {
                     %>
                      <th style="color:white">Aprobati</th>
                      <th style="color:white">Respingeti</th>
-                     <% } %>
+                     <% } 
+                    if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1")==0) {
+                     
+                     %>
+                     <th style="color:white">Modificati</th>
+                     <th style="color:white">Stergeti</th>
+                     <%} %>
                       <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
                 </tr>
                     </thead>
@@ -257,43 +266,48 @@
   
                     <%
                     // interogare de baza
-                    String sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                            "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
+                    String sql = "SELECT c.id_ang, u.id, c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
+                            "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon, " +
+                            "CONCAT('Str.', l.strada, ', loc. ', l.oras, ', jud. ', l.judet, ', ', l.tara) as adresa " +
                             "FROM useri u " +
                             "JOIN tipuri t ON u.tip = t.tip " +
                             "JOIN departament d ON u.id_dep = d.id_dep " +
                             "JOIN concedii c ON c.id_ang = u.id " +
                             "JOIN statusuri s ON c.status = s.status " +
                             "JOIN tipcon ct ON c.tip = ct.tip " +
+                            "join locatii_concedii l on c.id = l.id_concediu " +
                             "WHERE YEAR(c.start_c) = YEAR(CURDATE())";
+                    
                     // daca e sef
                     if (userType == 3 && request.getParameter("pag")==null ) {
                     	sql = sql + " and u.id_dep = " + userdep + " and c.status = 0 ";
                     }
-                    // daca e directoe
-                    if (userType == 0) {
+                    
+                    // daca e director
+                    if (userType == 0 && request.getParameter("pag")==null) {
                     	sql = sql + " and u.id_dep = " + userdep + " and c.status = 1 ";
                     }
+                    
                     // deci cand vreau eu sa modific lucruri la mine... oh well.. in plus tre sa tin cont de status
-                    if (request.getParameter("pag")!=null) { // tre sa vad ce tip de pagina e
+                    if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1") == 0) { // tre sa vad ce tip de pagina e
                     	sql = sql + " and u.id = " + id;
                     	// pun concediile lui
                     	
-                    	if (request.getParameter("pag").compareTo("1") == 0) {
-	                    	if (userType == 1 || userType == 2) {
-	                    		sql = sql + " and c.status = 0";
-	                    	}
-	                    	// merge la director, nu merge la sef =(
-	                    	if (userType == 0 || userType == 3) {
-	                    		sql = sql + " and c.status = 1";
-	                    	}
+                    	if (userType == 1 || userType == 2) {
+                    		sql = sql + " and c.status = 0";
                     	}
+                    	
+                    	// merge la director, nu merge la sef =(
+                    	if (userType == 0 || userType == 3) {
+                    		sql = sql + " and c.status = 1";
+                    	}
+                    	
                     }
                     // aici e fara pag=?
                     if (userType == 1 || userType == 2) {
                     	sql = sql + " and u.id = " + id;
                     }
-                    System.out.println(sql);
+                    // System.out.println(sql);
                     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                     	ResultSet rs1 = stmt.executeQuery();
                         boolean found = false;
@@ -309,65 +323,64 @@
                                     rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Fct'>" + rs1.getString("functie") + "</td><td data-label='Dep'>" + rs1.getString("departament") + 
                                     "</td>" + "<td data-label='Inceput'>" +
                                     		rs1.getString("start_c")+ "</td><td data-label='Final'>" + rs1.getString("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                    rs1.getString("locatie") + "</td>" + "<td data-label='Tip'>" + rs1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
+                                    rs1.getString("adresa") + "</td>" + "<td data-label='Tip'>" + rs1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
                                     "<td data-label='Acc/Res'>" + accres + "</td>");
-                            if (rs1.getString("status").compareTo("neaprobat") == 0) {
+                            
+                            if (rs1.getString("status").compareTo("Neaprobat") == 0) {
                                 out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
                             }
-                            if (rs1.getString("status").compareTo("aprobat sef") == 0) {
+                            
+                            if (rs1.getString("status").compareTo("Aprobat sef") == 0) {
                                 out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
                             }
-                            if (rs1.getString("status").compareTo("aprobat director") == 0) {
+                            
+                            if (rs1.getString("status").compareTo("Aprobat director") == 0) {
                                 out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
                             }
-                            if (rs1.getString("status").compareTo("dezaprobat director") == 0) {
+                            
+                            if (rs1.getString("status").compareTo("Dezaprobat director") == 0) {
                             	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
                             }
-                            if (rs1.getString("status").compareTo("dezaprobat sef") == 0) {
+                            
+                            if (rs1.getString("status").compareTo("Dezaprobat sef") == 0) {
                             	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
                             }
+                            
                           // pana aici e partea comuna
                           // apoi pentru sef sa aprobe sau sa respinga
-                           if (userType == 3 && (request.getParameter("pag")==null)) {
-	                          if (rs1.getString("status").compareTo("neaprobat") == 0) {
+                           if (userType == 3 && request.getParameter("pag")==null) {
+	                          if (rs1.getString("status").compareTo("Neaprobat") == 0) {
 	                        	  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='javascript:void(0);' onclick=\"showModal('aprobsef?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-checkbox-circle-line'></i></a></span></td>");
 								 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='javascript:void(0);' onclick=\"showModal('ressef?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-close-line'></i></a></span></td>");
 	                        	  
 	                          }
                            }
+                          
                           // apoi pentru director sa aprobe sau sa respinga
-                           if (userType == 0 && (request.getParameter("pag")==null)) {
-	                          if (rs1.getString("status").compareTo("aprobat sef") == 0) {
+                           if (userType == 0 && request.getParameter("pag")==null) {
+	                          if (rs1.getString("status").compareTo("Aprobat sef") == 0) {
 	                        	  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='javascript:void(0);' onclick=\"showModal('aprobdir?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-checkbox-circle-line'></i></a></span></td>");
 	                        	  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='javascript:void(0);' onclick=\"showModal('resdir?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-close-line'></i></a></span></td>");
 									}
                         	}
-                          // apoi pentru cine vrea sa modifice concediul
-                          if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1")==0) {
-                           //if (Integer.parseInt(request.getParameter("pag")) == 1) {
-							    if ((rs1.getString("status").compareTo("neaprobat") == 0 && (userType == 1 || userType == 2)) || 
-							        (rs1.getString("status").compareTo("aprobat sef") == 0 && (userType == 3 || userType == 0))) {
-							        
-							        out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
-							                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 
-							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
-							        out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'>" +
-							                   "<a href='delcon?idcon=" + rs1.getInt("nr_crt") + 
-							                   "'><i class='ri-close-line'></i></a></span></td></tr>");
-							    //}
-                           }
-							    out.println("<td data-label='Status'>N/A</td>");
-						        
-							} 
-                           out.println("<td data-label='Adaugati locatie concediu'><span class='status-icon status-neaprobat'>" +
-				                   "<a href='NewFile2.html?idcon=" + rs1.getInt("nr_crt") + 
-				                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
-                           out.println("<td data-label='Modificati'><span class='status-icon status-neaprobat'>" +
-				                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 
-				                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
-				        out.println("<td data-label='Stergeti'><span class='status-icon status-dezaprobat-director'>" +
-				                   "<a href='delcon?idcon=" + rs1.getInt("nr_crt") + 
-				                   "'><i class='ri-close-line'></i></a></span></td></tr>");
+                          
+                        // apoi pentru cine vrea sa modifice concediul
+                           if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1")==0) {
+                            //if (Integer.parseInt(request.getParameter("pag")) == 1) {
+ 							    if ((rs1.getString("status").compareTo("Neaprobat") == 0 && (userType == 1 || userType == 2)) || 
+ 							        (rs1.getString("status").compareTo("Aprobat sef") == 0 && (userType == 3 || userType == 0))) {
+ 							        
+ 							        out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
+ 							                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 
+ 							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
+ 							        out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'>" +
+ 							                   "<a href='delcon?idcon=" + rs1.getInt("nr_crt") + 
+ 							                   "'><i class='ri-close-line'></i></a></span></td></tr>");
+ 							    //}
+                            }
+ 						        
+ 							} 
+                         
                          nr++; 
                         }
                         if (!found) {
