@@ -501,4 +501,14 @@
     <servlet-name>locactdep</servlet-name>
     <url-pattern>/locactdep</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>locactacs</display-name>
+    <servlet-name>locactacs</servlet-name>
+    <servlet-class>mix.locactacs</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>locactacs</servlet-name>
+    <url-pattern>/locactacs</url-pattern>
+  </servlet-mapping>
 </web-app>
