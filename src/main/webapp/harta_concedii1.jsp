@@ -52,8 +52,7 @@
 <body>
     <div id="viewDiv"></div>
     <div class="sidebar">
-        <h1 style="color: white; text-align: center;">Harta Concedii</h1>
-        
+         
         <label for="locationSelect">Departament</label>
         <select id="locationSelect"></select>
         
