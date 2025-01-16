@@ -1,87 +1,190 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplicatie Concedii</title>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
-  <script src="https://js.arcgis.com/4.30/"></script>
-  <style>
-    html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        width: 100%;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harta Concedii</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.30/"></script>
+    <style>
+        html, body, #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        .sidebar {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            z-index: 100;
+            background-color: #3366cc;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar select,
+        .sidebar button {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .sidebar button {
+            background-color: #0044cc;
+            color: white;
+            cursor: pointer;
+        }
+        .sidebar button:hover {
+            background-color: #002a80;
+        }
+        #loadingSpinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+        }
+    </style>
 </head>
 <body>
-  <div id="viewDiv"></div>
-  <script src="script.js"></script>
-  <script>
-  
-  require([
-	  "esri/config",
-	  "esri/Map",
-	  "esri/views/MapView",
-	  "esri/layers/FeatureLayer",
-	  "esri/widgets/Search"
-	], function (esriConfig, Map, MapView, FeatureLayer, Search) {
-	  esriConfig.apiKey =
-	    "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
+    <div id="viewDiv"></div>
+    <div class="sidebar">
+        <h1 style="color: white; text-align: center;">Harta Concedii</h1>
+        <label for="locationSelect">Departament</label>
+        <select id="locationSelect"></select>
+        <button id="locateMeBtn">Localizează-mă</button>
+        <button id="homeToRouteBtn">Rutare de acasă</button>
+        <button id="generateRouteBtn">Generează rută</button>
+        <button id="resetBtn">Resetează harta</button>
+    </div>
+    <div id="loadingSpinner">
+        <p>Se încarcă...</p>
+    </div>
 
-	
-	  const destinationsUrl =
-	    "https://services.arcgis.com/example/arcgis/rest/services/Destinations/FeatureServer/0";
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            require([
+                "esri/config",
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/Graphic",
+                "esri/geometry/Point",
+                "esri/rest/route",
+                "esri/rest/support/RouteParameters",
+                "esri/rest/support/FeatureSet"
+            ], function (esriConfig, Map, MapView, Graphic, Point, route, RouteParameters, FeatureSet) {
 
-	  const destinationsLayer = new FeatureLayer({
-	    url: destinationsUrl,
-	    popupTemplate: {
-	      title: "{Name}",
-	      content: `
-	        <b>Descriere:</b> {Description}<br>
-	        <b>Tara:</b> {Country}<br>
-	        <b>Rating:</b> {Rating} / 5
-	      `
-	    },
-	    renderer: {
-	      type: "simple",
-	      symbol: {
-	        type: "simple-marker",
-	        color: "blue",
-	        size: "10px",
-	        outline: {
-	          color: "white",
-	          width: 1
-	        }
-	      }
-	    }
-	  });
+                esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
-	  const map = new Map({
-	    basemap: "arcgis/topographic",
-	    layers: [destinationsLayer]
-	  });
+                const map = new Map({ basemap: "arcgis/topographic" });
+                const view = new MapView({
+                    container: "viewDiv",
+                    map: map,
+                    center: [25, 45],
+                    zoom: 6
+                });
 
-	  const view = new MapView({
-	    container: "viewDiv",
-	    map: map,
-	    center: [0, 20],
-	    zoom: 2 
-	  });
+                const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+                const locateMeBtn = document.getElementById("locateMeBtn");
+                const locationSelect = document.getElementById("locationSelect");
+                const homeToRouteBtn = document.getElementById("homeToRouteBtn");
+                const resetBtn = document.getElementById("resetBtn");
 
-	 
-	  const searchWidget = new Search({
-	    view: view
-	  });
-	  view.ui.add(searchWidget, {
-	    position: "top-right"
-	  });
-	});
+                let homeLocation = null;
 
-  </script>
+                // 1. Încarcă lista de departamente
+                function loadDepartments() {
+                    fetch("GetDepartmentLocationServlet")
+                        .then(response => response.json())
+                        .then(data => {
+                            locationSelect.innerHTML = '<option value="" disabled selected>Selectează departamentul</option>';
+                            data.forEach(dep => {
+                                const option = document.createElement("option");
+                                option.value = JSON.stringify({ lat: dep.latitude, lon: dep.longitude });
+                                option.textContent = dep.nume_dep;
+                                locationSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error("Eroare la încărcarea departamentelor:", error));
+                }
+
+                // 2. Obține locația de acasă
+                function fetchHomeLocation() {
+                    fetch("GetHomeLocationServlet")
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.latitude && data.longitude) {
+                                homeLocation = new Point({ latitude: data.latitude, longitude: data.longitude });
+                                console.log("Locația de acasă:", homeLocation);
+                            } else {
+                                alert("Locația de acasă nu a fost găsită.");
+                            }
+                        })
+                        .catch(error => console.error("Eroare la încărcarea locației de acasă:", error));
+                }
+
+                // 3. Rutare de la locația de acasă
+                function routeFromHome() {
+                    if (!homeLocation) {
+                        alert("Locația de acasă nu este disponibilă.");
+                        return;
+                    }
+
+                    const selectedValue = locationSelect.value;
+                    if (!selectedValue) {
+                        alert("Selectează un departament!");
+                        return;
+                    }
+
+                    const destinationCoords = JSON.parse(selectedValue);
+                    const destinationPoint = new Point({
+                        latitude: destinationCoords.lat,
+                        longitude: destinationCoords.lon
+                    });
+
+                    const routeParams = new RouteParameters({
+                        stops: new FeatureSet({
+                            features: [
+                                new Graphic({ geometry: homeLocation }),
+                                new Graphic({ geometry: destinationPoint })
+                            ]
+                        }),
+                        returnDirections: true
+                    });
+
+                    route.solve(routeUrl, routeParams)
+                        .then(data => {
+                            data.routeResults.forEach(result => {
+                                result.route.symbol = { type: "simple-line", color: [0, 0, 255], width: 4 };
+                                view.graphics.add(result.route);
+                            });
+                        })
+                        .catch(error => console.error("Eroare la generarea rutei:", error));
+                }
+
+                // 4. Resetează harta
+                function resetMap() {
+                    view.graphics.removeAll();
+                    view.goTo({ center: [25, 45], zoom: 6 });
+                }
+
+                // Event Listeners
+                homeToRouteBtn.addEventListener("click", routeFromHome);
+                resetBtn.addEventListener("click", resetMap);
+
+                // Inițializare
+                loadDepartments();
+                fetchHomeLocation();
+            });
+        });
+    </script>
 </body>
 </html>

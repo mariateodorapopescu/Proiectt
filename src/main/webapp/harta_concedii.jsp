@@ -55,22 +55,6 @@
 <body>
     <div id="viewDiv"></div>
     <div class="sidebar">
-        <label for="periodSelect">Perioada</label>
-        <select id="periodSelect">
-            <option value="ianuarie">Ianuarie</option>
-            <option value="februarie">Februarie</option>
-            <option value="martie">Martie</option>
-            <option value="aprilie">Aprilie</option>
-            <option value="mai">Mai</option>
-            <option value="iunie">Iunie</option>
-            <option value="iulie">Iulie</option>
-            <option value="august">August</option>
-            <option value="septembrie">Septembrie</option>
-            <option value="octombrie">Octombrie</option>
-            <option value="noiembrie">Noiembrie</option>
-            <option value="decembrie">Decembrie</option>
-        </select>
-
         <label for="locationSelect">Localitatea</label>
         <select id="locationSelect"></select>
 		<button id="locateMeBtn">Localizează-mă</button>

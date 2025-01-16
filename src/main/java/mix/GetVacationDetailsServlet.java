@@ -14,11 +14,11 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import org.json.JSONArray;
 
-@WebServlet("/LoadVacationLocationsServlet")
-public class LoadVacationLocationsServlet extends HttpServlet {
+@WebServlet("/GetVacationDetailsServlet")
+public class GetVacationDetailsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    public LoadVacationLocationsServlet() {
+    public GetVacationDetailsServlet() {
         super();
     }
 
