@@ -627,7 +627,14 @@ body {
                         <div  class="sitextt">Actiuni</div>
                     </a>
                 </li>
-                    
+                       <li style="--bg: <%out.println(accent); %>;">
+                    <a href="actiuni_harti.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="globe"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Actiuni</div>
+                    </a>
+                </li>
                  <li style="--bg: <%out.println(accent); %>">
                     <a href="harta.jsp" class="load-content" target="iframe">
                         <div class="siiconn">

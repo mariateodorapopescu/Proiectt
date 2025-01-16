@@ -491,4 +491,14 @@
     <servlet-name>GetVacationDetailsServlet</servlet-name>
     <url-pattern>/GetVacationDetailsServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>locactdep</display-name>
+    <servlet-name>locactdep</servlet-name>
+    <servlet-class>mix.locactdep</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>locactdep</servlet-name>
+    <url-pattern>/locactdep</url-pattern>
+  </servlet-mapping>
 </web-app>
