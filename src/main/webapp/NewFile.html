@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -66,8 +66,7 @@
         "esri/Graphic",
         "esri/rest/locator"
       ], function (esriConfig, Map, MapView, Graphic, locator) {
-        esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
-
+        esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurD3614hU6avg5dgfJ0cyyj8cQ8C7k3IZRB6OnACsZ-rE1hULGhayhxdt3-DyiUZ3lkaYmzyQjvRTgl0Slvk8SyBIO2Segk7bmnRewIolBDbBOfOUyy3Vfc6BPl6s6SRn91vphbzw_QQpZuh5u0J_PHemWhTB0TDSod-Z_xeL7jaImuSKEazyI5GU80sve_kEVwagPYkxvSqX11IqMKvs2Ww.AT1_koIv1OGN";
 
         const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
 
@@ -78,13 +77,16 @@
         const view = new MapView({
           container: "viewDiv",
           map: map,
-          center: [0, 20],
-          zoom: 2
+          center: [26.1025, 44.4268], // Bucharest coordinates
+          zoom: 11
         });
+
+        let currentLocation = null;
 
         navigator.geolocation.getCurrentPosition(
           function (position) {
             const { latitude, longitude } = position.coords;
+            currentLocation = { latitude, longitude };
             view.center = [longitude, latitude];
             view.zoom = 14;
 
@@ -92,7 +94,15 @@
               geometry: {
                 type: "point",
                 longitude: longitude,
-                latitude: latitude
+                latitude: latitude,
+               
+	              strada: street,
+	              oras: city,
+	              judet: sector,
+	              cod: code,
+	              nr: number,
+	              tara: country,
+	             
               },
               symbol: {
                 type: "simple-marker",
@@ -106,7 +116,8 @@
             });
 
             view.graphics.add(userLocation);
-            document.getElementById("locationOutput").textContent = `Locatia curenta: Latitudine ${latitude.toFixed(6)}, Longitudine ${longitude.toFixed(6)}`;
+            document.getElementById("locationOutput").textContent = 
+              `Locatia curenta: Latitudine ${latitude.toFixed(6)}, Longitudine ${longitude.toFixed(6)}`;
           },
           function (error) {
             console.error("Eroare la detectarea locatiei utilizatorului:", error);
@@ -114,7 +125,7 @@
           }
         );
 
-        document.getElementById("addAddress").addEventListener("click", function () {
+        document.getElementById("addAddress").addEventListener("click", async function () {
           const street = document.getElementById("street").value;
           const number = document.getElementById("number").value;
           const code = document.getElementById("code").value;
@@ -132,17 +143,26 @@
 
           document.getElementById("addressOutput").textContent = `Adresa formata: ${address}`;
 
-          locator.addressToLocations(locatorUrl, {
-            address: {
-              SingleLine: address
-            }
-          })
-          .then(function (results) {
+          try {
+            const params = {
+              address: {
+                "address": address
+              },
+              outFields: ["*"]
+            };
+
+            const results = await locator.addressToLocations(locatorUrl, params);
+
             if (results.length > 0) {
               const location = results[0].location;
+              view.graphics.removeAll();
 
               const marker = new Graphic({
-                geometry: location,
+                geometry: {
+                  type: "point",
+                  longitude: location.longitude,
+                  latitude: location.latitude
+                },
                 symbol: {
                   type: "simple-marker",
                   color: "blue",
@@ -155,45 +175,46 @@
               });
 
               view.graphics.add(marker);
-              view.center = [location.x, location.y];
+              view.center = [location.longitude, location.latitude];
               view.zoom = 14;
 
-              fetch("ServletUpdateAddress", {
+              const requestBody = {
+                userId: userId,
+                strada: street,
+                nr: number,
+                cod: code,
+                judet: sector,
+                oras: city,
+                tara: country,
+                latitudine: location.latitude,
+                longitudine: location.longitude
+              };
+
+              const response = await fetch("locatiee", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                  userId: userId,
-                  address: address
-                })
-              })
-              .then((response) => {
-                if (response.ok) {
-                  return response.text();
-                } else {
-                  throw new Error("Eroare la actualizarea adresei in baza de date.");
-                }
-              })
-              .then((data) => {
-                document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru utilizatorul cu ID-ul ${userId}.`;
-              })
-              .catch((error) => {
-                console.error("Eroare la trimiterea datelor catre servlet:", error);
-                document.getElementById("addressOutput").textContent = "Eroare la salvarea adresei.";
+                body: JSON.stringify(requestBody)
               });
 
+              if (response.ok) {
+                document.getElementById("addressOutput").textContent = 
+                  `Adresa a fost salvata cu succes pentru utilizatorul cu ID-ul ${userId}.`;
+              } else {
+                throw new Error("Eroare la actualizarea adresei in baza de date.");
+              }
             } else {
               document.getElementById("locationOutput").textContent = "Adresa nu a fost gasita.";
             }
-          })
-          .catch(function (error) {
-            console.error("Eroare la geocodare:", error);
-            document.getElementById("locationOutput").textContent = "Eroare la geocodarea adresei.";
-          });
+          } catch (error) {
+            console.error("Eroare:", error);
+            document.getElementById("locationOutput").textContent = 
+              "Eroare la procesarea adresei: " + error.message;
+          }
         });
       });
     });
   </script>
 </body>
-</html>
+</html> 

@@ -511,4 +511,14 @@
     <servlet-name>locactacs</servlet-name>
     <url-pattern>/locactacs</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>locatiee</display-name>
+    <servlet-name>locatiee</servlet-name>
+    <servlet-class>mix.locatiee</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>locatiee</servlet-name>
+    <url-pattern>/locatiee</url-pattern>
+  </servlet-mapping>
 </web-app>
