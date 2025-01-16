@@ -242,6 +242,7 @@
 				                        new Graphic({ geometry: destinationPoint }) // Punctul de destinație
 				                    ]
 				                }),
+				                directionsLanguage: "ro",
 				                returnDirections: true
 				            });
 

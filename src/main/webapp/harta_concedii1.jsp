@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+ <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,10 +52,10 @@
 <body>
     <div id="viewDiv"></div>
     <div class="sidebar">
-         
         <label for="locationSelect">Departament</label>
         <select id="locationSelect"></select>
         
+        <button id="viewDepartmentBtn">Vezi departamentul</button>
         <button id="locateMeBtn">Localizează-mă</button>
         <button id="generateRouteBtn">Generează rută</button>
         <button id="resetBtn">Resetează harta</button>
@@ -89,7 +89,6 @@
                 RouteParameters,
                 FeatureSet
             ) {
-
                 esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
                 const map = new Map({
@@ -103,39 +102,72 @@
                     zoom: 6
                 });
 
-                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
                 const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
                 const locateMeBtn = document.getElementById("locateMeBtn");
                 const locationSelect = document.getElementById("locationSelect");
                 const generateRouteBtn = document.getElementById("generateRouteBtn");
                 const resetBtn = document.getElementById("resetBtn");
+                const viewDepartmentBtn = document.getElementById("viewDepartmentBtn");
                 const loadingSpinner = document.getElementById("loadingSpinner");
 
                 let currentLocation = null;
 
-                // 1. Încărcăm lista de departamente din servletul locactdep
-               fetch("locactdep")
-  .then(response => response.json())
-  .then(data => {
-    locationSelect.innerHTML = '<option value="" disabled selected>Selectează departamentul</option>';
+                // Load departments
+                fetch("locactdep")
+                    .then(response => response.json())
+                    .then(data => {
+                        locationSelect.innerHTML = '<option value="" disabled selected>Selectează departamentul</option>';
+                        data.forEach(dep => {
+                            const option = document.createElement("option");
+                            option.value = dep.id_dep;
+                            option.textContent = dep.nume_dep;
+                            option.setAttribute("data-lat", dep.latitude);
+                            option.setAttribute("data-lon", dep.longitude);
+                            locationSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error("Eroare la încărcarea departamentelor:", error));
 
-    data.forEach(dep => {
-      const option = document.createElement("option");
-      option.value = dep.id_dep;         // "1", "2", etc.
-      option.textContent = dep.nume_dep; // "IT", "HR", etc.
+                // View department functionality
+                viewDepartmentBtn.addEventListener("click", function() {
+                    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+                    if (!selectedOption.value) {
+                        alert("Selectează un departament!");
+                        return;
+                    }
 
-      // stocăm lat / lon ca atribute custom
-      option.setAttribute("data-lat", dep.latitude);
-      option.setAttribute("data-lon", dep.longitude);
+                    const lat = parseFloat(selectedOption.getAttribute("data-lat"));
+                    const lon = parseFloat(selectedOption.getAttribute("data-lon"));
+                    
+                    view.graphics.removeAll();
+                    
+                    const departmentPoint = new Point({
+                        longitude: lon,
+                        latitude: lat
+                    });
 
-      locationSelect.appendChild(option);
-    });
-  })
-  .catch(error => console.error("Eroare la încărcarea departamentelor:", error));
+                    const departmentGraphic = new Graphic({
+                        geometry: departmentPoint,
+                        symbol: {
+                            type: "simple-marker",
+                            color: "red",
+                            size: "12px"
+                        },
+                        popupTemplate: {
+                            title: selectedOption.textContent,
+                            content: `Latitude: ${lat}<br>Longitude: ${lon}`
+                        }
+                    });
 
+                    view.graphics.add(departmentGraphic);
+                    view.goTo({
+                        target: departmentPoint,
+                        zoom: 14
+                    });
+                });
 
-                // 2. Localizeaza-ma
+                // Locate me functionality
                 locateMeBtn.addEventListener("click", function () {
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(
@@ -174,138 +206,104 @@
                     }
                 });
 
-                // 3. Generează rută
-               generateRouteBtn.addEventListener("click", function () {
-  if (!currentLocation) {
-    alert("Te rog să te localizezi mai întâi.");
-    return;
-  }
+                // Generate route functionality
+                generateRouteBtn.addEventListener("click", async function () {
+                    if (!currentLocation) {
+                        alert("Te rog să te localizezi mai întâi.");
+                        return;
+                    }
 
-  const selectedOption = locationSelect.options[locationSelect.selectedIndex];
-  if (!selectedOption.value) {
-    alert("Selectează un departament!");
-    return;
-  }
+                    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+                    if (!selectedOption.value) {
+                        alert("Selectează un departament!");
+                        return;
+                    }
 
-  // Citești lat / lon din atributele custom
-  const lat = parseFloat(selectedOption.getAttribute("data-lat"));
-  const lon = parseFloat(selectedOption.getAttribute("data-lon"));
+                    loadingSpinner.style.display = "block";
 
-  // Creezi direct Point pentru destinație
-  const destinationPoint = new Point({
-    longitude: lon,
-    latitude: lat
-  });
+                    try {
+                        const lat = parseFloat(selectedOption.getAttribute("data-lat"));
+                        const lon = parseFloat(selectedOption.getAttribute("data-lon"));
 
-  // Marchezi grafic pe hartă
-  const destinationGraphic = new Graphic({
-    geometry: destinationPoint,
-    symbol: {
-      type: "simple-marker",
-      color: "red",
-      size: "12px"
-    }
-  });
-  view.graphics.add(destinationGraphic);
+                        const destinationPoint = new Point({
+                            longitude: lon,
+                            latitude: lat
+                        });
 
-  // Generezi ruta
-  const routeParams = new RouteParameters({
-    stops: new FeatureSet({
-      features: [
-        new Graphic({ geometry: currentLocation }),
-        new Graphic({ geometry: destinationPoint })
-      ]
-    }),
-    returnDirections: true
-  });
+                        const destinationGraphic = new Graphic({
+                            geometry: destinationPoint,
+                            symbol: {
+                                type: "simple-marker",
+                                color: "red",
+                                size: "12px"
+                            }
+                        });
 
-  route.solve(routeUrl, routeParams)
-    .then(function (data) {
-      data.routeResults.forEach(function (result) {
-        result.route.symbol = {
-          type: "simple-line",
-          color: [0, 0, 255],
-          width: 4
-        };
-        view.graphics.add(result.route);
-      });
+                        view.graphics.removeAll();
+                        view.graphics.add(new Graphic({
+                            geometry: currentLocation,
+                            symbol: {
+                                type: "simple-marker",
+                                color: "green",
+                                size: "12px"
+                            }
+                        }));
+                        view.graphics.add(destinationGraphic);
 
-      if (data.routeResults.length > 0) {
-      
-                            const destinationPoint = new Point({
-                                longitude: results[0].location.x,
-                                latitude: results[0].location.y
+                        const routeParams = new RouteParameters({
+                            stops: new FeatureSet({
+                                features: [
+                                    new Graphic({ geometry: currentLocation }),
+                                    new Graphic({ geometry: destinationPoint })
+                                ]
+                            }),
+                            directionsLanguage: "ro",
+                            returnDirections: true
+                        });
+
+                        const data = await route.solve(routeUrl, routeParams);
+
+                        data.routeResults.forEach(function (result) {
+                            result.route.symbol = {
+                                type: "simple-line",
+                                color: [0, 0, 255],
+                                width: 4
+                            };
+                            view.graphics.add(result.route);
+                        });
+
+                        if (data.routeResults.length > 0) {
+                            const directions = document.createElement("ol");
+                            directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
+                            directions.style.marginTop = "10px";
+                            directions.style.padding = "15px 15px 15px 30px";
+
+                            data.routeResults[0].directions.features.forEach(function (result) {
+                                const direction = document.createElement("li");
+                                direction.innerHTML = result.attributes.text + 
+                                    " (" + result.attributes.length.toFixed(2) + " km)";
+                                directions.appendChild(direction);
                             });
 
-                            const destinationGraphic = new Graphic({
-                                geometry: destinationPoint,
-                                symbol: {
-                                    type: "simple-marker",
-                                    color: "red",
-                                    size: "12px"
-                                }
-                            });
-
-                            view.graphics.add(destinationGraphic);
-
-                            const routeParams = new RouteParameters({
-                                stops: new FeatureSet({
-                                    features: [
-                                        new Graphic({ geometry: currentLocation }),
-                                        new Graphic({ geometry: destinationPoint })
-                                    ]
-                                }),
-                                returnDirections: true
-                            });
-
-                            route.solve(routeUrl, routeParams)
-                                .then(function (data) {
-                                    data.routeResults.forEach(function (result) {
-                                        result.route.symbol = {
-                                            type: "simple-line",
-                                            color: [0, 0, 255],
-                                            width: 4
-                                        };
-                                        view.graphics.add(result.route);
-                                    });
-
-                                    if (data.routeResults.length > 0) {
-                                        const directions = document.createElement("ol");
-                                        directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
-                                        directions.style.marginTop = "10px";
-                                        directions.style.padding = "15px 15px 15px 30px";
-
-                                        data.routeResults[0].directions.features.forEach(function (result, i) {
-                                            const direction = document.createElement("li");
-                                            direction.innerHTML = result.attributes.text + 
-                                                " (" + result.attributes.length.toFixed(2) + " km)";
-                                            directions.appendChild(direction);
-                                        });
-
-                                        view.ui.empty("top-right");
-                                        view.ui.add(directions, "top-right");
-                                    }
-                                })
-                                .catch(function (error) {
-                                    console.error("Eroare la generarea rutei:", error);
-                                });
-                        } else {
-                            alert("Nu s-au găsit coordonatele pentru departamentul selectat.");
+                            view.ui.empty("top-right");
+                            view.ui.add(directions, "top-right");
                         }
-                    }).catch(function (error) {
+                    } catch (error) {
+                        console.error("Eroare la generarea rutei:", error);
+                        alert("Eroare la generarea rutei. Verificați consola pentru detalii.");
+                    } finally {
                         loadingSpinner.style.display = "none";
-                        console.error("Eroare la geocodare:", error);
-                    });
+                    }
                 });
 
-                // 4. Resetează harta
+                // Reset functionality
                 resetBtn.addEventListener("click", function () {
                     view.graphics.removeAll();
+                    view.ui.empty("top-right");
                     view.goTo({ center: [25, 45], zoom: 6 });
                 });
-
             });
         });
     </script>
 </body>
-</html>
+</html> 

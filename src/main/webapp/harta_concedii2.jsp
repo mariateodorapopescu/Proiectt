@@ -255,6 +255,7 @@
                                         new Graphic({ geometry: destinationPoint })
                                     ]
                                 }),
+                                directionsLanguage: "ro",
                                 returnDirections: true
                             });
 
