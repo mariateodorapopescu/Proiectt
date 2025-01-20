@@ -7,6 +7,16 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Locale" %>
+<%! 
+public String escapeHtml(String input) {
+    if (input == null) return "";
+    return input.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#x27;");
+}
+%>
 <%
     HttpSession sesi = request.getSession(false);
 int pag = -1;
@@ -169,7 +179,7 @@ int pag = -1;
                     	
                  <div class="events"  style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
                  <%
-                    	
+                    	System.out.println(pag + " " + status + ' ' + tip);
                     	if (pag == 3) {
                			 out.println("<h1> Vizualizare concedii personale");
              				
@@ -443,68 +453,84 @@ int pag = -1;
                     			stmtt2.setString(nrp3, end);
                     		}
                     	}
-                    	
-                    	  ResultSet rss1 = stmtt2.executeQuery();
-                          boolean found = false;
-							int nr = 1;
-							if (!rss1.next()) {
-								 
-		                              out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
-		        
-		                          rss1.close();
-		                          stmtt2.close();
-							} else {
-                          while (rss1.next()) {
-                              found = true;
-                              
-                                String added = rss1.getString("added") != null ? rss1.getString("added") : " - ";
-                                String modif = rss1.getString("modified") != null ? rss1.getString("modified") : " - ";
-                                String accres = rss1.getString("acc_res") != null ? rss1.getString("acc_res") : " - ";
-                                		
-                                out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
-                                        rss1.getString("nume") + "</td><td data-label='Prenume'>" + rss1.getString("prenume") + "</td><td data-label='Fct'>" + rss1.getString("functie") + "</td><td data-label='Dep'>" + rss1.getString("departament") + 
-                                        "</td>" + "<td data-label='Inceput'>" +
-                                        		rss1.getString("start_c")+ "</td><td data-label='Final'>" + rss1.getString("end_c") + "</td><td data-label='Motiv'>" + rss1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                        rss1.getString("locatie") + "</td>" + "<td data-label='Tip'>" + rss1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
-                                        "<td data-label='Acc/Res'>" + accres + "</td>");
+                    	System.out.println(stmtt2);
+                    	 try (ResultSet rss1 = stmtt2.executeQuery()) {
+                    	        boolean found = false;
+                    	        int nr = 1;
 
-                              if (rss1.getString("status").compareTo("neaprobat") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
-                                
-                              }
-                              if (rss1.getString("status").compareTo("dezaprobat sef") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
-                                  //out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td></tr>");
-                              }
-                              if (rss1.getString("status").compareTo("dezaprobat director") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
-                                  //out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td></tr>");
-                              }
-                              if (rss1.getString("status").compareTo("aprobat director") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
-                                  //out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
-                              }
-                              if (rss1.getString("status").compareTo("aprobat sef") == 0) {
-                            	  out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
-                                  //out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td></tr>");
-                              }
-                              nr++;
-                          }
-							}
-                          if (!found) {
-                              out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
-                          }
+                    	        while (rss1.next()) {
+                    	            found = true;
+
+                    	            String added = rss1.getString("added") != null ? rss1.getString("added") : " - ";
+                    	            String modif = rss1.getString("modified") != null ? rss1.getString("modified") : " - ";
+                    	            String accres = rss1.getString("acc_res") != null ? rss1.getString("acc_res") : " - ";
+
+                    	            out.print("<tr><td>" + nr + "</td><td>" + escapeHtml(rss1.getString("nume")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("prenume")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("functie")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("departament")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("start_c")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("end_c")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("motiv")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("locatie")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(rss1.getString("tipcon")) + "</td>");
+                    	            out.print("<td>" + escapeHtml(added) + "</td>");
+                    	            out.print("<td>" + escapeHtml(modif) + "</td>");
+                    	            out.print("<td>" + escapeHtml(accres) + "</td>");
+									
+                    	            
+                    	            if (rss1.getString("status").compareTo("Neaprobat") == 0) {
+                                        out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
+                                    }
+                                    
+                                    if (rss1.getString("status").compareTo("Aprobat sef") == 0) {
+                                        out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
+                                    }
+                                    
+                                    if (rss1.getString("status").compareTo("Aprobat director") == 0) {
+                                        out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
+                                    }
+                                    
+                                    if (rss1.getString("status").compareTo("Dezaprobat director") == 0) {
+                                    	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
+                                    }
+                                    
+                                    if (rss1.getString("status").compareTo("Dezaprobat sef") == 0) {
+                                    	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
+                                    }
+                    	            /*
+                    	            String status2 = rss1.getString("status");
+                    	            if ("neaprobat".equalsIgnoreCase(status2)) {
+                    	                out.print("<td class='status-neaprobat'>Neaprobat</td>");
+                    	            } else if ("aprobat sef".equalsIgnoreCase(status2)) {
+                    	                out.print("<td class='status-aprobat-sef'>Aprobat sef</td>");
+                    	            } else if ("aprobat director".equalsIgnoreCase(status2)) {
+                    	                out.print("<td class='status-aprobat-director'>Aprobat director</td>");
+                    	            } else {
+                    	                out.print("<td> - </td>");
+                    	            }
+*/
+                    	            nr++;
+                    	        }
+
+                    	        if (!found) {
+                    	            out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
+                    	        }
+                    	 
                           rss1.close();
                           stmtt2.close();
-                        
+                    	 }
                     }
            %>
             </tbody>
                 </table> 
                               
                 </div>
-                
+             
                   <button id="generate" onclick="generate()">Descarcati PDF</button>
+                  <button id="csv" onclick="sendTableDataToCSV()">Descarcati CSV</button>
+                   <button onclick="generateJSONFromTable()">Descarcati un JSON</button>
+                  
                   <%
                   if (pag == 3) {
             			 out.println("<button ><a href='viewp.jsp'>Inapoi</a></button></div>");
@@ -549,6 +575,108 @@ int pag = -1;
                 }
 
             </script>
+            <script>
+ async function sendTableDataToCSV() {
+    const table = document.querySelector("table");
+    const rows = table.querySelectorAll("tbody tr");
+
+    const data = [];
+    rows.forEach((row, index) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length > 0) {
+            data.push({
+                "NrCrt": cells[0].textContent.trim(),
+                "Nume": cells[1].textContent.trim(),
+                "Prenume": cells[2].textContent.trim(),
+                "Functie": cells[3].textContent.trim(),
+                "Departament": cells[4].textContent.trim(),
+                "Inceput": cells[5].textContent.trim(),
+                "Final": cells[6].textContent.trim(),
+                "Motiv": cells[7].textContent.trim(),
+                "Locatie": cells[8].textContent.trim(),
+                "Tip": cells[9].textContent.trim(),
+                "Adaugat": cells[10].textContent.trim(),
+                "Modificat": cells[11].textContent.trim(),
+                "Vazut": cells[12]?.textContent.trim(),
+                "Status": cells[13]?.textContent.trim()
+            });
+        }
+    });
+
+    console.log("Data being sent to the server:", JSON.stringify(data, null, 2)); // Log data being sent
+
+    try {
+        const response = await fetch("generateCSV1", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            console.log("CSV generation successful");
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "table_data.csv";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            console.error("Failed to generate CSV. Response status:", response.status);
+        }
+    } catch (error) {
+        console.error("Error during CSV generation:", error);
+    }
+}
+</script>
+        <script>
+    function generateJSONFromTable() {
+        // Get the table
+        const table = document.querySelector("table");
+        const rows = table.querySelectorAll("tbody tr");
+
+        // Extract table data into a JSON array
+        const data = [];
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length > 0) { // Ignore rows with no data
+                data.push({
+                	 "NrCrt": cells[0].textContent.trim(),
+                     "Nume": cells[1].textContent.trim(),
+                     "Prenume": cells[2].textContent.trim(),
+                     "Functie": cells[3].textContent.trim(),
+                     "Departament": cells[4].textContent.trim(),
+                     "Inceput": cells[5].textContent.trim(),
+                     "Final": cells[6].textContent.trim(),
+                     "Motiv": cells[7].textContent.trim(),
+                     "Locatie": cells[8].textContent.trim(),
+                     "Tip": cells[9].textContent.trim(),
+                     "Adaugat": cells[10].textContent.trim(),
+                     "Modificat": cells[11].textContent.trim(),
+                     "Vazut": cells[12].textContent.trim(),
+                     "Status": cells[13].textContent.trim()
+                });
+            }
+        });
+
+        // Convert JSON array to string
+        const jsonString = JSON.stringify(data, null, 2); // Pretty print JSON
+
+        // Create a Blob and trigger a download
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "table_data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
+             
            <%
                 }
             

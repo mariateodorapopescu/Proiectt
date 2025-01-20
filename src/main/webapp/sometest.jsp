@@ -172,6 +172,11 @@ if (sesi != null) {
                    <p id="ceva2" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=accent %></p>
                  <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
                     class="login__button" onclick="generatePDF()">Descarcati PDF</button>
+                    
+                     <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 40%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" id="JSONN" onclick="generateJSON()">Descarcati un JSON</button>
+                    <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 30%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+    class="login__button" id="downloadCsv" onclick="downloadCsv()">Descarcati un CSV</button>
                 <script>
                 function autoSubmit() {
                     document.getElementById('statusForm').submit();
@@ -244,6 +249,7 @@ if (sesi != null) {
 <script>
 var clear = document.getElementById("ceva1").innerText;
 var accent = document.getElementById("ceva2").innerText;
+let chartData; // Variable to store the JSON data
 var hbnm = "";
 let colorPicker;
 const defaultColor = accent;
@@ -279,6 +285,7 @@ $(document).ready(function() {
             dataType: 'json', // Expecting JSON response
             success: function(response) {
                 updateChart(response); // Update the chart with the response
+                chartData = response; 
             },
             error: function(xhr, status, error) {
                 alert('Error: ' + xhr.statusText);
@@ -401,6 +408,97 @@ function generatePDF() {
                     }
                 }).from(element).save();
             }
+
+document.getElementById("JSONN").addEventListener("click", function () {
+    if (!chartData) {
+        alert("Nu exista date!");
+        return;
+    }
+    
+    // Transform the JSON structure
+    const transformedData = {
+        luna: chartData.h3.match(/luna (\w+)/)[1], // Extracts the month from the h3 string
+        status: chartData.status,
+        departament: chartData.departament,
+        zile: chartData.months, // Renaming "months" to "zile"
+        counts: chartData.counts
+    };
+    
+    // Convert JSON data to a string
+    const jsonString = JSON.stringify(transformedData, null, 2);
+    
+    // Create a Blob with the JSON data
+    const blob = new Blob([jsonString], { type: "application/json" });
+    
+    // Generate a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create a temporary link element
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "chart_data.json"; // Set the file name
+    document.body.appendChild(a); // Append link to the body
+    
+    // Programmatically trigger the download
+    a.click();
+    
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
+function downloadCsv() {
+    if (!chartData) {
+        alert("Nu exista date!");
+        return;
+    }
+
+    // Transform the JSON structure
+    const transformedData = {
+        luna: chartData.h3.match(/luna (\w+)/)[1],
+        status: chartData.status,
+        departament: chartData.departament,
+        zile: chartData.months,
+        counts: chartData.counts
+    };
+
+    // Prepare CSV header and rows
+    const header = ['Luna', 'Status', 'Departament', 'Zi', 'Count'];
+    const rows = [];
+
+    for (let i = 0; i < transformedData.zile.length; i++) {
+        rows.push([
+            transformedData.luna,
+            transformedData.status,
+            transformedData.departament,
+            transformedData.zile[i],
+            transformedData.counts[i]
+        ]);
+    }
+
+    // Convert the header and rows to CSV format
+    const csvContent = [header.join(','), ...rows.map(row => row.join(','))].join('\n');
+
+    // Create a Blob with the CSV data
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    // Generate a URL for the Blob
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary link element
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chart_data.csv'; // Set the file name
+    document.body.appendChild(a); // Append link to the body
+
+    // Programmatically trigger the download
+    a.click();
+
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+
 </script>
 </body>
 </html>

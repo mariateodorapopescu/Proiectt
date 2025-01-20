@@ -1,4 +1,67 @@
- <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="bean.MyUser" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Locale" %>
+
+<%
+    HttpSession sesi = request.getSession(false);
+int pag = -1;
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        if (currentUser != null) {
+            String username = currentUser.getUsername();
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (!rs.next()) {
+                	out.println("<script type='text/javascript'>");
+                    out.println("alert('Date introduse incorect sau nu exista date!');");
+                    out.println("</script>");
+                } else {
+                    int userType = rs.getInt("tip");
+                    int userId = rs.getInt("id");
+                    int userDep = rs.getInt("id_dep");
+                    if (userType == 4) {
+                        response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
+                    } else {
+                    	 String accent = null;
+                      	 String clr = null;
+                      	 String sidebar = null;
+                      	 String text = null;
+                      	 String card = null;
+                      	 String hover = null;
+                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             // Check for upcoming leaves in 3 days
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, userId);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                             // Display the user dashboard or related information
+                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
+                             // Add additional user-specific content here
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                      
+                      	 %> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,23 +71,26 @@
     <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
     <script src="https://js.arcgis.com/4.30/"></script>
     <style>
+      @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+		
         html, body, #viewDiv {
             padding: 0;
             margin: 0;
             height: 100%;
             width: 100%;
+            font-family: 'Poppins', sans-serif;
         }
         .sidebar {
             position: absolute;
             top: 80px;
             left: 20px;
             z-index: 100;
-            background-color: #3366cc;
+            background-color: <%= accent%>;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+          
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
         .sidebar select,
         .sidebar button {
@@ -35,20 +101,30 @@
             border: none;
             border-radius: 5px;
             font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .sidebar select:hover, .sidebar select:active, .sidebar select:selected, .sidebar select:visited {
+         background-color: <%= clr%>;
+            color: <%= text%>;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
         }
         .sidebar button {
-            background-color: #0044cc;
-            color: white;
+            background-color: <%= sidebar%>;
+            color: <%= text%>;
             cursor: pointer;
+            font-family: 'Poppins', sans-serif;
         }
-        .sidebar button:hover {
-            background-color: #002a80;
+        .sidebar button:hover  {
+            background-color: <%= clr%>;
+            font-family: 'Poppins', sans-serif;
         }
         .custom-popup {
-            background-color: white;
+            background-color: <%= sidebar%>;
             padding: 10px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-family: 'Poppins', sans-serif;
+           
         }
     </style>
 </head>
@@ -75,7 +151,8 @@
                 "esri/rest/route",
                 "esri/rest/support/RouteParameters",
                 "esri/rest/support/FeatureSet",
-                "esri/PopupTemplate"
+                "esri/PopupTemplate",
+                "esri/symbols/Font"
             ], function (esriConfig, Map, MapView, Graphic, GraphicsLayer, locator, FeatureLayer, Point, route, RouteParameters, FeatureSet, PopupTemplate) {
 
                 esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
@@ -125,7 +202,7 @@
                                     geometry: point,
                                     symbol: {
                                         type: "simple-marker",
-                                        color: [255, 0, 0],  // Red color
+                                        color: "<%=accent%>",  // Red color
                                         size: "12px",
                                         outline: {
                                             color: "white",
@@ -192,12 +269,13 @@
                                         geometry: point,
                                         symbol: {
                                             type: "simple-marker",
-                                            color: [255, 0, 0],  // Roșu
+                                            color: "<%=accent%>",  // Roșu
                                             size: "12px",
                                             outline: {
                                                 color: "white",
                                                 width: 2
                                             }
+                                           
                                         },
                                         attributes: {
                                             name: location
@@ -236,7 +314,7 @@
                                     geometry: currentLocation,
                                     symbol: {
                                         type: "simple-marker",
-                                        color: "green",
+                                        color: "<%=accent%>",
                                         size: "12px",
                                         outline: {
                                             color: "white",
@@ -395,5 +473,31 @@
             });
         });
     </script>
+    <%
+                    }
+                }
+                            
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                out.println("<script type='text/javascript'>");
+                    	        out.println("alert('Eroare la baza de date!');");
+                    	        out.println("</script>");
+                                response.sendRedirect("login.jsp");
+                            }
+                            
+                        } else {
+                        	out.println("<script type='text/javascript'>");
+                	        out.println("alert('Utilizator neconectat!');");
+                	        out.println("</script>");
+                            response.sendRedirect("login.jsp");
+                        }
+                        
+                    } else {
+                    	out.println("<script type='text/javascript'>");
+                        out.println("alert('Nu e nicio sesiune activa!');");
+                        out.println("</script>");
+                        response.sendRedirect("login.jsp");
+                    }
+    %>
 </body>
 </html> 

@@ -521,4 +521,14 @@
     <servlet-name>locatiee</servlet-name>
     <url-pattern>/locatiee</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>generateCSV1</display-name>
+    <servlet-name>generateCSV1</servlet-name>
+    <servlet-class>csv.generateCSV1</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>generateCSV1</servlet-name>
+    <url-pattern>/generateCSV1</url-pattern>
+  </servlet-mapping>
 </web-app>

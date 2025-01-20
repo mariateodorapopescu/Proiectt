@@ -121,8 +121,13 @@
 %>              	
                     	
                  <div class="events" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
-                  <% out.println("<h1>Vizualizare angajati din departamentul " + deptName + "</h1>"); 
+                  <% if (idDep != 0) { 
+                	  out.println("<h1>Vizualizare angajati din departamentul " + deptName + "</h1>"); 
                   out.println("<h3>" + today + "</h3>"); 
+                	  } else {
+                		  out.println("<h1>Vizualizare angajati din oricare departament</h1>"); 
+                          out.println("<h3>" + today + "</h3>"); 
+                	  }
                   
                   %>
                 <table >
@@ -141,9 +146,14 @@
                         
 
 <%
-
-                        PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on tipuri.tip = useri.tip left JOIN departament on departament.id_dep = useri.id_dep WHERE useri.id_dep = ? and username <> \"test\"");
-                        stmt.setInt(1, idDep);
+String sql = "SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on tipuri.tip = useri.tip left JOIN departament on departament.id_dep = useri.id_dep";
+if (idDep != 0) {
+	sql = "SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on tipuri.tip = useri.tip left JOIN departament on departament.id_dep = useri.id_dep WHERE useri.id_dep = ? and username <> \"test\""; 
+}
+                        PreparedStatement stmt = connection.prepareStatement(sql);
+                       if (idDep != 0) {
+                    	   stmt.setInt(1, idDep);
+                       }
                         ResultSet rs1 = stmt.executeQuery();
                         boolean found = false;
                         int nr = 1;
@@ -161,6 +171,9 @@
                 </div>
                  <div class="into">
                   <button id="generate" onclick="generate()" >Descarcati PDF</button>
+                       <button id="csv" onclick="sendTableDataToCSV()">Descarcati CSV</button>
+                   <button onclick="generateJSONFromTable()">Descarcati un JSON</button>
+                  
                 <%
                  
             		
@@ -191,6 +204,89 @@
                 }
 
             </script>
+              <script>
+    async function sendTableDataToCSV() {
+        // Get the table
+        const table = document.querySelector("table");
+        const rows = table.querySelectorAll("tbody tr");
+
+        // Extract table data into a JSON array
+        const data = [];
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length > 0) { // Ignore rows with no data
+                data.push({
+                    "NrCrt": cells[0].textContent.trim(),
+                    "Nume": cells[1].textContent.trim(),
+                    "Prenume": cells[2].textContent.trim(),
+                    "Functie": cells[3].textContent.trim(),
+                    "Departament": cells[4].textContent.trim()
+                });
+            }
+        });
+
+        // Send the JSON data to the generic CSV servlet
+        try {
+            const response = await fetch("generateCSV1", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "table_data.csv";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                console.error("Failed to generate CSV");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+</script>
+        <script>
+    function generateJSONFromTable() {
+        // Get the table
+        const table = document.querySelector("table");
+        const rows = table.querySelectorAll("tbody tr");
+
+        // Extract table data into a JSON array
+        const data = [];
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length > 0) { // Ignore rows with no data
+                data.push({
+                    "NrCrt": cells[0].textContent.trim(),
+                    "Nume": cells[1].textContent.trim(),
+                    "Prenume": cells[2].textContent.trim(),
+                    "Functie": cells[3].textContent.trim(),
+                    "Departament": cells[4].textContent.trim()
+                });
+            }
+        });
+
+        // Convert JSON array to string
+        const jsonString = JSON.stringify(data, null, 2); // Pretty print JSON
+
+        // Create a Blob and trigger a download
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "table_data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
                 
                 <%
                         rs1.close();

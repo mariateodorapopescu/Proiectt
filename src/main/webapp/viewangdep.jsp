@@ -95,9 +95,9 @@
                                    
                                     <div class="login__inputs">
                                         <div>
-                                            <label class="login__label" style="color:<%out.println(text);%>">Status</label>
+                                            <label class="login__label" style="color:<%out.println(text);%>">Departament</label>
                                             <select style="color:<%out.println(text);%>; border-color:<%out.println(accent);%>; background: <%out.println(sidebar);%>" name="iddep" class="login__input">
-                                                <option value="3">Oricare</option>
+                                                <option value="0">Oricare</option>
                                                 <%
                                                
 

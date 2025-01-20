@@ -218,9 +218,10 @@
                  <%
                     if (request.getParameter("pag")!=null || (request.getParameter("pag")== null && userType != 3 || userType != 0)) {
                     %>
-                     <h1>Concedii personale</h1>
+                    <h1>Cereri noi de concedii</h1>
                      <% } else {%>
-                  <h1>Cereri noi de concedii</h1>
+                      <h1>Concedii personale</h1>
+                  
                   <%} %>
                 <h3><%out.println(today); %></h3>
                 <table>
@@ -399,8 +400,18 @@
                               
                 </div>
                 <div class="into">
+                <button id="inapoi" ><a href ="actiuni.jsp">Inapoi</a></button>
+                <%  if (request.getParameter("pag") == null) {
+                %>
+               
+                
                   <button id="generate" onclick="generate()" >Descarcati PDF</button>
-                </div>
+                   <button id="csv" onclick="sendTableDataToCSV()">Descarcati CSV</button>
+                   <button onclick="generateJSONFromTable()">Descarcati un JSON</button>
+                  
+               
+                <% } %>
+                 </div>
                 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
@@ -488,6 +499,106 @@ window.onclick = function(event) {
     }
 }
 </script>
+<script>
+ async function sendTableDataToCSV() {
+    const table = document.querySelector("table");
+    const rows = table.querySelectorAll("tbody tr");
 
+    const data = [];
+    rows.forEach((row, index) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length > 0) {
+            data.push({
+                "NrCrt": cells[0].textContent.trim(),
+                "Nume": cells[1].textContent.trim(),
+                "Prenume": cells[2].textContent.trim(),
+                "Functie": cells[3].textContent.trim(),
+                "Departament": cells[4].textContent.trim(),
+                "Inceput": cells[5].textContent.trim(),
+                "Final": cells[6].textContent.trim(),
+                "Motiv": cells[7].textContent.trim(),
+                "Locatie": cells[8].textContent.trim(),
+                "Tip": cells[9].textContent.trim(),
+                "Adaugat": cells[10].textContent.trim(),
+                "Modificat": cells[11].textContent.trim(),
+                "Vazut": cells[12]?.textContent.trim(),
+                "Status": cells[13]?.textContent.trim()
+            });
+        }
+    });
+
+    console.log("Data being sent to the server:", JSON.stringify(data, null, 2)); // Log data being sent
+
+    try {
+        const response = await fetch("generateCSV1", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            console.log("CSV generation successful");
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "table_data.csv";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            console.error("Failed to generate CSV. Response status:", response.status);
+        }
+    } catch (error) {
+        console.error("Error during CSV generation:", error);
+    }
+}
+</script>
+        <script>
+    function generateJSONFromTable() {
+        // Get the table
+        const table = document.querySelector("table");
+        const rows = table.querySelectorAll("tbody tr");
+
+        // Extract table data into a JSON array
+        const data = [];
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length > 0) { // Ignore rows with no data
+                data.push({
+                	 "NrCrt": cells[0].textContent.trim(),
+                     "Nume": cells[1].textContent.trim(),
+                     "Prenume": cells[2].textContent.trim(),
+                     "Functie": cells[3].textContent.trim(),
+                     "Departament": cells[4].textContent.trim(),
+                     "Inceput": cells[5].textContent.trim(),
+                     "Final": cells[6].textContent.trim(),
+                     "Motiv": cells[7].textContent.trim(),
+                     "Locatie": cells[8].textContent.trim(),
+                     "Tip": cells[9].textContent.trim(),
+                     "Adaugat": cells[10].textContent.trim(),
+                     "Modificat": cells[11].textContent.trim(),
+                     "Vazut": cells[12].textContent.trim(),
+                     "Status": cells[13].textContent.trim()
+                });
+            }
+        });
+
+        // Convert JSON array to string
+        const jsonString = JSON.stringify(data, null, 2); // Pretty print JSON
+
+        // Create a Blob and trigger a download
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "table_data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
 </body>
 </html>
