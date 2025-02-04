@@ -69,7 +69,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Definire Utilizator</title>
+    <title>Adaugare utilizator nou</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
@@ -81,12 +81,7 @@
   <script src="https://js.arcgis.com/4.30/"></script>
     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script>
-const apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
-const baseUrl = "https://js.arcgis.com/4.30/";
-</script>
-<link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
-<script src="https://js.arcgis.com/4.30/"></script>
+
     <style>
          html,
     body,
@@ -96,79 +91,6 @@ const baseUrl = "https://js.arcgis.com/4.30/";
       height: 100%;
       width: 100%;
     }
-
-    #searchButton {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 100;
-      background-color: #0079c1;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-
-    #searchButton:hover {
-      background-color: #005a91;
-    }
-
-    #searchPane {
-      display: none; /* Ascuns inițial */
-      position: absolute;
-      top: 60px;
-      left: 20px;
-      z-index: 101;
-      background-color: white;
-      border: 1px solid #ccc;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-      padding: 10px;
-      border-radius: 5px;
-    }
-
-        .container {
-            padding-top: 120px;
-        }
-
-        #mapDiv {
-            height: 300px;
-            width: 100%;
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-            border: 2px solid <%=accent%>;
-        }
-
-        .esri-view {
-            border-radius: 1rem;
-        }
-
-        .esri-search {
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-
-        .esri-search__input {
-            background-color: <%=sidebar%> !important;
-            color: <%=text%> !important;
-            border-color: <%=accent%> !important;
-        }
-
-        .esri-search__submit-button {
-            background-color: <%=accent%> !important;
-            color: white !important;
-        }
-
-        .esri-popup__header {
-            background-color: <%=sidebar%> !important;
-            color: <%=text%> !important;
-        }
-
-        .esri-popup__content {
-            background-color: <%=clr%> !important;
-            color: <%=text%> !important;
-        }
 
 .container {
     padding-top: 120px; /* Adjust as needed */
@@ -270,11 +192,11 @@ table.picka-table tr {
 </head>
 <body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%=accent%>; --clr:<%=clr%>; --sd:<%=sidebar%>; --text:<%=text%>; background:<%=clr%>">
     <div class="container">
-        <div class="login__content" style="border-radius: 2rem; background:<%=clr%>; color:<%=text%>">
-            <form action="<%= request.getContextPath() %>/register" method="post" class="login__form" style="background:<%=sidebar%>; color:<%=text%>">
+        <div class="login__content" style="border-radius: 2rem; background:<%=clr%>; color:<%=clr%>">
+            <form action="<%= request.getContextPath() %>/register" method="post" class="login__form" style="background:<%=sidebar%>; color:<%=clr%>; border-color: <%=clr%>">
                 <div>
                     <h1 class="login__title">
-                        <span style="color: <%=accent%>">Definire utilizator nou</span>
+                        <span style="color: <%=accent%>">Adaugare utilizator nou</span>
                     </h1>
                 </div>
                 <div class="form__section" style="margin:0; top:-10px;">
@@ -294,43 +216,63 @@ table.picka-table tr {
     <input type="hidden" id="start-hidden" name="data_nasterii">
                                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" id="start" name="data_nasterii" value="2001-07-22" min="1954-01-01" max="2036-12-31" class="login__input">
                     </div>
-
-                    <div>
-                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Adresa</label>
-                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="adresa" placeholder="Introduceti adresa" required class="login__input">
-                    </div>
                     
+                   <div>
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Pozitie</label>
+                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="adresa" class="login__input" required>
+                            <%
+                            try {
+                                Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+                                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                String sql = "SELECT tip, denumire FROM tipuri;";
+                                PreparedStatement stmt = con.prepareStatement(sql);
+                                ResultSet rs1 = stmt.executeQuery();
+
+                                if (!rs1.next()) {
+                                    out.println("Nu exista date sau date incorecte");
+                                } else {
+                                    do {
+                                        out.println("<option value='" + rs1.getString("tip") + "' required>" + rs1.getString("denumire") + "</option>");
+                                    } while (rs1.next());
+                                }
+                                rs1.close();
+                                stmt.close();
+                                con.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                out.println("<script type='text/javascript'>");
+                                out.println("alert('Date introduse incorect sau nu exista date!');");
+                               
+                                out.println("</script>");
+                            }
+                            %>
+                        </select>
+                    </div>
+                     
                     <div>
                         <label style=" color:<%out.println(text);%>" for="" class="login__label">E-mail</label>
                         <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="email" placeholder="Introduceti e-mailul" required class="login__input">
                     </div>
 					
                     
-                </div></td>
-                
-                <td><p>   </p></td>
-                <td><p>   </p></td>
-                <td><p>   </p></td>
-                <td><p>   </p></td>
-                <td><p>   </p></td>
-                <td><p>   </p></td>
+                </div></td>              
                 
                 <td>
                 
                 <div class="form__section" style="margin:0; top:-10px;">
                     <div>
-                        <label style=" color:<%out.println(text);%>" for="" class="login__label">UserName</label>
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Nume de utilizator</label>
                         <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
                     </div>
 
                     <div>
-                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Password</label>
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Parola</label>
                         <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="password" name="password" placeholder="Introduceti parola" required class="login__input">
                     </div>
                
                     <div>
                         <label style=" color:<%out.println(text);%>" for="" class="login__label">Departament</label>
-                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="departament" class="login__input">
+                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="departament" class="login__input" required>
                             <%
                             try {
                                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
@@ -361,7 +303,7 @@ table.picka-table tr {
                     </div>
 
                     <div>
-                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Tip/Ierarhie</label>
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Rang</label>
                         <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="tip" class="login__input">
                             <%
                             try {
@@ -393,12 +335,7 @@ table.picka-table tr {
                     </div>
                     
                 </div>
-                 <div>
-                        <label style="color:<%=text%>" class="login__label">Locație</label>
-                        <div id="mapDiv"></div>
-                        <input type="hidden" name="latitude" id="latitude">
-                        <input type="hidden" name="longitude" id="longitude">
-                    </div>
+                 
                 </td></tr>
 </table>
  <a href="viewang3.jsp" class="login__forgot" style="margin:0; top:-10px; color:<%out.println(accent);%> ">Inapoi</a>
@@ -408,11 +345,7 @@ table.picka-table tr {
                 </div>
                 
             </form>
- <div id="viewDiv"></div>
-  <button id="searchButton">Căutare</button>
-  <div id="searchPane"></div>
-
-           
+            
         </div>
     </div>
      <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
@@ -457,101 +390,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 });
 
-require([
-	  "esri/config",
-	  "esri/Map",
-	  "esri/views/MapView",
-	  "esri/layers/FeatureLayer",
-	  "esri/widgets/Search"
-	], function (esriConfig, Map, MapView, FeatureLayer, Search) {
-	  esriConfig.apiKey =
-	    "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
-
-	  // URL-ul unui FeatureLayer cu locații pentru concedii
-	  const destinationsUrl =
-	    "https://services.arcgis.com/example/arcgis/rest/services/Destinations/FeatureServer/0";
-
-	  // Configurare FeatureLayer
-	  const destinationsLayer = new FeatureLayer({
-	    url: destinationsUrl,
-	    popupTemplate: {
-	      title: "{Name}",
-	      content: `
-	        <b>Descriere:</b> {Description}<br>
-	        <b>Țara:</b> {Country}<br>
-	        <b>Rating:</b> {Rating} / 5
-	      `
-	    },
-	    renderer: {
-	      type: "simple",
-	      symbol: {
-	        type: "simple-marker",
-	        color: "blue",
-	        size: "10px",
-	        outline: {
-	          color: "white",
-	          width: 1
-	        }
-	      }
-	    }
-	  });
-
-	  // Creare hartă
-	  const map = new Map({
-	    basemap: "arcgis/topographic",
-	    layers: [destinationsLayer]
-	  });
-
-	  // Creare MapView pentru vizualizarea hărții
-	  const view = new MapView({
-	    container: "viewDiv",
-	    map: map,
-	    center: [0, 20], // Centrul hărții
-	    zoom: 2 // Zoom inițial
-	  });
-
-	  // Adăugare widget Search
-	  const searchWidget = new Search({
-	    view: view
-	  });
-
-	  // Ascunde widget-ul Search inițial
-	  searchWidget.container.style.display = "none";
-
-	  // Adăugare funcționalitate pentru butonul de căutare
-	  const searchPane = document.getElementById("searchPane");
-	  const searchButton = document.getElementById("searchButton");
-
-	  searchButton.addEventListener("click", () => {
-	    const isHidden = searchPane.style.display === "none";
-	    searchPane.style.display = isHidden ? "block" : "none";
-	  });
-
-	  // Adaugă widget-ul Search în `searchPane`
-	  searchPane.appendChild(searchWidget.container);
-	});
-
-
-fetch('getLocations')
-.then(response => response.json())
-.then(locations => {
-    locations.forEach(loc => {
-        addPoint(loc.lat, loc.long, loc.descriere);
-    });
-});
-
-function saveLocation(lat, long, descriere) {
-    fetch('saveLocation', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            lat: lat,
-            long: long,
-            descriere: descriere
-        })
-    });
 }
 
 </script>
