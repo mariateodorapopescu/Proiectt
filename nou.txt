@@ -900,6 +900,7 @@ INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, passw
 
 use test;
 select * from useri;
+select * from locatii_useri where id_user = 16;
 select * from concedii;
 select * from locatii_useri;
 select * from locatii_concedii;
@@ -908,7 +909,7 @@ select * from locatii_departamente;
 describe locatii_departamente;
 
 select * from locatii_concedii;
-SELECT DISTINCT oras FROM locatii_useri;
+SELECT DISTINCT oras FROM useri;
 
 SELECT c.id_ang, u.id, c.acc_res, c.added, c.modified, c.id AS nr_crt, 
        d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, 
@@ -923,6 +924,13 @@ JOIN statusuri s ON c.status = s.status
 JOIN tipcon ct ON c.tip = ct.tip 
 LEFT JOIN locatii_concedii l ON c.id = l.id_concediu;
 SELECT DISTINCT oras, judet FROM locatii_concedii ORDER BY oras;
-
+use test;
 SELECT c.id_ang, u.id, c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon, CONCAT('Str.', l.strada, ', loc. ', l.oras, ', jud. ', l.judet, ', ', l.tara) as adresa FROM concedii c JOIN useri u ON u.id = c.id_ang JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip LEFT JOIN locatii_concedii l ON c.id = l.id_concediu WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = 1 and c.status = 1 ;
-SELECT DISTINCT oras, judet FROM locatii_departamente WHERE id_dep = 3 ORDER BY oras;
+SELECT DISTINCT oras, judet FROM locatii_departamente WHERE id_dep = 1 ORDER BY oras;
+SELECT nume, prenume, username, denumire, nume_dep FROM useri left JOIN tipuri on tipuri.tip = useri.tip left JOIN departament on departament.id_dep = useri.id_dep WHERE username <> "test";
+SELECT c.id_ang, u.id, c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon, CONCAT('Str.', l.strada, ', loc. ', l.oras, ', jud. ', l.judet, ', ', l.tara) as adresa FROM concedii c JOIN useri u ON u.id = c.id_ang JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip LEFT JOIN locatii_concedii l ON c.id = l.id_concediu WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = 1 and c.status = 1;
+SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  where c.id_ang = 11 and u.username <> "test" and YEAR(c.start_c) = YEAR(CURDATE()) 
+
+select * from teme;
+
+desc teme;

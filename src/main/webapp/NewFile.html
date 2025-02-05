@@ -6,6 +6,121 @@
   <title>Adaugare Adresa</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.30/"></script>
+  <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta charset="UTF-8">
+    
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+   
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
+      <style>
+		.modal {
+		    display: none;
+		    position: fixed;
+		    z-index: 1;
+		    left: 0;
+		    top: 0;
+		    width: 100%;
+		    height: 100%;
+		    overflow: auto;
+		    background-color: <%=clr%>;
+		    border-radius: 2rem;
+		}
+		
+		.modal-content {
+		    background-color: <%=sidebar%>;
+		    border-radius: 2rem;
+		    margin: 15% auto;
+		    padding: 20px;
+		    border: 1px solid #888;
+		    width: 80%;
+		}
+		
+		.close {
+			background-color: <%=sidebar%>;
+		    color: <%=accent%>;
+		    float: right;
+		    font-size: 28px;
+		    font-weight: bold;
+		}
+		
+		.close:hover,
+		.close:focus {
+		    color: black;
+		    text-decoration: none;
+		    cursor: pointer;
+		}
+		
+		body {
+			top: 0;
+			left: 0;
+			position: fixed;
+			width: 100vh;
+			height: 100vh;
+			padding: 0;
+			margin: 0;
+		}
+		
+        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+  
+        .status-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .status-neaprobat { background-color: #88aedb; }
+        .status-dezaprobat-sef { background-color: #b37142; }
+        .status-dezaprobat-director { background-color: #873931; }
+        .status-aprobat-director { background-color: #40854a; }
+        .status-aprobat-sef { background-color: #ccc55e; }
+        .status-pending { background-color: #e0a800; }
+       
+       	/* Tooltip */
+       	.tooltip {
+		  position: relative; 
+		  border-bottom: 1px dotted black; 
+		}
+		
+		.tooltip .tooltiptext {
+		  visibility: hidden;
+		  width: 120px;
+		  background-color: rgba(0,0,0,0.5);
+		  color: white;
+		  text-align: center;
+		  padding: 5px 0;
+		  border-radius: 6px;
+		  position: absolute;
+		  z-index: 1;
+		}
+		
+		.tooltip:hover .tooltiptext {
+		  visibility: visible;
+		}
+		
+       .content, .main-content {
+		    overflow: auto; /* Permite scroll-ul orizontal */
+		    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
+		}
+       
+		::-webkit-scrollbar {
+			    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
+		}
+		
+    </style>
   <style>
     html, body, #viewDiv {
       padding: 0;
@@ -45,17 +160,36 @@
 </head>
 <body>
   <div id="viewDiv"></div>
-  <div class="form-container">
-    <h3>Adaugare Adresa</h3>
-    <input type="text" id="street" placeholder="Strada">
-    <input type="text" id="number" placeholder="Numarul">
-    <input type="text" id="code" placeholder="Cod postal">
-    <input type="text" id="sector" placeholder="Sector (optional)">
-    <input type="text" id="city" placeholder="Oras">
-    <input type="text" id="country" placeholder="Tara">
-    <button id="addAddress">Adaugare Adresa</button>
-    <p id="addressOutput"></p>
-    <p id="locationOutput"></p>
+  <div class="form-container" style="background:#ECEDFA; color:#d8d9e1; border-color: #d8d9e1">
+    <h3 style="color: #10439F">Adaugare adresa angajat</h3>
+    <div>
+        <label style=" color:#333" for="" class="login__label">Strada</label>
+        <input id="street" style="border-color:#10439F; background:#d8d9e1; color:#333" type="text" name="street" placeholder="Introduceti strada..." required class="login__input">
+    </div>
+    <div>
+        <label style=" color:#333" for="" class="login__label">Numarul</label>
+        <input id="number" style="border-color:#10439F; background:#d8d9e1; color:#333" type="text" name="number" placeholder="Introduceti numarul strazii..." required class="login__input">
+    </div>
+     <div>
+        <label style=" color:#333" for="" class="login__label">Localitatea</label>
+        <input id="city" style="border-color:#10439F; background:#d8d9e1; color:#333" type="text" name="city" placeholder="Introduceti localitatea..." required class="login__input">
+    </div>
+    <div>
+        <label style=" color:#333" for="" class="login__label">Judetul/Sectorul</label>
+        <input id="sector" style="border-color:#10439F; background:#d8d9e1; color:#333" type="text" name="sector" placeholder="Introduceti judetul/sectorul..." required class="login__input">
+    </div>
+    <div>
+        <label style=" color:#333" for="" class="login__label">Tara</label>
+        <input id="country" style="border-color:#10439F; background:#d8d9e1; color:#333" type="text" name="country" placeholder="Introduceti tara..." required class="login__input">
+    </div>
+    <div>
+        <label style=" color:#333" for="" class="login__label">Codul Postal</label>
+        <input id="code" style="border-color:#10439F; background:#d8d9e1; color:#333" type="text" name="code" placeholder="Introduceti codul postal..." required class="login__input">
+    </div>
+    
+    <button style="margin:0; top:-10px; box-shadow: 0 6px 24px #10439F; background:#10439F" id="addAddress">Adaugare</button>
+    <p style=" color:#333" for="" class="login__label" id="addressOutput"></p>
+    <p style=" color:#333" for="" class="login__label" id="locationOutput"></p>
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', function () {

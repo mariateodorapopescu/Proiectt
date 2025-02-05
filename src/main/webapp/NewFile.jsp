@@ -1,69 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
-<%@ page import="javax.sql.DataSource" %>
-<%@ page import="bean.MyUser" %>
-<%@ page import="jakarta.servlet.http.HttpSession" %>
-<%
-    HttpSession sesi = request.getSession(false);
-
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, id, prenume from useri where username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                    out.println("<script type='text/javascript'>");
-                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                    out.println("</script>");
-                } else {
-                    if (rs.getString("tip").compareTo("4") != 0) {
-                        if (rs.getString("tip").compareTo("1") == 0) {
-                            response.sendRedirect("tip1ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("2") == 0) {
-                            response.sendRedirect("tip2ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("3") == 0) {
-                            response.sendRedirect("sefok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("0") == 0) {
-                            response.sendRedirect("dashboard.jsp");
-                        }
-                    } else {
-                        int id = rs.getInt("id");
-                        String prenume = rs.getString("prenume");
-                        String accent = null;
-                        String clr = null;
-                        String sidebar = null;
-                        String text = null;
-                        String card = null;
-                        String hover = null;
-                        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                            String query = "SELECT * from teme where id_usr = ?";
-                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                stmt.setInt(1, id);
-                                try (ResultSet rs2 = stmt.executeQuery()) {
-                                    if (rs2.next()) {
-                                        accent = rs2.getString("accent");
-                                        clr = rs2.getString("clr");
-                                        sidebar = rs2.getString("sidebar");
-                                        text = rs2.getString("text");
-                                        card = rs2.getString("card");
-                                        hover = rs2.getString("hover");
-                                    }
-                                }
-                            }
-                        } catch (SQLException e) {
-                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                            e.printStackTrace();
-                        }
-%>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -71,24 +6,7 @@
   <title>Adaugare Adresa</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.30/"></script>
-  <!-- CSS -->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-   
-    <!-- JavaScript -->
-  <script src="https://js.arcgis.com/4.30/"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-
-    <style>
-      
-
-.container {
-    padding-top: 120px; /* Adjust as needed */
-     
-}
+  <style>
     html, body, #viewDiv {
       padding: 0;
       margin: 0;
@@ -125,287 +43,206 @@
     }
   </style>
 </head>
-<body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0;">
+<body>
   <div id="viewDiv"></div>
-  <div class="form-container" style="background:<%=sidebar%>; color:<%=clr%>; border-color: <%=clr%>">
-    <h3 style="color: <%=accent%>">Adaugare adresa angajat</h3>
-    <div>
-        <label style=" color:<%out.println(text);%>" for="" class="login__label">Strada</label>
-        <input id="street" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="street" placeholder="Introduceti strada..." required class="login__input">
-    </div>
-    <div>
-        <label style=" color:<%out.println(text);%>" for="" class="login__label">Numarul</label>
-        <input id="number" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="number" placeholder="Introduceti numarul strazii..." required class="login__input">
-    </div>
-     <div>
-        <label style=" color:<%out.println(text);%>" for="" class="login__label">Localitatea</label>
-        <input id="city" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="city" placeholder="Introduceti localitatea..." required class="login__input">
-    </div>
-    <div>
-        <label style=" color:<%out.println(text);%>" for="" class="login__label">Judetul/Sectorul</label>
-        <input id="sector" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="sector" placeholder="Introduceti judetul/sectorul..." required class="login__input">
-    </div>
-    <div>
-        <label style=" color:<%out.println(text);%>" for="" class="login__label">Tara</label>
-        <input id="country" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="country" placeholder="Introduceti tara..." required class="login__input">
-    </div>
-    <div>
-        <label style=" color:<%out.println(text);%>" for="" class="login__label">Codul Postal</label>
-        <input id="code" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="code" placeholder="Introduceti codul postal..." required class="login__input">
-    </div>
-    
-    <button style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="addAddress">Adaugare</button>
-    <p style=" color:<%out.println(text);%>" for="" class="login__label" id="addressOutput"></p>
-    <p style=" color:<%out.println(text);%>" for="" class="login__label" id="locationOutput"></p>
+  <div class="form-container">
+    <h3>Adaugare locatie departament</h3>
+    <input type="text" id="street" placeholder="Strada">
+    <input type="text" id="number" placeholder="Numarul">
+    <input type="text" id="code" placeholder="Cod postal">
+    <input type="text" id="sector" placeholder="Judet/Sector">
+    <input type="text" id="city" placeholder="Oras">
+    <input type="text" id="country" placeholder="Tara">
+    <button id="addAddress">Adaugare</button>
+    <p id="addressOutput"></p>
+    <p id="locationOutput"></p>
   </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      require([
-        "esri/config",
-        "esri/Map",
-        "esri/views/MapView",
-        "esri/Graphic",
-        "esri/rest/locator"
-      ], function (esriConfig, Map, MapView, Graphic, locator) {
-        esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurD3614hU6avg5dgfJ0cyyj8cQ8C7k3IZRB6OnACsZ-rE1hULGhayhxdt3-DyiUZ3lkaYmzyQjvRTgl0Slvk8SyBIO2Segk7bmnRewIolBDbBOfOUyy3Vfc6BPl6s6SRn91vphbzw_QQpZuh5u0J_PHemWhTB0TDSod-Z_xeL7jaImuSKEazyI5GU80sve_kEVwagPYkxvSqX11IqMKvs2Ww.AT1_koIv1OGN";
+ <script>
+ document.addEventListener('DOMContentLoaded', function () {
+	 require([
+		    "esri/config",
+		    "esri/Map",
+		    "esri/views/MapView",
+		    "esri/Graphic",
+		    "esri/rest/locator"
+		  ], function (esriConfig, Map, MapView, Graphic, locator) {
+		    esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurNNdtZiU82xWUzYLPb7EktsQl_JcOdzgsJtZDephAvIhplMB4PQTWSaU4tGgQhsL4u6bAO6Hp_pE8hzL0Ko7jbY9o98fU61l_j7VXlLRDf08Y0PheuGHZtJdT4bJcAKLrP5dqPCFsZesVv-S7BH1OaZnV-_IsKRdxJdxZI3RVw7XGZ0xvERxTi57udW9oIg3VzF-oY1Oy4ybqDshlMgejQI.AT1_a5lV7G2k";
 
-        const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+		    const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
 
-        const map = new Map({
-          basemap: "arcgis/topographic"
-        });
+		    const map = new Map({
+		      basemap: "arcgis/topographic"
+		    });
 
-        const view = new MapView({
-          container: "viewDiv",
-          map: map,
-          center: [26.1025, 44.4268], // Bucharest coordinates
-          zoom: 11
-        });
+		    const view = new MapView({
+		      container: "viewDiv",
+		      map: map,
+		      center: [26.1025, 44.4268], // Bucharest coordinates as fallback
+		      zoom: 11
+		    });
 
-        let currentLocation = null;
+		    // Opțiuni pentru geolocație
+		    const options = {
+		      enableHighAccuracy: true,
+		      timeout: 10000,
+		      maximumAge: 0
+		    };
 
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const { latitude, longitude } = position.coords;
-            currentLocation = { latitude, longitude };
-            view.center = [longitude, latitude];
-            view.zoom = 14;
+		    // Handler pentru erori de geolocație
+		    function handleLocationError(error) {
+		      let errorMessage = "";
+		      switch(error.code) {
+		        case error.PERMISSION_DENIED:
+		          errorMessage = "Utilizatorul a refuzat cererea de geolocație.";
+		          break;
+		        case error.POSITION_UNAVAILABLE:
+		          errorMessage = "Informațiile despre locație nu sunt disponibile.";
+		          break;
+		        case error.TIMEOUT:
+		          errorMessage = "Cererea de detectare a locației a expirat.";
+		          break;
+		        case error.UNKNOWN_ERROR:
+		          errorMessage = "A apărut o eroare necunoscută.";
+		          break;
+		      }
+		      console.error("Eroare la geolocație:", errorMessage);
+		      document.getElementById("locationOutput").textContent = "Eroare: " + errorMessage;
+		      
+		      // Centrăm harta pe București ca fallback
+		      view.center = [26.1025, 44.4268];
+		      view.zoom = 11;
+		    }
 
-            const userLocation = new Graphic({
-              geometry: {
-                type: "point",
-                longitude: longitude,
-                latitude: latitude,
-               
+		    // Handler pentru succes
+		    function handleLocationSuccess(position) {
+		      const { latitude, longitude } = position.coords;
+		      console.log("Locație detectată:", latitude, longitude);
+		      
+		      // Actualizăm centrul hărții
+		      view.center = [longitude, latitude];
+		      view.zoom = 14;
+
+		      // Adăugăm marker pentru locația curentă
+		      const userLocation = new Graphic({
+		        geometry: {
+		          type: "point",
+		          longitude: longitude,
+		          latitude: latitude
+		        },
+		        symbol: {
+		          type: "simple-marker",
+		          color: "red",
+		          size: "12px",
+		          outline: {
+		            color: "white",
+		            width: 2
+		          }
+		        }
+		      });
+
+		      view.graphics.add(userLocation);
+		      document.getElementById("locationOutput").textContent = 
+		        `Locația curentă: Latitudine ${latitude.toFixed(6)}, Longitudine ${longitude.toFixed(6)}`;
+		    }
+
+		    // Verificăm dacă browserul suportă geolocație
+		    if ("geolocation" in navigator) {
+		      console.log("Începe detectarea locației...");
+		      navigator.geolocation.getCurrentPosition(
+		        handleLocationSuccess,
+		        handleLocationError,
+		        options
+		      );
+		    } else {
+		      document.getElementById("locationOutput").textContent = 
+		        "Geolocația nu este suportată de acest browser.";
+		    }
+
+	    document.getElementById("addAddress").addEventListener("click", function () {
+	      const street = document.getElementById("street").value;
+	      const number = document.getElementById("number").value;
+	      const code = document.getElementById("code").value;
+	      const sector = document.getElementById("sector").value;
+	      const city = document.getElementById("city").value;
+	      const country = document.getElementById("country").value;
+		  // const county = document.getElementById("county").value;
+	      const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
+	      const idDep = new URLSearchParams(window.location.search).get("id");
+
+	      if (!idDep) {
+	    	  document.getElementById("addressOutput").textContent = "ID-ul departamentului este lipsa!";
+	    	  return;
+	    	}
+
+	      document.getElementById("addressOutput").textContent = `Adresa formata: ${address}`;
+
+	      locator.addressToLocations(locatorUrl, {
+	        address: { SingleLine: address }
+	      })
+	      .then(function (results) {
+	        if (results.length > 0) {
+	          const location = results[0].location;
+	          const latitude = location.y;
+	          const longitude = location.x;
+
+	          const marker = new Graphic({
+	            geometry: location,
+	            symbol: {
+	              type: "simple-marker",
+	              color: "blue",
+	              size: "10px",
+	              outline: { color: "white", width: 1 }
+	            }
+	          });
+
+	          view.graphics.add(marker);
+	          view.center = [longitude, latitude];
+	          view.zoom = 14;
+
+	          // Trimite datele către servlet
+	          fetch("/Proiect/locatiee", {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify({
+	              id_dep: idDep,
+	              adresa: address,
 	              strada: street,
 	              oras: city,
 	              judet: sector,
 	              cod: code,
 	              nr: number,
 	              tara: country,
-	             
-              },
-              symbol: {
-                type: "simple-marker",
-                color: "red",
-                size: "10px",
-                outline: {
-                  color: "white",
-                  width: 1
-                }
-              }
-            });
+	              latitudine: latitude,
+	              longitudine: longitude
+	            })
+	          })
+	          .then((response) => {
+	            if (response.ok) {
+	              return response.text();
+	            } else {
+	              throw new Error("Eroare la actualizarea adresei în baza de date.");
+	            }
+	          })
+	          .then((data) => {
+	            document.getElementById("addressOutput").textContent = `Adresa a fost salvata cu succes pentru departamentul cu ID-ul ${idDep}.`;
+	          })
+	          .catch((error) => {
+	            console.error("Eroare la trimiterea datelor catre servlet:", error);
+	            document.getElementById("addressOutput").textContent = "Eroare la salvarea adresei.";
+	          });
 
-            view.graphics.add(userLocation);
-            document.getElementById("locationOutput").textContent = 
-              `Locatia curenta: Latitudine ${latitude.toFixed(6)}, Longitudine ${longitude.toFixed(6)}`;
-          },
-          function (error) {
-            console.error("Eroare la detectarea locatiei utilizatorului:", error);
-            document.getElementById("locationOutput").textContent = "Eroare la detectarea locatiei.";
-          }
-        );
+	        } else {
+	          document.getElementById("locationOutput").textContent = "Adresa nu a fost gasita.";
+	        }
+	      })
+	      .catch(function (error) {
+	        console.error("Eroare la geocodare:", error);
+	        document.getElementById("locationOutput").textContent = "Eroare la geocodarea adresei.";
+	      });
+	    });
+	  });
+	});
 
-        document.getElementById("addAddress").addEventListener("click", async function () {
-          const street = document.getElementById("street").value;
-          const number = document.getElementById("number").value;
-          const code = document.getElementById("code").value;
-          const sector = document.getElementById("sector").value;
-          const city = document.getElementById("city").value;
-          const country = document.getElementById("country").value;
-
-          const address = `${street} ${number}, ${code} ${sector ? "Sector " + sector + ", " : ""}${city}, ${country}`;
-          const userId = new URLSearchParams(window.location.search).get("id");
-
-          if (!userId) {
-            document.getElementById("addressOutput").textContent = "ID-ul utilizatorului este lipsa!";
-            return;
-          }
-
-          document.getElementById("addressOutput").textContent = `Adresa formata: ${address}`;
-
-          try {
-            const params = {
-              address: {
-                "address": address
-              },
-              outFields: ["*"]
-            };
-
-            const results = await locator.addressToLocations(locatorUrl, params);
-
-            if (results.length > 0) {
-              const location = results[0].location;
-              view.graphics.removeAll();
-
-              const marker = new Graphic({
-                geometry: {
-                  type: "point",
-                  longitude: location.longitude,
-                  latitude: location.latitude
-                },
-                symbol: {
-                  type: "simple-marker",
-                  color: "blue",
-                  size: "10px",
-                  outline: {
-                    color: "white",
-                    width: 1
-                  }
-                }
-              });
-
-              view.graphics.add(marker);
-              view.center = [location.longitude, location.latitude];
-              view.zoom = 14;
-
-              const requestBody = {
-                userId: userId,
-                strada: street,
-                nr: number,
-                cod: code,
-                judet: sector,
-                oras: city,
-                tara: country,
-                latitudine: location.latitude,
-                longitudine: location.longitude
-              };
-
-              const response = await fetch("locatiee", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-              });
-
-              if (response.ok) {
-                document.getElementById("addressOutput").textContent = 
-                  `Adresa a fost salvata cu succes pentru utilizatorul cu ID-ul ${userId}.`;
-              } else {
-                throw new Error("Eroare la actualizarea adresei in baza de date.");
-              }
-            } else {
-              document.getElementById("locationOutput").textContent = "Adresa nu a fost gasita.";
-            }
-          } catch (error) {
-            console.error("Eroare:", error);
-            document.getElementById("locationOutput").textContent = 
-              "Eroare la procesarea adresei: " + error.message;
-          }
-        });
-      });
-    });
-  </script>
-    <% 
-    if ("true".equals(request.getParameter("p"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Trebuie sa alegeti o parola mai complexa!');");
-        out.println("</script>");
-        out.println("<br>Parola trebuie sa contina:<br>");
-        out.println("- minim 8 caractere<br>");
-        out.println("- un caracter special (!()?*\\[\\]{}:;_\\-\\\\/`~'<>@#$%^&+=])<br>");
-        out.println("- o litera mare<br>");
-        out.println("- o litera mica<br>");
-        out.println("- o cifra<br>");
-        out.println("- cifrele alaturate sa nu fie egale sau consecutive<br>");
-        out.println("- literele alaturate sa nu fie egale sau una dupa <br>cealalta, inclusiv diacriticele");
-    }
-
-    if ("true".equals(request.getParameter("n"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Nume scris incorect!');");
-        out.println("</script>");
-    }
-
-    if ("true".equals(request.getParameter("pn"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Prenume scris incorect!');");
-        out.println("</script>");
-    }
-
-    if ("true".equals(request.getParameter("t"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Telefon scris incorect!');");
-        out.println("</script>");
-    }
-
-    if ("true".equals(request.getParameter("e"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('E-mail scris incorect!');");
-        out.println("</script>");
-    }
-
-    if ("true".equals(request.getParameter("dn"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Utilizatorul trebuie sa aiba minim 18 ani!');");
-        out.println("</script>");
-    }   
-
-    if ("true".equals(request.getParameter("pms"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Poate fi maxim un sef / departament!');");
-        out.println("</script>");
-    }   
-
-    if ("true".equals(request.getParameter("pmd"))) {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Poate fi maxim un director / departament!');");
-        out.println("</script>");
-    }   
-                }
-                }
-            } catch (Exception e) {
-                out.println("<script type='text/javascript'>");
-                out.println("alert('Eroare la baza de date!');");
-                out.println("alert('" + e.getMessage() + "');");
-                out.println("</script>");
-                if (currentUser.getTip() == 1) {
-                    response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
-                    response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
-                    response.sendRedirect("sefok.jsp");
-                }
-                if (currentUser.getTip() == 0) {
-                    response.sendRedirect("dashboard.jsp");
-                }
-                e.printStackTrace();
-            }
-        } else {
-            out.println("<script type='text/javascript'>");
-            out.println("alert('Utilizator neconectat!');");
-            out.println("</script>");
-            response.sendRedirect("login.jsp");
-        }
-    } else {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Nu e nicio sesiune activa!');");
-        out.println("</script>");
-        response.sendRedirect("login.jsp");
-    }
-%>
+</script>
 </body>
 </html>
