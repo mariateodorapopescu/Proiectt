@@ -1,113 +1,197 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
-<%@ page import="javax.sql.DataSource" %>
-<%@ page import="bean.MyUser" %>
-<%@ page import="jakarta.servlet.http.HttpSession" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.Date" %>
-<%@ page import="java.util.Locale" %>
-<%
-// structura unei pagini este astfel
-// verificare daca exista sesiune activa, utilizator conectat, 
-// extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
-// se mai extrag temele de culoare ale fiecarui utilizator
-// apoi se incarca pagina in sine
-// in ceea ce priveste gruparea de pagini concediinoieu, concediinoisef, concediinoidir, este astfel
-// header cu titlu si data curenta
-// cap de tabel: partea comuna la toti 3 e de la nr crt la status, apoi la sef si la director e in plus aprobati/respingeti
-// nrcrt, nume, preume, functie, departament, inceput, sfarsit, motiv, locatie, tip, adaugat, modificat, acceptat/respins, status
-// apoi urmeaza sql-ul comun SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c,
-// c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep 
-// JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip WHERE YEAR(c.start_c) = YEAR(CURDATE()) and u.id_dep = ?
-// la care in plus depinzand de user se adauga: and c.status = 0 (sef) and c.status = 1 (director), c.id_ang sau id = uid pentru concediinoieu
-// exista 2 tipuri de concediinoieu, unul care permite modificarea -> si aici ai cazuri: and c.status = 0 pentru tip1,tip2, and c.status = 1 pentru director si sef 
-// -> la fel, la partea comuna din capul de tabel adaugi coloanele de modificati/stergeti
-// apoi vin ultimele coloane: status, aprobati,respingeti/modificati,stergeti cu iconitele:  if (rs1.getString("status").compareTo("neaprobat") == 0) {
-// out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
-// out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='aprobsef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-checkbox-circle-line'></i></a></span></td>");
-// out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='ressef?idcon=" + rs1.getInt("nr_crt")+ "'><i class='ri-close-line'></i></a></span></td></tr>"); }
-    
-	HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
-        if (currentUser != null) {
-            String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                	// extrag date despre userul curent
-                    int id = rs.getInt("id");
-                	// System.out.println(id);
-                    int userType = rs.getInt("tip");
-                    // System.out.println(userType);
-                    int userdep = rs.getInt("id_dep");
-                    // System.out.println(userdep);
-                    if (userType != 4) {  
-                    	// aflu data curenta, tot ca o interogare bd =(
-                    	String today = "";
-                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
-                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                               try (ResultSet rs2 = stmt.executeQuery()) {
-                                    if (rs2.next()) {
-                                      today =  rs2.getString("today");
-                                    }
-                                }
-                            }
-                        } catch (SQLException e) {
-                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                            e.printStackTrace();
-                        }
-                   	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
-                   	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
-                  	 String clr = "#d8d9e1";
-                  	 String sidebar = "#ECEDFA";
-                  	 String text = "#333";
-                  	 String card = "#ECEDFA";
-                  	 String hover = "#ECEDFA";
-                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                         String query = "SELECT * from teme where id_usr = ?";
-                         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                             stmt.setInt(1, id);
-                             try (ResultSet rs2 = stmt.executeQuery()) {
-                                 if (rs2.next()) {
-                                   accent =  rs2.getString("accent");
-                                   clr =  rs2.getString("clr");
-                                   sidebar =  rs2.getString("sidebar");
-                                   text = rs2.getString("text");
-                                   card =  rs2.getString("card");
-                                   hover = rs2.getString("hover");
-                                 }
-                             }
-                         }
-                    } catch (SQLException e) {
-                         out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                         e.printStackTrace();
-                     }
-                        %>
-<html>
-<head>
-    <title>Concedii noi</title>
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <meta charset="UTF-8">
-    
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-   
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
-      <style>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.*, java.util.*, com.fasterxml.jackson.databind.ObjectMapper, bean.MyUser, jakarta.servlet.http.HttpSession" %>
+<%@ page import="java.time.LocalDate, java.time.format.DateTimeFormatter" %>
+
+<%
+    // Obținem sesiunea curentă
+    HttpSession sesi = request.getSession(false);
+    if (sesi == null) {
+        if ("true".equals(request.getParameter("json"))) {
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Nu există sesiune activă\"}");
+        } else {
+            out.println("<script>alert('Nu există sesiune activă!');</script>");
+            response.sendRedirect("logout");
+        }
+        return;
+    }
+
+    MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+    if (currentUser == null) {
+        if ("true".equals(request.getParameter("json"))) {
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Utilizator neconectat\"}");
+        } else {
+            out.println("<script>alert('Utilizator neconectat!');</script>");
+            response.sendRedirect("logout");
+        }
+        return;
+    }
+
+    String username = currentUser.getUsername();
+    int userdep = 0, id = 0, userType = 0;
+
+    // Setăm culorile implicite
+    String accent = "#10439F";
+    String clr = "#d8d9e1";
+    String sidebar = "#ECEDFA";
+    String text = "#333";
+    String card = "#ECEDFA";
+    String hover = "#ECEDFA";
+
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+
+        preparedStatement.setString(1, username);
+        ResultSet rs = preparedStatement.executeQuery();
+
+        if (rs.next()) {
+            id = rs.getInt("id");
+            userType = rs.getInt("tip");
+            userdep = rs.getInt("id_dep");
+
+            if (userType != 4) {
+                String query = "SELECT * FROM teme WHERE id_usr = ?";
+                try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                    stmt.setInt(1, id);
+                    try (ResultSet rs2 = stmt.executeQuery()) {
+                        if (rs2.next()) {
+                            accent = rs2.getString("accent");
+                            clr = rs2.getString("clr");
+                            sidebar = rs2.getString("sidebar");
+                            text = rs2.getString("text");
+                            card = rs2.getString("card");
+                            hover = rs2.getString("hover");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Dacă cererea este pentru JSON, returnăm direct JSON-ul
+    if ("true".equals(request.getParameter("json"))) {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Generăm data curentă în formatul dorit
+        // La începutul secțiunii de procesare JSON, adaugă:
+System.out.println("Processing JSON request");
+    System.out.println("UserType: " + userType);
+    System.out.println("Page param: " + request.getParameter("pag"));
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        List<Map<String, String>> concedii = new ArrayList<>();
+        try {
+            String sql = "SELECT c.id AS nr_crt, c.id_ang, u.nume, u.prenume, d.nume_dep AS departament, t.denumire AS functie, " +
+            	       "c.start_c, c.end_c, c.motiv, CONCAT('Str.', l.strada, ', loc. ', l.oras, ', jud. ', l.judet, ', ', l.tara) as adresa,  ct.motiv as tipcon, " +
+            	       "s.nume_status AS status, c.added, c.modified, c.acc_res " +
+            	"FROM concedii c "+
+            	"JOIN useri u ON u.id = c.id_ang "+
+            	"JOIN tipuri t ON u.tip = t.tip "+
+            	"JOIN departament d ON u.id_dep = d.id_dep "+
+            	"JOIN statusuri s ON c.status = s.status "+
+            	"JOIN tipcon ct ON c.tip = ct.tip "+
+            	"LEFT JOIN locatii_concedii l ON c.id = l.id_concediu " +
+                "WHERE YEAR(c.start_c) = YEAR(CURDATE())";
+            String pagParam = request.getParameter("pag");
+            System.out.println("Request URL: " + request.getRequestURL());
+            System.out.println("Query String: " + request.getQueryString());
+            System.out.println("Parametrul pag: [" + pagParam + "]");
+
+            // apoi folosim variabila salvată
+            if (userType == 3 && pagParam == null) {
+                sql = sql + " and u.id_dep = " + userdep + " and c.status = 0 ";
+            }
+
+            if (userType == 0 && pagParam == null) {
+                sql = sql + " and u.id_dep = " + userdep + " and c.status = 1 ";
+            }
+
+            if (pagParam != null && pagParam.equals("1")) {
+                sql = sql + " and u.id = " + id;
+                if (userType == 1 || userType == 2) {
+                    sql = sql + " and c.status = 0";
+                } else if (userType == 0 || userType == 3) {
+                    sql = sql + " and c.status = 1";
+                }
+            }
+         // aici e fara pag=?
+            if (userType == 1 || userType == 2 && pagParam == null) {
+                sql = sql + " and u.id = " + id;
+            }
+System.out.println(sql);
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+        		PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            
+            int nr = 1;
+            while (rs.next()) {
+                Map<String, String> concediu = new LinkedHashMap<>();
+                concediu.put("NrCrt", String.valueOf(nr++));
+                concediu.put("Nume", rs.getString("nume"));
+                concediu.put("Prenume", rs.getString("prenume"));
+                concediu.put("Fct", rs.getString("functie"));
+                concediu.put("Dep", rs.getString("departament"));
+                concediu.put("Incipit", rs.getString("start_c"));
+                concediu.put("Fine", rs.getString("end_c"));
+                concediu.put("Motiv", rs.getString("motiv"));
+                concediu.put("Loc", rs.getString("adresa"));
+                concediu.put("Tip", rs.getString("tipcon"));
+                concediu.put("Adaug", rs.getString("added") != null ? rs.getString("added") : "N/A");
+                concediu.put("Modif", rs.getString("modified") != null ? rs.getString("modified") : "N/A");
+                concediu.put("Vzt", rs.getString("acc_res") != null ? rs.getString("acc_res") : "N/A");
+                concediu.put("Status", rs.getString("status"));
+                concediu.put("id", rs.getString("nr_crt")); // pentru butoanele de acțiune
+                concedii.add(concediu);
+            }
+        }
+        System.out.println("Number of results: " + concedii.size());
+        System.out.println("First row data (if exists): " + 
+            (concedii.isEmpty() ? "No data" : concedii.get(0).toString()));
+        Map<String, Object> responseJson = new HashMap<>();
+        responseJson.put("header", "Cereri noi de concedii");
+        responseJson.put("data", concedii);
+        responseJson.put("today", today);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        out.print(objectMapper.writeValueAsString(responseJson));
+        System.out.println(objectMapper.writeValueAsString(responseJson));
+    } catch (Exception e) {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        out.print("{\"error\": \"" + e.getMessage() + "\"}");
+    }
+    return;
+
+    }
+%>
+
+<!DOCTYPE html>
+<html lang="ro">
+   <head>
+        <title>Concedii</title>
+         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+        <!--=============== REMIXICONS ===============-->
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+        <!--=============== CSS ===============-->
+        <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css"> 
+       <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
+       <style>
+            a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
+            
+        </style>
+       
+       <!--=============== icon ===============-->
+        <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+       
+        <!--=============== scripts ===============-->
+        <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+         <style>
 		.modal {
 		    display: none;
 		    position: fixed;
@@ -207,15 +291,15 @@
 		}
 		
     </style>
+        
     </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+    <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
+        <div style="position: fixed; top: 0; left: 0; margin: 0; padding-left:1rem; padding-right:1rem;" class="main-content">
+            <div style=" border-radius: 2rem;" class="content">
+                <div class="intro" style=" border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                    <div class="events"  style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
 
-     <div class="main-content">
-        <div class="header"></div>
-        <div style=" border-radius: 2rem;" class="content">
-            <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>;">
-                 <div class="events" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
-                 <%
+                        <%
                     if (request.getParameter("pag")!=null || (request.getParameter("pag")== null && userType != 3 || userType != 0)) {
                     %>
                     <h1>Cereri noi de concedii</h1>
@@ -223,23 +307,24 @@
                       <h1>Concedii personale</h1>
                   
                   <%} %>
-                <h3><%out.println(today); %></h3>
-                <table>
-                    <thead>
-                        <tr>
-                  <th style="color:white">Nr.crt</th>
+                        
+                        <h3 id="tableDate"></h3>
+                        <table id="employeeTable">
+                            <thead>
+                                <tr style="color:<%out.println("white");%>">
+                                     <th style="color:white">Nr.crt</th>
                     <th style="color:white">Nume</th>
                     <th style="color:white">Prenume</th>
-                    <th style="color:white">Functie</th>
+                    <th style="color:white">Fct.</th>
                     <th style="color:white">Dep.</th>
                     <th style="color:white">Incipit</th>
-                    <th style="color:white">Final</th>
+                    <th style="color:white">Fine</th>
                     <th style="color:white">Motiv</th>
-                    <th style="color:white">Locatie</th>
+                    <th style="color:white">Loc</th>
                     <th style="color:white">Tip</th>
                     <th style="color:white">Adaug.</th>
                     <th style="color:white">Modif.</th>
-                     <th style="color:white">Vazut</th>
+                     <th style="color:white">Vzt.</th>
                     <th style="color:white">Status</th>
                     <!-- Cap tabel de baza -->
                     <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
@@ -251,221 +336,197 @@
                     
                     if (request.getParameter("pag")== null && (userType == 3 || userType == 0)) {
                     %>
-                     <th style="color:white">Aprobati</th>
-                     <th style="color:white">Respingeti</th>
+                     <th style="color:white">Aprob.</th>
+                     <th style="color:white">Resp.</th>
                      <% } 
                     if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1")==0) {
                      
                      %>
-                     <th style="color:white">Localizare</th>
-                     <th style="color:white">Modificati</th>
+                     <th style="color:white">Localiz.</th>
+                     <th style="color:white">Modif.</th>
                      <th style="color:white">Stergeti</th>
                      <%} %>
                       <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
                 </tr>
-                    </thead>
-                   <tbody style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
-  
-                    <%
-                    // interogare de baza
-                    String sql = "SELECT c.id_ang, u.id, c.acc_res, c.added, c.modified, c.id AS nr_crt, "+
-                    	      "d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, "+
-                    	       "c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, "+
-                    	       "ct.motiv as tipcon, "+
-                    	       "CONCAT('Str.', l.strada, ', loc. ', l.oras, ', jud. ', l.judet, ', ', l.tara) as adresa " +
-                    	"FROM concedii c "+
-                    	"JOIN useri u ON u.id = c.id_ang "+
-                    	"JOIN tipuri t ON u.tip = t.tip "+
-                    	"JOIN departament d ON u.id_dep = d.id_dep "+ 
-                    	"JOIN statusuri s ON c.status = s.status "+
-                    	"JOIN tipcon ct ON c.tip = ct.tip "+
-                    	"LEFT JOIN locatii_concedii l ON c.id = l.id_concediu " +
-                            "WHERE YEAR(c.start_c) = YEAR(CURDATE())";
+
+                            </thead>
+                            <tbody id="dateaici" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
+                                <!-- Se încarcă dinamic -->
+                            </tbody>
+                        </table>
+                    </div>
                     
-                    // daca e sef
-                    if (userType == 3 && request.getParameter("pag")==null ) {
-                    	sql = sql + " and u.id_dep = " + userdep + " and c.status = 0 ";
-                    }
-                    
-                    // daca e director
-                    if (userType == 0 && request.getParameter("pag")==null) {
-                    	sql = sql + " and u.id_dep = " + userdep + " and c.status = 1 ";
-                    }
-                    
-                    // deci cand vreau eu sa modific lucruri la mine... oh well.. in plus tre sa tin cont de status
-                    if (request.getParameter("pag")!=null && request.getParameter("pag").compareTo("1") == 0) { // tre sa vad ce tip de pagina e
-                    	sql = sql + " and u.id = " + id;
-                    	// pun concediile lui
-                    	
-                    	if (userType == 1 || userType == 2) {
-                    		sql = sql + " and c.status = 0";
-                    	}
-                    	
-                    	// merge la director, nu merge la sef =(
-                    	if (userType == 0 || userType == 3) {
-                    		sql = sql + " and c.status = 1";
-                    	}
-                    	
-                    }
-                    // aici e fara pag=?
-                    if (userType == 1 || userType == 2) {
-                    	sql = sql + " and u.id = " + id;
-                    }
-                    // System.out.println(sql);
-                    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-                    	System.out.println(stmt);
-                    	ResultSet rs1 = stmt.executeQuery();
-                        boolean found = false;
-                        int nr = 1;
-                        while (rs1.next()) {
-                            found = true;
-                          	// initial voiam sa fac aici un pretty print de date dar nu mi-a iesit asa ca da
-                            String added = rs1.getString("added") != null ? rs1.getString("added") : "N/A";
-                            String modif = rs1.getString("modified") != null ? rs1.getString("modified") : "N/A";
-                            String accres = rs1.getString("acc_res") != null ? rs1.getString("acc_res") : "N/A";
-                            		
-                            out.print("<tr><td data-label='Nr.crt'>" + nr + "</td><td data-label='Nume'>" +
-                                    rs1.getString("nume") + "</td><td data-label='Prenume'>" + rs1.getString("prenume") + "</td><td data-label='Fct'>" + rs1.getString("functie") + "</td><td data-label='Dep'>" + rs1.getString("departament") + 
-                                    "</td>" + "<td data-label='Inceput'>" +
-                                    		rs1.getString("start_c")+ "</td><td data-label='Final'>" + rs1.getString("end_c") + "</td><td data-label='Motiv'>" + rs1.getString("motiv") + "</td><td data-label='Locatie'>" +
-                                    rs1.getString("adresa") + "</td>" + "<td data-label='Tip'>" + rs1.getString("tipcon") + "</td>" + "<td data-label='Adaugat'>" + added + "</td>" + "<td data-label='Modif'>" + modif + "</td>"+ 
-                                    "<td data-label='Acc/Res'>" + accres + "</td>");
-                            
-                            if (rs1.getString("status").compareTo("Neaprobat") == 0) {
-                                out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
-                            }
-                            
-                            if (rs1.getString("status").compareTo("Aprobat sef") == 0) {
-                                out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
-                            }
-                            
-                            if (rs1.getString("status").compareTo("Aprobat director") == 0) {
-                                out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
-                            }
-                            
-                            if (rs1.getString("status").compareTo("Dezaprobat director") == 0) {
-                            	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
-                            }
-                            
-                            if (rs1.getString("status").compareTo("Dezaprobat sef") == 0) {
-                            	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
-                            }
-                            
-                          // pana aici e partea comuna
-                          // apoi pentru sef sa aprobe sau sa respinga
-                           if (userType == 3 && request.getParameter("pag")==null) {
-	                          if (rs1.getString("status").compareTo("Neaprobat") == 0) {
-	                        	  out.println("<td data-label='Status'><span class='status-icon status-aprobat-sef'><a href='javascript:void(0);' onclick=\"showModal('aprobsef?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-checkbox-circle-line'></i></a></span></td>");
-								 out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-sef'><a href='javascript:void(0);' onclick=\"showModal('ressef?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-close-line'></i></a></span></td>");
-	                        	  
-	                          }
-                           }
-                          
-                          // apoi pentru director sa aprobe sau sa respinga
-                           if (userType == 0 && request.getParameter("pag")==null) {
-	                          if (rs1.getString("status").compareTo("Aprobat sef") == 0) {
-	                        	  out.println("<td data-label='Status'><span class='status-icon status-aprobat-director'><a href='javascript:void(0);' onclick=\"showModal('aprobdir?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-checkbox-circle-line'></i></a></span></td>");
-	                        	  out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'><a href='javascript:void(0);' onclick=\"showModal('resdir?idcon=" + rs1.getInt("nr_crt") + "')\"><i class='ri-close-line'></i></a></span></td>");
-									}
-                        	}
-                          
-                        // apoi pentru cine vrea sa modifice concediul
-                           if (request.getParameter("pag")!=null) {
-                            //if (Integer.parseInt(request.getParameter("pag")) == 1) {
- 							    if ((rs1.getString("status").compareTo("Neaprobat") == 0 && (userType == 1 || userType == 2)) || 
- 							        (rs1.getString("status").compareTo("Aprobat sef") == 0 && (userType == 3 || userType == 0))) {
- 							    	 out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
-							                   "<a href='NewFile2.jsp?idcon=" + rs1.getInt("nr_crt") + 
-							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
- 							        out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
- 							                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 
- 							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
- 							        out.println("<td data-label='Status'><span class='status-icon status-dezaprobat-director'>" +
- 							                   "<a href='delcon?idcon=" + rs1.getInt("nr_crt") + 
- 							                   "'><i class='ri-close-line'></i></a></span></td></tr>");
- 							    //}
-                            }
- 						        
- 							} 
-                         
-                         nr++; 
-                        }
-                        if (!found) {
-                            out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
-                        }
-                    }
-                         %>
-                          </tbody>
-                </table> 
-                              
+                    <button id="generate" onclick="sendJsonToPDFServer()">Descarcati PDF</button>
+                   <button id="inapoi" ><a href ="viewang4.jsp">Inapoi</a></button>
+                
                 </div>
-                <div class="into">
-                <button id="inapoi" ><a href ="actiuni.jsp">Inapoi</a></button>
-                <%  if (request.getParameter("pag") == null) {
-                %>
-               
-                
-                  <button id="generate" onclick="generate()" >Descarcati PDF</button>
-                  
-               
-                <% } %>
-                 </div>
-                <div id="myModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <form id="theform" method="POST">
-            <label for="reason">Motivul acțiunii:</label>
-            <input class="login__input" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" id="reason" name="reason" required>
-            <input type="hidden" id="actionUrl" name="actionUrl">
-            <button type="submit">Trimite</button>
-        </form>
-    </div>
-</div>
-                
-                <%
-        			} else {
-                    	switch (userType) {
-                        case 4: response.sendRedirect("adminok.jsp"); break;
-                    }
-                    }
-                } else {
-                	out.println("<script type='text/javascript'>");
-                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                    out.println("</script>");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                out.println("<script type='text/javascript'>");
-    	        out.println("alert('Eroare la baza de date!');");
-    	        out.println("alert('" + e.getMessage() + "');");
-    	        out.println("</script>");
-                response.sendRedirect("login.jsp");
-            }
-        } else {
-        	out.println("<script type='text/javascript'>");
-	        out.println("alert('Utilizator neconectat!');");
-	        out.println("</script>");
-            response.sendRedirect("login.jsp");
-        }
-    } else {
-    	out.println("<script type='text/javascript'>");
-        out.println("alert('Nu e nicio sesiune activa!');");
-        out.println("</script>");
-        response.sendRedirect("login.jsp");
-    }
-%>
+            </div>
+        </div>
+            
+     <script>
+     // Funcții helper pentru status
+ 	function getStatusClass(status) {
+ 	    switch(status.toLowerCase()) {
+ 	        case 'neaprobat': return 'neaprobat';
+ 	        case 'aprobat sef': return 'aprobat-sef';
+ 	        case 'aprobat director': return 'aprobat-director';
+ 	        case 'dezaprobat director': return 'dezaprobat-director';
+ 	        case 'dezaprobat sef': return 'dezaprobat-sef';
+ 	        default: return 'neaprobat';
+ 	    }
+ 	}
 
+ 	function getStatusIcon(status) {
+ 	    switch(status.toLowerCase()) {
+ 	        case 'neaprobat': return 'ri-focus-line';
+ 	        case 'aprobat sef':
+ 	        case 'aprobat director': return 'ri-checkbox-circle-line';
+ 	        case 'dezaprobat sef':
+ 	        case 'dezaprobat director': return 'ri-close-line';
+ 	        default: return 'ri-focus-line';
+ 	    }
+ 	}
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("🚀 Pagina încărcată, începe request-ul AJAX...");
+            const currentUrl = window.location.pathname;
+            const currentParams = window.location.search;
+            const separator = currentParams ? '&' : '?';
+            const fetchUrl = currentUrl + currentParams + separator + "json=true";
+            
+            console.log("Starting fetch from:", fetchUrl);
 
-<script>
-    function confirmAction(link, message, id) {
-        if(confirm(message)) {
-            window.location.href = link; // Redirect user to the link if confirmed
-        }
-        return false; // Stop the action if not confirmed
-    }
+            fetch(fetchUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("❌ Eroare la fetch: " + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(jsonData => {
+                    console.log("✅ JSON primit:", jsonData);
+
+                    if (!jsonData || !jsonData.data || jsonData.data.length === 0) {
+                        console.warn("⚠ JSON-ul nu conține date valide.");
+                        document.getElementById("dateaici").textContent = "Nu există angajați disponibili!";
+                        return;
+                    }
+
+                   // document.getElementById("tableTitle").textContent = jsonData.header;
+                    document.getElementById("tableDate").textContent = new Date().toLocaleDateString("ro-RO");
+
+                    const tableBody = document.querySelector("#employeeTable tbody");
+                    tableBody.innerHTML = "";
+
+                    jsonData.data.forEach((row, index) => {
+                        console.log("🔍 Rand:", row);
+                        const tr = document.createElement("tr");
+                        
+                        // Calculăm statusClass și statusIcon înainte de a le folosi
+                        const statusClass = getStatusClass(row.Status);
+                        const statusIcon = getStatusIcon(row.Status);
+
+                        let cellsHtml = "";
+                        cellsHtml += "<td data-label='Nr.crt'>" + (row.NrCrt || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Nume'>" + (row.Nume || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Prenume'>" + (row.Prenume || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Functie'>" + (row.Fct || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Departament'>" + (row.Dep || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Inceput'>" + (row.Incipit || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Final'>" + (row.Fine || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Motiv'>" + (row.Motiv || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Locatie'>" + (row.Loc || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Tip'>" + (row.Tip || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Adaugat'>" + (row.Adaug || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Modificat'>" + (row.Modif || 'N/A') + "</td>";
+                        cellsHtml += "<td data-label='Vazut'>" + (row.Vzt || 'N/A') + "</td>";
+
+                        cellsHtml += "<td class='tooltip' data-label='Status'>" +
+                                    "<span class='tooltiptext'>" + row.Status + "</span>" +
+                                    "<span class='status-icon status-" + statusClass + "'>" +
+                                    "<i class='" + statusIcon + "'></i>" +
+                                    "</span>" +
+                                    "</td>";
+
+                        // Butoane pentru șef
+                        if (<%=userType%> === 3 && !<%=request.getParameter("pag")%>) {
+                            if (row.Status === "Neaprobat") {
+                                cellsHtml += "<td data-label='Status'>" +
+                                            "<span class='status-icon status-aprobat-sef'>" +
+                                            "<a href='javascript:void(0);' onclick='showModal(\"aprobsef?idcon=" + row.id + "\")'>" +
+                                            "<i class='ri-checkbox-circle-line'></i>" +
+                                            "</a>" +
+                                            "</span>" +
+                                            "</td>";
+                                cellsHtml += "<td data-label='Status'>" +
+                                            "<span class='status-icon status-dezaprobat-sef'>" +
+                                            "<a href='javascript:void(0);' onclick='showModal(\"ressef?idcon=" + row.id + "\")'>" +
+                                            "<i class='ri-close-line'></i>" +
+                                            "</a>" +
+                                            "</span>" +
+                                            "</td>";
+                            }
+                        }
+
+                        // Butoane pentru director
+                        if (<%=userType%> === 0 && !<%=request.getParameter("pag")%>) {
+                            if (row.Status === "Aprobat sef") {
+                                cellsHtml += "<td data-label='Status'>" +
+                                            "<span class='status-icon status-aprobat-director'>" +
+                                            "<a href='javascript:void(0);' onclick='showModal(\"aprobdir?idcon=" + row.id + "\")'>" +
+                                            "<i class='ri-checkbox-circle-line'></i>" +
+                                            "</a>" +
+                                            "</span>" +
+                                            "</td>";
+                                cellsHtml += "<td data-label='Status'>" +
+                                            "<span class='status-icon status-dezaprobat-director'>" +
+                                            "<a href='javascript:void(0);' onclick='showModal(\"resdir?idcon=" + row.id + "\")'>" +
+                                            "<i class='ri-close-line'></i>" +
+                                            "</a>" +
+                                            "</span>" +
+                                            "</td>";
+                            }
+                        }
+
+                        // Butoane de modificare/ștergere
+                        if (<%=request.getParameter("pag") != null%>) {
+                            if ((row.Status === "Neaprobat" && (<%=userType%> === 1 || <%=userType%> === 2)) || 
+                                (row.Status === "Aprobat sef" && (<%=userType%> === 3 || <%=userType%> === 0))) {
+                                cellsHtml += "<td data-label='Status'>" +
+                                            "<span class='status-icon status-neaprobat'>" +
+                                            "<a href='NewFile2.jsp?idcon=" + row.id + "'>" +
+                                            "<i class='ri-edit-circle-line'></i>" +
+                                            "</a>" +
+                                            "</span>" +
+                                            "</td>";
+                                cellsHtml += "<td data-label='Status'>" +
+                                            "<span class='status-icon status-neaprobat'>" +
+                                            "<a href='modifc2.jsp?idcon=" + row.id + "'>" +
+                                            "<i class='ri-edit-circle-line'></i>" +
+                                            "</a>" +
+                                            "</span>" +
+                                            "</td>";
+                                cellsHtml += "<td data-label='Status'>" +
+                                            "<span class='status-icon status-dezaprobat-director'>" +
+                                            "<a href='delcon?idcon=" + row.id + "'>" +
+                                            "<i class='ri-close-line'></i>" +
+                                            "</a>" +
+                                            "</span>" +
+                                            "</td>";
+                            }
+                        }
+
+                        tr.innerHTML = cellsHtml;
+                        tableBody.appendChild(tr);
+                    });
+
+                    console.log("✅ Tabel încărcat cu succes!");
+                })
+                .catch(error => console.error("🔥 Eroare AJAX:", error));
+        });
+   
+
     </script>
-
-<script>
+    <script>
 // Get the modal
 
 var modal = document.getElementById("myModal");
@@ -490,77 +551,165 @@ window.onclick = function(event) {
     }
 }
 </script>
+    <script>
+    function generate() {
+        const element = document.getElementById("content");
+        html2pdf()
+        .from(element)
+        .save();
+    } 
+</script>
+  <script>
+    async function sendTableDataToCSV() {
+        // Get the table
+        const table = document.querySelector("table");
+        const rows = table.querySelectorAll("tbody tr");
 
-        <script>
-        async function generateJSONForPDF() {
-            const table = document.querySelector("table");
-            const headers = Array.from(table.querySelectorAll("thead th"))
-                .filter(th => {
-                    const text = th.textContent.trim().toLowerCase();
-                    return !text.includes("aprobati") && 
-                           !text.includes("respingeti") && 
-                           !text.includes("localizare") && 
-                           !text.includes("modificati") && 
-                           !text.includes("stergeti");
-                })
-                .map(th => 
-                    th.textContent.trim()
-                        .normalize('NFD')
-                        .replace(/[\u0300-\u036f]/g, '')
-                        .replace(/\s+/g, '')
-                );
-
-            const rows = table.querySelectorAll("tbody tr");
-
-            const data = Array.from(rows).map(row => {
-                const cells = row.querySelectorAll("td");
-                const rowData = {};
-
-                headers.forEach((header, index) => {
-                    // Convertim headerul într-un key valid pentru JSON
-                    rowData[header] = cells[index] ? cells[index].textContent.trim() : 'N/A';
+        // Extract table data into a JSON array
+        const data = [];
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length > 0) { // Ignore rows with no data
+                data.push({
+                    "NrCrt": cells[0].textContent.trim(),
+                    "Nume": cells[1].textContent.trim(),
+                    "Prenume": cells[2].textContent.trim(),
+                    "Functie": cells[3].textContent.trim(),
+                    "Departament": cells[4].textContent.trim()
                 });
+            }
+        });
 
-                return rowData;
+        // Send the JSON data to the generic CSV servlet
+        try {
+            const response = await fetch("generateCSV1", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
             });
 
-            const jsonData = {
-                data: data,
-                today: new Date().toLocaleDateString('ro-RO'),
-                header: document.querySelector('h1').textContent
-            };
-
-            console.log("JSON generat pentru PDF:", JSON.stringify(jsonData, null, 2));
-
-            try {
-                const response = await fetch("generatePDF.jsp", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-
-                if (!response.ok) {
-                    throw new Error("Eroare la generarea PDF: " + response.statusText);
-                }
-
+            if (response.ok) {
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = "Raport_Concedii.pdf";
+                a.download = "table_data.csv";
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-            } catch (error) {
-                console.error("Eroare la generare PDF:", error);
-                alert("A apărut o eroare la generarea PDF-ului!");
+            } else {
+                console.error("Failed to generate CSV");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+</script>
+        <script>
+    function generateJSONFromTable() {
+        // Get the table
+        const table = document.querySelector("table");
+        const rows = table.querySelectorAll("tbody tr");
+
+        // Extract table data into a JSON array
+        const data = [];
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length > 0) { // Ignore rows with no data
+                data.push({
+                    "NrCrt": cells[0].textContent.trim(),
+                    "Nume": cells[1].textContent.trim(),
+                    "Prenume": cells[2].textContent.trim(),
+                    "Functie": cells[3].textContent.trim(),
+                    "Departament": cells[4].textContent.trim()
+                });
+            }
+        });
+
+        // Convert JSON array to string
+        const jsonString = JSON.stringify(data, null, 2); // Pretty print JSON
+
+        // Create a Blob and trigger a download
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "table_data.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
+<script>
+async function sendJsonToPDFServer() {
+    console.log("🚀 Fetching JSON data from this page...");
+    const currentUrl = window.location.pathname;
+    const currentParams = window.location.search;
+    const separator = currentParams ? '&' : '?';
+    const fetchUrl = currentUrl + currentParams + separator + "json=true";
+    
+    console.log("Starting fetch from:", fetchUrl);
+
+   
+    try {
+        let response = await fetch(fetchUrl);
+        
+        if (!response.ok) {
+            throw new Error("❌ Error fetching JSON data: " + response.statusText);
+        }
+        
+        let jsonData = await response.json();
+        console.log("✅ JSON data received:", jsonData);
+
+        // Now send this JSON to the PDF generator server
+        console.log("🚀 Sending JSON to PDF generator...");
+        let pdfResponse = await fetch("generatePDF.jsp", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(jsonData)
+        });
+
+        if (!pdfResponse.ok) {
+            throw new Error("❌ Error sending JSON to PDF server: " + pdfResponse.statusText);
+        }
+
+        console.log("✅ PDF successfully generated! Downloading...");
+
+        // 🔹 Extrage numele fișierului din header-ul Content-Disposition
+        let contentDisposition = pdfResponse.headers.get("Content-Disposition");
+        let fileName = "Raport_Angajati.pdf"; // Default dacă nu găsim în header
+
+        if (contentDisposition) {
+            let match = contentDisposition.match(/filename="(.+)"/);
+            if (match) {
+                fileName = match[1];
             }
         }
 
-        // Înlocuiți butonul existent cu această nouă funcție
-        document.getElementById('generate').onclick = generateJSONForPDF;
+        console.log("📂 Numele fișierului detectat:", fileName);
+
+        // Convert response to blob and trigger download
+        let blob = await pdfResponse.blob();
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+    } catch (error) {
+        console.error("🔥 Error:", error);
+        alert("Eroare la trimiterea datelor către serverul de PDF!");
+    }
+}
+
 </script>
+
 </body>
 </html>
+
