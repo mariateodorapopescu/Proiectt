@@ -375,7 +375,7 @@
  							    if ((rs1.getString("status").compareTo("Neaprobat") == 0 && (userType == 1 || userType == 2)) || 
  							        (rs1.getString("status").compareTo("Aprobat sef") == 0 && (userType == 3 || userType == 0))) {
  							    	 out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
-							                   "<a href='NewFile2.html?idcon=" + rs1.getInt("nr_crt") + 
+							                   "<a href='NewFile2.jsp?idcon=" + rs1.getInt("nr_crt") + 
 							                   "'><i class='ri-edit-circle-line'></i></a></span></td>");
  							        out.println("<td data-label='Status'><span class='status-icon status-neaprobat'>" +
  							                   "<a href='modifc2.jsp?idcon=" + rs1.getInt("nr_crt") + 

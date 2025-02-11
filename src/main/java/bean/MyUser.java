@@ -17,7 +17,7 @@ public class MyUser implements Serializable {
     private String password;
     private int departament;
     private int tip;
-    private int cnp;
+    private String cnp;
     private int id;
     private String culoare;
     public String getUsername() {
@@ -83,13 +83,13 @@ public class MyUser implements Serializable {
 	/**
 	 * @return the cnp
 	 */
-	public int getCnp() {
+	public String getCnp() {
 		return cnp;
 	}
 	/**
 	 * @param cnp the cnp to set
 	 */
-	public void setCnp(int cnp) {
+	public void setCnp(String cnp) {
 		this.cnp = cnp;
 	}
 	/**

@@ -7,10 +7,35 @@
 
 
 <%
+String cnp = "";
+cnp = request.getParameter("cnp");
+if (cnp == null){
+	cnp = "";
+}
+System.out.println(cnp); // ok
+String idd = request.getParameter("id");
+
+if (idd == null || idd.trim().isEmpty()) {
+ idd = "0"; 
+} else {
+	idd = idd.replaceAll("[^0-9]", ""); // Păstrează doar cifre
+}
+if (idd.isEmpty()) {
+ idd = "0";
+}
+int idd2 = 0;
+try {
+ idd2 = Integer.parseInt(idd);
+ System.out.println("ID-ul este: " + idd2); // ✅ Va afișa un număr valid
+} catch (NumberFormatException e) {
+ System.err.println("Eroare: ID invalid! Valoarea primită: " + idd);
+}
+
 HttpSession sesi = request.getSession(false);
     		String username = null;
 if (sesi != null) {
 	 username = (String) sesi.getAttribute("username");
+	 System.out.println(username); // ok
     MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
     if (currentUser != null) {
         username = currentUser.getUsername();
@@ -29,8 +54,13 @@ if (sesi != null) {
             if (!rs.next()) {
                 out.println("<script type='text/javascript'>alert('Date introduse incorect sau nu exista date!');</script>");
             } else {
-                int userId = rs.getInt("id");
-                String userType = rs.getString("tip");
+                int userId = 0;
+                userId = rs.getInt("id");
+                System.out.println(userId); // ok
+                int userType = 0;
+                userType = rs.getInt("tip");
+                System.out.println(userType); // ok
+                
                 String accent = "##03346E";
                 String clr = "#d8d9e1";
                 String sidebar =  "#ecedfa";
@@ -56,27 +86,30 @@ if (sesi != null) {
                 }
 
                 // Check if the user type is not admin
-                if (!"4".equals(userType)) {
+                if (userType != 4) {
                     // Logic for non-admin users
-                   
-                    username = (String) sesi.getAttribute("username");
-                    
-                        try (PreparedStatement stmt = connection.prepareStatement("SELECT id FROM useri WHERE username = ?")) {
-                            stmt.setString(1, username);
+                     try (PreparedStatement stmt = connection.prepareStatement("SELECT id FROM useri WHERE cnp = ?")) {
+                            stmt.setString(1, cnp);
                             try (ResultSet rs1 = stmt.executeQuery()) {
-                                if (!rs1.next() || rs1.getInt("id") != userId) {
+                                if (!rs1.next()) {
                                     out.println("<script type='text/javascript'>alert('Cod incorect sau acces neautorizat!'); location='modifdel.jsp';</script>");
                                     return;
                                 }
+                                userId = rs1.getInt("id");
+                                System.out.println(userId);
+                            } catch (Exception e) {
+                            	out.println("<script type='text/javascript'>alert('Cod incorect sau acces neautorizat!'); location='modifdel.jsp';</script>");
+                                return;
                             }
+                        } catch (Exception e) {
+                        	out.println("<script type='text/javascript'>alert('Cod incorect sau acces neautorizat!'); location='modifdel.jsp';</script>");
+                            return;
                         }
-                    
                 } else {
-                	userId = Integer.parseInt(request.getParameter("id"));
+                	userId = idd2;
+                	System.out.println(userId);
                 }
-               
-                // Additional user-specific form rendering logic would go here
-                
+                              
                 %>
                 <html lang="ro">
 <head>
@@ -227,10 +260,7 @@ table.picka-table tr {
 			            			<%
 			            	// out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"date\" name=\"data_nasterii\" value=\""+ rs2.getDate("data_nasterii") + "\" min=\"1954-01-01\" max=\"2036-12-31\" required class=\"login__input\">");
 			            	out.println("                </div>");
-			            	out.println("                <div>");
-			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Adresa</label>");
-			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"text\" name=\"adresa\" placeholder=\"Introduceti adresa\" value=\""+ rs2.getString("adresa") + "\" required class=\"login__input\">");
-			            	out.println("                </div>");
+			            	
 			            	out.println("                <div>");
 			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">E-mail</label>");
 			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"email\" name=\"email\" placeholder=\"Introduceti e-mailul\" value=\" "+ rs2.getString("email") +"\" required class=\"login__input\">");
@@ -240,10 +270,7 @@ table.picka-table tr {
 			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Telefon</label>");
 			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"text\" name=\"telefon\" placeholder=\"Introduceti telefonul\" value=\""+ rs2.getString("telefon") +"\" required class=\"login__input\">");
 			            	out.println("                </div>");
-			            	out.println("                <div>");
-			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">UserName</label>");
-			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"text\" name=\"username\" placeholder=\"Introduceti numele de utilizator\" value=\""+ rs2.getString("username") +"\" required class=\"login__input\">");
-			            	out.println("                </div>");
+			            	
 			            	out.println("                <div>");
 			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Departament</label>");
 			            	out.println("                    <select style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" name=\"departament\" class=\"login__input\">");
@@ -289,7 +316,7 @@ table.picka-table tr {
 			                        out.println("                    </select>");
 			                        out.println("                </div>");
 			                        out.println("                <div>");
-			                        out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Tip/Ierarhie</label>");
+			                        out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Pozitie</label>");
 			                        out.println("                    <select style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" name=\"tip\" class=\"login__input\">");
 			                        
 			                        String tip = null;
@@ -303,6 +330,7 @@ table.picka-table tr {
 			                            if (rs9.next()) {
 			                                tip = rs9.getString("tiip");
 			                                nume = rs9.getString("den_tip");
+			                                
 			                            }
 			                            rs9.close();
 			                           
@@ -321,13 +349,13 @@ table.picka-table tr {
 			                            ResultSet rs10 = stmt4.executeQuery();
 			
 			                            while (rs10.next()) {
-			                                String depId = rs10.getString("tip");
+			                                String tip_id = rs10.getString("tip");
 			                                String depName = rs10.getString("denumire");
 			                                String selected = "";
-			                                if (depId.equals(id_dep)) {
+			                                if (tip_id.equals(tip)) {
 			                                    selected = "selected";
 			                                }
-			                                out.println("<option value='" + depId + "' " + selected + ">" + depName + "</option>");
+			                                out.println("<option value='" + tip + "' " + selected + ">" + nume + "</option>");
 			                            }
 			                            rs10.close();
 			                            stmt4.close();
@@ -342,7 +370,66 @@ table.picka-table tr {
 			                        
 				            out.println("                        </select>");
 				            out.println("                    </div>");
+				            out.println("                <div>");
+	                        out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Rang</label>");
+	                        out.println("                    <select style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" name=\"tip\" class=\"login__input\">");
+	                        
+	                        String tip2 = null;
+	                        String nume2 = null;
+	                       
+	                        try {
+	                            String sql3 = "SELECT u.tip as tiip, t.denumire as den_tip FROM useri u JOIN tipuri t ON u.tip = t.tip WHERE id = ?";
+	                            PreparedStatement stmt3 = connection.prepareStatement(sql3);
+	                            stmt3.setInt(1, userId);
+	                            ResultSet rs9 = stmt3.executeQuery();
+	                            if (rs9.next()) {
+	                                tip2 = rs9.getString("tiip");
+	                                nume2 = rs9.getString("den_tip");
+	                            }
+	                            rs9.close();
+	                           
+	                            
+	                        } catch (Exception e) {
+	                            e.printStackTrace();
+	                            out.println("<script type='text/javascript'>");
+	                            out.println("alert('Date introduse incorect sau nu exista date!');");
+	                            out.println("alert('" + e.getMessage() + "');");
+	                            out.println("</script>");
+	                        }
+	                        
+	                        try {
+	                            String sql4 = "SELECT tip, denumire FROM tipuri;";
+	                            PreparedStatement stmt4 = connection.prepareStatement(sql4);
+	                            ResultSet rs10 = stmt4.executeQuery();
+	
+	                            while (rs10.next()) {
+	                                String rang_id = rs10.getString("tip");
+	                                String rang_nume = rs10.getString("denumire");
+	                                String selected = "";
+	                                if (rang_id.equals(tip2)) {
+	                                    selected = "selected";
+	                                }
+	                                out.println("<option value='" + rang_id + "' " + selected + ">" + rang_nume + "</option>");
+	                            }
+	                            rs10.close();
+	                            stmt4.close();
+	                          
+	                        } catch (Exception e) {
+	                            e.printStackTrace();
+	                            out.println("<script type='text/javascript'>");
+	                            out.println("alert('Date introduse incorect sau nu exista date!');");
+	                            out.println("alert('" + e.getMessage() + "');");
+	                            out.println("</script>");
+	                        }
+	                        
+		            out.println("                        </select>");
+		            out.println("                    </div>");
+		            out.println("                <div>");
+	            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">CNP</label>");
+	            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"text\" name=\"cnp\" placeholder=\"Introduceti codul...\" value=\"" +  rs2.getString("cnp") + "\" required class=\"login__input\">");
+	            	out.println("                </div>");
 				            out.println("                </div>");
+				            
 				            out.println("</td></tr></table>");
 				            
 				            out.println("<a style=\"color: " + accent + "\" href ='modifdel.jsp' class='login__forgot''>Inapoi</a>");

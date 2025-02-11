@@ -31,23 +31,9 @@
                   int id = rs.getInt("id");
                   int userType = rs.getInt("tip");
                   int userdep = rs.getInt("id_dep");
-                  if (userType != 4) {  
-                  	// aflu data curenta, tot ca o interogare bd =(
-                  	String today = "";
-                 	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                          String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
-                          try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                             try (ResultSet rs2 = stmt.executeQuery()) {
-                                  if (rs2.next()) {
-                                    today =  rs2.getString("today");
-                                  }
-                              }
-                          }
-                      } catch (SQLException e) {
-                          out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                          e.printStackTrace();
-                      }
-                 	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                  if (userType == 4) {  
+                  	
+                 	 // aflu tematica de culoare ce variaza de la un utilizator la celalalt
                  	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
                 	 String clr = "#d8d9e1";
                 	 String sidebar = "#ECEDFA";
@@ -155,10 +141,12 @@
                 e.printStackTrace();
             }
         } else {
-            out.println("<script type='text/javascript'>");
-            out.println("alert('Utilizator neconectat!');");
-            out.println("</script>");
-            response.sendRedirect("logout");
+        	out.println("<script type='text/javascript'>");
+    	    out.println("alert('Utilizator neconectat!');");
+    	    out.println("</script>");
+    	    out.flush(); // Golesc buffer-ul înainte de redirecționare
+    	    response.sendRedirect("logout");
+    	    return;
         }
     } else {
         out.println("<script type='text/javascript'>");

@@ -38,8 +38,8 @@ public class MyUserDao {
 
 	public int registerEmployee(MyUser employee) throws ClassNotFoundException, SQLException, IOException {
 	    String INSERT_USERS_SQL = "INSERT INTO useri" +
-	        "  (nume, prenume, data_nasterii, adresa, email, telefon, username, password, id_dep, tip, cnp, culoare) VALUES " +
-	        " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+	        "  (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, cnp, culoare) VALUES " +
+	        " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
 	    int result = 0;
 
@@ -52,15 +52,15 @@ public class MyUserDao {
 	        preparedStatement.setString(1, employee.getNume());
 	        preparedStatement.setString(2, employee.getPrenume());
 	        preparedStatement.setString(3, employee.getData_nasterii());
-	        preparedStatement.setString(4, employee.getAdresa());
-	        preparedStatement.setString(5, employee.getEmail());
-	        preparedStatement.setString(6, employee.getTelefon());
-	        preparedStatement.setString(7, employee.getUsername());
-	        preparedStatement.setString(8, hashedPassword);
-	        preparedStatement.setInt(9, employee.getDepartament());
-	        preparedStatement.setInt(10, employee.getTip());
-	        preparedStatement.setInt(11, employee.getCnp());
-	        preparedStatement.setString(12, employee.getCuloare());
+	      
+	        preparedStatement.setString(4, employee.getEmail());
+	        preparedStatement.setString(5, employee.getTelefon());
+	        preparedStatement.setString(6, employee.getUsername());
+	        preparedStatement.setString(7, hashedPassword);
+	        preparedStatement.setInt(8, employee.getDepartament());
+	        preparedStatement.setInt(9, employee.getTip());
+	        preparedStatement.setString(10, employee.getCnp());
+	        preparedStatement.setString(11, employee.getCuloare());
 	        //System.err.println(employee.getNume() + " " + employee.getPrenume() + " " + employee.getData_nasterii() + " " + employee.getAdresa() + " " + employee.getEmail() + " " + employee.getTelefon() +" " + employee.getUsername() + " " + employee.getPassword() + " " + employee.getDepartament() + " " + employee.getTip());
 	        /*
 	        File imageFile = new File("C:\\Users\\Popi\\eclipse-workspace\\Proiect\\person.jpg");
@@ -75,6 +75,7 @@ public class MyUserDao {
 
 	    } catch (SQLException e) {
 	        printSQLException(e);
+	        throw new IOException();
 	    }
 	    // insertUserWithImage("C:\Users\Popi\eclipse-workspace\Proiect\person.jpg", id);
 	    return result;

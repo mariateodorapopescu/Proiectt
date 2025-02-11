@@ -372,7 +372,7 @@ const cv =  new URLSearchParams(window.location.search).get("id");
                             });
 
                             const requestBody = {
-                            		userId: cv,
+                                idDep: cv,
                                 strada: street,
                                 nr: number,
                                 cod: code,
@@ -383,7 +383,7 @@ const cv =  new URLSearchParams(window.location.search).get("id");
                                 longitudine: location.longitude
                             };
 
-                            const response = await fetch("/Proiect/locatiee", {
+                            const response = await fetch("/Proiect/ServletUpdateAddressDep", {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"

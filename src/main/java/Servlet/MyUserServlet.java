@@ -17,48 +17,126 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Pattern;
+import java.util.List;
+import java.util.ArrayList;
 
 @WebServlet("/register")
 public class MyUserServlet extends HttpServlet {
     private static final long serialVersionUID = 1;
     private MyUserDao employeeDao;
+    
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/test?useSSL=false";
+    private static final String DB_USER = "root";
+    private static final String DB_PASSWORD = "student";
 
+    
     public void init() {
         employeeDao = new MyUserDao();
     }
+    
+    //  Verificare optimizată a existenței username-ului
+    private static boolean usernameExists(Connection connection, String username) throws SQLException {
+        String query = "SELECT 1 FROM useri WHERE username = ? LIMIT 1"; //  Limităm rezultatele la 1
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next(); //  Returnează `true` dacă există, `false` dacă nu
+            }
+        }
+    }
 
+    public static String generareUsername(String nume, String prenume, String data_nasterii) {
+        //  Evităm adăugarea recursivă în listă
+        List<String> potentialUsernames = new ArrayList<>();
+        
+        //  Construim nume fără să creștem lista exponențial
+        potentialUsernames.add(formatUsername(prenume, nume, null));
+        if (prenume.contains("-")) {
+            potentialUsernames.add(formatUsername(prenume.split("-")[1], nume, null));
+        }
+        
+        //  Adăugăm variante cu data nașterii
+        String zzll = data_nasterii.substring(8, 10) + data_nasterii.substring(5, 7);  // ZZLL
+        String zzllaa = zzll + data_nasterii.substring(2, 4);  // ZZLLAA
+        potentialUsernames.add(formatUsername(prenume, nume, zzll));
+        potentialUsernames.add(formatUsername(prenume, nume, zzllaa));
+
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            for (String username : potentialUsernames) {
+                if (!usernameExists(connection, username)) {
+                    return username;
+                }
+            }
+
+            //  Dacă toate variantele sunt ocupate, adăugăm un număr incremental (până la 99)
+            String baseUsername = potentialUsernames.get(potentialUsernames.size() - 1);
+            for (int counter = 2; counter < 100; counter++) {
+                String newUsername = baseUsername + counter;
+                if (!usernameExists(connection, newUsername)) {
+                    return newUsername;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //  Fallback final (dacă toate numele sunt ocupate)
+        return "user" + System.currentTimeMillis();
+    }
+
+    //  Funcție auxiliară pentru a formata username-ul
+    private static String formatUsername(String prenume, String nume, String extra) {
+        String base = prenume.split("-")[0] + "." + nume.split("-")[0];  // Evităm split necontrolat
+        return (extra != null) ? base + extra : base;
+    }
+    
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
     	
     	String nume = request.getParameter("nume");
     	String prenume = request.getParameter("prenume");
     	String data_nasterii = request.getParameter("data_nasterii");
-    	String adresa = request.getParameter("adresa");
-    	String email = request.getParameter("email");
-    	String telefon = request.getParameter("telefon");
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+    	// String adresa = request.getParameter("data_nasterii"); // nu mai am nevoie de asta
+    	String email = request.getParameter("email"); // email personal, ca sa poata primi prin mail instructiuni utilizare platforma -> vei avea in bd o coloana cu email personal =))
+    	String telefon = request.getParameter("telefon"); // telefon de serviciu are numai hr ul, dar asta hai ca e prea specific asa ca da 
+        // String username = request.getParameter("username"); // asta o sa l generezi tu
+        // String password = request.getParameter("password"); // asta by default faci un TFRiD2024:) pe care toata lumea tre sa l schimbe la first use sau ceva 
+    	// -> faci un compare cu TFRiD2024:) si daca are parola asta il pui sa si-o schimbe =))
+    	String password = "TFRiD2024:)"; // se incadreaza in standard, adica 
+    	// minim o litera mare, minim o litera mica, minim un caractrer special, minim o cifra, cifre si litere neconsecutive, lungime minima de 8 caractere
         int dep = Integer.valueOf(request.getParameter("departament"));
-        int tip = Integer.valueOf(request.getParameter("tip"));
+        int tip = Integer.valueOf(request.getParameter("rang"));
+        int pozitie = Integer.valueOf(request.getParameter("pozitie"));
+        String cnp = request.getParameter("cnp");
         int id = RandomNumberGenerator.generate();
         String culoare = RandomColorGenerator.generate(id);
-
+        String username = new String(generareUsername(nume, prenume, data_nasterii));
         MyUser employee = new MyUser();
         employee.setNume(nume);
         employee.setPrenume(prenume);
         employee.setData_nasterii(data_nasterii);
-        employee.setAdresa(adresa);
+       // employee.setAdresa(adresa);
         employee.setEmail(email);
         employee.setTelefon(telefon);
         employee.setUsername(username);
         employee.setPassword(password);
         employee.setDepartament(dep);
         employee.setTip(tip);
-        employee.setCnp(id);
+        employee.setCnp(cnp);
         employee.setCuloare(culoare);
-        
+        /* 
         if (!PasswordValidator.validatePassword(password)) {
             response.sendRedirect("signin.jsp?p=true");
+            return;
+        }
+        */
+        if (!CNPValidator.isValidCNP(cnp)) {
+            response.sendRedirect("signin.jsp?cnp=true");
             return;
         }
         if (!NameValidator.validateName(nume)) {
@@ -83,51 +161,12 @@ public class MyUserServlet extends HttpServlet {
             response.sendRedirect("signin.jsp?dn=true");
             return;
         }
-       // username ul e unic
-        int nrsef = -1;
-        int nrdir = -1;
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-      	         PreparedStatement preparedStatement = connection.prepareStatement("select count(*) as total from useri where tip = 3 and username != ? group by id_dep having id_dep = ?;");
-        		 PreparedStatement stmt = connection.prepareStatement("select count(*) as total from useri where tip = 0 and username != ? group by id_dep having id_dep = ?;")) {
-        	preparedStatement.setInt(2, dep);
-        	preparedStatement.setString(1, username);
-        	stmt.setInt(2, dep);
-        	stmt.setString(1, username);
-                  ResultSet rs = preparedStatement.executeQuery();
-                  ResultSet res = stmt.executeQuery();
-               while (rs.next()) {
-                  nrsef = rs.getInt("total");
-               }
-               while (res.next()) {
-                   nrdir = res.getInt("total");
-               }
-           } catch (SQLException e) {
-		        //printSQLException(e);
-		        response.setContentType("text/html;charset=UTF-8");
-				 PrintWriter out = response.getWriter();
-				    out.println("<script type='text/javascript'>");
-				    out.println("alert('Eroare la baza de date - debug only!');");
-				    out.println("window.location.href = 'signin.jsp';"); 
-				    out.println("</script>");
-				    out.close();
-				    e.printStackTrace();
-		        throw new IOException("Eroare la baza de date", e);
-		    }
-        
-        if (tip == 3 && nrsef == 1) {
-            response.sendRedirect("signin.jsp?pms=true");
-            return;
-        }
-        
-        if (tip == 0 && nrdir == 1) {
-            response.sendRedirect("signin.jsp?pmd=true");
-            return;
-        }
-
+       
         try {
             employeeDao.registerEmployee(employee);
-            System.out.println("OK");
+            
          // trimit notificare la angajat
+            
             GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
             String to = "";
            

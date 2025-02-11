@@ -24,19 +24,10 @@
                     out.println("alert('Date introduse incorect sau nu exista date!');");
                     out.println("</script>");
                 } else {
-                    if (rs.getString("tip").compareTo("4") != 0) {
-                        if (rs.getString("tip").compareTo("1") == 0) {
-                            response.sendRedirect("tip1ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("2") == 0) {
-                            response.sendRedirect("tip2ok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("3") == 0) {
-                            response.sendRedirect("sefok.jsp");
-                        }
-                        if (rs.getString("tip").compareTo("0") == 0) {
-                            response.sendRedirect("dashboard.jsp");
-                        }
+                    if (rs.getString("tip").compareTo("4") == 0) {
+                        
+                            response.sendRedirect("adminok.jsp");
+                        
                     } else {
                         int id = rs.getInt("id");
                         String prenume = rs.getString("prenume");
@@ -341,7 +332,7 @@
                             outFields: ["*"],
                             maxLocations: 1
                         };
-const cv =  new URLSearchParams(window.location.search).get("id");
+const cv =  new URLSearchParams(window.location.search).get("idcon");
                         const results = await locator.addressToLocations(locatorUrl, params);
 
                         if (results.length > 0) {
@@ -372,7 +363,7 @@ const cv =  new URLSearchParams(window.location.search).get("id");
                             });
 
                             const requestBody = {
-                            		userId: cv,
+                            		id_con: cv,
                                 strada: street,
                                 nr: number,
                                 cod: code,
@@ -383,7 +374,7 @@ const cv =  new URLSearchParams(window.location.search).get("id");
                                 longitudine: location.longitude
                             };
 
-                            const response = await fetch("/Proiect/locatiee", {
+                            const response = await  fetch("/Proiect/AddLeaveLocation", {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
@@ -419,17 +410,9 @@ const cv =  new URLSearchParams(window.location.search).get("id");
                 out.println("alert('Eroare la baza de date!');");
                 out.println("alert('" + e.getMessage() + "');");
                 out.println("</script>");
-                if (currentUser.getTip() == 1) {
-                    response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
-                    response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
-                    response.sendRedirect("sefok.jsp");
-                }
-                if (currentUser.getTip() == 0) {
-                    response.sendRedirect("dashboard.jsp");
+               
+                if (currentUser.getTip() == 4) {
+                    response.sendRedirect("adminok.jsp");
                 }
                 e.printStackTrace();
             }

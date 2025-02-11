@@ -93,21 +93,26 @@ userId = id;
         }
     </style>
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+<body style="position: fixed; top: 0; left: 0; --bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
 
-<div class="container" style="background: <%=clr%>; color: <%=text%>;">
-    <div class="login__content" style="justify-content: center; border-radius: 2rem; border-color: <%=sidebar%>; background: <%=clr%>;">
+<div class="container" style="position: fixed; top: 0; left: 0; background: <%=clr%>; color: <%=text%>;">
+    <div class="login__content" style="position: fixed; top: 0; left: 0; justify-content: center; border-radius: 2rem; border-color: <%=sidebar%>; background: <%=clr%>;">
         <div align='center'>
             
             <form style="background:  <%=sidebar%>; border-color: <%=sidebar%>;" action="<%=request.getContextPath()%>/ModifPasdServlet" method='post' class='login__form'>
             <h1 style="color: <%=accent%>;">Modificare parola</h1>
                 <input type='hidden' name='id' value='<%=userId%>' />
                 <table style='width: 80%'>
-                    <tr>
-                        <td style="color:  <%=text%>;">Parola noua:</td>
-                        <td><input style="background:  <%=clr%>; color: <%=text%>; border-color: <%=accent%>;" type='password' name='password' placeholder="Introduceti parola" required class='login__input'/></td>
-                    </tr>
+                   
+                      <div>
+                                   
+                                <div class="login__box">
+                                    <input style="color: <%=text%>; background:  <%=sidebar%>; border-color: <%=accent%>;" type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass" name="password">
+                                    <i class="ri-eye-off-line login__eye" id="input-icon"></i>
+                                    
+                                </div>
+            </div>
                     <tr><td>  <a style="color:  <%=accent%>;" href='modifdel.jsp' class='login__forgot'>Inapoi</a></td></tr>
                     <tr>
                   
@@ -136,5 +141,6 @@ userId = id;
     - literele alaturate sa nu fie egale sau una dupa <br>cealalta, inclusiv diacriticele
 <% } %>
 
+<script src="./responsive-login-form-main/assets/js/main.js"></script>
 </body>
 </html>

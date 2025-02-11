@@ -86,11 +86,11 @@
     </style>
 </head>
 <%
-    HttpSession sess = request.getSession(false); // Make sure you have the correct import for HttpSession
+    HttpSession sess = request.getSession(false); 
+int id = 0;
     if (sess != null) {
-        String username = (String) sess.getAttribute("username"); // Assuming username is stored in session
+        String username = (String) sess.getAttribute("username"); 
         
-        // Check if the username is actually retrieved from the session
         if (username != null && !username.isEmpty()) {
         	  Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
               try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
@@ -102,16 +102,15 @@
                       out.println("alert('Date duse incorect sau nu exista date!');");
                       out.println("</script>");
                   } else {
-                      
-                      	int id = rs.getInt("id");
-                      	String accent = null;
-                     	 String clr = null;
-                     	 String sidebar = null;
-                     	 String text = null;
-                     	 String card = null;
-                     	 String hover = null;
+                      	
+                      	id = rs.getInt("id");
+                      	 String accent = "#03346E";
+                     	 String clr = "#d8d9e1";
+                     	 String sidebar = "#ECEDFA";
+                     	 String text = "#333";
+                     	 String card = "#ECEDFA";
+                     	 String hover = "#ECEDFA";
                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                            // Check for upcoming leaves in 3 days
                             String query = "SELECT * from teme where id_usr = ?";
                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                                 stmt.setInt(1, id);
@@ -126,13 +125,8 @@
                                     }
                                 }
                             }
-                            
-                           
-                            // Display the user dashboard or related information
-                            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                            // Add additional user-specific content here
                         } catch (SQLException e) {
-                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            out.println("<script>alert('Eroare la cautarea temei de culoare\nEroare la baza de date: " + e.getMessage() + "');</script>");
                             e.printStackTrace();
                         }
         	%>
@@ -155,7 +149,8 @@
                              <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Cod</label>
                              <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
                          </div>
-                        
+                        <input type="hidden" name='id' value=<%=id %>/>
+                         
                        
                          <div class="login__buttons">
                              <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
@@ -170,9 +165,12 @@
 </html>
         	<%
                   }
+                  } catch (Exception e) {
+                      out.println("<script>alert('Ooof, ceva nu a mers bine =((');</script>");
+                      e.printStackTrace();
                   }
         } else {
-            // If username is not in session, redirect to login
+            
             String accent = "#03346E";
                      	 String clr = "#d8d9e1";
                      	 String sidebar = "#ECEDFA";

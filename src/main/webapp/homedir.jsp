@@ -69,6 +69,7 @@
                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                             e.printStackTrace();
                         }
+                        
                         %>
 <html>
 <head>
@@ -275,6 +276,8 @@
                     response.sendRedirect("sefok.jsp");
                 } else if (currentUser.getTip() == 0) {
                     response.sendRedirect("dashboard.jsp");
+                }  else if (currentUser.getTip() == 4) {
+                    response.sendRedirect("homeadmin.jsp");
                 }
                 e.printStackTrace();
             }

@@ -14,6 +14,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class ModifPasdServlet extends HttpServlet {
     /**
 	 * 
@@ -96,12 +98,35 @@ public class ModifPasdServlet extends HttpServlet {
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
 			    out.println("alert('Nume de utilizator introdus gresit!');");
-			    out.println("window.location.href = 'forgotpass.jsp';");
+			    out.println("window.location.href = 'modifdel.jsp';");
 			    out.println("</script>");
 			    out.close();
         	return;
         }
 
+        // Obțin parola veche (hash-ul din baza de date)
+        String oldHashedPassword = fetchPasswdById(id);
+        if (oldHashedPassword == null) {
+        	PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('Nu s-a putut obtine parola veche!');");
+		    out.println("window.location.href = 'modifdel.jsp';");
+		    out.println("</script>");
+		    out.close();
+            return;
+        }
+
+        // Compar parola nouă cu cea veche folosind BCrypt.checkpw()
+        if (BCrypt.checkpw(password, oldHashedPassword)) {
+        	PrintWriter out = response.getWriter();
+		    out.println("<script type='text/javascript'>");
+		    out.println("alert('E aceeasi parola!');");
+		    out.println("window.location.href = 'modifdel.jsp';");
+		    out.println("</script>");
+		    out.close();
+    	return;
+        }
+        
         // Update password in database
         try {
             employeeDao.registerEmployee(password, username);
@@ -117,7 +142,7 @@ public class ModifPasdServlet extends HttpServlet {
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
 		    out.println("alert('Nu s-a putut modifica din motive necunoscute.');");
-		    out.println("window.location.href = 'forgotpass.jsp';");
+		    out.println("window.location.href = 'modifdel.jsp';");
 		    out.println("</script>");
 		    out.close();
 			e.printStackTrace();
@@ -142,4 +167,24 @@ public class ModifPasdServlet extends HttpServlet {
         }
         return username;
     }
+    
+    private String fetchPasswdById(int userId) {
+        String pass = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT password FROM useri WHERE id = ?")) {
+                preparedStatement.setInt(1, userId);
+                try (ResultSet rs = preparedStatement.executeQuery()) {
+                    if (rs.next()) {
+                        pass = rs.getString("password");
+                    }
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return pass;
+    }
+    
 }

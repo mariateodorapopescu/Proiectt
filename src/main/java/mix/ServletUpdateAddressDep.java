@@ -44,7 +44,7 @@ public class ServletUpdateAddressDep extends HttpServlet {
         }
 
         // Extrage parametrii din JSON
-        int idDep = json.optInt("id_dep");
+        int idDep = json.optInt("idDep");
         String strada = json.optString("strada", "");
         double latitudine = json.optDouble("latitudine");
         double longitudine = json.optDouble("longitudine");

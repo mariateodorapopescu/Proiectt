@@ -78,121 +78,187 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
    
     <!-- JavaScript -->
-  <script src="https://js.arcgis.com/4.30/"></script>
     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-
-    <style>
-         html,
-    body,
-    #viewDiv {
-      padding: 0;
-      margin: 0;
-      height: 100%;
-      width: 100%;
-    }
-
-.container {
-    padding-top: 120px; /* Adjust as needed */
+ 
+ <style>
+     @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+    
+     :root{
+     /*========== culori de baza ==========*/
+      --first-color: #2a2a2a;
+	  --second-color: hsl(249, 64%, 47%);
+	  /*========== cuulori text ==========*/
+	  --title-color-light: hsl(244, 12%, 12%);
+	  --text-color-light: hsl(244, 4%, 36%);
+	  --title-color-dark: hsl(0, 0%, 95%);
+	  --text-color-dark: hsl(0, 0%, 80%);
+	  /*========== cuulori corp ==========*/
+	  --body-color-light: hsl(208, 97%, 85%);
+	  --body-color-dark: #1a1a1a;
+	  --form-bg-color-light: hsla(244, 16%, 92%, 0.6);
+	  --form-border-color-light: hsla(244, 16%, 92%, 0.75);
+	  --form-bg-color-dark: #333;
+	  --form-border-color-dark: #3a3a3a;
+	  /*========== Font ==========*/
+	  --body-font: "Poppins", sans-serif;
+	  --h2-font-size: 1.25rem;
+	  --small-font-size: .813rem;
+	  --smaller-font-size: .75rem;
+	  --font-medium: 500;
+	  --font-semi-bold: 600;
+	 }
+	 
+	 * {
+	    margin: 0;
+	    padding: 0;
+	    box-sizing: border-box;
+	    font-family: 'Poppins', sans-serif;
+		}
+		        
+	::placeholder {
+	  color: var(--text);
+	  opacity: 1; /* Firefox */
+	}
+	
+	::-ms-input-placeholder { /* Edge 12-18 */
+	  color: var(--text);
+	}
      
-}
-      
-/* Hover Effect on Date Buttons */
-.pika-button:hover, .pika-button:active {
-    background: <%=accent%>;
-    color: #fff; /* White text for hover */
-}
-
-/* Styling for the navigation header */
-.pika-label {
-    color: <%=accent%>; /* Light grey color for the month and year */
-    font-size: 16px; /* Larger font size */
-    background: <%=sidebar%>;
-}
-
-/* Navigation buttons */
-.pika-prev, .pika-next {
-    cursor: pointer;
-    color: <%=text%>;
-    background: <%=sidebar%>;
-    border: none;
-}
-
-/* Table cells */
-.pika-button {
-    border: none; /* Remove default borders */
-    padding: 5px; /* Padding for the date numbers */
-    color: <%=text%>; /* Default date color */
-    background: <%=sidebar%>;
-}
-
-/* Hover effect on date cells */
-.pika-button:hover {
-    background: <%=clr%>; /* Darker background on hover */
-    color: <%=text%>; /* White text on hover */
-}
-
-/* Special styles for today */
-.pika-single .is-today .pika-button {
-    color: <%=accent%>; /* Green color for today's date */
-    font-weight: bold; /* Make it bold */
-}
-
-/* Styles for the selected date */
-.pika-single .is-selected .pika-button {
-    background: <%=accent%>; /* Bright color for selection */
-    color: #fff; /* White text for selected date */
-}
-
-/* Weekday labels */
-.pika-weekday {
-    /* color: #aaa; */ /* Light gray for weekdays */
-    font-weight: normal;
-}
-
-/* Styling for the Selected Date */
-.pika-single .is-selected {
-    background: <%=accent%>;
-    color: #fff; /* White text for selected date */
-}
-
-/* Styling for Today's Date */
-.pika-single .is-today {
-    border: 2px solid <%=accent%> /* White border for today */
-    color: <%=accent%> /* White text for today */
-}
-.pika-title {
-    background: <%=sidebar%>; /* Darker shade for the header */
-    color: <%=accent%>; /* White text for clarity */
-    text-align: center; /* Center the month and year */
-    padding: 5px 0; /* Padding for better spacing */
-    border-top-left-radius: 8px; /* Rounded corners at the top */
-    border-top-right-radius: 8px;
-}
-/* If you use dropdowns for month/year selection, style them too */
-.pika-month, .pika-year {
-    color: <%=accent%>; /* Matching text color */
-    background: <%=sidebar%>; /* Transparent background to blend in with the header */
-    border: none; /* Remove borders for a cleaner look */
-}
-.pika-single {
-    background: <%=sidebar%>; /* Change to your desired color */
-    border-radius: 1rem;
-}
-
-table.picka-table tr {
-    background-color: <%=accent%>; /* Golden color for the header */
-}
-
-
-.pika-single .pika-week {
-    background:  <%=clr%>; /* Change week numbers background */
-}
-  </style>
+     input[type="date"] {
+     background-color: <%=accent%>; 
+	    color: <%=accent%>; 
+	    border: 2px solid <%=accent%>; 
+	}
+	
+	.pika-single {
+	    background-color: <%=sidebar%>;
+	    color: <%=text%>;
+	}
+	
+	input[type="date"]:focus {
+	    border-color: <%=accent%>; 
+	    box-shadow: 0 0 8px 0 <%=accent%>; 
+	}
+	       
+    .flex-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 2rem;
+        margin: 2rem;
+    }
+    
+    .calendar-container, .form-container {
+        background-color: #2a2a2a;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .calendar-container {
+        max-width: 300px;
+    }
+    
+     th.calendar, td.calendar {
+        border: 1px solid #1a1a1a;
+        text-align: center;
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    th.calendar {
+        background-color: #333;
+    }
+    
+    .highlight {
+        color: white;
+    }
+	    
+	.pika-button:hover, .pika-button:active {
+	    background: <%=accent%>;
+	    color: #fff; 
+	}
+	
+	.pika-label {
+	    color: <%=accent%>;
+	    font-size: 16px;
+	    background: <%=sidebar%>;
+	}
+	
+	.pika-prev, .pika-next {
+	    cursor: pointer;
+	    color: <%=text%>;
+	    background: <%=sidebar%>;
+	    border: none;
+	}
+	
+	.pika-button {
+	    border: none;
+	    padding: 5px; 
+	    color: <%=text%>;
+	    background: <%=sidebar%>;
+	}
+	
+	.pika-button:hover {
+	    background: <%=clr%>;
+	    color: <%=text%>; 
+	}
+	
+	.pika-single .is-today .pika-button {
+	    color: <%=accent%>;
+	    font-weight: bold;
+	}
+	
+	.pika-single .is-selected .pika-button {
+	    background: <%=accent%>; 
+	    color: #fff; 
+	}
+	
+	.pika-weekday {
+	    font-weight: normal;
+	}
+	
+	.pika-single .is-selected {
+	    background: <%=accent%>;
+	    color: #fff; 
+	}
+	
+	.pika-single .is-today {
+	    border: 2px solid <%=accent%> ;
+	    color: <%=accent%>;
+	}
+	.pika-title {
+	    background: <%=sidebar%>; 
+	    color: <%=accent%>; 
+	    text-align: center; 
+	    padding: 5px 0; 
+	    border-top-left-radius: 8px; 
+	    border-top-right-radius: 8px;
+	}
+	
+	.pika-month, .pika-year {
+	    color: <%=accent%>; 
+	    background: <%=sidebar%>; 
+	    border: none; 
+	}
+	
+	.pika-single {
+	    background: <%=sidebar%>; 
+	    border-radius: 1rem;
+	}
+	
+	table.picka-table tr {
+	    background-color: <%=accent%>; 
+	}
+	
+	.pika-single .pika-week {
+	    background:  <%=clr%>; 
+	}
+    </style>
 </head>
-<body style="position: relative; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; --bg:<%=accent%>; --clr:<%=clr%>; --sd:<%=sidebar%>; --text:<%=text%>; background:<%=clr%>">
+<body style="--bg:<%=accent%>; --clr:<%=clr%>; --sd:<%=sidebar%>; --text:<%=text%>; background:<%=clr%>">
     <div class="container">
-        <div class="login__content" style="border-radius: 2rem; background:<%=clr%>; color:<%=clr%>">
+        <div class="login__content" style="position: fixed; top: 0; left: 0; border-radius: 2rem; padding: 0; padding-left: 1rem; padding-right: 1rem; margin: 0; border-radius: 2rem; background:<%=clr%>; color:<%=clr%>">
             <form action="<%= request.getContextPath() %>/register" method="post" class="login__form" style="background:<%=sidebar%>; color:<%=clr%>; border-color: <%=clr%>">
                 <div>
                     <h1 class="login__title">
@@ -213,13 +279,13 @@ table.picka-table tr {
                     <div>
                         <label style=" color:<%out.println(text);%>" for="" class="login__label">Data nasterii</label>
                                                            
-    <input type="hidden" id="start-hidden" name="data_nasterii">
-                                            <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" id="start" name="data_nasterii" value="2001-07-22" min="1954-01-01" max="2036-12-31" class="login__input">
+    <input type="date" id="start-hidden" name="data_nasterii" value="2001-07-22" min="1954-01-01" max="2036-12-31" class="login__input" style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+
                     </div>
                     
                    <div>
                         <label style=" color:<%out.println(text);%>" for="" class="login__label">Pozitie</label>
-                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="adresa" class="login__input" required>
+                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="pozitie" class="login__input" required>
                             <%
                             try {
                                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
@@ -254,22 +320,12 @@ table.picka-table tr {
                         <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="email" placeholder="Introduceti e-mailul" required class="login__input">
                     </div>
 					
-                    
                 </div></td>              
                 
                 <td>
                 
                 <div class="form__section" style="margin:0; top:-10px;">
-                    <div>
-                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Nume de utilizator</label>
-                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
-                    </div>
-
-                    <div>
-                        <label style=" color:<%out.println(text);%>" for="" class="login__label">Parola</label>
-                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="password" name="password" placeholder="Introduceti parola" required class="login__input">
-                    </div>
-               
+                    
                     <div>
                         <label style=" color:<%out.println(text);%>" for="" class="login__label">Departament</label>
                         <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="departament" class="login__input" required>
@@ -304,7 +360,7 @@ table.picka-table tr {
 
                     <div>
                         <label style=" color:<%out.println(text);%>" for="" class="login__label">Rang</label>
-                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="tip" class="login__input">
+                        <select style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" name="rang" class="login__input">
                             <%
                             try {
                                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
@@ -333,6 +389,10 @@ table.picka-table tr {
                         <label style=" color:<%out.println(text);%>" for="" class="login__label">Telefon</label>
                         <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="telefon" placeholder="Introduceti telefonul" required class="login__input">
                     </div>
+                     <div>
+                        <label style=" color:<%out.println(text);%>" for="" class="login__label">CNP</label>
+                        <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" name="cnp" placeholder="Introduceti codul numeric personal" required class="login__input">
+                    </div>
                     
                 </div>
                  
@@ -348,10 +408,6 @@ table.picka-table tr {
             
         </div>
     </div>
-     <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
-
 <script>
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -366,11 +422,11 @@ document.addEventListener("DOMContentLoaded", function() {
 	    isRTL: false, // Right-to-left languages
 	    theme: 'current',
 	    i18n: {
-	        previousMonth: 'Luna precedentă',
-	        nextMonth: 'Luna următoare',
-	        months: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
+	        previousMonth: 'Prec.',
+	        nextMonth: 'Urm.',
+	        months: ['Ian.', 'Febr.', 'Mar.', 'Apr.', 'Mai', 'Iun.', 'Iul.', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'],
 	        weekdays: ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
-	        weekdaysShort: ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm']
+	        weekdaysShort: ['Du.', 'Lu.', 'Ma.', 'Mi.', 'Joi', 'Vi.', 'Sâ.']
 	    },
 	    
 	    firstDay: 1,
@@ -379,9 +435,11 @@ document.addEventListener("DOMContentLoaded", function() {
 	        date.setDate(date.getDate() + 1);
 	        // console.log(date); // Check what you get here
 	        if (date) {
-	            var formattedDate = date.toISOString().substring(0, 10);
+	        	  var formattedDate = moment(date).format('YYYY-MM-DD');
+	            // var formattedDate = date.toISOString().substring(0, 10);
 	            console.log(formattedDate); // Ensure format is correct
 	            document.getElementById('start-hidden').value = formattedDate;
+	            document.getElementById('start').value = formattedDate;
 	        } else {
 	            console.error('No date returned from date picker');
 	        }
@@ -407,6 +465,12 @@ document.addEventListener("DOMContentLoaded", function() {
         out.println("- o cifra<br>");
         out.println("- cifrele alaturate sa nu fie egale sau consecutive<br>");
         out.println("- literele alaturate sa nu fie egale sau una dupa <br>cealalta, inclusiv diacriticele");
+    }
+    
+    if ("true".equals(request.getParameter("cnp"))) {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('CNP scris incorect! Verificati log-ul serverului pentru detalii!');");
+        out.println("</script>");
     }
 
     if ("true".equals(request.getParameter("n"))) {
