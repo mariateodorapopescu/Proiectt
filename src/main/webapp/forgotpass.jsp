@@ -3,7 +3,7 @@
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <html>
 <head>
-    <title>Resetare parola</title>
+    <title>Modificare date</title>
      <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
@@ -26,7 +26,7 @@
             background-color: #2a2a2a;
             padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+           
         }
         
         .calendar-container {
@@ -45,7 +45,7 @@
             background-color: var(--bg);
             color: white;
         }
-        :root{
+         :root{
           --first-color: #2a2a2a;
   --second-color: hsl(249, 64%, 47%);
   --title-color-light: hsl(244, 12%, 12%);
@@ -68,101 +68,157 @@
   --font-semi-bold: 600;
         }
         
+        ::placeholder {
+  color: var(--text);
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder { /* Edge 12-18 */
+  color: var(--text);
+}
+         @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
     </style>
 </head>
-<body>
 <%
-    HttpSession sess = request.getSession(false); // Make sure you have the correct import for HttpSession
+    HttpSession sess = request.getSession(false); 
+int id = 0;
     if (sess != null) {
-        String username = (String) sess.getAttribute("username"); // Assuming username is stored in session
-        String redir = "";
-        // Check if the username is actually retrieved from the session
+        String username = (String) sess.getAttribute("username"); 
+        
         if (username != null && !username.isEmpty()) {
-        	 if (request.getParameter("page").compareTo("2") == 0) {
-            	 redir = "/modifpasd2.jsp?page=2";
-            }
-            else {
-           redir = "/modifpasd2.jsp";
-            }
+        	  Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+              try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                   PreparedStatement preparedStatement = connection.prepareStatement("select tip, prenume, id from useri where username = ?")) {
+                  preparedStatement.setString(1, username);
+                  ResultSet rs = preparedStatement.executeQuery();
+                  if (!rs.next()) {
+                      out.println("<script type='text/javascript'>");
+                      out.println("alert('Date puse incorect sau nu exista date!');");
+                      out.println("</script>");
+                  } else {
+                      	
+                      	id = rs.getInt("id");
+                      	 String accent = "#03346E";
+                     	 String clr = "#d8d9e1";
+                     	 String sidebar = "#ECEDFA";
+                     	 String text = "#333";
+                     	 String card = "#ECEDFA";
+                     	 String hover = "#ECEDFA";
+                     	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            String query = "SELECT * from teme where id_usr = ?";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                stmt.setInt(1, id);
+                                try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      accent =  rs2.getString("accent");
+                                      clr =  rs2.getString("clr");
+                                      sidebar =  rs2.getString("sidebar");
+                                      text = rs2.getString("text");
+                                      card =  rs2.getString("card");
+                                      hover = rs2.getString("hover");
+                                    }
+                                }
+                            }
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Eroare la cautarea temei de culoare\nEroare la baza de date: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
         	%>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+
         	 <div class="flex-container">
-            
-             <div class="form-container">
+             
+             <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
           
 
-                 <form action="<%= request.getContextPath() %>/modifpasd2.jsp" method="post" class="login__form">
+                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifpasd2.jsp" method="post" class="login__form">
                      <div>
-                         <h1 class="login__title"><span>Modificare parola</span></h1>
+                         <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Modificare date personale</span></h1>
                          
                      </div>
                      
-                     <div class="login__inputs">
+                     <div style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>" class="login__inputs">
                         
                          <div>
-                             <label class="login__label">Cod</label>
-                             <input type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
+                             <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Cod</label>
+                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
                          </div>
-                          <%  out.println("            <a href=\"about:blank\" class=\"login__forgot\">Inapoi</a>"); %>
+                        <input type="hidden" name='id' value=<%=id %>/>
+                         
                        
                          <div class="login__buttons">
-                             <input type="submit" value="Modificare" class="login__button login__button-ghost">
-                         </div>
+                             <input style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    type="submit" value="Mai departe" class="login__button"></div>
                      </form>
                      <%
                      out.println("</div>");
                      %>
                  </div>
              </div>
-       
-         
+             </body>
+</html>
         	<%
-           
+                  }
+                  } catch (Exception e) {
+                      out.println("<script>alert('Ooof, ceva nu a mers bine =((');</script>");
+                      e.printStackTrace();
+                  }
         } else {
-            // If username is not in session, redirect to login
-            if (request.getParameter("page").compareTo("2") == 0) {
-            	 redir = "/OTP?page=2";
-            }
-            else {
-           redir = "/OTP?page=2";
-            }
-            %>
-        	<div class="flex-container">
             
-            <div class="form-container">
-         
+            String accent = "#03346E";
+                     	 String clr = "#d8d9e1";
+                     	 String sidebar = "#ECEDFA";
+                     	 String text = "#333";
+                     	 String card = "#ECEDFA";
+                     	 String hover = "#ECEDFA";
+            %>
+           <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
 
-               <form action="<%= request.getContextPath() %><%= redir %>" method="post" class="login__form">
+        	 <div style=" background:<%out.println(clr);%>" class="flex-container">
+             
+             <div class="form-container" style="border-color:<%out.println(clr);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>">
+          
+
+                 <form style="border-color:<%out.println(clr);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" action="<%= request.getContextPath() %>/modifpasd2.jsp" method="post" class="login__form">
                      <div>
-                         <h1 class="login__title"><span>Modificare parola</span></h1>
+                         <h1 style=" color:<%out.println(accent);%>" class="login__title"><span style=" color:<%out.println(accent);%>">Modificare date personale</span></h1>
                          
                      </div>
                      
-                     <div class="login__inputs">
+                     <div style="border-color:<%out.println(accent);%>; color:<%out.println(text);%>" class="login__inputs">
                         
                          <div>
-                             <label class="login__label">Nume de utilizator</label>
-                             <input type="text" placeholder="Introduceti numele de utilizator" required class="login__input" name='username'/>
+                             <label style=" color:<%out.println(text);%>" class="login__label" class="login__label">Cod</label>
+                             <input style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" type="text" placeholder="Introduceti codul" required class="login__input" name='cnp'/>
                          </div>
-                          <%  out.println("            <a href=\"about:blank\" class=\"login__forgot\">Inapoi</a>"); %>
+                        
                        
                          <div class="login__buttons">
-                             <input type="submit" value="Modificare" class="login__button login__button-ghost">
-                         </div>
+                         <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" type="submit" value="Inainte" class="login__button">
+                                        </div>
                      </form>
-                    <%
-                    out.println("</div>");
-                    %>
-                </div>
-            </div>
-        </div>
-        <%
+                     <%
+                     out.println("</div>");
+                     %>
+                 </div>
+             </div>
+             </body>
+</html>
+            <%
+
         }
 
     } else {
     	out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("logout");
     }
 %>
 </body>

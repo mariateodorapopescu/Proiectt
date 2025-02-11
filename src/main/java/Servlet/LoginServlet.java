@@ -21,49 +21,48 @@ public class LoginServlet extends HttpServlet {
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     		throws ServletException, IOException {
-    	String username = request.getParameter("username");
-    	String password = request.getParameter("password");
-    	MyUser loginBean = new MyUser();
-    	loginBean.setUsername(username);
-    	loginBean.setPassword(password);
+    	 String username = request.getParameter("username");
+    	    String password = request.getParameter("password");
+    	    MyUser loginBean = new MyUser();
+    	    loginBean.setUsername(username);
+    	    loginBean.setPassword(password);
 
-    	try {
-    	    MyUser validatedUser = loginDao.validate(loginBean);
-    	    if (validatedUser != null) {
-    	        HttpSession session = request.getSession(false); // Get the existing session
-    	        
-    	        
-    	        if (session != null) {
-    	            session.invalidate(); // Invalidate the existing session if it exists
+    	    try {
+    	        MyUser validatedUser = loginDao.validate(loginBean);
+    	        if (validatedUser != null) {
+    	            HttpSession session = request.getSession(false);
+    	            
+    	            if (session != null) {
+    	                session.invalidate();
+    	            }
+    	            session = request.getSession(true);
+    	            session.setAttribute("username", username);
+    	            session.setAttribute("currentUser", validatedUser);
+    	            response.sendRedirect(request.getContextPath() + "/OTP?username=" + username);
+    	        } else {
+    	            // Gestionare încercări de login eșuate
+    	            HttpSession session = request.getSession(true);
+    	            Integer loginAttempts = (Integer) session.getAttribute("loginAttempts");
+    	            
+    	            if (loginAttempts == null) {
+    	                loginAttempts = 1;
+    	            } else {
+    	                loginAttempts++;
+    	            }
+    	            
+    	            session.setAttribute("loginAttempts", loginAttempts);
+    	            
+    	            if (loginAttempts >= 3) {
+    	                // Dacă sunt mai mult de 3 încercări, trimite la pagina de recuperare parolă
+    	                response.sendRedirect("forgotpass.jsp");
+    	            } else {
+    	                // Altfel, întoarce-te la login cu mesaj de eroare
+    	                response.sendRedirect("login.jsp?wup=true&loginAttempts=" + loginAttempts);
+    	            }
     	        }
-    	        session = request.getSession(true); // Create a new session
-    	        // session.setAttribute("currentUser", validatedUser);
-    	        session.setAttribute("username", username); // Store username in session
-    	        session.setAttribute("currentUser", validatedUser);
-    	        // session.setAttribute("username", validatedUser.getUsername());
-    	        // response.sendRedirect("/Proiect/OTP?username=" + username); // Redirect to an intermediary page or dashboard
-    	        // response.sendRedirect(request.getContextPath() + "/OTP?username=" + java.net.URLEncoder.encode(username, "UTF-8")); // Redirect to an intermediary page or dashboard
-    	        response.sendRedirect(request.getContextPath() + "/OTP?username=" + username); // Redirect to an intermediary page or dashboard
-    	    } else {
-    	    	
-    	    	 Integer loginAttempts = (Integer) request.getSession(true).getAttribute("loginAttempts");
-                 if (loginAttempts == null) {
-                     loginAttempts = 1;
-                 } else {
-                     loginAttempts++;
-                 }
-                request.getSession(true).setAttribute("loginAttempts", loginAttempts);
-                if (loginAttempts == 3) {
-     	        	response.sendRedirect("login.jsp?rp=true&loginAttempts=" + loginAttempts);
-     	        } else if (loginAttempts > 7) {
-     	        	response.sendRedirect("forgotpass.jsp"); // Redirect back to the login page with error
-     	        } else if (loginAttempts < 3) {
-     	        	response.sendRedirect("login.jsp?loginAttempts=" + loginAttempts); // Redirect back to the login page with error
-     	        }
-     	        
+    	    } catch (Exception e) {
+    	        // Orice excepție va redirecționa la login cu mesaj de eroare
+    	        response.sendRedirect("login.jsp?wup=true");
     	    }
-    	} catch (Exception e) {
-    	    response.sendRedirect("login.jsp?wup=true"); // Redirect to the login page on exception
-    	}
     }
 }
