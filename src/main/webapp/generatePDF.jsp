@@ -92,7 +92,7 @@
         }
         document.add(table);
     } else {
-        document.add(new Paragraph("⚠️ Nu există date în JSON!").setFont(font).setFontSize(12));
+        document.add(new Paragraph("Nu exista date disponibile!").setFont(font).setFontSize(12));
     }
 
     document.close();
