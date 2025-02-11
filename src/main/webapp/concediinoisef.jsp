@@ -231,14 +231,14 @@
                     <th style="color:white">Nume</th>
                     <th style="color:white">Prenume</th>
                     <th style="color:white">Functie</th>
-                    <th style="color:white">Departament</th>
-                    <th style="color:white">Inceput</th>
+                    <th style="color:white">Dep.</th>
+                    <th style="color:white">Incipit</th>
                     <th style="color:white">Final</th>
                     <th style="color:white">Motiv</th>
                     <th style="color:white">Locatie</th>
                     <th style="color:white">Tip</th>
-                    <th style="color:white">Adaugat</th>
-                    <th style="color:white">Modificat</th>
+                    <th style="color:white">Adaug.</th>
+                    <th style="color:white">Modif.</th>
                      <th style="color:white">Vazut</th>
                     <th style="color:white">Status</th>
                     <!-- Cap tabel de baza -->
@@ -406,8 +406,6 @@
                
                 
                   <button id="generate" onclick="generate()" >Descarcati PDF</button>
-                   <button id="csv" onclick="sendTableDataToCSV()">Descarcati CSV</button>
-                   <button onclick="generateJSONFromTable()">Descarcati un JSON</button>
                   
                
                 <% } %>
@@ -459,13 +457,6 @@
 
 
 <script>
-    function generate() {
-        const element = document.getElementById("content");
-        html2pdf()
-        .from(element)
-        .save();
-    }
-    
     function confirmAction(link, message, id) {
         if(confirm(message)) {
             window.location.href = link; // Redirect user to the link if confirmed
@@ -499,106 +490,77 @@ window.onclick = function(event) {
     }
 }
 </script>
-<script>
- async function sendTableDataToCSV() {
-    const table = document.querySelector("table");
-    const rows = table.querySelectorAll("tbody tr");
 
-    const data = [];
-    rows.forEach((row, index) => {
-        const cells = row.querySelectorAll("td");
-        if (cells.length > 0) {
-            data.push({
-                "NrCrt": cells[0].textContent.trim(),
-                "Nume": cells[1].textContent.trim(),
-                "Prenume": cells[2].textContent.trim(),
-                "Functie": cells[3].textContent.trim(),
-                "Departament": cells[4].textContent.trim(),
-                "Inceput": cells[5].textContent.trim(),
-                "Final": cells[6].textContent.trim(),
-                "Motiv": cells[7].textContent.trim(),
-                "Locatie": cells[8].textContent.trim(),
-                "Tip": cells[9].textContent.trim(),
-                "Adaugat": cells[10].textContent.trim(),
-                "Modificat": cells[11].textContent.trim(),
-                "Vazut": cells[12]?.textContent.trim(),
-                "Status": cells[13]?.textContent.trim()
-            });
-        }
-    });
-
-    console.log("Data being sent to the server:", JSON.stringify(data, null, 2)); // Log data being sent
-
-    try {
-        const response = await fetch("generateCSV1", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            console.log("CSV generation successful");
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "table_data.csv";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } else {
-            console.error("Failed to generate CSV. Response status:", response.status);
-        }
-    } catch (error) {
-        console.error("Error during CSV generation:", error);
-    }
-}
-</script>
         <script>
-    function generateJSONFromTable() {
-        // Get the table
-        const table = document.querySelector("table");
-        const rows = table.querySelectorAll("tbody tr");
+        async function generateJSONForPDF() {
+            const table = document.querySelector("table");
+            const headers = Array.from(table.querySelectorAll("thead th"))
+                .filter(th => {
+                    const text = th.textContent.trim().toLowerCase();
+                    return !text.includes("aprobati") && 
+                           !text.includes("respingeti") && 
+                           !text.includes("localizare") && 
+                           !text.includes("modificati") && 
+                           !text.includes("stergeti");
+                })
+                .map(th => 
+                    th.textContent.trim()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/\s+/g, '')
+                );
 
-        // Extract table data into a JSON array
-        const data = [];
-        rows.forEach((row, index) => {
-            const cells = row.querySelectorAll("td");
-            if (cells.length > 0) { // Ignore rows with no data
-                data.push({
-                	 "NrCrt": cells[0].textContent.trim(),
-                     "Nume": cells[1].textContent.trim(),
-                     "Prenume": cells[2].textContent.trim(),
-                     "Functie": cells[3].textContent.trim(),
-                     "Departament": cells[4].textContent.trim(),
-                     "Inceput": cells[5].textContent.trim(),
-                     "Final": cells[6].textContent.trim(),
-                     "Motiv": cells[7].textContent.trim(),
-                     "Locatie": cells[8].textContent.trim(),
-                     "Tip": cells[9].textContent.trim(),
-                     "Adaugat": cells[10].textContent.trim(),
-                     "Modificat": cells[11].textContent.trim(),
-                     "Vazut": cells[12].textContent.trim(),
-                     "Status": cells[13].textContent.trim()
+            const rows = table.querySelectorAll("tbody tr");
+
+            const data = Array.from(rows).map(row => {
+                const cells = row.querySelectorAll("td");
+                const rowData = {};
+
+                headers.forEach((header, index) => {
+                    // Convertim headerul într-un key valid pentru JSON
+                    rowData[header] = cells[index] ? cells[index].textContent.trim() : 'N/A';
                 });
+
+                return rowData;
+            });
+
+            const jsonData = {
+                data: data,
+                today: new Date().toLocaleDateString('ro-RO'),
+                header: document.querySelector('h1').textContent
+            };
+
+            console.log("JSON generat pentru PDF:", JSON.stringify(jsonData, null, 2));
+
+            try {
+                const response = await fetch("generatePDF.jsp", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                if (!response.ok) {
+                    throw new Error("Eroare la generarea PDF: " + response.statusText);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "Raport_Concedii.pdf";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error("Eroare la generare PDF:", error);
+                alert("A apărut o eroare la generarea PDF-ului!");
             }
-        });
+        }
 
-        // Convert JSON array to string
-        const jsonString = JSON.stringify(data, null, 2); // Pretty print JSON
-
-        // Create a Blob and trigger a download
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "table_data.json";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
+        // Înlocuiți butonul existent cu această nouă funcție
+        document.getElementById('generate').onclick = generateJSONForPDF;
 </script>
 </body>
 </html>

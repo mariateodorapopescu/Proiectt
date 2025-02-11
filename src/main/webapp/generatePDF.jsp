@@ -42,7 +42,7 @@
 
  // 📌 Formatăm data și ora în numele fișierului
     String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-    String fileName = "Raport_" + timestamp + ".pdf";
+    String fileName = "raport" + timestamp + ".pdf";
 
     System.out.println("📂 PDF generat cu numele: " + fileName); // Debugging în consolă
 
