@@ -1,12 +1,101 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+
+ <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
+      
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="bean.MyUser" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+
+//structura unei pagini este astfel
+//verificare daca exista sesiune activa, utilizator conectat, 
+//extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
+//se mai extrag temele de culoare ale fiecarui utilizator
+//apoi se incarca pagina in sine
+
+    HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
+        if (currentUser != null) {
+            String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	// extrag date despre userul curent
+                    int id = rs.getInt("id");
+                    int userType = rs.getInt("tip");
+                    int userdep = rs.getInt("id_dep");
+                    if (userType != 4) {  
+                    	// aflu data curenta, tot ca o interogare bd =(
+                    	String today = "";
+                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                               try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      today =  rs2.getString("today");
+                                    }
+                                }
+                            }
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
+                   	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                   	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                  	 String clr = "#d8d9e1";
+                  	 String sidebar = "#ECEDFA";
+                  	 String text = "#333";
+                  	 String card = "#ECEDFA";
+                  	 String hover = "#ECEDFA";
+                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                         String query = "SELECT * from teme where id_usr = ?";
+                         try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                             stmt.setInt(1, id);
+                             try (ResultSet rs2 = stmt.executeQuery()) {
+                                 if (rs2.next()) {
+                                   accent =  rs2.getString("accent");
+                                   clr =  rs2.getString("clr");
+                                   sidebar =  rs2.getString("sidebar");
+                                   text = rs2.getString("text");
+                                   card =  rs2.getString("card");
+                                   hover = rs2.getString("hover");
+                                 }
+                             }
+                         }
+                    } catch (SQLException e) {
+                         out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                         e.printStackTrace();
+                     }
+                    	%>
+         
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Harta Concedii</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
+     <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
+ 
     <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
     <script src="https://js.arcgis.com/4.30/"></script>
+    <!--=============== icon ===============-->
+    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <!--=============== titlu ===============-->
+    <title>Localizare atractii turistice</title>
+    
     <style>
         html, body, #viewDiv {
             padding: 0;
@@ -51,15 +140,23 @@
 </head>
 <body>
     <div id="viewDiv"></div>
-    <div class="sidebar">
-         
-        <label for="locationSelect">Departament</label>
-        <select id="locationSelect"></select>
+     <div class="form-container" style="position: fixed; top: 80px; left: 20px; z-index: 100; padding: 15px; background:<%=sidebar%>; color:<%=clr%>; border-color: <%=clr%>">
+        <label style="color:<%out.println(text);%>" class="login__label" for="locationSelect">Departament</label>
+        <select style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+        border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" id="locationSelect"></select>
         
-        <button id="locateMeBtn">Localizează-mă</button>
-        <button id="generateRouteBtn">Generează rută</button>
-        <button id="resetBtn">Resetează harta</button>
+       <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="locateMeBtn">Localizare</button>
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="generateRouteBtn">Generare rută</button>
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="resetBtn">Resetare harta</button>
     </div>
+
     <div id="loadingSpinner">
         <p>Se încarcă...</p>
     </div>
@@ -113,17 +210,18 @@
                 const loadingSpinner = document.getElementById("loadingSpinner");
 
                 let currentLocation = null;
+                var accentColor = "<%= accent %>"; // Păstrați valoarea culorii într-o variabilă JavaScript
 
-                // 1. Încărcăm lista de departamente din servletul locactdep
+                // 1. Încărcăm lista de departamente din servlet
                fetch("locactacs")
   .then(response => response.json())
   .then(data => {
-    locationSelect.innerHTML = '<option value="" disabled selected>Selectează departamentul</option>';
+    locationSelect.innerHTML = '<option value="" disabled selected>Selectează o locatie</option>';
 
     data.forEach(dep => {
       const option = document.createElement("option");
-      option.value = dep.id_dep;         // "1", "2", etc.
-      option.textContent = dep.nume_dep; // "IT", "HR", etc.
+      option.value = dep.id;        
+      option.textContent = dep.nume;
 
       // stocăm lat / lon ca atribute custom
       option.setAttribute("data-lat", dep.latitude);
@@ -133,7 +231,6 @@
     });
   })
   .catch(error => console.error("Eroare la încărcarea departamentelor:", error));
-
 
                 // 2. Localizeaza-ma
                 locateMeBtn.addEventListener("click", function () {
@@ -152,7 +249,7 @@
                                     geometry: currentLocation,
                                     symbol: {
                                         type: "simple-marker",
-                                        color: "green",
+                                        color: accentColor,
                                         size: "12px"
                                     }
                                 });
@@ -177,13 +274,13 @@
                 // 3. Generează rută
                generateRouteBtn.addEventListener("click", function () {
   if (!currentLocation) {
-    alert("Te rog să te localizezi mai întâi.");
+    alert("Rog localizare mai întâi.");
     return;
   }
 
   const selectedOption = locationSelect.options[locationSelect.selectedIndex];
   if (!selectedOption.value) {
-    alert("Selectează un departament!");
+    alert("Selectati o locatie!");
     return;
   }
 
@@ -196,13 +293,13 @@
     longitude: lon,
     latitude: lat
   });
-
+  
   // Marchezi grafic pe hartă
   const destinationGraphic = new Graphic({
     geometry: destinationPoint,
     symbol: {
       type: "simple-marker",
-      color: "red",
+      color: accentColor,
       size: "12px"
     }
   });
@@ -224,7 +321,7 @@
       data.routeResults.forEach(function (result) {
         result.route.symbol = {
           type: "simple-line",
-          color: [0, 0, 255],
+          color: accentColor,
           width: 4
         };
         view.graphics.add(result.route);
@@ -241,7 +338,7 @@
                                 geometry: destinationPoint,
                                 symbol: {
                                     type: "simple-marker",
-                                    color: "red",
+                                    color: accentColor,
                                     size: "12px"
                                 }
                             });
@@ -264,7 +361,7 @@
                                     data.routeResults.forEach(function (result) {
                                         result.route.symbol = {
                                             type: "simple-line",
-                                            color: [0, 0, 255],
+                                            color: accentColor,
                                             width: 4
                                         };
                                         view.graphics.add(result.route);
@@ -291,7 +388,7 @@
                                     console.error("Eroare la generarea rutei:", error);
                                 });
                         } else {
-                            alert("Nu s-au găsit coordonatele pentru departamentul selectat.");
+                            alert("Nu s-au găsit coordonatele pentru locatia selectata.");
                         }
                     }).catch(function (error) {
                         loadingSpinner.style.display = "none";
@@ -308,5 +405,41 @@
             });
         });
     </script>
+  <%
+                    }
+                }
+            } catch (Exception e) {
+                out.println("<script type='text/javascript'>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("alert('" + e.getMessage() + "');");
+                out.println("</script>");
+                if (currentUser.getTip() == 1) {
+                    response.sendRedirect("tip1ok.jsp");
+                }
+                if (currentUser.getTip() == 2) {
+                    response.sendRedirect("tip2ok.jsp");
+                }
+                if (currentUser.getTip() == 3) {
+                    response.sendRedirect("sefok.jsp");
+                }
+                if (currentUser.getTip() == 0) {
+                    response.sendRedirect("dashboard.jsp");
+                }
+                e.printStackTrace();
+            }
+        } else {
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Utilizator neconectat!');");
+            out.println("</script>");
+            response.sendRedirect("login.jsp");
+        }
+    } else {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
+    }
+%>
 </body>
-</html>
+</html> 
+

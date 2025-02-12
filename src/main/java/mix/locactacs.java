@@ -42,37 +42,36 @@ public class locactacs extends HttpServlet {
             );
 
             // 2. Scriu interogarea
-            String query = "SELECT u.id, concat(u.nume, ' ', u.prenume) as nume, l.longitudine, l.latitudine " +
-                           "FROM useri u " +
-                           "JOIN locatii_useri l ON u.id = l.id_user ";
+            String query = "SELECT l.id_locatie as id, l.nume, l.longitudine, l.latitudine " +
+                           "FROM locatii_atractii l;";
 
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 
             // 3. Construiesc un JSONArray cu informații despre departamente
-            JSONArray departments = new JSONArray();
+            JSONArray locatii = new JSONArray();
 
             while (resultSet.next()) {
                 // Creez un obiect JSON pentru fiecare rând
-                JSONObject department = new JSONObject();
-                department.put("id_dep", resultSet.getInt("id"));
-                department.put("nume_dep", resultSet.getString("nume"));
-                department.put("longitude", resultSet.getDouble("longitudine"));
-                department.put("latitude", resultSet.getDouble("latitudine"));
+                JSONObject locatie = new JSONObject();
+                locatie.put("id", resultSet.getString("id"));
+                locatie.put("nume", resultSet.getString("nume"));
+                locatie.put("longitude", resultSet.getDouble("longitudine"));
+                locatie.put("latitude", resultSet.getDouble("latitudine"));
 
                 // Adaug obiectul în JSONArray
-                departments.put(department);
+                locatii.put(locatie);
             }
 
             // 4. Trimit răspunsul JSON
-            out.print(departments.toString());
+            out.print(locatii.toString());
             out.flush();
 
         } catch (Exception e) {
             // În caz de eroare, loghez și returnez un mesaj
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"error\": \"Eroare la încărcarea departamentelor\"}");
+            out.print("{\"error\": \"Eroare la încărcarea atractiilor turistice\"}");
         } finally {
             // 5. Închid resursele
             try {
