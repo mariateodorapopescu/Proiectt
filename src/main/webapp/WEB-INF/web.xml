@@ -531,4 +531,14 @@
     <servlet-name>generateCSV1</servlet-name>
     <url-pattern>/generateCSV1</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>locactacss</display-name>
+    <servlet-name>locactacss</servlet-name>
+    <servlet-class>mix.locactacss</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>locactacss</servlet-name>
+    <url-pattern>/locactacss</url-pattern>
+  </servlet-mapping>
 </web-app>

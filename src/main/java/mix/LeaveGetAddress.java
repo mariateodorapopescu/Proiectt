@@ -29,6 +29,7 @@ public class LeaveGetAddress extends HttpServlet {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
+        String id = request.getParameter("id");
 
         try {
             // Conectare la baza de date
@@ -37,7 +38,10 @@ public class LeaveGetAddress extends HttpServlet {
 
             // Interogare pentru a obține localitățile unice din tabelul locatii_useri
             //String query = "SELECT DISTINCT oras FROM locatii_concedii";
-            String query = "SELECT DISTINCT oras, judet FROM locatii_useri ORDER BY oras";
+            String query = "SELECT DISTINCT l.oras, l.judet FROM locatii_useri l " +
+            		"join useri u on u.id=l.id_user " +
+            		"where u.id_dep = " + id + " " + 
+            		"ORDER BY l.oras;";
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 

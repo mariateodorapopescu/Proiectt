@@ -278,7 +278,7 @@
                     container: "viewDiv",
                     map: map
                 });
-
+                var accentColor = "<%= accent %>"; // Păstrați valoarea culorii într-o variabilă JavaScript
                 view.when(() => {
                     console.log("Harta s-a incarcat");
                     
@@ -303,7 +303,7 @@
                     			      geometry: point,
                     			      symbol: {
                     			        type: "simple-marker",
-                    			        color: "red",
+                    			        color: accentColor,
                     			        size: "12px"
                     			      }
                     			    });
@@ -356,7 +356,7 @@ const cv =  new URLSearchParams(window.location.search).get("id");
                                 },
                                 symbol: {
                                     type: "simple-marker",
-                                    color: [0, 0, 255],
+                                    color: accentColor,
                                     size: "12px",
                                     outline: {
                                         color: [255, 255, 255],

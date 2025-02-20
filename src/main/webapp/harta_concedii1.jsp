@@ -157,6 +157,10 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
         <button style="
 display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
          box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="resetBtn">Resetare harta</button>
+          <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="resetBtn"><a style="color: white; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">< Inapoi</a></button>
+    
     </div>
 
     <div id="loadingSpinner">
@@ -200,7 +204,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                     center: [25, 45], 
                     zoom: 6
                 });
-
+                var accentColor = "<%= accent %>"; // Păstrați valoarea culorii într-o variabilă JavaScript
                 const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
                 const locateMeBtn = document.getElementById("locateMeBtn");
@@ -229,42 +233,44 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                     .catch(error => console.error("Eroare la încărcarea departamentelor:", error));
 
                 // View department functionality
-                viewDepartmentBtn.addEventListener("click", function() {
-                    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
-                    if (!selectedOption.value) {
-                        alert("Selectează un departament!");
-                        return;
-                    }
+                viewDepartmentBtn.addEventListener("change", function () {
+                        const selectedOption = this.options[this.selectedIndex];
 
-                    const lat = parseFloat(selectedOption.getAttribute("data-lat"));
-                    const lon = parseFloat(selectedOption.getAttribute("data-lon"));
-                    
-                    view.graphics.removeAll();
-                    
-                    const departmentPoint = new Point({
-                        longitude: lon,
-                        latitude: lat
-                    });
+                        if (selectedOption.value) {
+                            // Citește coordonatele lat/lon din opțiunea selectată
+                            const lat = parseFloat(selectedOption.getAttribute("data-lat"));
+                            const lon = parseFloat(selectedOption.getAttribute("data-lon"));
 
-                    const departmentGraphic = new Graphic({
-                        geometry: departmentPoint,
-                        symbol: {
-                            type: "simple-marker",
-                            color: "red",
-                            size: "12px"
-                        },
-                        popupTemplate: {
-                            title: selectedOption.textContent,
-                            content: `Latitude: ${lat}<br>Longitude: ${lon}`
+                            if (!isNaN(lat) && !isNaN(lon)) {
+                                const selectedPoint = new Point({
+                                    longitude: lon,
+                                    latitude: lat
+                                });
+
+                                // Creare marker pentru locația selectată
+                                const pointGraphic = new Graphic({
+                                    geometry: selectedPoint,
+                                    symbol: {
+                                        type: "simple-marker",
+                                        color: accentColor,
+                                        size: "12px"
+                                    }
+                                });
+
+                                // Eliminăm markerii anteriori și adăugăm unul nou
+                                view.graphics.removeAll();
+                                view.graphics.add(pointGraphic);
+
+                                // Zoom și centrare pe locația selectată
+                                view.goTo({
+                                    target: selectedPoint,
+                                    zoom: 21
+                                });
+                            } else {
+                                console.error("Coordonate invalide pentru locația selectată.");
+                            }
                         }
                     });
-
-                    view.graphics.add(departmentGraphic);
-                    view.goTo({
-                        target: departmentPoint,
-                        zoom: 14
-                    });
-                });
 
                 // Locate me functionality
                 locateMeBtn.addEventListener("click", function () {
@@ -283,7 +289,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                                     geometry: currentLocation,
                                     symbol: {
                                         type: "simple-marker",
-                                        color: "green",
+                                        color: accentColor,
                                         size: "12px"
                                     }
                                 });
@@ -293,7 +299,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
 
                                 view.goTo({
                                     center: [longitude, latitude],
-                                    zoom: 14
+                                    zoom: 21
                                 });
                             },
                             function (error) {
@@ -333,7 +339,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                             geometry: destinationPoint,
                             symbol: {
                                 type: "simple-marker",
-                                color: "red",
+                                color: accentColor,
                                 size: "12px"
                             }
                         });
@@ -343,35 +349,37 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                             geometry: currentLocation,
                             symbol: {
                                 type: "simple-marker",
-                                color: "green",
+                                color: accentColor,
                                 size: "12px"
                             }
                         }));
                         view.graphics.add(destinationGraphic);
 
                         const routeParams = new RouteParameters({
-                            stops: new FeatureSet({
-                                features: [
-                                    new Graphic({ geometry: currentLocation }),
-                                    new Graphic({ geometry: destinationPoint })
-                                ]
-                            }),
-                            directionsLanguage: "ro",
-                            returnDirections: true
-                        });
+			                stops: new FeatureSet({
+			                    features: [
+			                        new Graphic({ geometry: currentLocation }), // Punctul de plecare
+			                        new Graphic({ geometry: destinationPoint }) // Punctul de destinație
+			                    ]
+			                }),
+			                directionsLanguage: "ro",
+			                returnDirections: true
+			            });
 
                         const data = await route.solve(routeUrl, routeParams);
 
                         data.routeResults.forEach(function (result) {
                             result.route.symbol = {
                                 type: "simple-line",
-                                color: [0, 0, 255],
+                                color: accentColor,
                                 width: 4
                             };
                             view.graphics.add(result.route);
                         });
 
                         if (data.routeResults.length > 0) {
+                        	                   	
+                        	
                             const directions = document.createElement("ol");
                             directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
                             directions.style.marginTop = "10px";
@@ -399,7 +407,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                 resetBtn.addEventListener("click", function () {
                     view.graphics.removeAll();
                     view.ui.empty("top-right");
-                    view.goTo({ center: [25, 45], zoom: 6 });
+                    view.goTo({ center: [25, 45], zoom: 21 });
                 });
             });
         });

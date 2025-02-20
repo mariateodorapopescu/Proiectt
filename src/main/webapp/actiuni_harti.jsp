@@ -97,9 +97,12 @@
 	<div class="main-content">
 	 <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
 		<h3>Ce doriti sa faceti?</h3>
-		
+		<button > <a href = "NewFile.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - acasa</a></button>
 		<button > <a href = "harta_concedii1.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - munca</a></button>
-		<button > <a href = "harta_concedii2.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - acasa</a></button>
+		<button > <a href = "harta_concedii2.jsp" style="text-decoration:none;">Vizualizare ruta locatie actuala - atractii turistice</a></button>
+		<% if (userType == 0 || userType == 3) { %>
+		<button > <a href = "harta.jsp" style="text-decoration:none;">Vizualizare locatii concedii din departamentul meu</a></button>
+		<% } %>
       </div>
    </div>
    

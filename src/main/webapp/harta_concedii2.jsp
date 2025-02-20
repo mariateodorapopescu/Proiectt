@@ -75,7 +75,7 @@
                     	%>
          
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
     <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,7 +141,7 @@
 <body>
     <div id="viewDiv"></div>
      <div class="form-container" style="position: fixed; top: 80px; left: 20px; z-index: 100; padding: 15px; background:<%=sidebar%>; color:<%=clr%>; border-color: <%=clr%>">
-        <label style="color:<%out.println(text);%>" class="login__label" for="locationSelect">Departament</label>
+        <label style="color:<%out.println(text);%>" class="login__label" for="locationSelect">Locatie turistica</label>
         <select style="
 display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
         border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" class="login__input" id="locationSelect"></select>
@@ -155,6 +155,13 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
         <button style="
 display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
          box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="resetBtn">Resetare harta</button>
+         <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="toggleLayerBtn">Activare strat de atractii turistice</button>
+         <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="resetBtn"><a style="color: white; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">< Inapoi</a></button>
+    
     </div>
 
     <div id="loadingSpinner">
@@ -174,6 +181,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                 "esri/rest/route",
                 "esri/rest/support/RouteParameters",
                 "esri/rest/support/FeatureSet"
+              
             ], function (
                 esriConfig,
                 Map,
@@ -200,23 +208,44 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                     zoom: 6
                 });
 
+            	// Layer de atracții turistice
+                const attractionsLayer = new FeatureLayer({
+                    url: "https://services-eu1.arcgis.com/zci5bUiJ8olAal7N/arcgis/rest/services/OSM_Tourism_EU/FeatureServer",
+                    title: "Atracții turistice"
+                });
+             	
+                let layerAdded = false;
+                
                 const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
-                const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
                 const locateMeBtn = document.getElementById("locateMeBtn");
                 const locationSelect = document.getElementById("locationSelect");
                 const generateRouteBtn = document.getElementById("generateRouteBtn");
+                
+                let currentLocation = null;
+                const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+
+                document.getElementById("toggleLayerBtn").addEventListener("click", function () {
+                    if (layerAdded) {
+                        map.remove(attractionsLayer);
+                        this.textContent = "Activare strat de atractii turistice";
+                    } else {
+                        map.add(attractionsLayer);
+                        this.textContent = "Dezactivare strat de atractii turistice";
+                    }
+                    layerAdded = !layerAdded;
+                });
+                
                 const resetBtn = document.getElementById("resetBtn");
                 const loadingSpinner = document.getElementById("loadingSpinner");
-
-                let currentLocation = null;
+              
                 var accentColor = "<%= accent %>"; // Păstrați valoarea culorii într-o variabilă JavaScript
 
-                // 1. Încărcăm lista de departamente din servlet
+                // 0. Încărcăm lista de departamente din servlet
                fetch("locactacs")
   .then(response => response.json())
   .then(data => {
-    locationSelect.innerHTML = '<option value="" disabled selected>Selectează o locatie</option>';
+    locationSelect.innerHTML = '<option value="" disabled selected>Selectati o locatie</option>';
 
     data.forEach(dep => {
       const option = document.createElement("option");
@@ -231,6 +260,46 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
     });
   })
   .catch(error => console.error("Eroare la încărcarea departamentelor:", error));
+
+            // 1. Selectare și zoom pe locația aleasă
+               locationSelect.addEventListener("change", function () {
+                   const selectedOption = this.options[this.selectedIndex];
+
+                   if (selectedOption.value) {
+                       // Citește coordonatele lat/lon din opțiunea selectată
+                       const lat = parseFloat(selectedOption.getAttribute("data-lat"));
+                       const lon = parseFloat(selectedOption.getAttribute("data-lon"));
+
+                       if (!isNaN(lat) && !isNaN(lon)) {
+                           const selectedPoint = new Point({
+                               longitude: lon,
+                               latitude: lat
+                           });
+
+                           // Creare marker pentru locația selectată
+                           const pointGraphic = new Graphic({
+                               geometry: selectedPoint,
+                               symbol: {
+                                   type: "simple-marker",
+                                   color: accentColor,
+                                   size: "12px"
+                               }
+                           });
+
+                           // Eliminăm markerii anteriori și adăugăm unul nou
+                           view.graphics.removeAll();
+                           view.graphics.add(pointGraphic);
+
+                           // Zoom și centrare pe locația selectată
+                           view.goTo({
+                               target: selectedPoint,
+                               zoom: 21
+                           });
+                       } else {
+                           console.error("Coordonate invalide pentru locația selectată.");
+                       }
+                   }
+               });
 
                 // 2. Localizeaza-ma
                 locateMeBtn.addEventListener("click", function () {
@@ -259,7 +328,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
 
                                 view.goTo({
                                     center: [longitude, latitude],
-                                    zoom: 14
+                                    zoom: 21
                                 });
                             },
                             function (error) {
@@ -306,15 +375,16 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
   view.graphics.add(destinationGraphic);
 
   // Generezi ruta
-  const routeParams = new RouteParameters({
-    stops: new FeatureSet({
-      features: [
-        new Graphic({ geometry: currentLocation }),
-        new Graphic({ geometry: destinationPoint })
-      ]
-    }),
-    returnDirections: true
-  });
+      const routeParams = new RouteParameters({
+				                stops: new FeatureSet({
+				                    features: [
+				                        new Graphic({ geometry: currentLocation }), // Punctul de plecare
+				                        new Graphic({ geometry: destinationPoint }) // Punctul de destinație
+				                    ]
+				                }),
+				                directionsLanguage: "ro",
+				                returnDirections: true
+				            });
 
   route.solve(routeUrl, routeParams)
     .then(function (data) {
@@ -328,7 +398,19 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
       });
 
       if (data.routeResults.length > 0) {
-      
+    	  const directions = document.createElement("ol");
+          directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
+          directions.style.marginTop = "10px";
+          directions.style.padding = "15px 15px 15px 30px";
+
+          data.routeResults[0].directions.features.forEach(function (result, i) {
+              const direction = document.createElement("li");
+              direction.innerHTML = result.attributes.text + " (" + result.attributes.length.toFixed(2) + " km)";
+              directions.appendChild(direction);
+          });
+
+          view.ui.empty("top-right");
+          view.ui.add(directions, "top-right");
                             const destinationPoint = new Point({
                                 longitude: results[0].location.x,
                                 latitude: results[0].location.y
@@ -399,7 +481,7 @@ display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; f
                 // 4. Resetează harta
                 resetBtn.addEventListener("click", function () {
                     view.graphics.removeAll();
-                    view.goTo({ center: [25, 45], zoom: 6 });
+                    view.goTo({ center: [25, 45], zoom: 21 });
                 });
 
             });

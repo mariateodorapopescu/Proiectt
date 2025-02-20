@@ -632,17 +632,10 @@ body {
                         <div class="siiconn">
                             <ion-icon name="globe"></ion-icon>
                         </div>
-                        <div  class="sitextt">Actiuni</div>
+                        <div  class="sitextt">Harti</div>
                     </a>
                 </li>
-                 <li style="--bg: <%out.println(accent); %>">
-                    <a href="harta.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                           <ion-icon name="pin"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Harta cu detoate</div>
-                    </a>
-                </li>
+                 
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="setari.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
