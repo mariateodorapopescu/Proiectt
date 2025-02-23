@@ -711,6 +711,14 @@
     </div>
     <script src="./responsive-login-form-main/assets/js/index.js"></script>
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+   <script>
+let fullToken = '<%= session.getAttribute("token") %>'; // Assuming 'token' is stored as a session attribute
+if (fullToken.startsWith("Bearer ")) {
+    let token = fullToken.substring(7); // Correct the substring index to skip "Bearer "
+    localStorage.setItem('jwtToken', token);
+}
+</script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const iframe = document.getElementById('iframe');

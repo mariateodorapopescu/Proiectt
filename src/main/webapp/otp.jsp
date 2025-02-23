@@ -155,5 +155,20 @@
 %>
 <script src="./responsive-login-form-main/assets/js/main.js"></script>
 <script src="./responsive-login-form-main/assets/js/calendar4.js"></script>
+<script>
+//La începutul paginii
+const token = localStorage.getItem('jwtToken');
+if (token) {
+    // Adaugă token-ul în header pentru toate request-urile fetch
+    fetch = new Proxy(fetch, {
+        apply: function(target, thisArg, argumentsList) {
+            const [url, config = {}] = argumentsList;
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = token;
+            return target.apply(thisArg, [url, config]);
+        }
+    });
+}
+</script>
 </body>
 </html>

@@ -5,109 +5,119 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.Random;
 
-/**
- * Servlet implementation class OTP
- */
 public class OTP extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/test?useSSL=false";
+    private static final String DB_USER = "root";
+    private static final String DB_PASSWORD = "student";
 
-    public OTP() {
-        super();
-    }
+    private void processRequest(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
 
-    private String generateOTP() {
-        Random rnd = new Random();
-        return String.format("%06d", rnd.nextInt(999999));
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
         String username = request.getParameter("username");
-        String email = "";
+        String token = (String) session.getAttribute("token");
+        String page = request.getParameter("page");
 
-        String otp = generateOTP();
-        session.setAttribute("otp", otp); // Store OTP in session
-        session.setAttribute("username", username); // Store username in session
+        if (username == null || username.trim().isEmpty()) {
+            response.sendRedirect("login.jsp?error=missing_username");
+            return;
+        }
+
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String query = "SELECT email FROM useri WHERE username = ?";
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, username);
-                try (ResultSet rs = preparedStatement.executeQuery()) {
-                    if (rs.next()) {
-                        email = rs.getString("email");
-                        sendEmail(email, otp); // Call to your existing email sending function
-                        if (request.getParameter("page")!= null){
-                        if (request.getParameter("page").compareTo("2") == 0) {
-                        	 response.sendRedirect("otp.jsp?page=2"); // Redirect to OTP verification page
-                        	 return;
-                        }
-                        else if (request.getParameter("page").compareTo("3") == 0) {
-                       	 response.sendRedirect("otp.jsp?page=3"); // Redirect to OTP verification page
-                       	 return;
-                       }
-                       else {
-                       response.sendRedirect("otp.jsp"); // Redirect to OTP verification page
-                       return;
-                       }
-                        } else {
-                        	response.sendRedirect("otp.jsp"); // Redirect to OTP verification page
-                            return;
-                        }
-                    } else {
-                        response.sendRedirect("login.jsp?error=User not found");
-                    }
-                }
+            String otp = generateOTP();
+            session.setAttribute("otp", otp);
+            session.setAttribute("username", username);
+            
+            // Păstrăm token-ul în sesiune
+            if (token != null) {
+                session.setAttribute("token", token);
+                // Setăm și în header pentru API calls
+                System.out.println("TOKENUL ESTE: " + token); // V
+                response.setHeader("Authorization", token);
             }
+
+            String email = getUserEmail(username);
+            if (email != null) {
+                sendEmail(email, otp);
+                redirectToOtpPage(response, page);
+            } else {
+                response.sendRedirect("login.jsp?error=User not found");
+            }
+
         } catch (Exception e) {
+            System.err.println("Error in OTP processing: " + e.getMessage());
+            e.printStackTrace();
             throw new ServletException("Error processing OTP", e);
         }
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String username = request.getParameter("username");
-        String email = "";
+    // Restul metodelor rămân la fel
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
-        String otp = generateOTP();
-        session.setAttribute("otp", otp); // Store OTP in session
-        session.setAttribute("username", username); // Store username in session
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            String query = "SELECT email FROM useri WHERE username = ?";
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, username);
-                try (ResultSet rs = preparedStatement.executeQuery()) {
-                    if (rs.next()) {
-                        email = rs.getString("email");
-                        sendEmail(email, otp); // Call to your existing email sending function
-                        response.sendRedirect("otp.jsp?page=2"); // Redirect to OTP verification page
-                    } else {
-                        response.sendRedirect("login.jsp?error=User not found");
-                    }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    private String generateOTP() {
+        return String.format("%06d", new Random().nextInt(999999));
+    }
+
+    private String getUserEmail(String username) throws Exception {
+        String email = null;
+        String query = "SELECT email FROM useri WHERE username = ?";
+        
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    email = rs.getString("email");
                 }
             }
-        } catch (Exception e) {
-            throw new ServletException("Eroare OTP", e);
         }
+        return email;
     }
-    
+
+    private void redirectToOtpPage(HttpServletResponse response, String page) throws IOException {
+        String redirectUrl = "otp.jsp";
+        if (page != null) {
+            switch (page) {
+                case "2":
+                    redirectUrl += "?page=2";
+                    break;
+                case "3":
+                    redirectUrl += "?page=3";
+                    break;
+                default:
+                    break;
+            }
+        }
+        response.sendRedirect(redirectUrl);
+    }
+
     private void sendEmail(String email, String otp) throws Exception {
         String subject = "\uD83D\uDD11 Cod verificare conectare \uD83D\uDD11";
-        String message = "<h1>Codul este: " + otp + "</h1><p>Discretia este recomandata! &#x1F642;"
-        		+ "</p>";
-        GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+        String message = "<h1>Codul este: " + otp + "</h1>" +
+                        "<p>Discretia este recomandata! &#x1F642;</p>";
         
+        GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
         sender.send(subject, message, "liviaaamp@gmail.com", email);
     }
 }

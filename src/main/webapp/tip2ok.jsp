@@ -708,6 +708,13 @@
             };
         });
     </script>
+       <script>
+let fullToken = '<%= session.getAttribute("token") %>'; // Assuming 'token' is stored as a session attribute
+if (fullToken.startsWith("Bearer ")) {
+    let token = fullToken.substring(7); // Correct the substring index to skip "Bearer "
+    localStorage.setItem('jwtToken', token);
+}
+</script>
                        <%
                     }
                 }
