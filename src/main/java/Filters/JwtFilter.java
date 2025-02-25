@@ -39,13 +39,13 @@ public class JwtFilter implements Filter {
         // Permitem resursele statice și căile excluse
         if (isStaticResource(path)) {
             System.out.println("Allowing static resource: " + path);
-            chain.doFilter(request, response);
+            chain.doFilter(request, (ServletResponse) response);
             return;
         }
 
         if (isExcludedPath(path)) {
             System.out.println("Allowing excluded path: " + path);
-            chain.doFilter(request, response);
+            chain.doFilter(request, (ServletResponse) response);
             return;
         }
 

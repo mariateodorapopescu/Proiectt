@@ -1,20 +1,19 @@
 package Filters;
-
-import redis.clients.jedis.Jedis;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 
 public class rateLimitingFilter implements Filter {
-    private Jedis jedis;
-    private final int MAX_REQUESTS_PER_SECOND = 13; // Limit each IP to 10 requests per second
+    private final ConcurrentHashMap<String, AtomicInteger> requestCounts = new ConcurrentHashMap<>();
+    private final int MAX_REQUESTS_PER_SECOND = 10; // Limit each IP to 10 requests per second
 
     @Override
-    public void init(FilterConfig filterConfig) {
-        jedis = new Jedis("localhost", 6379); // Connect to the Redis server
-    }
+    public void init(FilterConfig filterConfig) {}
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -23,27 +22,22 @@ public class rateLimitingFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String clientIp = httpRequest.getRemoteAddr();
-        String redisKey = "rate_limit:" + clientIp;
+        requestCounts.putIfAbsent(clientIp, new AtomicInteger(0));
 
-        // Increment the counter in Redis
-        long requestCount = jedis.incr(redisKey);
-        if (requestCount == 1) { // Set the key to expire after 1 second on the first request
-            jedis.expire(redisKey, 1);
-        }
-
-        if (requestCount > MAX_REQUESTS_PER_SECOND) {
-            httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        if (requestCounts.get(clientIp).incrementAndGet() > MAX_REQUESTS_PER_SECOND) {
+            httpResponse.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
             httpResponse.getWriter().write("Too many requests");
             return;
         }
 
         chain.doFilter(request, response);
+
+        // Reset the count every second
+        requestCounts.get(clientIp).decrementAndGet();
     }
 
     @Override
     public void destroy() {
-        if (jedis != null) {
-            jedis.close();
-        }
+        requestCounts.clear();
     }
 }
