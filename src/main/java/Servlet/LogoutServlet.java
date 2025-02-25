@@ -39,7 +39,10 @@ public class LogoutServlet extends HttpServlet {
                 if (username != null) {
                     updateActiveStatus(username, false);
                 }
+                session.removeAttribute("token");
+                
                 session.invalidate(); // This clears the session and all attributes
+                session.removeAttribute("token");
                 response.sendRedirect("login.jsp?logout=true");
             } catch (Exception e) {
                 handleException(response, e);

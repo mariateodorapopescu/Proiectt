@@ -677,7 +677,7 @@
                         </div>
                         
                         
-                        <div  class="sitextt">Deconectare</div>
+                        <div id="logout_btn" class="sitextt">Deconectare</div>
                     </a>
                 </li>
                 
@@ -714,6 +714,12 @@ if (fullToken.startsWith("Bearer ")) {
     let token = fullToken.substring(7); // Correct the substring index to skip "Bearer "
     localStorage.setItem('jwtToken', token);
 }
+document.getElementById('logout_btn').addEventListener('click', (event) => {
+    localStorage.removeItem('jwtToken');
+    <% // session.removeAttribute("token"); %>
+    console.log('Deconectare cu succes!');
+  });
+
 </script>
                        <%
                     }

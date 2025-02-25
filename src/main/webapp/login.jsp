@@ -126,5 +126,13 @@
    
 </div>
 <script src="./responsive-login-form-main/assets/js/main.js"></script>
+<script>
+    // Check if the 'logout' query parameter is set to 'true'
+    if (new URLSearchParams(window.location.search).has('logout')) {
+        localStorage.removeItem('jwtToken');  // Remove the JWT from local storage
+        window.location.href = 'login.jsp';   // Optionally redirect to clean the URL
+    }
+</script>
+
 </body>
 </html>
