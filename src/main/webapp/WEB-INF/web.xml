@@ -545,6 +545,7 @@
     <display-name>JwtFilter</display-name>
     <filter-name>JwtFilter</filter-name>
     <filter-class>Filters.JwtFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>JwtFilter</filter-name>
@@ -554,6 +555,7 @@
     <display-name>rateLimitingFilter</display-name>
     <filter-name>rateLimitingFilter</filter-name>
     <filter-class>Filters.rateLimitingFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>rateLimitingFilter</filter-name>

@@ -2,10 +2,12 @@ package Filters;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
 
 public class JwtFilter implements Filter {
     private final JwtUtil jwtUtil = new JwtUtil();

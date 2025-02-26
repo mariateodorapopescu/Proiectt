@@ -30,10 +30,12 @@ public class CSRFValidationFilter implements Filter {
             String requestToken = httpRequest.getParameter("csrfToken");
 
             if (sessionToken == null || !sessionToken.equals(requestToken)) {
+            	  System.out.println("NU merge tokenul de form =(");
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "CSRF token does not match");
                 return;
             }
         }
+        System.out.println("merge tokenul de form");
         chain.doFilter(request, response);
     }
 

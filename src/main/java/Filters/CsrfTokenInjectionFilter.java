@@ -46,6 +46,7 @@ public class CsrfTokenInjectionFilter implements Filter {
         StringBuffer sb = new StringBuffer(html.length());
 
         while (matcher.find()) {
+        	System.out.println("Fac ceva");
             String tokenInput = "<input type='hidden' name='csrfToken' value='" + csrfToken + "'/>";
             matcher.appendReplacement(sb, matcher.group() + tokenInput);
         }

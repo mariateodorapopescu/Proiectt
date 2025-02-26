@@ -22,6 +22,7 @@ public class CSRFTokenGeneratorFilter implements Filter {
 
         if (session.getAttribute("csrfToken") == null) {
             session.setAttribute("csrfToken", generateToken());
+            System.out.println("S-a generat token pentru form");
         }
         chain.doFilter(request, response);
     }
