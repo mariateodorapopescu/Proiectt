@@ -6,15 +6,26 @@ import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class CSRFValidationFilter implements Filter {
+    // List of paths where CSRF validation is required
+    private static final List<String> INCLUDED_PATHS = Arrays.asList(
+        "/AddAddrUsr.jsp",
+        "/AddAddrUsr0.jsp",
+        "/addc.jsp",
+        "/adddep.jsp",
+        "/forgotpass.jsp",
+        "/sefok.jsp"
+        // Add more paths as needed
+    );
+
     @Override
     public void init(FilterConfig filterConfig) {}
 
@@ -24,19 +35,51 @@ public class CSRFValidationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if ("POST".equalsIgnoreCase(httpRequest.getMethod())) {
-            HttpSession session = httpRequest.getSession();
+        String path = httpRequest.getServletPath();
+
+        // Continue without CSRF validation for paths not included
+        if (!isIncludedPath(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Perform CSRF token validation for included paths
+        validateCsrfToken(httpRequest, httpResponse, path, chain);
+    }
+
+    private boolean isIncludedPath(String path) {
+        return INCLUDED_PATHS.stream().anyMatch(path::startsWith);
+    }
+
+    private void validateCsrfToken(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String path, FilterChain chain)
+            throws IOException, ServletException {
+        String method = httpRequest.getMethod();
+        if ("POST".equalsIgnoreCase(method) || 
+            "PUT".equalsIgnoreCase(method) || 
+            "DELETE".equalsIgnoreCase(method)) {
+            
+            HttpSession session = httpRequest.getSession(false);
+            if (session == null) {
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid session");
+                return;
+            }
+            
             String sessionToken = (String) session.getAttribute("csrfToken");
             String requestToken = httpRequest.getParameter("csrfToken");
+            if (requestToken == null) {
+                requestToken = httpRequest.getHeader("X-CSRF-Token");
+            }
 
-            if (sessionToken == null || !sessionToken.equals(requestToken)) {
-            	  System.out.println("NU merge tokenul de form =(");
+            if (sessionToken == null || requestToken == null || !sessionToken.equals(requestToken)) {
+                System.out.println("CSRF token invalid: " + requestToken + " vs " + sessionToken);
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "CSRF token does not match");
                 return;
             }
+            
+            System.out.println("CSRF token valid for " + path);
         }
-        System.out.println("merge tokenul de form");
-        chain.doFilter(request, response);
+        
+        chain.doFilter(httpRequest, httpResponse);
     }
 
     @Override

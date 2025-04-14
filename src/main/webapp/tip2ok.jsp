@@ -677,7 +677,7 @@
                         </div>
                         
                         
-                        <div id="logout_btn" class="sitextt">Deconectare</div>
+                        <div id='logout_btn' class="sitextt">Deconectare</div>
                     </a>
                 </li>
                 
@@ -716,10 +716,8 @@ if (fullToken.startsWith("Bearer ")) {
 }
 document.getElementById('logout_btn').addEventListener('click', (event) => {
     localStorage.removeItem('jwtToken');
-    <% // session.removeAttribute("token"); %>
     console.log('Deconectare cu succes!');
   });
-
 </script>
                        <%
                     }

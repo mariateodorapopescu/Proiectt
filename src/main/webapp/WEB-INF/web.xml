@@ -541,51 +541,6 @@
     <servlet-name>locactacss</servlet-name>
     <url-pattern>/locactacss</url-pattern>
   </servlet-mapping>
-  <filter>
-    <display-name>JwtFilter</display-name>
-    <filter-name>JwtFilter</filter-name>
-    <filter-class>Filters.JwtFilter</filter-class>
-    <async-supported>true</async-supported>
-  </filter>
-  <filter-mapping>
-    <filter-name>JwtFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter>
-    <display-name>rateLimitingFilter</display-name>
-    <filter-name>rateLimitingFilter</filter-name>
-    <filter-class>Filters.rateLimitingFilter</filter-class>
-    <async-supported>true</async-supported>
-  </filter>
-  <filter-mapping>
-    <filter-name>rateLimitingFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter>
-    <display-name>CSRFTokenGeneratorFilter</display-name>
-    <filter-name>CSRFTokenGeneratorFilter</filter-name>
-    <filter-class>Filters.CSRFTokenGeneratorFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>CSRFTokenGeneratorFilter</filter-name>
-    <url-pattern>/CSRFTokenGeneratorFilter</url-pattern>
-  </filter-mapping>
-  <filter>
-    <display-name>CSRFValidationFilter</display-name>
-    <filter-name>CSRFValidationFilter</filter-name>
-    <filter-class>Filters.CSRFValidationFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>CSRFValidationFilter</filter-name>
-    <url-pattern>/CSRFValidationFilter</url-pattern>
-  </filter-mapping>
-  <filter>
-    <display-name>CsrfTokenInjectionFilter</display-name>
-    <filter-name>CsrfTokenInjectionFilter</filter-name>
-    <filter-class>Filters.CsrfTokenInjectionFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>CsrfTokenInjectionFilter</filter-name>
-    <url-pattern>/CsrfTokenInjectionFilter</url-pattern>
-  </filter-mapping>
+
+
 </web-app>

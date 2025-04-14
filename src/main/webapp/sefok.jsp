@@ -664,7 +664,7 @@ body {
                         </div>
                         
                         
-                        <div id="logout_btn" class="sitextt">Deconectare</div>
+                        <div  class="sitextt">Deconectare</div>
                     </a>
                 </li>
             </div>
@@ -692,12 +692,6 @@ body {
                 iframe.style.height = iframeDocument.documentElement.scrollHeight * 1.07 + 'px';
             };
         });
-        document.getElementById('logout_btn').addEventListener('click', (event) => {
-            localStorage.removeItem('jwtToken');
-            <% // session.removeAttribute("token"); %>
-            console.log('Deconectare cu succes!');
-          });
-
     </script>
                        <%
                     }

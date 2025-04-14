@@ -418,7 +418,7 @@ public class AddConServlet extends HttpServlet {
 	                    PrintWriter out = response.getWriter();
 	                    out.println("<script type='text/javascript'>");
 	                    out.println("alert('Adaugare cu succes!');");
-	                    out.println("window.location.href = 'actiuni.jsp';");
+	                    out.println("window.location.href = 'concediinoisef.jsp';");
 	                    out.println("</script>");
 	                    out.close();
 	                    

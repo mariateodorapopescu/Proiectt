@@ -1,125 +1,93 @@
 package Filters;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.*;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.*;  // Schimbat din javax în jakarta
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class JwtFilter implements Filter {
-    private final JwtUtil jwtUtil = new JwtUtil();
-    
-    // Căi publice care nu necesită autentificare
+
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
-        "/login",
-        "/register",
+        "/login", 
+        "/register", 
         "/public",
         "/OTP",
-        "/OTP2",
-        "/OTP3",
         "/login.jsp",
         "/otp.jsp",
-        "/forgotpass.jsp",
         "/responsive-login-form-main",
-        "/assets",
-        "/resources"
+        "/assets"
     );
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // init method
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) 
             throws IOException, ServletException {
+        
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+        
         String path = request.getServletPath();
-
-        // Debug pentru a vedea path-ul curent
-        System.out.println("Current path: " + path);
-
-        // Permitem resursele statice și căile excluse
+        
+        // Permitem resursele statice
         if (isStaticResource(path)) {
-            System.out.println("Allowing static resource: " + path);
-            chain.doFilter(request, (ServletResponse) response);
+            chain.doFilter(request, response);
             return;
         }
 
+        // Verificăm dacă path-ul este exclus
         if (isExcludedPath(path)) {
-            System.out.println("Allowing excluded path: " + path);
-            chain.doFilter(request, (ServletResponse) response);
+            chain.doFilter(request, response);
             return;
         }
 
-        // Verificăm sesiunea
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            System.out.println("No session found, redirecting to login");
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+        String header = request.getHeader("Authorization");
+
+        if (header == null || !header.startsWith("Bearer ")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token lipsă sau invalid");
             return;
         }
 
-        // Verificăm token-ul
-        String token = (String) session.getAttribute("token");
-        System.out.println("Token found in session: " + (token != null));
-
-        if (token == null) {
-            System.out.println("No token found, redirecting to login");
-            session.invalidate();
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
+        String token = header.substring(7); // Remove "Bearer "
 
         try {
-            if (!jwtUtil.validateToken(token)) {
-                System.out.println("Invalid token, redirecting to login");
-                session.invalidate();
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
-                return;
-            }
-
-            // Token valid, adăugăm claims la request
-            Claims claims = jwtUtil.parseToken(token);
+            Claims claims = Jwts.parser()
+                    .setSigningKey("secretKeysecretKeysecretKeysecretKey")
+                    .parseClaimsJws(token)
+                    .getBody();
+                    
             request.setAttribute("claims", claims);
-            System.out.println("Valid token for user: " + claims.getSubject());
-            
-            chain.doFilter(request, response);
+            chain.doFilter(req, res);
         } catch (Exception e) {
-            System.out.println("Token processing error: " + e.getMessage());
-            session.invalidate();
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalid");
         }
     }
 
     private boolean isStaticResource(String path) {
-        return path != null && (
-            path.endsWith(".css") ||
-            path.endsWith(".js") ||
-            path.endsWith(".png") ||
-            path.endsWith(".jpg") ||
-            path.endsWith(".gif") ||
-            path.endsWith(".ico") ||
-            path.endsWith(".woff") ||
-            path.endsWith(".woff2") ||
-            path.endsWith(".ttf") ||
-            path.contains("/assets/") ||
-            path.contains("/responsive-login-form-main/") ||
-            path.contains("/resources/")
-        );
+        return path.endsWith(".css") || 
+               path.endsWith(".js") || 
+               path.endsWith(".png") || 
+               path.endsWith(".jpg")
+              ;
     }
 
     private boolean isExcludedPath(String path) {
-        return path != null && EXCLUDED_PATHS.stream()
+        return EXCLUDED_PATHS.stream()
             .anyMatch(excludedPath -> path.startsWith(excludedPath));
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        System.out.println("JwtFilter initialized");
-    }
-
-    @Override
     public void destroy() {
-        System.out.println("JwtFilter destroyed");
+        // destroy method
     }
 }

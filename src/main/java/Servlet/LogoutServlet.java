@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+//import Filters.TokenBlacklist;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -39,10 +39,12 @@ public class LogoutServlet extends HttpServlet {
                 if (username != null) {
                     updateActiveStatus(username, false);
                 }
-                session.removeAttribute("token");
-                
+                String authHeader = request.getHeader("Authorization");
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    String token = authHeader.substring(7);
+                    // TokenBlacklist.blacklistToken(token);
+                }
                 session.invalidate(); // This clears the session and all attributes
-                session.removeAttribute("token");
                 response.sendRedirect("login.jsp?logout=true");
             } catch (Exception e) {
                 handleException(response, e);

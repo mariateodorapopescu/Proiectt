@@ -527,29 +527,74 @@ System.out.println(sql);
 
     </script>
     <script>
-// Get the modal
-
-var modal = document.getElementById("myModal");
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal 
-function showModal(actionUrl) {
-    document.getElementById("actionUrl").value = actionUrl; // Set the action URL
-    document.getElementById("theform").action = actionUrl;
-    modal.style.display = "block";
-}
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
+// Codul pentru modal va fi executat după ce DOM-ul este complet încărcat
+document.addEventListener("DOMContentLoaded", function() {
+    // Acum definim variabilele pentru modal după ce DOM-ul este încărcat
+    var modal = document.getElementById("myModal");
+    var span = document.getElementsByClassName("close")[0];
+    
+    // Verificăm dacă elementele există pentru a evita erori
+    if (!modal) {
+        console.error("Elementul modal cu ID-ul 'myModal' nu a fost găsit!");
+        return;
     }
-}
+    
+    if (!span) {
+        console.error("Elementul 'close' nu a fost găsit în modal!");
+    } else {
+        // Adăugăm event listener pentru butonul de închidere
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+    }
+    
+    // Adăugăm event listener pentru clic în afara modalului
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    
+    // Definim funcția globală showModal
+    window.showModal = function(actionUrl) {
+        console.log("showModal called with URL:", actionUrl);
+        var actionUrlInput = document.getElementById("actionUrl");
+        var theForm = document.getElementById("theform");
+        
+        if (!actionUrlInput) {
+            console.error("Input-ul 'actionUrl' nu a fost găsit!");
+            return;
+        }
+        
+        if (!theForm) {
+            console.error("Formularul 'theform' nu a fost găsit!");
+            return;
+        }
+        
+        actionUrlInput.value = actionUrl;
+        theForm.action = actionUrl;
+        modal.style.display = "block";
+    }
+});
+</script>
+<script>
+// Adăugați acest script pentru a verifica clickurile pe butoanele de aprobare/respingere
+document.addEventListener("DOMContentLoaded", function() {
+    // Adăugați handleri pentru toate link-urile cu onclick
+    var allLinks = document.querySelectorAll("a[onclick]");
+    allLinks.forEach(function(link) {
+        link.addEventListener("click", function(event) {
+            console.log("Link clicked:", this.getAttribute("onclick"));
+        });
+    });
+});
+</script>
+<script>
+window.onerror = function(message, source, lineno, colno, error) {
+    console.error("JavaScript error:", message, "at", source, "line", lineno, "column", colno);
+    alert("A apărut o eroare JavaScript: " + message);
+    return true;
+};
 </script>
     <script>
     function generate() {
@@ -709,7 +754,18 @@ async function sendJsonToPDFServer() {
 }
 
 </script>
-
+<!-- Modal pentru introducerea motivului -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form id="theform" method="POST">
+            <label for="reason">Motivul aprobarii/respingerii:</label>
+            <input class="login__input" style="border-color:<%=accent%>; background:<%=clr%>; color:<%=text%>" type="text" id="reason" name="reason" required>
+            <input type="hidden" id="actionUrl" name="actionUrl">
+            <button type="submit">Trimite</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
 
