@@ -187,47 +187,95 @@ int pag = -1;
                 };
 
                 // Load vacation points
+                // Load vacation points
+             // Modifică funcția loadVacationPoints pentru a adăuga verificări
                 function loadVacationPoints() {
                     fetch("GetVacationDetailsServlet")
                         .then(response => response.json())
                         .then(vacations => {
+                            console.log("Date primite:", vacations);
                             vacationLayer.removeAll();
+                            
+                            // Verifică dacă vacations este un array valid
+                            if (!Array.isArray(vacations)) {
+                                console.error("Datele primite nu sunt un array:", vacations);
+                                return;
+                            }
+                            
+                            if (vacations.length === 0) {
+                                console.log("Nu există concedii disponibile.");
+                                return;
+                            }
+                            
+                            // Acum putem folosi forEach în siguranță
                             vacations.forEach(vacation => {
-                                const point = new Point({
-                                    longitude: vacation.longitude,
-                                    latitude: vacation.latitude
-                                });
+                                // Verifică dacă vacation este de tipul așteptat (obiect sau string)
+                                if (!vacation) {
+                                    console.log("Element de concediu invalid:", vacation);
+                                    return;
+                                }
+                                
+                                // Geocodificare pentru adresă
+                                let adresaGeo = typeof vacation === 'string' ? vacation : vacation.address;
+                                
+                                locator.addressToLocations(locatorUrl, {
+                                    address: { "SingleLine": adresaGeo },
+                                    countryCode: "RO",
+                                    maxLocations: 1
+                                }).then(results => {
+                                    if (results.length > 0) {
+                                        const point = new Point({
+                                            longitude: results[0].location.x,
+                                            latitude: results[0].location.y
+                                        });
 
-                                const pointGraphic = new Graphic({
-                                    geometry: point,
-                                    symbol: {
-                                        type: "simple-marker",
-                                        color: "<%=accent%>",  // Red color
-                                        size: "12px",
-                                        outline: {
-                                            color: "white",
-                                            width: 2
-                                        }
-                                    },
-                                    attributes: {
-                                        address: vacation.address,
-                                        nume: vacation.nume,
-                                        prenume: vacation.prenume, 
-                                        departament: vacation.departament
-                                    },
-                                    popupTemplate: {
-                                        title: "Adresă Locație Concediu",
-                                        text: "<div class='custom-popup'>" +
-                                        "<strong>Locație:</strong> {address}<br>" +
-                                        "<strong>Angajat:</strong> {prenume} {nume}<br>" +
-                                        "<strong>Departament:</strong> {departament}" +
-                                        "</div>"
-
+                                        // Dacă vacation este obiect, folosim proprietățile lui
+                                        // Altfel, folosim doar adresa ca string
+                                        let attributes = {};
+                                        let color = "<%=accent%>";
                                         
-                                    }
-                                });
+                                        if (typeof vacation === 'object') {
+                                            attributes = {
+                                                address: vacation.address || adresaGeo,
+                                                nume: vacation.nume || "",
+                                                prenume: vacation.prenume || "",
+                                                departament: vacation.departament || ""
+                                            };
+                                            color = vacation.color || "<%=accent%>";
+                                        } else {
+                                            attributes = { address: adresaGeo };
+                                        }
 
-                                vacationLayer.add(pointGraphic);
+                                        const pointGraphic = new Graphic({
+                                            geometry: point,
+                                            symbol: {
+                                                type: "simple-marker",
+                                                color: color,
+                                                size: "12px",
+                                                outline: {
+                                                    color: "white",
+                                                    width: 2
+                                                }
+                                            },
+                                            attributes: attributes,
+                                            popupTemplate: {
+                                                title: "Locație Concediu",
+                                                content: [{
+                                                    type: "text",
+                                                    text: "<div class='custom-popup'>" +
+                                                        "<strong>Locație:</strong> {address}<br>" +
+                                                        (attributes.nume ? "<strong>Angajat:</strong> {prenume} {nume}<br>" : "") +
+                                                        (attributes.departament ? "<strong>Departament:</strong> {departament}" : "") +
+                                                        "</div>"
+                                                }]
+                                            }
+                                        });
+
+                                        vacationLayer.add(pointGraphic);
+                                    }
+                                }).catch(error => {
+                                    console.error("Eroare la geocodare:", error);
+                                });
                             });
                         })
                         .catch(error => {
@@ -251,61 +299,59 @@ int pag = -1;
                 map.add(selectableLocationsLayer);
 
                 // Load locations for dropdown and add points to map
+                 // Similar, modifică și codul pentru dropdown-ul de locații
                 fetch("GetVacationDetailsServlet")
                     .then(response => response.json())
                     .then(data => {
+                        console.log("Date pentru dropdown:", data);
+                        
+                        // Verifică dacă data este un array valid
+                        if (!Array.isArray(data)) {
+                            console.error("Datele primite pentru dropdown nu sunt un array:", data);
+                            return;
+                        }
+                        
                         locationSelect.innerHTML = '<option value="" selected disabled>Selectează o localitate</option>';
-                        data.forEach(location => {
-                            const option = document.createElement("option");
-                            option.value = location;
-                            option.textContent = location;
-                            locationSelect.appendChild(option);
+                        
+                        // Set pentru a evita duplicarea localităților
+                        const uniqueLocations = new Set();
+                        
+                        data.forEach(item => {
+                            if (!item) return;
                             
-                            // Geocode and add point for each location
-                            locator.addressToLocations(locatorUrl, {
-                                address: { "SingleLine": location },
-                                countryCode: "RO",
-                                maxLocations: 1
-                            }).then(function(results) {
-                                if (results.length > 0) {
-                                    const point = {
-                                        type: "point",
-                                        longitude: results[0].location.x,
-                                        latitude: results[0].location.y
-                                    };
-
-                                    const pointGraphic = new Graphic({
-                                        geometry: point,
-                                        symbol: {
-                                            type: "simple-marker",
-                                            color: "<%=accent%>",  // Roșu
-                                            size: "12px",
-                                            outline: {
-                                                color: "white",
-                                                width: 2
-                                            }
-                                           
-                                        },
-                                        attributes: {
-                                            name: location
-                                        },
-                                        popupTemplate: {
-                                            title: "Locație",
-                                            content: "{name}"
-                                        }
-                                    });
-
-                                    selectableLocationsLayer.add(pointGraphic);
+                            let location;
+                            
+                            if (typeof item === 'object' && item.address) {
+                                const addressParts = item.address.split(',');
+                                if (addressParts.length > 1) {
+                                    location = addressParts[1].trim(); // Luăm orașul (a doua parte)
+                                } else {
+                                    location = item.address;
                                 }
-                            }).catch(function(error) {
-                                console.error("Eroare la geocodare:", error);
-                            });
+                            } else if (typeof item === 'string') {
+                                const addressParts = item.split(',');
+                                if (addressParts.length > 1) {
+                                    location = addressParts[1].trim();
+                                } else {
+                                    location = item;
+                                }
+                            } else {
+                                return; // Salt peste item-uri care nu au formatul așteptat
+                            }
+                            
+                            if (!uniqueLocations.has(location)) {
+                                uniqueLocations.add(location);
+                                
+                                const option = document.createElement("option");
+                                option.value = location;
+                                option.textContent = location;
+                                locationSelect.appendChild(option);
+                            }
                         });
                     })
                     .catch(error => {
                         console.error("Eroare la încărcarea localităților:", error);
                     });
-
                 // Locate Me functionality
                 locateMeBtn.addEventListener("click", function () {
                     if (navigator.geolocation) {
@@ -447,16 +493,31 @@ int pag = -1;
                 });
 
                 // Location select change handler
-                locationSelect.addEventListener("change", function () {
-                    const selectedLocation = this.value;
-                    if (selectedLocation) {
-                        // Clear existing route and directions
-                        routeLayer.removeAll();
-                        view.ui.empty("top-right");
-                        
-                        geocodeLocation(selectedLocation);
-                    }
-                });
+                // Location select change handler
+locationSelect.addEventListener("change", function () {
+    const selectedLocation = this.value;
+    if (selectedLocation) {
+        // Clear existing route and directions
+        routeLayer.removeAll();
+        view.ui.empty("top-right");
+        
+        // Găsește toate locațiile care au orașul selectat
+        fetch("GetVacationDetailsServlet")
+            .then(response => response.json())
+            .then(data => {
+                const locationsInCity = data.filter(loc => loc.city === selectedLocation);
+                if (locationsInCity.length > 0) {
+                    // Alege prima locație pentru centrarea hărții
+                    geocodeLocation(locationsInCity[0].address);
+                }
+            })
+            .catch(error => {
+                console.error("Eroare la filtrarea locațiilor:", error);
+                // Fallback la geocodare directă
+                geocodeLocation(selectedLocation);
+            });
+    }
+});
 
                 // Geocode location function
                 function geocodeLocation(location) {

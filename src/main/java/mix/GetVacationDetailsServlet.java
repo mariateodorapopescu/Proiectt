@@ -1,4 +1,4 @@
- package mix;
+package mix;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -10,8 +10,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class GetVacationDetailsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -35,33 +35,56 @@ public class GetVacationDetailsServlet extends HttpServlet {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 
-            // Interogare pentru a obține localitățile unice din tabelul locatii_useri
-            //String query = "SELECT DISTINCT oras FROM locatii_concedii";
-            String query = "SELECT culoare, strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;";
+            String query = "SELECT culoare, strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii " +
+                          "JOIN concedii ON locatii_concedii.id_concediu = concedii.id " +
+                          "JOIN useri ON useri.id = concedii.id_ang " +
+                          "JOIN departament ON useri.id_dep = departament.id_dep " +
+                          "ORDER BY oras";
+            
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 
-            ArrayList<String> locations = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray();
+
             while (resultSet.next()) {
-                //locations.add(resultSet.getString("oras"));
-            	String culoare = resultSet.getString("culoare");
-            	String strada = resultSet.getString("strada");
-            	String oras = resultSet.getString("oras");
+                JSONObject jsonObject = new JSONObject();
+                
+                String culoare = resultSet.getString("culoare");
+                String strada = resultSet.getString("strada");
+                String oras = resultSet.getString("oras");
                 String judet = resultSet.getString("judet");
-                String nume = resultSet.getString("nume"); // tre sa fac un join......
+                String nume = resultSet.getString("nume");
                 String prenume = resultSet.getString("prenume");
                 String departament = resultSet.getString("nume_dep");
-                locations.add("Concediul angajatului " + nume + " " + prenume + " din departamentul " + departament + " este la adresa " + strada + ", " + oras + ", " + judet);
+                
+                // Setează informațiile în obiectul JSON
+                jsonObject.put("color", culoare);
+                jsonObject.put("street", strada);
+                jsonObject.put("city", oras);
+                jsonObject.put("county", judet);
+                jsonObject.put("nume", nume);
+                jsonObject.put("prenume", prenume);
+                jsonObject.put("departament", departament);
+                
+                // Creează adresa completă pentru afișare și geocodificare
+                String address = strada + ", " + oras + ", " + judet;
+                jsonObject.put("address", address);
+                
+                // Text pentru popup
+                String popupText = "Concediul angajatului " + nume + " " + prenume + " din departamentul " + departament + " este la adresa " + address;
+                jsonObject.put("popupText", popupText);
+                
+                jsonArray.put(jsonObject);
             }
 
-            // Conversie a listei în JSON și trimitere ca răspuns
-            JSONArray jsonArray = new JSONArray(locations);
             out.print(jsonArray.toString());
             out.flush();
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"error\": \"Eroare la incarcarea localitatilor\"}");
+            JSONObject error = new JSONObject();
+            error.put("error", "Eroare la incarcarea localitatilor: " + e.getMessage());
+            out.print(error.toString());
         } finally {
             try {
                 if (resultSet != null) resultSet.close();

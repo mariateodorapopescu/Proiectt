@@ -294,10 +294,100 @@ System.out.println(sql);
         
     </head>
     <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
-        <div style="position: fixed; top: 0; left: 0; margin: 0; padding-left:1rem; padding-right:1rem;" class="main-content">
+<%
+// Verifică dacă există concedii în ziua curentă care să aibă locații
+boolean hasLocationsForTodayLeaves = false;
+int todayLeavesCount = 0;
+int todayLeavesWithLocationCount = 0;
+
+try {
+    // Interogare pentru a verifica concediile din ziua curentă folosind direct CURDATE()
+    String checkQuery = "SELECT c.id FROM concedii c WHERE c.added = CURDATE() and c.id_ang =" + id;
+
+    try (Connection connection2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+         PreparedStatement checkStmt = connection2.prepareStatement(checkQuery)) {
+        
+        try (ResultSet checkRs = checkStmt.executeQuery()) {
+            // Numără concediile din ziua curentă
+            while (checkRs.next()) {
+                todayLeavesCount++;
+
+                // Pentru fiecare concediu, verifică dacă are o locație
+                int concediuId = checkRs.getInt("id");
+                String locatieQuery = "SELECT COUNT(*) AS count FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on concedii.id_Ang = useri.id WHERE id_concediu = ? and useri.id = " + id;
+
+                try (PreparedStatement locatieStmt = connection2.prepareStatement(locatieQuery)) {
+                    locatieStmt.setInt(1, concediuId);
+                    try (ResultSet locatieRs = locatieStmt.executeQuery()) {
+                        if (locatieRs.next() && locatieRs.getInt("count") > 0) {
+                            todayLeavesWithLocationCount++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Există locații pentru concediile din ziua curentă dacă cel puțin un concediu are locație
+    hasLocationsForTodayLeaves = (todayLeavesWithLocationCount > 0);
+
+} catch (Exception e) {
+    e.printStackTrace();
+    out.println("<script type='text/javascript'>");
+    out.println("console.error('Eroare la verificarea concediilor: " + e.getMessage() + "');");
+    out.println("</script>");
+}
+%>
+
+<!-- Alertă pentru concedii fără locații -->
+<% if (todayLeavesCount > todayLeavesWithLocationCount) { %>
+<div id="noLocationsBanner" style="
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    background-color: <%= accent %>;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 80%;
+    max-width: 600px;
+">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="min-width: 24px;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <div>
+        <strong>Atenție!</strong> Există <%= todayLeavesCount %> concedii adăugate astăzi, dar numai <%=todayLeavesWithLocationCount %> are locație asociată.
+    </div>
+    <button onclick="document.getElementById('noLocationsBanner').style.display='none';" style="
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+        margin-left: 10px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    ">&times;</button>
+</div>
+<% } %>
+
+<!-- Restul conținutului paginii -->
+<div style="position: fixed; top: 0; left: 0; margin: 0; padding-left:1rem; padding-right:1rem;" class="main-content">
             <div style=" border-radius: 2rem;" class="content">
                 <div class="intro" style=" border-radius:2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
                     <div class="events"  style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
+
 
                         <%
                     if (request.getParameter("pag")!=null || (request.getParameter("pag")== null && userType != 3 || userType != 0)) {
@@ -362,7 +452,11 @@ System.out.println(sql);
                 </div>
             </div>
         </div>
-            
+            <script>
+    console.log("Debug: Concedii totale azi: <%= todayLeavesCount %>");
+    console.log("Debug: Concedii cu locații: <%= todayLeavesWithLocationCount %>");
+    console.log("Debug: Ar trebui să afișez alerta? <%= todayLeavesCount > 0 && !hasLocationsForTodayLeaves %>");
+</script>
      <script>
      // Funcții helper pentru status
  	function getStatusClass(status) {
