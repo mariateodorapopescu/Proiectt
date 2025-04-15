@@ -47,113 +47,216 @@ if (sesi != null) {
     <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
     <style>
        .fc-day-number {
-    color: <%=accent%> !important;
-}
-
+          color: <%=accent%> !important;
+       }
     
-        body {
-            margin: 0;
-            padding: 0;
-            
-            background-color: <%=sidebar%>;
-        }
-        #calendar {
-            max-width: 700px;
-            max-height: 700px;
-            padding: 0;
-            margin: 20px auto;
-           text: <%=accent%>; !important;
-			color: <%=accent%>; !important;
-        }
+       body {
+          margin: 0;
+          padding: 0;
+          background-color: <%=sidebar%>;
+       }
+       
+       #calendar {
+          max-width: 700px;
+          max-height: 700px;
+          padding: 0;
+          margin: 20px auto;
+          text: <%=accent%>; !important;
+          color: <%=accent%>; !important;
+       }
         
-		table, 
-		td,
-		thead,
-		tbody,
-		.fc-row, .fc-column {
-			border-color: <%=clr%> !important;
-			background: <%=sidebar%> !important;
-			text: <%=accent%>; !important;
-			color: <%=accent%>; !important;
-		}
+       table, 
+       td,
+       thead,
+       tbody,
+       .fc-row, .fc-column {
+          border-color: <%=clr%> !important;
+          background: <%=sidebar%> !important;
+          text: <%=accent%>; !important;
+          color: <%=accent%>; !important;
+       }
 		
-		th, hr{
-			border-color: <%=accent%> !important;
-			background: <%=accent%> !important;
-			color: white;
-		}
-		
+       th, hr {
+          border-color: <%=accent%> !important;
+          background: <%=accent%> !important;
+          color: white;
+       }
+       
+       /* Stiluri pentru selectorul de status */
+       .status-selector {
+          position: fixed;
+          top: 12rem;
+          left: 3%;
+          width: 220px;
+          padding: 15px;
+          background-color: <%=sidebar%>;
+          border-radius: 15px;
+          margin-bottom: 10px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: flex-start;
+          gap: 15px;
+          z-index: 100;
+        
+       }
+       
+       .status-selector select {
+          padding: 8px;
+          border-radius: 4px;
+          border: 1px solid <%=accent%>;
+          background-color: <%=sidebar%>;
+          color: <%=accent%>;
+          font-size: 14px;
+          width: 100%;
+       }
+       
+       .status-selector button {
+          padding: 8px 15px;
+          border: none;
+          border-radius: 4px;
+          background-color: <%=accent%>;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background-color 0.3s;
+          width: 100%;
+       }
+       
+       .status-selector button:hover {
+          background-color: <%=clr%>;
+          color: <%=text%>;
+          text-decoration: underline;
+       }
+       
+       .legend {
+          position: fixed;
+          top: 2rem;
+          right: 5%;
+          padding: 10px;
+          background-color: <%=sidebar%>;
+          border-radius: 5px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+       }
+       
+       .legend-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 5px;
+       }
+       
+       .legend-color {
+          width: 15px;
+          height: 15px;
+          margin-right: 5px;
+          border-radius: 50%;
+       }
     </style>
 </head>
 <body style="background:<%=clr%>">
+    <!-- Selector pentru status concedii -->
+    <div class="status-selector">
+        <h4 style="color: <%=accent%>; margin-top: 0; margin-bottom: 10px;">Filtrare concedii</h4>
+        <label for="leaveStatus" style="color: <%=accent%>; margin-bottom: 5px;">Status concedii:</label>
+        <select id="leaveStatus" style="width: 100%; margin-bottom: 10px;">
+            <option value="2" selected>Aprobate de director</option>
+            <option value="1">Aprobate de sef</option>
+            <option value="0">Neaprobate</option>
+            <option value="-1">Respins sef</option>
+            <option value="-2">Respins director</option>
+             <option value="3">Oricare</option>
+        </select>
+        <button id="applyStatus" style="width: 100%;">Aplica</button>
+    </div>
+    
     <div style="position: fixed; top: 5rem; left:25%;" id='calendar'></div>
     <script>
         $(document).ready(function() {
-            var calendar = $('#calendar').fullCalendar({
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
-                },
-                locale: 'ro', // Romanian language
-                buttonIcons: true,
-                weekNumbers: false,
-                navLinks: true,
-                editable: true,
-                dayMaxEvents: true,
-                defaultView: 'month',
-                dayRender: function(date, cell)
-                {
-                var today = $.fullCalendar.moment();
-                if(date.get('date')==today.get('date'))
-                {
-                   // cell.css("background", "rgb(52, 140, 235)");
-                   cell.css("textColor", "white");
-                  
-                }
-                },
-                selectable: true,
-                selectHelper: true,
-
-                dayClick: function (date, jsEvent, view) {
-                    //var D = moment(date);
-                    t.row.add([
-                        counter,
-                        date.format('dddd,MMMM DD,YYYY'),
-                        'testing'
-                    ]).draw(false);
-
-                    counter++;
-
-                    cell.css("background-color", "teal");
-                },
-                
-                dayRender: function(date, cell) { 
-
-                	var today = $.fullCalendar.moment(); 
-                	var end = $.fullCalendar.moment().add(7, 'days'); 
-                	if (date.get('date') == today.get('date')) { $(".fc-"+date.format('ddd').toLowerCase()).css("background", "#f8f9fa"); 
-                	$("th.fc-"+date.format('ddd').toLowerCase()).text("Holiday"); 
-                	$("th.fc-"+date.format('ddd').toLowerCase()).css("background", "red"); 
-                	$("th.fc-"+date.format('ddd').toLowerCase()).css("color", "#fff"); } },
-                	
-                events: function(start, end, timezone, callback) {
-                    $.ajax({
-                    	url: 'decenulvede',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            start: start.format(),
-                            end: end.format()
-                        },
-                        success: function(response) {
-                            callback(response);
-                        },
-                        error: function() {
-                            alert('There was an error while fetching events!');
+            var currentStatus = 2; // Default status (aprobat de director)
+            
+            // Functie pentru reincarcarea calendarului cu statusul selectat
+            function reloadCalendar(status) {
+                $('#calendar').fullCalendar('destroy'); // Distruge vechiul calendar
+                initCalendar(status); // Initializeaza un nou calendar
+            }
+            
+            // Functie pentru initializarea calendarului
+            function initCalendar(status) {
+                var calendar = $('#calendar').fullCalendar({
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                    },
+                    locale: 'ro', // Romanian language
+                    buttonIcons: true,
+                    weekNumbers: false,
+                    navLinks: true,
+                    editable: true,
+                    dayMaxEvents: true,
+                    defaultView: 'month',
+                    dayRender: function(date, cell) {
+                        var today = $.fullCalendar.moment();
+                        if(date.get('date') == today.get('date')) {
+                           cell.css("textColor", "white");
                         }
-                    });
-                }
+                    },
+                    selectable: true,
+                    selectHelper: true,
+    
+                    dayClick: function (date, jsEvent, view) {
+                        //var D = moment(date);
+                        t.row.add([
+                            counter,
+                            date.format('dddd,MMMM DD,YYYY'),
+                            'testing'
+                        ]).draw(false);
+    
+                        counter++;
+    
+                        cell.css("background-color", "teal");
+                    },
+                    
+                    dayRender: function(date, cell) { 
+                        var today = $.fullCalendar.moment(); 
+                        var end = $.fullCalendar.moment().add(7, 'days'); 
+                        if (date.get('date') == today.get('date')) { 
+                            $(".fc-"+date.format('ddd').toLowerCase()).css("background", "#f8f9fa"); 
+                            $("th.fc-"+date.format('ddd').toLowerCase()).text("Holiday"); 
+                            $("th.fc-"+date.format('ddd').toLowerCase()).css("background", "red"); 
+                            $("th.fc-"+date.format('ddd').toLowerCase()).css("color", "#fff"); 
+                        } 
+                    },
+                        
+                    events: function(start, end, timezone, callback) {
+                        $.ajax({
+                            url: 'decenulvede',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                start: start.format(),
+                                end: end.format(),
+                                status: status // Adaugam parametrul de status
+                            },
+                            success: function(response) {
+                                callback(response);
+                            },
+                            error: function() {
+                                alert('There was an error while fetching events!');
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Initializeaza calendarul cu statusul implicit
+            initCalendar(currentStatus);
+            
+            // Handler pentru butonul de aplicare a statusului
+            $('#applyStatus').click(function() {
+                var selectedStatus = $('#leaveStatus').val();
+                currentStatus = selectedStatus;
+                reloadCalendar(selectedStatus);
             });
         });
     </script>

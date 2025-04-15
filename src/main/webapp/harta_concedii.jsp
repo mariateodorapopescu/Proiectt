@@ -130,7 +130,7 @@ int pag = -1;
 </head>
 <body>
     <div id="viewDiv"></div>
-    <div class="sidebar">
+    <div class="sidebar" style="display:none;">
         <label for="locationSelect">Localitatea</label>
         <select id="locationSelect"></select>
         
@@ -210,11 +210,20 @@ int pag = -1;
                                         }
                                     },
                                     attributes: {
-                                        address: vacation.address
+                                        address: vacation.address,
+                                        nume: vacation.nume,
+                                        prenume: vacation.prenume, 
+                                        departament: vacation.departament
                                     },
                                     popupTemplate: {
-                                        title: "Adresă Locație",
-                                        content: "{address}"
+                                        title: "Adresă Locație Concediu",
+                                        text: "<div class='custom-popup'>" +
+                                        "<strong>Locație:</strong> {address}<br>" +
+                                        "<strong>Angajat:</strong> {prenume} {nume}<br>" +
+                                        "<strong>Departament:</strong> {departament}" +
+                                        "</div>"
+
+                                        
                                     }
                                 });
 

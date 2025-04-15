@@ -22,7 +22,20 @@ public class decenulvede extends HttpServlet {
         try {
             int departmentId = getUserDepartment(request);
             if (departmentId != -1) {
-                	loadDepartmentLeaves(departmentId, events);
+                // Obține parametrul status din cerere, valoarea default este 2 (aprobat director)
+                String statusParam = request.getParameter("status");
+                int status = 2; // valoare default
+                
+                // Dacă statusParam nu este null și este un număr valid
+                if (statusParam != null && !statusParam.isEmpty()) {
+                    try {
+                        status = Integer.parseInt(statusParam);
+                    } catch (NumberFormatException e) {
+                        // Ignoră și folosește valoarea default
+                    }
+                }
+                
+                loadDepartmentLeaves(departmentId, events, status);
             } 
         } catch (Exception e) {
             e.printStackTrace();
@@ -39,7 +52,20 @@ public class decenulvede extends HttpServlet {
         try {
             int departmentId = getUserDepartment(request);
             if (departmentId != -1) {
-                loadDepartmentLeaves(departmentId, events);
+                // Obține parametrul status din cerere, valoarea default este 2 (aprobat director)
+                String statusParam = request.getParameter("status");
+                int status = 2; // valoare default
+                
+                // Dacă statusParam nu este null și este un număr valid
+                if (statusParam != null && !statusParam.isEmpty()) {
+                    try {
+                        status = Integer.parseInt(statusParam);
+                    } catch (NumberFormatException e) {
+                        // Ignoră și folosește valoarea default
+                    }
+                }
+                
+                loadDepartmentLeaves(departmentId, events, status);
             }
             PrintWriter out = response.getWriter();
             out.print(events.toString());
@@ -72,16 +98,33 @@ public class decenulvede extends HttpServlet {
         return -1;
     }
 
-    private void loadDepartmentLeaves(int departmentId, JSONArray events) throws ClassNotFoundException, SQLException {
+    private void loadDepartmentLeaves(int departmentId, JSONArray events, int status) throws ClassNotFoundException, SQLException {
     	// initializarea driverului pentru Jdbc
     	// crearea conexiunii pentru baza de date
         Class.forName("com.mysql.cj.jdbc.Driver");
+        
+        // Creează interogarea SQL în funcție de status
+        String sql;
+        if (status == 3) {
+            // Încarcă toate concediile, indiferent de status
+            sql = "SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ?";
+        } else {
+            // Încarcă doar concediile cu status-ul specificat
+            sql = "SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ? AND concedii.status = ?";
+        }
+        
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-        		// pregatirea interogarii
-             PreparedStatement statement = connection.prepareStatement(
-                 "SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ? and concedii.status = 2")) {
+            // pregatirea interogarii
+            PreparedStatement statement = connection.prepareStatement(sql)) {
+            
             // setare variabile in interogare
         	statement.setInt(1, departmentId);
+            
+            // Adaugă al doilea parametru doar dacă selectăm un status specific
+            if (status != 3) {
+                statement.setInt(2, status);
+            }
+            
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
             	// de fiecare data cand a gasit ceva, il pune in json cu nume, prenume, data inceput/final. locatie, motiv, tip, completand obiectul de tip concediu

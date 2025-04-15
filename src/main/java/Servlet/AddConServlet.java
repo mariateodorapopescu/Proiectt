@@ -218,7 +218,7 @@ public class AddConServlet extends HttpServlet {
 			response.setContentType("text/html;charset=UTF-8");
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Nu a gasit clasa - debug only!');");
+		    out.println("alert('Off, a crapat =(!');");
 		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
@@ -228,7 +228,7 @@ public class AddConServlet extends HttpServlet {
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Eroare IO - debug only!');");
+		    out.println("alert('Off, a crapat =(!');");
 		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
@@ -264,7 +264,7 @@ public class AddConServlet extends HttpServlet {
 			response.setContentType("text/html;charset=UTF-8");
 		    PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Nu a gasit clasa - debug only!');");
+		    out.println("alert('Off, a crapat =(!');");
 		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
@@ -274,7 +274,7 @@ public class AddConServlet extends HttpServlet {
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter out = response.getWriter();
 		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Eroare IO - debug only!');");
+		    out.println("alert('Off, a crapat =(!');");
 		    out.println("window.location.href = 'actiuni.jsp';");
 		    out.println("</script>");
 		    out.close();
@@ -324,7 +324,7 @@ public class AddConServlet extends HttpServlet {
 				response.setContentType("text/html;charset=UTF-8");
 			    PrintWriter out = response.getWriter();
 			    out.println("<script type='text/javascript'>");
-			    out.println("alert('Nu a gasit clasa - debug only!');");
+			    out.println("alert('Off, a crapat =(!');");
 			    out.println("window.location.href = 'actiuni.jsp';");
 			    out.println("</script>");
 			    out.close();
@@ -390,7 +390,7 @@ public class AddConServlet extends HttpServlet {
 			response.setContentType("text/html;charset=UTF-8");
 	        PrintWriter out = response.getWriter();
 	        out.println("<script type='text/javascript'>");
-	        out.println("alert('Eroare la baza de date!');");
+	        out.println("alert('Off, a crapat =(!');");
 	        out.println("window.location.href = 'actiuni.jsp';");
 	        out.println("</script>");
 	        out.close();
@@ -405,29 +405,25 @@ public class AddConServlet extends HttpServlet {
 	        int result = concediu.incarca(concediul);
 	        
 	        if (result > 0) {
-	            // Concediul a fost inserat cu succes, acum trimitem email-ul asincron
-	            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
+	            // Mai întâi trimite răspunsul către client
+	            response.setContentType("text/html;charset=UTF-8");
+	            PrintWriter out = response.getWriter();
+	            out.println("<script type='text/javascript'>");
+	            out.println("alert('Adaugare cu succes!');");
+	            out.println("window.location.href = 'concediinoisef.jsp?pag=1';");
+	            out.println("</script>");
+	            out.close();
 	            
-	            asyncContext.start(() -> {
+	            // Apoi trimite emailul în mod asincron (fără a mai folosi response)
+	            Thread mailThread = new Thread(() -> {
 	                try {
 	                    MailAsincron.send(id, tip, inceput, sfarsit, motiv, locatie, durata2);
-	                    asyncContext.complete();
-	                    
-	                    // Redirectare după trimiterea email-ului
-	                    response.setContentType("text/html;charset=UTF-8");
-	                    PrintWriter out = response.getWriter();
-	                    out.println("<script type='text/javascript'>");
-	                    out.println("alert('Adaugare cu succes!');");
-	                    out.println("window.location.href = 'concediinoisef.jsp';");
-	                    out.println("</script>");
-	                    out.close();
-	                    
 	                } catch (Exception e) {
 	                    e.printStackTrace();
-	                    asyncContext.complete();
 	                    System.out.println("Eroare la trimiterea email-ului: " + e.getMessage());
 	                }
 	            });
+	            mailThread.start();
 	        } else {
 	            throw new SQLException("Nu s-a putut adăuga concediul în baza de date");
 	        }
@@ -440,7 +436,7 @@ public class AddConServlet extends HttpServlet {
 	        out.println("window.location.href = 'actiuni.jsp';");
 	        out.println("</script>");
 	        out.close();
-	    } 
+	    }
 	}
 	
 	/**

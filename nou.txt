@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS concedii (
   added DATE NULL DEFAULT NULL,
   modified DATE NULL DEFAULT NULL,
   acc_res DATE NULL DEFAULT NULL,
-  mentiuni VARCHAR(256) NOT NULL,
+  mentiuni VARCHAR(256) default NULL,
   PRIMARY KEY (id));
 
 -- -----------------------------------------------------
@@ -764,17 +764,17 @@ INSERT INTO tipcon (motiv, nr_zile) VALUES
 DROP TRIGGER IF EXISTS after_user_insert; -- nu stiu de ce a trebuit sa-l sterg pe asta, dar cred ca-mi dadea eroare -> sa vad cum rezolv
 
 -- Inserarea datelor inițiale despre angajati
-INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa) VALUES 
-('Vasile', 'Fabian', '1996-09-19', 'vasile.fabian@example.com', '0700000000', 'fvasile', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 0, 'Strada Unirii'),
-('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății'),
-('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii'),
-('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab'),
-('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății'),
-('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei'),
-('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei'),
-('Rebreanu', 'Andrei', '2003-07-07', 'andrei.rebreanu@example.com', '0700000006', 'andrei.rebreanu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei'),
-('Ionescu', 'Lucian', '1989-04-18', 'lucion@example.com', '0700000007', 'lucian.i', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 3, 'Strada Alunului'),
-('Ciucioiu', 'Elena', '2002-09-11', 'elena.c@example.com', '0700000008', 'elena.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 4, 'Strada Izvorului')
+INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa, culoare) VALUES 
+('Vasile', 'Fabian', '1996-09-19', 'vasile.fabian@example.com', '0700000000', 'fvasile', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 0, 'Strada Unirii', '#3A8DFF'),
+('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății', '#FF5733'),
+('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii', '#42E695'),
+('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab', '#9B59B6'),
+('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății', '#FFD700'),
+('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei', '#E74C3C'),
+('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei', '#1ABC9C'),
+('Rebreanu', 'Andrei', '2003-07-07', 'andrei.rebreanu@example.com', '0700000006', 'andrei.rebreanu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei', '#F39C12'),
+('Ionescu', 'Lucian', '1989-04-18', 'lucion@example.com', '0700000007', 'lucian.i', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 3, 'Strada Alunului', '#8E44AD'),
+('Ciucioiu', 'Elena', '2002-09-11', 'elena.c@example.com', '0700000008', 'elena.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 4, 'Strada Izvorului', '#2ECC71')
 ;
 
 -- niste update-uri de test pentru ca sa nu mai schimb de fiecare data cand refac baza =)))
@@ -952,4 +952,6 @@ ORDER BY l.oras;
 -- -----------------------------------------------------
 -- test
 -- -----------------------------------------------------
-select * from concedii;
+select * from useri;
+desc locatii_concedii;
+SELECT strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;
