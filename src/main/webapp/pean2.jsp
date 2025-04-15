@@ -91,13 +91,15 @@ if (sesi != null) {
             margin-left: 290px;
             padding: 20px;
             width: calc(100% - 330px);
+            top: 5rem;
         }
         
         .chart-container {
-            background-color: white;
+            background-color: <%=card%>;
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
+            top: 5rem;
            
         }
         
@@ -107,11 +109,11 @@ if (sesi != null) {
         }
         
         .chart-info {
-            background-color: white;
+            background-color: <%=card%>;
             border-radius: 20px;
             padding: 20px;
             margin-top: 20px;
-            
+            color: <%=text%>;
         }
         
         .form-group {
@@ -133,7 +135,9 @@ if (sesi != null) {
         }
         
         .btn:hover {
-            background-color: <%=hover%>;
+            background-color: black;
+            color: white;
+            text-decoration: underline;
         }
         
         h3, h4 {
@@ -217,7 +221,15 @@ if (sesi != null) {
             </div>
         </div>
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <!-- Add these script tags in the <head> section BEFORE your other scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
 var clear = document.getElementById("ceva1").innerText;
 var accent = document.getElementById("ceva2").innerText;
@@ -362,57 +374,37 @@ $(document).ready(function() {
         });
     }, false);
 });
-
 function generatePDF() {
-    // Create a clone of the content div for PDF generation
+    // Ensure libraries are loaded
+    if (typeof html2canvas === 'undefined' || typeof html2pdf === 'undefined') {
+        alert('PDF generation libraries not loaded. Please refresh the page.');
+        return;
+    }
+
+    // Get the content to convert
     const contentElement = document.getElementById('content');
-    const clone = contentElement.cloneNode(true);
-    clone.style.position = 'static';
-    clone.style.width = '100%';
-    clone.style.padding = '20px';
-    clone.style.backgroundColor = 'white';
-    
-    // Get chart as image first
-    zingchart.exec('myChart', 'getimagedata', {
-        filetype: 'png',
-        callback: function(imageData) {
-            // Replace chart div with image in the clone
-            const chartDiv = clone.querySelector('#myChart');
-            if (chartDiv) {
-                const img = document.createElement('img');
-                img.src = imageData;
-                img.style.width = '100%';
-                img.style.maxWidth = '100%';
-                chartDiv.parentNode.replaceChild(img, chartDiv);
-                
-                // Create temporary div for PDF generation
-                const tempDiv = document.createElement('div');
-                tempDiv.appendChild(clone);
-                document.body.appendChild(tempDiv);
-                tempDiv.style.position = 'absolute';
-                tempDiv.style.left = '-9999px';
-                
-                // Generate PDF
-                html2pdf().set({
-                    margin: 10,
-                    filename: 'raport_concedii.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        logging: true
-                    },
-                    jsPDF: {
-                        unit: 'mm',
-                        format: 'a4',
-                        orientation: 'portrait'
-                    }
-                }).from(tempDiv).save().then(() => {
-                    // Clean up
-                    document.body.removeChild(tempDiv);
-                });
-            }
+
+    // Use html2pdf to generate PDF directly
+    html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'raport_concedii.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            allowTaint: true
+        },
+        jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
         }
+    }).from(contentElement).save().then(() => {
+        console.log('PDF generated successfully');
+    }).catch((error) => {
+        console.error('PDF Generation Error:', error);
+        alert('Failed to generate PDF. Check browser console for details.');
     });
 }
 
