@@ -273,7 +273,7 @@
                     <th style="color:white">Start</th>
                     <th style="color:white">Fine</th>
                     <th style="color:white">Motiv</th>
-                    <th style="color:white">Loc</th>
+                    <th style="color:white">Obs</th>
                     <th style="color:white">Tip</th>
                     <th style="color:white">Adaug.</th>
                     <th style="color:white">Modif.</th>
@@ -289,12 +289,14 @@
                         </table>
                     </div>
                     
-                    <button id="generate" onclick="sendJsonToPDFServer()">Descarcati PDF</button>
+                    <button id="generate">Descarcati PDF</button>
                    <button id="inapoi" ><a href ="viewang4.jsp">Inapoi</a></button>
                 
                 </div>
             </div>
         </div>
+        
+        
 <script>
      // Funcții helper pentru status
  	function getStatusClass(status) {
@@ -396,14 +398,110 @@
             });
 
             // Curățăm sessionStorage după ce am folosit datele
-            sessionStorage.removeItem('tableData');
+            // sessionStorage.removeItem('tableData');
 
         } catch (error) {
             console.error('Error:', error);
             document.getElementById('tableBody').innerHTML = 
-                '<tr><td colspan="14" style="text-align: center;">Nu sunt date disponibile</td></tr>';
+                '<tr><td colspan="14" style="text-align: left;">Nu sunt date disponibile</td></tr>';
         }
     });
     </script>
+ <script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("generate").addEventListener("click", async function () {
+    const jsonStr = sessionStorage.getItem("tableData");
+
+    if (!jsonStr) {
+      alert("⚠️ Datele lipsesc din sessionStorage!");
+      return;
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch (e) {
+      alert("❌ JSON invalid!");
+      console.error("Eroare JSON.parse:", e);
+      return;
+    }
+
+    if (!parsed.data || !Array.isArray(parsed.data)) {
+      alert("⚠️ Câmpul `data` lipsește sau nu este un array!");
+      return;
+    }
+
+    if (parsed.data.length === 0) {
+      alert("⚠️ Nu există înregistrări de trimis în PDF!");
+      return;
+    }
+
+    // ✅ Reordonăm câmpurile în fiecare obiect
+    const orderedKeys = [
+      "NrCrt", "Nume", "Prenume", "Functie", "Departament",
+      "Inceput", "Final", "Motiv", "Obs", "Tip",
+      "Adaugat", "Modificat", "Vazut", "Status"
+    ];
+
+    const orderedData = parsed.data.map(row => {
+      const orderedRow = {};
+      orderedKeys.forEach(key => {
+    	  if (key == "Obs") {
+    		  orderedRow[key] = row["Locatie"] || ""; 
+    	  } else {
+        orderedRow[key] = row[key] || ""; }// completăm cu string gol dacă lipsește
+      });
+      return orderedRow;
+    });
+
+    // înlocuim data cu cea reordonată
+    parsed.data = orderedData;
+
+    try {
+        const response = await fetch("generatePDF.jsp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(parsed)
+        });
+
+        if (!response.ok) {
+          throw new Error("❌ Eroare la generarea PDF-ului: " + response.statusText);
+        }
+
+        // 🔍 Extragem numele fișierului PDF din header
+        let contentDisposition = response.headers.get("Content-Disposition");
+        let fileName = "Raport_Concedii.pdf";
+
+        if (contentDisposition) {
+          let match = contentDisposition.match(/filename="(.+)"/);
+          if (match) {
+            fileName = match[1];
+          }
+        }
+
+        console.log("📂 Numele fișierului detectat:", fileName);
+
+        // Descarcă PDF-ul
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+      } catch (error) {
+        console.error("🔥 Eroare:", error);
+        alert("A apărut o eroare la trimiterea datelor către serverul de PDF!");
+      }
+    });
+  });
+</script>
+
+ 
+   
 </body>
 </html>
