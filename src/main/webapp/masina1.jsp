@@ -1,708 +1,233 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="application/json;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.Date" %>
-<%@ page import="java.util.Locale" %>
-<%! 
-public String escapeHtml(String input) {
-    if (input == null) return "";
-    return input.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#x27;");
-}
-%>
+<%@ page import="java.util.*" %>
+<%@ page import="java.io.BufferedReader" %>
+<%@ page import="org.json.JSONObject" %>
+<%@ page import="org.json.JSONArray" %>
+
 <%
-    HttpSession sesi = request.getSession(false);
-int pag = -1;
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-        if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                	out.println("<script type='text/javascript'>");
-                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                    out.println("</script>");
-                } else {
-                    int userType = rs.getInt("tip");
-                    int userId = rs.getInt("id");
-                    int userDep = rs.getInt("id_dep");
-                    if (userType == 4) {
-                        response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
-                    } else {
-                    	 String accent = null;
-                      	 String clr = null;
-                      	 String sidebar = null;
-                      	 String text = null;
-                      	 String card = null;
-                      	 String hover = null;
-                      	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             // Check for upcoming leaves in 3 days
-                             String query = "SELECT * from teme where id_usr = ?";
-                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                 stmt.setInt(1, userId);
-                                 try (ResultSet rs2 = stmt.executeQuery()) {
-                                     if (rs2.next()) {
-                                       accent =  rs2.getString("accent");
-                                       clr =  rs2.getString("clr");
-                                       sidebar =  rs2.getString("sidebar");
-                                       text = rs2.getString("text");
-                                       card =  rs2.getString("card");
-                                       hover = rs2.getString("hover");
-                                     }
-                                 }
-                             }
-                             // Display the user dashboard or related information
-                             //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                             // Add additional user-specific content here
-                         } catch (SQLException e) {
-                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                             e.printStackTrace();
-                         }
-                      	 %> 
-<html>
-
-<head>
-    <title>Vizualizare concedii</title>
-     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
-    <style>
-        
-        a, a:visited, a:hover, a:active{color:#eaeaea !important; text-decoration: none;}
-  
-        .status-icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 20px;
-            color: white;
-            font-size: 14px;
-        }
-        
-        .status-neaprobat { background-color: #88aedb; }
-        .status-dezaprobat-sef { background-color: #b37142; }
-        .status-dezaprobat-director { background-color: #873931; }
-        .status-aprobat-director { background-color: #40854a; }
-        .status-aprobat-sef { background-color: #ccc55e; }
-        .status-pending { background-color: #e0a800; }
-       
-       /* Tooltip */
-       	.tooltip {
-		  position: relative; 
-		  border-bottom: 1px dotted black; 
-		}
-		
-		.tooltip .tooltiptext {
-		  visibility: hidden;
-		  width: 120px;
-		  background-color: rgba(0,0,0,0.5);
-		  color: white;
-		  text-align: center;
-		  padding: 5px 0;
-		  border-radius: 6px;
-		  position: absolute;
-		  z-index: 1;
-		}
-		
-		.tooltip:hover .tooltiptext {
-		  visibility: visible;
-		}
-       .content, .main-content {
-    overflow: auto; /* Permite scroll-ul orizontal */
-    width: 100%; /* Asigură că folosește întreaga lățime disponibilă */
-}
-       
-::-webkit-scrollbar {
-		    display: none; /* Ascunde scrollbar pentru Chrome, Safari și Opera */
-		}
-		       
-    </style>
-</head>
-
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
-
-                      	 <%
-                    	 int id = Integer.valueOf(request.getParameter("id"));
-                    	 int status = Integer.valueOf(request.getParameter("status"));
-                    	 int tip = Integer.valueOf(request.getParameter("tip"));
-                    	 int dep = Integer.valueOf(request.getParameter("dep"));
-                    	 String an =  request.getParameter("an");
-                    	 int perioada = 0;
-                    	 String start = null;
-                    	 String end = null;
-                    	
-                    	if (an == null) {
-                    		perioada = 1;
-                    		start = request.getParameter("start");
-                    		end = request.getParameter("end");
-                    		if (start.compareTo("")==0) {
-                    			perioada = 0;
-                    		}
-                    		if (end.compareTo("")==0) {
-                    			perioada = 0;
-                    		}
-                    	}
-                    	
-                    	 pag = Integer.valueOf(request.getParameter("pag"));
-                    	
-                    	String sql = null;
-                    	PreparedStatement stmtt2 = null;
-                    	%>
-                    	
-                    	<div class="main-content" style="background:<%out.println(clr);%>; ">
-        <div class="header">
-         </div>
-        <div class="content" style="border-radius: 2rem; margin-top:5%; ">
-            <div class="intro" style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%> ">             	
-                    	
-                 <div class="events"  style="border-radius: 2rem; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" id="content">
-                 <%
-                    	System.out.println(pag + " " + status + ' ' + tip);
-                    	if (pag == 3) {
-               			 out.println("<h1> Vizualizare concedii personale");
-             				
-               		}
-               		if (pag == 4) {
-               		
-                    	 out.println("<h1> Vizualizare concedii ale unui angajat");
-
-                     }
-               		
-               		if (pag == 5) {
-              			 out.println("<h1> Vizualizare concedii ale unui coleg din departamentul meu");
-            				
-              		}
-               		if (pag == 6) {
-             			 out.println("<h1> Vizualizare concedii din departamentul meu");
-           				
-             		}
-               		if (pag == 7) {
-                     	out.println("<h1> Vizualizare concedii dintr-un departament ");
-           				
-             		}
-               		if (pag == 8) {
-            			 out.println("<h1> Vizualizare concedii din toata institutia");
-          				
-            		}
-               		
-               		if (perioada == 0) {
-               			out.println(" pe an. </h1>");
-               		} else 
-               		{
-               			out.println(" pe perioada " + start + " - " + end + ". </h1>");
-               		}
-                    	
-               		String today = null;
-                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                           // Check for upcoming leaves in 3 days
-                           String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
-                           try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                               // stmt.setInt(1, id);
-                               try (ResultSet rs2 = stmt.executeQuery()) {
-                                   if (rs2.next()) {
-                                     today =  rs2.getString("today");
-                                   }
-                               }
-                           }
-                          
-                           // Display the user dashboard or related information
-                           //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-                           // Add additional user-specific content here
-                       } catch (SQLException e) {
-                           out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                           e.printStackTrace();
-                       }
-                    	
-                    	%>
- 	
-                <h3><%out.println(today); %></h3>
-                <table style="color: white">
-                    <thead style="color: white">
-                        <tr style="color: white">
-                    
-                    <th style="color:white">Nr.crt</th>
-                    <th style="color:white">Nume</th>
-                    <th style="color:white">Prenume</th>
-                    <th style="color:white">Functie</th>
-                    <th style="color:white">Departament</th>
-                    <th style="color:white">Inceput</th>
-                    <th style="color:white">Final</th>
-                    <th style="color:white">Motiv</th>
-                    <th style="color:white">Locatie</th>
-                    <th style="color:white">Tip</th>
-                    <th style="color:white">Adaugat</th>
-                    <th style="color:white">Modificat</th>
-                     <th style="color:white">Vazut</th>
-                    <th style="color:white">Status</th>
-                    
-                     
-                </tr>
-            </thead>
-             <tbody style="background:<%out.println(clr);%>; color:<%out.println(text);%>">
-                   <% 	
-                   sql = "SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, " +
-                           "t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon " +
-                           "FROM useri u " +
-                           "JOIN tipuri t ON u.tip = t.tip " +
-                           "JOIN departament d ON u.id_dep = d.id_dep " +
-                           "JOIN concedii c ON c.id_ang = u.id " +
-                           "JOIN statusuri s ON c.status = s.status " +
-                           "JOIN tipcon ct ON c.tip = ct.tip ";
-                    	if (pag == 3 || pag == 4 || pag == 5) {
-                    		// aici se adauga id_ang pentru ca: personal, angajat, coleg de departament
-                    		sql = sql + " where c.id_ang = ? and u.username <> " + "\"test\"";
-                    		
-                    		int nr = 1;
-                    		int nrt = -1;
-                    		int nrs = -1;
-                    		int nrp1 = -1;
-                    		int nrp2 = -1;
-                    		int nrp3 = -1;
-                    		
-                    		if (perioada == 0) {
-                    			sql = sql + " and YEAR(c.start_c) = YEAR(CURDATE()) ";
-                    		}
-                    		
-                    		if (tip != -1) {
-                    			sql = sql  + " and c.tip = ? ";
-                    			nr++;
-                    			nrt = nr;
-                  		}
-                    		if (status != 3) {
-                    			sql = sql  + " and c.status = ? ";
-                    			nr++;
-                    			nrs = nr;
-                  		}
-                    		
-                    		if (perioada == 1) {
-                    			sql = sql  + " and YEAR(c.start_c) = YEAR(CURDATE()) AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			nr++;
-                    			nrp1 = nr;
-                    			nr++;
-                    			nrp2 = nr;
-                    			nr++;
-                    			nrp3 = nr;
-                    		}
-                    		 
-                    		stmtt2 = connection.prepareStatement(sql);
-                    		stmtt2.setInt(1, id);
-                    		
-                    		if (nrt != -1) {
-                    			stmtt2.setInt(nrt, tip);
-                    		}
-                    		
-                    		if (nrs != -1) {
-                    			stmtt2.setInt(nrs, status);
-                    		}
-                    		
-                    		if (nrp1 != -1) {
-                    			stmtt2.setString(nrp1, start);
-                    			stmtt2.setString(nrp2, end);
-                    			stmtt2.setString(nrp3, end);
-                    		}
-                    	}
-                    	
-                    	if (pag == 6 || pag == 7) {
-                    		// aici adaug departamentul
-							sql = sql + " where u.id_dep = ? and u.tip <> 4 ";
-                    		
-                    		if (pag == 6) {
-                    			sql = sql + " and c.id_ang <> " + userId;
-                    		}
-                    		
-                    		if (pag == 7 && dep == userDep) {
-                    			sql = sql + " and c.id_ang <> " + userId;
-                    		}
-                    		
-                    		int nr = 1;
-                    		int nrt = -1;
-                    		int nrs = -1;
-                    		int nrp1 = -1;
-                    		int nrp2 = -1;
-                    		int nrp3 = -1;
-                    		
-                    		if (perioada == 0) {
-                    			sql = sql + " and YEAR(c.start_c) = YEAR(CURDATE()) ";
-                    		}
-                    		
-                    		if (tip != -1) {
-                    			sql = sql  + " and c.tip = ? ";
-                    			nr++;
-                    			nrt = nr;
-                  		}
-                    		if (status != 3) {
-                    			sql = sql  + " and c.status = ? ";
-                    			nr++;
-                    			nrs = nr;
-                  		}
-                    		
-                    		if (perioada == 1) {
-                    			sql = sql  + " and YEAR(c.start_c) = YEAR(CURDATE()) AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			nr++;
-                    			nrp1 = nr;
-                    			nr++;
-                    			nrp2 = nr;
-                    			nr++;
-                    			nrp3 = nr;
-                    		}
-                    		 
-                    		stmtt2 = connection.prepareStatement(sql);
-                    		stmtt2.setInt(1, dep);
-                    		
-                    		if (nrt != -1) {
-                    			stmtt2.setInt(nrt, tip);
-                    		}
-                    		
-                    		if (nrs != -1) {
-                    			stmtt2.setInt(nrs, status);
-                    		}
-                    		
-                    		if (nrp1 != -1) {
-                    			stmtt2.setString(nrp1, start);
-                    			stmtt2.setString(nrp2, end);
-                    			stmtt2.setString(nrp3, end);
-                    		}
-                    		
-                    	}
-                    	if (pag == 8) {
-                    		// aici e pe toata institutia
-                    		
-                    		sql = sql + " and u.id <> " + userId; 
-                    		
-                    		int nr = 0;
-                    		int nrt = -1;
-                    		int nrs = -1;
-                    		int nrp1 = -1;
-                    		int nrp2 = -1;
-                    		int nrp3 = -1;
-                    		
-                    		String word = " and ";
-                    		if (perioada == 0) {
-                    			nr++;
-                    			if (nr == 1) {
-                    				word = " where ";
-                    			}
-                    			sql = sql + word + " YEAR(c.start_c) = YEAR(CURDATE()) ";
-                    		}
-                    		
-                    		if (tip != -1) {
-                    			nr++;
-                    			if (nr == 1) {
-                    				word = " where ";
-                    			}
-                    			sql = sql + word + " c.tip = ? ";
-                    			nrt = nr;
-                  		}
-                    		if (status != 3) {
-                    			nr++;
-                    			if (nr == 1) {
-                    				word = " where ";
-                    			}
-                    			sql = sql + word  + " c.status = ? ";
-                    			nrs = nr;
-                  		}
-                    		
-                    		if (perioada == 1) {
-                    			nr++;
-                    			nrp1 = nr;
-                    			if (nr == 1) {
-                    				word = " where ";
-                    			}
-                    			sql = sql + word + " YEAR(c.start_c) = YEAR(CURDATE()) AND c.start_c between ? AND ? AND c.end_c <= ?";
-                    			nr++;
-                    			nrp2 = nr;
-                    			nr++;
-                    			nrp3 = nr;
-                    		}
-                    		 
-                    		stmtt2 = connection.prepareStatement(sql);
-                    		
-                    		if (nrt != -1) {
-                    			stmtt2.setInt(nrt, tip);
-                    		}
-                    		
-                    		if (nrs != -1) {
-                    			stmtt2.setInt(nrs, status);
-                    		}
-                    		
-                    		if (nrp1 != -1) {
-                    			stmtt2.setString(nrp1, start);
-                    			stmtt2.setString(nrp2, end);
-                    			stmtt2.setString(nrp3, end);
-                    		}
-                    	}
-                    	System.out.println(stmtt2);
-                    	 try (ResultSet rss1 = stmtt2.executeQuery()) {
-                    	        boolean found = false;
-                    	        int nr = 1;
-
-                    	        while (rss1.next()) {
-                    	            found = true;
-
-                    	            String added = rss1.getString("added") != null ? rss1.getString("added") : " - ";
-                    	            String modif = rss1.getString("modified") != null ? rss1.getString("modified") : " - ";
-                    	            String accres = rss1.getString("acc_res") != null ? rss1.getString("acc_res") : " - ";
-
-                    	            out.print("<tr><td>" + nr + "</td><td>" + escapeHtml(rss1.getString("nume")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("prenume")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("functie")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("departament")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("start_c")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("end_c")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("motiv")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("locatie")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(rss1.getString("tipcon")) + "</td>");
-                    	            out.print("<td>" + escapeHtml(added) + "</td>");
-                    	            out.print("<td>" + escapeHtml(modif) + "</td>");
-                    	            out.print("<td>" + escapeHtml(accres) + "</td>");
-									
-                    	            
-                    	            if (rss1.getString("status").compareTo("Neaprobat") == 0) {
-                                        out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Neaprobat</span><span class='status-icon status-neaprobat'><i class='ri-focus-line'></i></span></td>");
-                                    }
-                                    
-                                    if (rss1.getString("status").compareTo("Aprobat sef") == 0) {
-                                        out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat sef</span><span class='status-icon status-aprobat-sef'><i class='ri-checkbox-circle-line'></i></span></td>");
-                                    }
-                                    
-                                    if (rss1.getString("status").compareTo("Aprobat director") == 0) {
-                                        out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Aprobat director</span><span class='status-icon status-aprobat-director'><i class='ri-checkbox-circle-line'></i></span></td>");
-                                    }
-                                    
-                                    if (rss1.getString("status").compareTo("Dezaprobat director") == 0) {
-                                    	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat director</span><span class='status-icon status-dezaprobat-director'><i class='ri-close-line'></i></span></td>");
-                                    }
-                                    
-                                    if (rss1.getString("status").compareTo("Dezaprobat sef") == 0) {
-                                    	out.println("<td class='tooltip' data-label='Status'><span class='tooltiptext'>Dezaprobat sef</span><span class='status-icon status-dezaprobat-sef'><i class='ri-close-line'></i></span></td>");
-                                    }
-                    	            /*
-                    	            String status2 = rss1.getString("status");
-                    	            if ("neaprobat".equalsIgnoreCase(status2)) {
-                    	                out.print("<td class='status-neaprobat'>Neaprobat</td>");
-                    	            } else if ("aprobat sef".equalsIgnoreCase(status2)) {
-                    	                out.print("<td class='status-aprobat-sef'>Aprobat sef</td>");
-                    	            } else if ("aprobat director".equalsIgnoreCase(status2)) {
-                    	                out.print("<td class='status-aprobat-director'>Aprobat director</td>");
-                    	            } else {
-                    	                out.print("<td> - </td>");
-                    	            }
-*/
-                    	            nr++;
-                    	        }
-
-                    	        if (!found) {
-                    	            out.println("<tr><td colspan='14'>Nu exista date.</td></tr>");
-                    	        }
-                    	 
-                          rss1.close();
-                          stmtt2.close();
-                    	 }
-                    }
-           %>
-            </tbody>
-                </table> 
-                              
-                </div>
-             
-                  <button id="generate" onclick="generate()">Descarcati PDF</button>
-                  <button id="csv" onclick="sendTableDataToCSV()">Descarcati CSV</button>
-                   <button onclick="generateJSONFromTable()">Descarcati un JSON</button>
-                  
-                  <%
-                  if (pag == 3) {
-            			 out.println("<button ><a href='viewp.jsp'>Inapoi</a></button></div>");
-            		}
-            		if (pag == 4) {
-            			out.println("<button ><a href='viewcol.jsp'>Inapoi</a></button></div>");
-                 	  }
-            		if (pag == 5) {
-            			out.println("<button ><a href='viewconcoldepeu.jsp'>Inapoi</a></button></div>");
-           			 }
-            		if (pag == 6) {
-            			out.println("<button ><a href='viewdepeu.jsp'>Inapoi</a></button></div>");
-          			 }
-            		if (pag == 7) {
-            			out.println("<button ><a href='viewcondep.jsp'>Inapoi</a></button></div>");
-                  		}
-            		if (pag == 8) {
-            			out.println("<button ><a href='viewtot.jsp'>Inapoi</a></button></div>");
-         			}
-                  
-                  %>
-               
-                <script>
-              
-                function generate() {
-                    const element = document.getElementById('content'); // Ensure you target the specific div
-                    html2pdf().set({
-                        pagebreak: { mode: ['css', 'legacy'] },
-                        html2canvas: {
-                            scale: 1, // Adjust scale to manage the size and visibility of content
-                            logging: true,
-                            dpi: 192,
-                            letterRendering: true,
-                            useCORS: true // This helps handle external content like images
-                        },
-                        jsPDF: {
-                            unit: 'in',
-                            format: 'a4',
-                            orientation: 'landscape' // Change to 'landscape' if the content is too wide
-                        }
-                    }).from(element).save();
-                }
-
-            </script>
-            <script>
- async function sendTableDataToCSV() {
-    const table = document.querySelector("table");
-    const rows = table.querySelectorAll("tbody tr");
-
-    const data = [];
-    rows.forEach((row, index) => {
-        const cells = row.querySelectorAll("td");
-        if (cells.length > 0) {
-            data.push({
-                "NrCrt": cells[0].textContent.trim(),
-                "Nume": cells[1].textContent.trim(),
-                "Prenume": cells[2].textContent.trim(),
-                "Functie": cells[3].textContent.trim(),
-                "Departament": cells[4].textContent.trim(),
-                "Inceput": cells[5].textContent.trim(),
-                "Final": cells[6].textContent.trim(),
-                "Motiv": cells[7].textContent.trim(),
-                "Locatie": cells[8].textContent.trim(),
-                "Tip": cells[9].textContent.trim(),
-                "Adaugat": cells[10].textContent.trim(),
-                "Modificat": cells[11].textContent.trim(),
-                "Vazut": cells[12]?.textContent.trim(),
-                "Status": cells[13]?.textContent.trim()
-            });
-        }
-    });
-
-    console.log("Data being sent to the server:", JSON.stringify(data, null, 2)); // Log data being sent
-
     try {
-        const response = await fetch("generateCSV1", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        if (response.ok) {
-            console.log("CSV generation successful");
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "table_data.csv";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } else {
-            console.error("Failed to generate CSV. Response status:", response.status);
-        }
-    } catch (error) {
-        console.error("Error during CSV generation:", error);
-    }
-}
-</script>
-        <script>
-    function generateJSONFromTable() {
-        // Get the table
-        const table = document.querySelector("table");
-        const rows = table.querySelectorAll("tbody tr");
-
-        // Extract table data into a JSON array
-        const data = [];
-        rows.forEach((row, index) => {
-            const cells = row.querySelectorAll("td");
-            if (cells.length > 0) { // Ignore rows with no data
-                data.push({
-                	 "NrCrt": cells[0].textContent.trim(),
-                     "Nume": cells[1].textContent.trim(),
-                     "Prenume": cells[2].textContent.trim(),
-                     "Functie": cells[3].textContent.trim(),
-                     "Departament": cells[4].textContent.trim(),
-                     "Inceput": cells[5].textContent.trim(),
-                     "Final": cells[6].textContent.trim(),
-                     "Motiv": cells[7].textContent.trim(),
-                     "Locatie": cells[8].textContent.trim(),
-                     "Tip": cells[9].textContent.trim(),
-                     "Adaugat": cells[10].textContent.trim(),
-                     "Modificat": cells[11].textContent.trim(),
-                     "Vazut": cells[12].textContent.trim(),
-                     "Status": cells[13].textContent.trim()
-                });
+        // Citire JSON din request
+        StringBuilder jsonBody = new StringBuilder();
+        try (BufferedReader reader = request.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonBody.append(line).append("\n");
             }
-        });
+        }
 
-        // Convert JSON array to string
-        const jsonString = JSON.stringify(data, null, 2); // Pretty print JSON
+        String jsonStr = jsonBody.toString().trim();
+        System.out.println("JSON String primit: " + jsonStr);  // Debug
 
-        // Create a Blob and trigger a download
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "table_data.json";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
-</script>
-             
-           <%
+        // Verificare JSON gol
+        if (jsonStr.isEmpty()) {
+            throw new Exception("Empty request body");
+        }
+
+        // Parsare JSON
+        JSONObject inputJson = new JSONObject(jsonStr);
+        System.out.println("JSON Object parsed: " + inputJson.toString());  // Debug
+
+        // Verificare sesiune
+        HttpSession sesi = request.getSession(false);
+        if (sesi == null) {
+            throw new Exception("Nu există sesiune activă");
+        }
+
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
+        if (currentUser == null) {
+            throw new Exception("Utilizator neconectat");
+        }
+
+        // Obținere informații utilizator
+        String username = currentUser.getUsername();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+
+        try {
+            PreparedStatement userStmt = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?");
+            userStmt.setString(1, username);
+            ResultSet userRs = userStmt.executeQuery();
+
+            if (!userRs.next()) {
+                throw new Exception("Utilizator negăsit");
+            }
+
+            int userType = userRs.getInt("tip");
+            int userId = userRs.getInt("id");
+            int userDep = userRs.getInt("id_dep");
+
+            if (userType == 4) {
+                throw new Exception("Acces restricționat pentru administratori");
+            }
+
+            // Parsare parametri din JSON
+            int id = inputJson.optInt("id", userId);
+            int status = inputJson.optInt("status", 3);
+            int tip = inputJson.optInt("tip", -1);
+            int dep = inputJson.optInt("dep", userDep);
+            int pag = inputJson.optInt("pag", 3);
+            boolean an = "1".equals(inputJson.optString("an", "0"));
+            String start = inputJson.optString("start", "");
+            String end = inputJson.optString("end", "");
+
+            // Determinare perioadă
+            int perioada = (!an && !start.isEmpty() && !end.isEmpty()) ? 1 : 0;
+
+            // Construire query
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, ");
+            sql.append("d.nume_dep AS departament, u.nume, u.prenume, ");
+            sql.append("t.denumire AS functie, c.start_c, c.end_c, c.motiv, ");
+            sql.append("c.locatie, s.nume_status AS status, ct.motiv as tipcon ");
+            sql.append("FROM useri u ");
+            sql.append("JOIN tipuri t ON u.tip = t.tip ");
+            sql.append("JOIN departament d ON u.id_dep = d.id_dep ");
+            sql.append("JOIN concedii c ON c.id_ang = u.id ");
+            sql.append("JOIN statusuri s ON c.status = s.status ");
+            sql.append("JOIN tipcon ct ON c.tip = ct.tip ");
+
+            List<Object> params = new ArrayList<>();
+
+            // Adăugare condiții WHERE
+            if (pag == 3 || pag == 4 || pag == 5) {
+                sql.append(" WHERE c.id_ang = ? AND u.username <> 'test'");
+                params.add(id);
+            } else if (pag == 6 || pag == 7) {
+                sql.append(" WHERE u.id_dep = ? AND u.tip <> 4");
+                params.add(dep);
+                if (pag == 6 || (pag == 7 && dep == userDep)) {
+                    sql.append(" AND c.id_ang <> ?");
+                    params.add(userId);
                 }
-            
-            } catch (Exception e) {
-                e.printStackTrace();
-                out.println("<script type='text/javascript'>");
-    	        out.println("alert('Eroare la baza de date!');");
-    	        out.println("</script>");
-                response.sendRedirect("login.jsp");
+            } else if (pag == 8) {
+                sql.append(" WHERE u.id <> ?");
+                params.add(userId);
             }
-            
-        } else {
-        	out.println("<script type='text/javascript'>");
-	        out.println("alert('Utilizator neconectat!');");
-	        out.println("</script>");
-            response.sendRedirect("login.jsp");
-        }
-        
-    } else {
-    	out.println("<script type='text/javascript'>");
-        out.println("alert('Nu e nicio sesiune activa!');");
-        out.println("</script>");
-        response.sendRedirect("login.jsp");
-    }
 
+            // Adăugare condiții comune
+            if (perioada == 0) {
+                sql.append(" AND YEAR(c.start_c) = YEAR(CURDATE())");
+            }
+            if (tip != -1) {
+                sql.append(" AND c.tip = ?");
+                params.add(tip);
+            }
+            if (status != 3) {
+                sql.append(" AND c.status = ?");
+                params.add(status);
+            }
+            if (perioada == 1) {
+                sql.append(" AND c.start_c BETWEEN ? AND ? AND c.end_c <= ?");
+                params.add(start);
+                params.add(end);
+                params.add(end);
+            }
+
+            // Executare query
+            PreparedStatement stmt = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            System.out.println("Executing query: " + sql.toString());
+            System.out.println("With parameters: " + params);
+
+            ResultSet rs = stmt.executeQuery();
+            JSONArray data = new JSONArray();
+            int nr = 1;
+
+            while (rs.next()) {
+                JSONObject row = new JSONObject();
+                row.put("NrCrt", nr++);
+                row.put("Nume", rs.getString("nume"));
+                row.put("Prenume", rs.getString("prenume"));
+                row.put("Functie", rs.getString("functie"));
+                row.put("Departament", rs.getString("departament"));
+                row.put("Inceput", rs.getString("start_c"));
+                row.put("Final", rs.getString("end_c"));
+                row.put("Motiv", rs.getString("motiv"));
+                row.put("Locatie", rs.getString("locatie") != null ? rs.getString("locatie") : "N/A");
+                row.put("Tip", rs.getString("tipcon"));
+                row.put("Adaugat", rs.getString("added") != null ? rs.getString("added") : "N/A");
+                row.put("Modificat", rs.getString("modified") != null ? rs.getString("modified") : "N/A");
+                row.put("Vazut", rs.getString("acc_res") != null ? rs.getString("acc_res") : "N/A");
+                row.put("Status", rs.getString("status"));
+                row.put("id", rs.getString("nr_crt"));
+                data.put(row);
+            }
+
+         // După ce obținem toate datele necesare și înainte de a construi răspunsul JSON, adăugăm:
+
+         // Determinare titlu în funcție de pagină și perioadă
+         String pageTitle = "";
+         switch (pag) {
+             case 3: 
+                 pageTitle = "Vizualizare concedii personale";
+                 break;
+             case 4: 
+                 pageTitle = "Vizualizare concedii ale unui angajat";
+                 break;
+             case 5: 
+                 pageTitle = "Vizualizare concedii ale unui coleg din departament";
+                 break;
+             case 6: 
+                 pageTitle = "Vizualizare concedii din departamentul meu";
+                 break;
+             case 7: 
+                 pageTitle = "Vizualizare concedii dintr-un departament";
+                 break;
+             case 8: 
+                 pageTitle = "Vizualizare concedii din toată instituția";
+                 break;
+             default: 
+                 pageTitle = "Vizualizare concedii";
+         }
+
+         // Adăugăm perioada la titlu
+         if (perioada == 0) {
+             pageTitle += " pe an";
+         } else {
+             pageTitle += " pe perioada " + start + " - " + end;
+         }
+
+         // Obținem data curentă formatată
+         PreparedStatement dateStmt = connection.prepareStatement("SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today");
+         ResultSet dateRs = dateStmt.executeQuery();
+         String today = dateRs.next() ? dateRs.getString("today") : "";
+         dateRs.close();
+         dateStmt.close();
+
+         // Actualizăm construirea răspunsului JSON
+         JSONObject result = new JSONObject();
+         result.put("success", true);
+         result.put("data", data);
+         result.put("count", data.length());
+         result.put("header", pageTitle);
+         result.put("today", today);
+
+         out.print(result.toString());
+
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        JSONObject error = new JSONObject();
+        error.put("success", false);
+        error.put("error", e.getMessage());
+        error.put("stack", e.toString());
+        out.print(error.toString());
+    }
 %>
- 
-</body>
-</html>
