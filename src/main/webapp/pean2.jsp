@@ -162,7 +162,7 @@ if (sesi != null) {
     </style>
 </head>
 <body>
-    <div class="page-container">
+    <div style="padding-top:4rem;" class="page-container">
         <!-- Sidebar -->
         <div class="sidebar">
             <h3>Optiuni Raport</h3>
@@ -195,9 +195,7 @@ if (sesi != null) {
             </div>
             
             <button class="btn" onclick="generatePDF()">Descarcati PDF</button>
-            <button class="btn" id="JSONN" onclick="downloadJSON(chartData)">Descarcati JSON</button>
-            <button class="btn" id="downloadCsv" onclick="downloadCSV(chartData)">Descarcati CSV</button>
-            
+             
             <p id="ceva1" style="display:none;"><%=sidebar%></p>
             <p id="ceva2" style="display:none;"><%=accent%></p>
         </div>
@@ -224,7 +222,6 @@ if (sesi != null) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-    <!-- Add these script tags in the <head> section BEFORE your other scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
@@ -406,64 +403,6 @@ function generatePDF() {
         console.error('PDF Generation Error:', error);
         alert('Failed to generate PDF. Check browser console for details.');
     });
-}
-
-function downloadJSON(chartData) {
-    if (!chartData) {
-        alert("No data available!");
-        return;
-    }
-
-    const jsonString = JSON.stringify(chartData, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "chart_data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function downloadCSV(chartData) {
-    if (!chartData) {
-        alert("No data available!");
-        return;
-    }
-
-    const { months, counts, h3, status, departament } = chartData;
-    const header = ['Luna', 'Status', 'Departament', 'Luna_Index', 'Count'];
-    
-    // Extract department from h3 or use default
-    let departmentName = departament;
-    try {
-        const match = h3.match(/din departamentul (\w+)/);
-        if (match && match[1]) {
-            departmentName = match[1];
-        }
-    } catch (e) {
-        console.error("Could not extract department name", e);
-    }
-    
-    const rows = months.map((month, index) => [
-        departmentName,
-        status,
-        departament,
-        month,
-        counts[index]
-    ]);
-
-    const csvContent = [header.join(','), ...rows.map(row => row.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "chart_data.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
 }
 </script>
 
