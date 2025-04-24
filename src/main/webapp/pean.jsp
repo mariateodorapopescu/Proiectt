@@ -50,20 +50,8 @@ if (sesi != null) {
     <title>Raport</title>
     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
-     <script type="text/javascript" src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script nonce="undefined" src="https://cdn.zingchart.com/zingchart.min.js"></script>
- 
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <style>
         body {
@@ -74,142 +62,222 @@ if (sesi != null) {
             --sd: <%=sidebar%>;
             --text: <%=text%>;
             background: <%=clr%>;
+            font-family: 'Arial', sans-serif;
         }
-        .container {
+        
+        .page-container {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 0;
         }
-        h1, h3 {
-            text-align: center;
-            padding: 0; 
-            margin: 0; 
-            top: -10%; 
-            color: <%=accent%>
+        
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            background-color: <%=sidebar%>;
+            border-radius: 20px;
+            color: <%=text%>;
+            position: fixed;
+            left: 0;
+            top: 5rem;
+            height: 100%;
+            overflow-y: auto;
         }
+        
+        .main-content {
+            margin-left: 290px;
+            padding: 20px;
+            width: calc(100% - 330px);
+            top: 5rem;
+        }
+        
+        .chart-container {
+            background-color: <%=sidebar%>;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            
+        }
+        
         #myChart {
             width: 100%;
-            height: 900px;
+            height: 400px;
         }
+        
+        .chart-info {
+            background-color: <%=sidebar%>;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            color: <%=text%>;
+            
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid <%=accent%>;
+            border-radius: 5px;
+            background-color: <%=sidebar%>;
+            color: <%=text%>;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: <%=accent%>;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: black;
+            color: white;
+            text-decoration: underline;
+        }
+        
+        h3, h4 {
+            color: <%=accent%>;
+            margin-top: 0;
+        }
+        
         .zc-img, .zc-svg, .zc-rel .zc-top{
-        background-color: transparent;
+            background-color: transparent;
         }
-       
+        
+        .header-title {
+            text-align: center;
+            color: <%=accent%>;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .note {
+            font-size: 0.8rem;
+            color: #777;
+            font-style: italic;
+        }
+        
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
     </style>
 </head>
-
-
 <body>
-<div style="position: fixed; top: 8rem; left: 33%; margin-top: 1em;" class="container" id="content">
-    <h3 id="chartHeader" style="position: fixed; top: 5rem; color: <%=accent%>;"></h3>
-    <div id="myChart"></div>
-</div>
-<div style="position: fixed; top: 10rem;" class="container">
-                
-                    <div style="position: fixed; top: 10rem;" id="myChart"></div>
-                </div>
-                <div style="position: fixed; left: 15%; bottom: 40%; margin: 0; padding: 0;" class="login__check">
-                    <form id="statusForm" method="post" onsubmit="return false;">
-                        <div>
-                            <label style="color:<%out.println(text);%>" class="login__label">Status</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name="status" class="login__input" >
-                                <option value="3" >Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("status");
-                                            String nume = rs1.getString("nume_status");
-                                            // out.println("<option value='" + id + "' " + (status == id ? "selected" : "") + ">" + nume + "</option>");
-                                            out.println("<option value='" + id + "'>" + nume + "</option>");
-                                        }
-                                    }
+    <div style="padding-top:4rem;" class="page-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Optiuni Raport</h3>
+            
+            <form id="statusForm" method="post" onsubmit="return false;">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status" style="border-color:<%=accent%>; background:white; color:<%=text%>;">
+                        <option value="3">Oricare</option>
+                        <%
+                        try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
+                            try (ResultSet rs1 = stm.executeQuery()) {
+                                while (rs1.next()) {
+                                    int id = rs1.getInt("status");
+                                    String nume = rs1.getString("nume_status");
+                                    out.println("<option value='" + id + "'>" + nume + "</option>");
                                 }
-                                %>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="color:<%out.println(text);%>" class="login__label">Departament</label>
-                            <select style="border-color:<%out.println(accent);%>; background:<%out.println(sidebar);%>; color:<%out.println(text);%>" name="dep" class="login__input">
-                                <option value="-1">Oricare</option>
-                                <%
-                                try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
-                                    try (ResultSet rs1 = stm.executeQuery()) {
-                                        while (rs1.next()) {
-                                            int id = rs1.getInt("id_dep");
-                                            String nume = rs1.getString("nume_dep");
-                                            // out.println("<option value='" + id + "' " + (dep == id ? "selected" : "") + ">" + nume + "</option>");
-                                            out.println("<option value='" + id + "'" + ">" + nume + "</option>");
-                                        }
-                                    }
-                                }
-                                %>
-                            </select>
-                        </div>
-   
-                          <input type="hidden" name="tip" value="1">
-                 </form>
-                 <input type="color" id="color-picker" value=<%=accent %>>
-                  <p id="ceva1" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=sidebar %></p>
-                   <p id="ceva2" style="color:rgba(0,0,0,0); padding:0; margin:0; display:inline-block;"><%=accent %></p>
-                 <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 50%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
-                    class="login__button" onclick="generatePDF()">Descarcati PDF</button>
-                    
-                      <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 40%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
-                    class="login__button" id="JSONN" onclick="downloadJSON(chartData)">Descarcati un JSON</button>
-                    <button style="width: 10em; height: 4em; position: fixed; left: 80%; bottom: 30%; margin: 0; padding: 0; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
-    class="login__button" id="downloadCsv" onclick="downloadCSV(chartData)">Descarcati un CSV</button>
-                <script>
-                function autoSubmit() {
-                    document.getElementById('statusForm').submit();
-                }
-                
-                    window.onload = function() {
-                    	
-                    function generate() {
-                        const element = document.getElementById("content");
-                        html2pdf()
-                        .from(element)
-                        .save();
-                    }
-
-                    function submitForm() {
-                        const form = document.getElementById("statusForm");
-                        const data = new FormData(form);
-                        const params = new URLSearchParams(data).toString();
-                        fetch("pean.jsp?" + params)
-                            .then(response => response.text())
-                            .then(html => {
-                                document.open();
-                                document.write(html);
-                                document.close();
-                            });
-                    }
-                    
-                    function generatePDF() {
-                        const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
-                        html2pdf().set({
-                            pagebreak: { mode: ['css', 'avoid-all'] },
-                            html2canvas: {
-                                scale: 2, // Increase scale to enhance quality
-                                logging: true,
-                                dpi: 192,
-                                letterRendering: true,
-                                useCORS: true // Ensures external content is handled properly
-                            },
-                            jsPDF: {
-                                unit: 'pt',
-                                format: 'a4',
-                                orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
                             }
-                        }).from(element).save();
-                    }
+                        }
+                        %>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Departament</label>
+                    <select name="dep" style="border-color:<%=accent%>; background:white; color:<%=text%>;">
+                        <option value="-1">Oricare</option>
+                        <%
+                        try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
+                            try (ResultSet rs1 = stm.executeQuery()) {
+                                while (rs1.next()) {
+                                    int id = rs1.getInt("id_dep");
+                                    String nume = rs1.getString("nume_dep");
+                                    out.println("<option value='" + id + "'>" + nume + "</option>");
+                                }
+                            }
+                        }
+                        %>
+                    </select>
+                </div>
+                
+                <input type="hidden" name="tip" value="1">
+            </form>
+            
+            <div class="form-group">
+                <label>Culoare Grafic</label>
+                <input type="color" id="color-picker" value="<%=accent%>" style="width: 100%; height: 30px;">
+            </div>
+            
+            <button class="btn" onclick="generatePDF()">Descarcati PDF</button>
+            
+            
+            <p id="ceva1" style="display:none;"><%=sidebar%></p>
+            <p id="ceva2" style="display:none;"><%=accent%></p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div id="content">
+                <h3 id="chartHeader" class="header-title"></h3>
+                <p class="note">*Graficul afiseaza numarul de concedii in fiecare luna</p>
+                
+                <div class="chart-container">
+                    <div id="myChart"></div>
+                </div>
+                
+                <div class="chart-info">
+                    <h4>Detalii raport</h4>
+                    <p id="statusInfo"></p>
+                    <p id="departmentInfo"></p>
+                    <p id="dataInfo"></p>
+                    <p id="totalInfo"></p>
+                    <p id="explanationInfo" style="font-style: italic; margin-top: 15px;">
+                        Acest raport afiseaza numarul de concedii suprapuse in fiecare luna. 
+                        O valoare de 3, de exemplu, inseamna ca in acea luna sunt 3 angajati in concediu simultan.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-                </script>
-                </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
 var clear = document.getElementById("ceva1").innerText;
 var accent = document.getElementById("ceva2").innerText;
@@ -229,9 +297,7 @@ function startup() {
 }
 
 function updateFirst(event) {
-  
-    hbrnm = event.target.value;
-  
+  hbrnm = event.target.value;
 }
 
 $(document).ready(function() {
@@ -248,34 +314,51 @@ $(document).ready(function() {
             data: $('#statusForm').serialize(), // Serialize the form data
             dataType: 'json', // Expecting JSON response
             success: function(response) {
-            	 chartData = response; 
-            	 updateChart(response); // Update the chart with the response
+                chartData = response; 
+                updateChart(response); // Update the chart with the response
+                updateChartInfo(response);
             },
             error: function(xhr, status, error) {
                 alert('Error: ' + xhr.statusText);
             }
         });
     }
+    
+    function updateChartInfo(data) {
+        $('#statusInfo').text('Status: ' + (data.status === '3' ? 'Toate statusurile' : data.status));
+        $('#departmentInfo').text('Departament: ' + data.departament);
+        
+        // Determine the date range if available
+        if (data.months && data.months.length > 0) {
+            $('#dataInfo').text('Luni analizate: ' + data.months[0] + ' - ' + data.months[data.months.length-1]);
+        } else {
+            $('#dataInfo').text('Luni analizate: Nu sunt date disponibile');
+        }
+        
+        // Calculate total from counts and max overlap
+        const total = data.counts.reduce((a, b) => a + b, 0);
+        
+        
+        $('#totalInfo').html('Total concedii: ' + total );
+    }
 
     function updateChart(data) {
-    	 $('#chartHeader').text(data.h3);
-    	zingchart.render({
+        $('#chartHeader').text(data.h3);
+        
+        zingchart.render({
             id: 'myChart',
-            
             data: {
                 type: 'bar',
                 backgroundColor: 'transparent', // Sets the background color of the chart area
                 title: {
-                    text: 'Numar angajati / luna'
+                    text: 'Suprapuneri concedii / luna'
                 },
                 scaleX: {
                     values: data.months.map(month => month.toString())
                 },
                 series: [{
                     values: data.counts,
-                    //backgroundColor: accent // Sets the color of the bars
                     backgroundColor: document.getElementById("color-picker").value
-                    
                 }],
                 plot: { // Additional styling for plot area
                     valueBox: {
@@ -296,152 +379,95 @@ $(document).ready(function() {
                       "border-color": "white",
                       "line-style": "dashdot"
                     },
-                "animation": {
-                    "effect": "ANIMATION_EXPAND_BOTTOM",
-                    "method": "ANIMATION_STRONG_EASE_OUT",
-                    "sequence": "ANIMATION_BY_PLOT_AND_NODE",
-                    "speed": 275
-                }
+                    "animation": {
+                        "effect": "ANIMATION_EXPAND_BOTTOM",
+                        "method": "ANIMATION_STRONG_EASE_OUT",
+                        "sequence": "ANIMATION_BY_PLOT_AND_NODE",
+                        "speed": 275
+                    }
                 }
             },
             height: 400,
             width: '100%'
         });
     }  
+    
     document.getElementById('color-picker').addEventListener('change', function(e) {
+        if (!chartData) return;
+        
         var myConfig2 = {
-        type: 'bar',
-        plot: {
-            "animation": {
-                "effect": "ANIMATION_EXPAND_BOTTOM",
-                "method": "ANIMATION_STRONG_EASE_OUT",
-                "sequence": "ANIMATION_BY_PLOT_AND_NODE",
-                "speed": 275
+            type: 'bar',
+            plot: {
+                "animation": {
+                    "effect": "ANIMATION_EXPAND_BOTTOM",
+                    "method": "ANIMATION_STRONG_EASE_OUT",
+                    "sequence": "ANIMATION_BY_PLOT_AND_NODE",
+                    "speed": 275
+                },
+                valueBox: {
+                    text: '%v',
+                    placement: 'top',
+                    fontColor: '#FFF',
+                    backgroundColor: document.getElementById("color-picker").value,
+                    borderRadius: 3
+                }
             },
-            valueBox: {
-                text: '%v', // Displaying value on the bar
-                placement: 'top',
-                fontColor: '#FFF',
-                backgroundColor: document.getElementById("color-picker").value,
-                borderRadius: 3
-            }
-        },
-        title: {
-            text: 'Numar angajati / luna'
-        },
-        scaleX: {
-            values: data.months.map(month => month.toString())
-        },
-        series: [{
-            values: data.counts,
+            title: {
+                text: 'Suprapuneri concedii / luna'
+            },
+            scaleX: {
+                values: chartData.months.map(month => month.toString())
+            },
+            series: [{
+                values: chartData.counts,
                 backgroundColor: document.getElementById("color-picker").value
-            }
-        ]
-    };
+            }]
+        };
 
-    // Render the initial chart
-    zingchart.render({
-        id: 'myChart',
-        data: myConfig2,
-        height: '100%',
-        width: '100%'
-    });
+        zingchart.render({
+            id: 'myChart',
+            data: myConfig2,
+            height: '100%',
+            width: '100%'
+        });
     }, false);
 });
-function generate() {
-    const element = document.getElementById("content");
-    html2pdf()
-    .from(element)
-    .save();
-}
+
 function generatePDF() {
-                const element = document.getElementById('content'); // Make sure this ID matches the container of your chart
-                html2pdf().set({
-                    pagebreak: { mode: ['css', 'avoid-all'] },
-                    html2canvas: {
-                        scale: 2, // Increase scale to enhance quality
-                        logging: true,
-                        dpi: 192,
-                        letterRendering: true,
-                        useCORS: true // Ensures external content is handled properly
-                    },
-                    jsPDF: {
-                        unit: 'pt',
-                        format: 'a4',
-                        orientation: 'portrait' // Adjusts orientation to landscape if the content is wide
-                    }
-                }).from(element).save();
-            }
-function downloadJSON(chartData) {
-    if (!chartData) {
-        alert("No data available!");
+	// Ensure libraries are loaded
+    if (typeof html2canvas === 'undefined' || typeof html2pdf === 'undefined') {
+        alert('PDF generation libraries not loaded. Please refresh the page.');
         return;
     }
 
-    // Convert chartData to JSON string
-    const jsonString = JSON.stringify(chartData, null, 2);
+    // Get the content to convert
+    const contentElement = document.getElementById('content');
 
-    // Create a Blob with the JSON data
-    const blob = new Blob([jsonString], { type: "application/json" });
-
-    // Generate a URL for the Blob
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary link element
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "chart_data.json"; // File name
-    document.body.appendChild(a);
-
-    // Trigger download and clean up
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-function downloadCSV(chartData) {
-    if (!chartData) {
-        alert("No data available!");
-        return;
-    }
-
-    // Extract data
-    const { months, counts, h3, status, departament } = chartData;
-
-    // Prepare CSV header
-    const header = ['Luna', 'Status', 'Departament', 'Luna_Index', 'Count'];
-
-    // Prepare rows
-    const rows = months.map((month, index) => [
-        h3.match(/din departamentul (\w+)/)[1], // Extract department name from h3
-        status,
-        departament,
-        month,
-        counts[index]
-    ]);
-
-    // Convert the header and rows to CSV format
-    const csvContent = [header.join(','), ...rows.map(row => row.join(','))].join('\n');
-
-    // Create a Blob with the CSV data
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-
-    // Generate a URL for the Blob
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary link element
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "chart_data.csv"; // File name
-    document.body.appendChild(a);
-
-    // Trigger download and clean up
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Use html2pdf to generate PDF directly
+    html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'raport_concedii.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            allowTaint: true
+        },
+        jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+        }
+    }).from(contentElement).save().then(() => {
+        console.log('PDF generated successfully');
+    }).catch((error) => {
+        console.error('PDF Generation Error:', error);
+        alert('Failed to generate PDF. Check browser console for details.');
+    });
 }
 
 </script>
-
 </body>
 </html>
 <%
