@@ -541,6 +541,44 @@
     <servlet-name>locactacss</servlet-name>
     <url-pattern>/locactacss</url-pattern>
   </servlet-mapping>
-
-
+  <servlet>
+    <description></description>
+    <display-name>PenalizariServlet</display-name>
+    <servlet-name>PenalizariServlet</servlet-name>
+    <servlet-class>Servlet.PenalizariServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PenalizariServlet</servlet-name>
+    <url-pattern>/PenalizariServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>SporuriServlet</display-name>
+    <servlet-name>SporuriServlet</servlet-name>
+    <servlet-class>Servlet.SporuriServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SporuriServlet</servlet-name>
+    <url-pattern>/SporuriServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>PromovareServlet</display-name>
+    <servlet-name>PromovareServlet</servlet-name>
+    <servlet-class>Servlet.PromovareServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PromovareServlet</servlet-name>
+    <url-pattern>/PromovareServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ConcediiSuplimentareServlet</display-name>
+    <servlet-name>ConcediiSuplimentareServlet</servlet-name>
+    <servlet-class>Servlet.ConcediiSuplimentareServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ConcediiSuplimentareServlet</servlet-name>
+    <url-pattern>/ConcediiSuplimentareServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

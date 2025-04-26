@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS tipuri (
   salariu INT NOT NULL,
   PRIMARY KEY (tip));
 
+
 -- -----------------------------------------------------
 -- Tabel sporuri
 -- -----------------------------------------------------
@@ -161,6 +162,84 @@ CREATE UNIQUE INDEX cnp ON useri (cnp ASC) VISIBLE;
 CREATE UNIQUE INDEX email ON useri (email ASC) VISIBLE;
 
 CREATE UNIQUE INDEX telefon ON useri (telefon ASC) VISIBLE;
+
+-- Tabel istoric penalizări
+DROP TABLE IF EXISTS istoric_penalizari;
+CREATE TABLE istoric_penalizari (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    tip_penalizare INT NOT NULL,
+    data_start DATE NOT NULL,
+    data_final DATE NOT NULL,
+    motiv VARCHAR(500),
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    FOREIGN KEY (tip_penalizare) REFERENCES tipuri_penalizari(id)
+);
+
+-- Tabel istoric sporuri
+DROP TABLE IF EXISTS istoric_sporuri;
+CREATE TABLE istoric_sporuri (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    tip_spor INT NOT NULL,
+    data_start DATE NOT NULL,
+    data_final DATE NOT NULL,
+    motiv VARCHAR(500),
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    FOREIGN KEY (tip_spor) REFERENCES tipuri_sporuri(id)
+);
+
+-- Tabel istoric încetări contract
+DROP TABLE IF EXISTS istoric_incetari;
+CREATE TABLE istoric_incetari (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    data_incetare DATE NOT NULL,
+    motiv VARCHAR(100) NOT NULL,
+    observatii TEXT,
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- Tabel istoric promovări
+DROP TABLE IF EXISTS istoric_promovari;
+CREATE TABLE istoric_promovari (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    tip_vechi INT NOT NULL,
+    tip_nou INT NOT NULL,
+    tip_promovare VARCHAR(50) NOT NULL,
+    data_promovare DATE NOT NULL,
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    FOREIGN KEY (tip_vechi) REFERENCES tipuri(tip),
+    FOREIGN KEY (tip_nou) REFERENCES tipuri(tip)
+);
+
+-- Tabel istoric concedii suplimentare
+DROP TABLE IF EXISTS istoric_concedii_suplimentare;
+CREATE TABLE istoric_concedii_suplimentare (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    zile_acordate INT NOT NULL,
+    motiv VARCHAR(255),
+    data_acordare DATE NOT NULL,
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- Tabel istoric fluturaș salariu
+DROP TABLE IF EXISTS istoric_fluture;
+CREATE TABLE istoric_fluture (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    luna INT NOT NULL,
+    an INT NOT NULL,
+    salariu_brut DECIMAL(10,2) NOT NULL,
+    salariu_net DECIMAL(10,2) NOT NULL,
+    data_generare DATE NOT NULL,
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
 
 -- -----------------------------------------------------
 -- Tabel experienta
@@ -605,6 +684,7 @@ CREATE TABLE IF NOT EXISTS users (
   last_name VARCHAR(45) NULL DEFAULT NULL,
   photo MEDIUMBLOB NULL DEFAULT NULL,
   PRIMARY KEY (id));
+  
 
 -- 4. Creare triggeri
 -- -----------------------------------------------------
@@ -1314,7 +1394,7 @@ ORDER BY l.oras;
 -- test
 -- -----------------------------------------------------
 select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
-select * from useri;
+select * from tipuri;
 use test;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
 desc locatii_concedii;

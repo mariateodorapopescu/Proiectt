@@ -34,6 +34,12 @@ public class Testing extends TimerTask
 	                
 	                sendReminders5(connection);
 	                
+	                // Verifică dacă este ziua 15 a lunii pentru acordarea salariilor
+	                LocalDate today = LocalDate.now();
+	                if (today.getDayOfMonth() == 15) {
+	                    acordaSalarii(connection);
+	                }
+	                
 	            } catch (IOException e) {
 	                System.err.println("Error during database operation: " + e.getMessage());
 	            } catch (SQLException e1) {
@@ -49,7 +55,82 @@ public class Testing extends TimerTask
 				// System.out.println("ok");
 
 	        }
+
+	private void acordaSalarii(Connection connection) {
+	    try {
+	        // Selectează toți angajații activi
+	        String sql = "SELECT u.id, u.email, t.salariu as salariu_baza, " +
+	                    "s.procent as procent_spor, p.procent as procent_penalizare, " +
+	                    "u.nume, u.prenume, d.nume_dep, t.denumire as functie " +
+	                    "FROM useri u " +
+	                    "JOIN tipuri t ON u.tip = t.tip " +
+	                    "JOIN departament d ON u.id_dep = d.id_dep " +
+	                    "LEFT JOIN tipuri_sporuri s ON u.sporuri = s.id " +
+	                    "LEFT JOIN tipuri_penalizari p ON u.penalizari = p.id " +
+	                    "WHERE u.activ = 1";
+	        
+	        PreparedStatement pstmt = connection.prepareStatement(sql);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            int idAng = rs.getInt("id");
+	            String email = rs.getString("email");
+	            String nume = rs.getString("nume");
+	            String prenume = rs.getString("prenume");
+	            String departament = rs.getString("nume_dep");
+	            String functie = rs.getString("functie");
+	            double salariuBaza = rs.getDouble("salariu_baza");
+	            double procentSpor = rs.getDouble("procent_spor");
+	            double procentPenalizare = rs.getDouble("procent_penalizare");
+	            
+	            // Calculează salariul
+	            double spor = salariuBaza * procentSpor / 100;
+	            double penalizare = salariuBaza * procentPenalizare / 100;
+	            double salariuBrut = salariuBaza + spor - penalizare;
+	            
+	            // Generează fluturaș și trimite email
+	            generareSiTrimitereFluturash(idAng, email, nume, prenume, departament, functie, salariuBrut, salariuBaza, spor, penalizare);
+	        }
+	        
+	        rs.close();
+	        pstmt.close();
+	        
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
 	
+	private void generareSiTrimitereFluturash(int idAng, String email, String nume, String prenume, 
+	        String departament, String functie, double salariuBrut, double salariuBaza, double spor, double penalizare) {
+	    
+	    String subject = "\uD83D\uDCB0 Fluturașul de salariu - " + LocalDate.now().getMonth() + " " + LocalDate.now().getYear();
+	    
+	    String message = 
+	        "<h1>Fluturaș de salariu</h1>" +
+	        "<p>Angajat: " + nume + " " + prenume + "</p>" +
+	        "<p>Departament: " + departament + "</p>" +
+	        "<p>Funcție: " + functie + "</p>" +
+	        "<br>" +
+	        "<table border='1' style='border-collapse: collapse;'>" +
+	        "<tr><td><b>Salariu de bază:</b></td><td>" + salariuBaza + " RON</td></tr>" +
+	        "<tr><td><b>Sporuri:</b></td><td>" + spor + " RON</td></tr>" +
+	        "<tr><td><b>Penalizări:</b></td><td>" + penalizare + " RON</td></tr>" +
+	        "<tr><td><b>Salariu brut total:</b></td><td><b>" + salariuBrut + " RON</b></td></tr>" +
+	        "</table>" +
+	        "<br>" +
+	        "<p>Acest email a fost generat automat în data de " + LocalDate.now() + "</p>" +
+	        "<p><i>Departamentul Resurse Umane</i></p>";
+	    
+	    GMailServer sender = new GMailServer(Constants.setFrom, Constants.setPassword);
+	    
+	    try {
+	        sender.send(subject, message, Constants.setFrom, email);
+	        System.out.println("Generat și trimis fluturaș pentru angajatul " + idAng + " (" + email + ")");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
 	private void sendReminders(Connection connection) throws Exception {
 	    String query = "select useri.id, useri.email, concedii.start_c, concedii.end_c, locatie, concedii.motiv, tipcon.motiv AS tip_motiv, tipcon.motiv as tip_motiv, DATEDIFF(concedii.start_c, CURRENT_DATE()) AS days_until_start "
 	            + "FROM useri "
