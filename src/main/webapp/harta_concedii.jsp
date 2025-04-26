@@ -85,11 +85,11 @@ int pag = -1;
             top: 80px;
             left: 20px;
             z-index: 100;
-            background-color: <%= accent%>;
+            background-color: <%= sidebar%>;
             padding: 15px;
             border-radius: 8px;
           
-            color: white;
+            color: <%=text%>;
             font-family: 'Poppins', sans-serif;
         }
         .sidebar select,
@@ -104,19 +104,19 @@ int pag = -1;
             font-family: 'Poppins', sans-serif;
         }
         .sidebar select:hover, .sidebar select:active, .sidebar select:selected, .sidebar select:visited {
-         background-color: <%= clr%>;
-            color: <%= text%>;
+         background-color: <%= accent%>;
+            color: white;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
         }
         .sidebar button {
-            background-color: <%= sidebar%>;
-            color: <%= text%>;
+            background-color: <%= accent%>;
+            color: white;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
         }
         .sidebar button:hover  {
-            background-color: <%= clr%>;
+            background-color: black;
             font-family: 'Poppins', sans-serif;
         }
         .custom-popup {
@@ -126,15 +126,69 @@ int pag = -1;
             font-family: 'Poppins', sans-serif;
            
         }
+        .sidebar label {
+            display: block;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
     <div id="viewDiv"></div>
-    <div class="sidebar" style="display:none;">
-        <label for="locationSelect">Localitatea</label>
-        <select id="locationSelect"></select>
+    <div class="sidebar">
+        <% if (userType == 3 || userType == 0 || (userType >= 12 && userType <= 19)) { %>
+            <label for="departmentSelect">Departament</label>
+            <select id="departmentSelect">
+                <% if (userType == 0 || (userType >= 12 && userType <= 19)) { %>
+                    <option value="">Toate departamentele</option>
+                <% } %>
+                <%
+                    // Load departments based on user type
+                    try (Connection deptConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                        String deptQuery;
+                        PreparedStatement deptStmt;
+                        
+                        if (userType == 3) { // Sef - only their department
+                            deptQuery = "SELECT id_dep, nume_dep FROM departament WHERE id_dep = ?";
+                            deptStmt = deptConn.prepareStatement(deptQuery);
+                            deptStmt.setInt(1, userDep);
+                        } else { // Director - all departments
+                            deptQuery = "SELECT id_dep, nume_dep FROM departament";
+                            deptStmt = deptConn.prepareStatement(deptQuery);
+                        }
+                        
+                        ResultSet deptRs = deptStmt.executeQuery();
+                        while (deptRs.next()) {
+                            int deptId = deptRs.getInt("id_dep");
+                            String deptName = deptRs.getString("nume_dep");
+                            %>
+                            <option value="<%= deptId %>" <%= (userType == 3 && deptId == userDep) ? "selected" : "" %>><%= deptName %></option>
+                            <%
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                %>
+            </select>
+            
+            <label for="employeeSelect">Angajat</label>
+            <select id="employeeSelect">
+                <option value="">Toți angajații</option>
+            </select>
+            
+            <label for="statusSelect">Status</label>
+            <select id="statusSelect">
+                <option value="">Toate statusurile</option>
+                <option value="2">Aprobat director</option>
+                <option value="1">Aprobat șef</option>
+                <option value="0">Neaprobat</option>
+                <option value="-1">Dezaprobat șef</option>
+                <option value="-2">Dezaprobat director</option>
+            </select>
+        <% } %>
         
-        
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button" id="showMyLocations">Concediile mele</button>
     </div>
 
     <script>
@@ -177,26 +231,84 @@ int pag = -1;
                 const vacationLayer = new GraphicsLayer();
                 map.add(vacationLayer);
 
-                // Create a popup template for vacation points
-                const popupTemplate = {
-                    title: "Detalii Concediu",
-                    content: [{
-                        type: "text",
-                        text: "{address}"
-                    }]
-                };
+                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+                const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
-                // Load vacation points
-                // Load vacation points
-             // Modifică funcția loadVacationPoints pentru a adăuga verificări
-                function loadVacationPoints() {
-                    fetch("GetVacationDetailsServlet")
+                let currentLocation = null;
+                const userType = <%= userType %>;
+                const userId = <%= userId %>;
+                const userDep = <%= userDep %>;
+
+                // Load employees based on department selection
+                function loadEmployees(departmentId) {
+                    const employeeSelect = document.getElementById("employeeSelect");
+                    employeeSelect.innerHTML = "<option value=''>Toți angajații</option>";
+                    
+                    if (!departmentId) return;
+                    
+                    fetch("get_employees.jsp?deptId=" + departmentId)
+                        .then(response => response.json())
+                        .then(employees => {
+                            employees.forEach(emp => {
+                                const option = document.createElement("option");
+                                option.value = emp.id;
+                                option.textContent = emp.nume + " " + emp.prenume;
+                                employeeSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error("Error loading employees:", error));
+                }
+
+                // Event listener for department select
+                const departmentSelect = document.getElementById("departmentSelect");
+                if (departmentSelect) {
+                    departmentSelect.addEventListener("change", function() {
+                        loadEmployees(this.value);
+                        loadVacationPoints(this.value, document.getElementById("employeeSelect").value, document.getElementById("statusSelect").value);
+                    });
+                    
+                    // Load initial employees for sef
+                    <% if (userType == 3) { %>
+                    loadEmployees(userDep);
+                    <% } %>
+                }
+
+                // Event listener for employee select
+                const employeeSelect = document.getElementById("employeeSelect");
+                if (employeeSelect) {
+                    employeeSelect.addEventListener("change", function() {
+                        loadVacationPoints(departmentSelect.value, this.value, document.getElementById("statusSelect").value);
+                    });
+                }
+
+                // Event listener for status select
+                const statusSelect = document.getElementById("statusSelect");
+                if (statusSelect) {
+                    statusSelect.addEventListener("change", function() {
+                        loadVacationPoints(departmentSelect.value, employeeSelect.value, this.value);
+                    });
+                }
+
+                // Load vacation points based on user type and selection
+                function loadVacationPoints(departmentId = null, employeeId = null, statusId = null) {
+                    let url = "GetVacationDetailsServlet?userType=" + userType + "&userId=" + userId + "&userDep=" + userDep;
+                    
+                    if (departmentId) {
+                        url += "&deptId=" + departmentId;
+                    }
+                    if (employeeId) {
+                        url += "&empId=" + employeeId;
+                    }
+                    if (statusId) {
+                        url += "&statusId=" + statusId;
+                    }
+
+                    fetch(url)
                         .then(response => response.json())
                         .then(vacations => {
                             console.log("Date primite:", vacations);
                             vacationLayer.removeAll();
                             
-                            // Verifică dacă vacations este un array valid
                             if (!Array.isArray(vacations)) {
                                 console.error("Datele primite nu sunt un array:", vacations);
                                 return;
@@ -207,15 +319,12 @@ int pag = -1;
                                 return;
                             }
                             
-                            // Acum putem folosi forEach în siguranță
                             vacations.forEach(vacation => {
-                                // Verifică dacă vacation este de tipul așteptat (obiect sau string)
                                 if (!vacation) {
                                     console.log("Element de concediu invalid:", vacation);
                                     return;
                                 }
                                 
-                                // Geocodificare pentru adresă
                                 let adresaGeo = typeof vacation === 'string' ? vacation : vacation.address;
                                 
                                 locator.addressToLocations(locatorUrl, {
@@ -229,8 +338,6 @@ int pag = -1;
                                             latitude: results[0].location.y
                                         });
 
-                                        // Dacă vacation este obiect, folosim proprietățile lui
-                                        // Altfel, folosim doar adresa ca string
                                         let attributes = {};
                                         let color = "<%=accent%>";
                                         
@@ -239,7 +346,11 @@ int pag = -1;
                                                 address: vacation.address || adresaGeo,
                                                 nume: vacation.nume || "",
                                                 prenume: vacation.prenume || "",
-                                                departament: vacation.departament || ""
+                                                departament: vacation.departament || "",
+                                                start_c: vacation.start_c || "",
+                                                end_c: vacation.end_c || "",
+                                                status: vacation.status || "",
+                                                statusText: vacation.statusText || ""
                                             };
                                             color = vacation.color || "<%=accent%>";
                                         } else {
@@ -265,7 +376,9 @@ int pag = -1;
                                                     text: "<div class='custom-popup'>" +
                                                         "<strong>Locație:</strong> {address}<br>" +
                                                         (attributes.nume ? "<strong>Angajat:</strong> {prenume} {nume}<br>" : "") +
-                                                        (attributes.departament ? "<strong>Departament:</strong> {departament}" : "") +
+                                                        (attributes.departament ? "<strong>Departament:</strong> {departament}<br>" : "") +
+                                                        (attributes.start_c ? "<strong>Perioada:</strong> {start_c} - {end_c}<br>" : "") +
+                                                        (attributes.statusText ? "<strong>Status:</strong> {statusText}" : "") +
                                                         "</div>"
                                                 }]
                                             }
@@ -283,263 +396,23 @@ int pag = -1;
                         });
                 }
 
-                // Load vacation points when the map loads
-                loadVacationPoints();
-
-                const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
-                const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
-
-                let currentLocation = null;
-                const locateMeBtn = document.getElementById("locateMeBtn");
-                const locationSelect = document.getElementById("locationSelect");
-                const generateRouteBtn = document.getElementById("generateRouteBtn");
-
-                // Layer for selectable locations
-                const selectableLocationsLayer = new GraphicsLayer();
-                map.add(selectableLocationsLayer);
-
-                // Load locations for dropdown and add points to map
-                 // Similar, modifică și codul pentru dropdown-ul de locații
-                fetch("GetVacationDetailsServlet")
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Date pentru dropdown:", data);
-                        
-                        // Verifică dacă data este un array valid
-                        if (!Array.isArray(data)) {
-                            console.error("Datele primite pentru dropdown nu sunt un array:", data);
-                            return;
-                        }
-                        
-                        locationSelect.innerHTML = '<option value="" selected disabled>Selectează o localitate</option>';
-                        
-                        // Set pentru a evita duplicarea localităților
-                        const uniqueLocations = new Set();
-                        
-                        data.forEach(item => {
-                            if (!item) return;
-                            
-                            let location;
-                            
-                            if (typeof item === 'object' && item.address) {
-                                const addressParts = item.address.split(',');
-                                if (addressParts.length > 1) {
-                                    location = addressParts[1].trim(); // Luăm orașul (a doua parte)
-                                } else {
-                                    location = item.address;
-                                }
-                            } else if (typeof item === 'string') {
-                                const addressParts = item.split(',');
-                                if (addressParts.length > 1) {
-                                    location = addressParts[1].trim();
-                                } else {
-                                    location = item;
-                                }
-                            } else {
-                                return; // Salt peste item-uri care nu au formatul așteptat
-                            }
-                            
-                            if (!uniqueLocations.has(location)) {
-                                uniqueLocations.add(location);
-                                
-                                const option = document.createElement("option");
-                                option.value = location;
-                                option.textContent = location;
-                                locationSelect.appendChild(option);
-                            }
-                        });
-                    })
-                    .catch(error => {
-                        console.error("Eroare la încărcarea localităților:", error);
-                    });
-                // Locate Me functionality
-                locateMeBtn.addEventListener("click", function () {
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            function (position) {
-                                const longitude = position.coords.longitude;
-                                const latitude = position.coords.latitude;
-
-                                currentLocation = new Point({
-                                    longitude: longitude,
-                                    latitude: latitude
-                                });
-
-                                const pointGraphic = new Graphic({
-                                    geometry: currentLocation,
-                                    symbol: {
-                                        type: "simple-marker",
-                                        color: "<%=accent%>",
-                                        size: "12px",
-                                        outline: {
-                                            color: "white",
-                                            width: 2
-                                        }
-                                    }
-                                });
-
-                                graphicsLayer.removeAll();
-                                graphicsLayer.add(pointGraphic);
-                                
-                                // Clear existing route and directions
-                                routeLayer.removeAll();
-                                view.ui.empty("top-right");
-
-                                view.goTo({
-                                    center: [longitude, latitude],
-                                    zoom: 14
-                                });
-                            },
-                            function (error) {
-                                alert("Eroare la obținerea poziției: " + error.message);
-                            }
-                        );
-                    } else {
-                        alert("Geolocația nu este suportată de acest browser.");
-                    }
+                // Show my locations button functionality
+                document.getElementById("showMyLocations").addEventListener("click", function() {
+                    loadVacationPoints(null, userId);
                 });
 
-                // Generate route functionality
-                generateRouteBtn.addEventListener("click", function () {
-                    if (!currentLocation) {
-                        alert("Te rog să te localizezi mai întâi.");
-                        return;
-                    }
-
-                    const selectedLocation = locationSelect.value;
-                    if (!selectedLocation) {
-                        alert("Selectează o localitate!");
-                        return;
-                    }
-
-                    routeLayer.removeAll();
-
-                    locator.addressToLocations(locatorUrl, {
-                        address: { "SingleLine": selectedLocation },
-                        countryCode: "RO",
-                        maxLocations: 1
-                    }).then(function (results) {
-                        if (results.length > 0) {
-                            const destinationPoint = new Point({
-                                longitude: results[0].location.x,
-                                latitude: results[0].location.y
-                            });
-
-                            const destinationGraphic = new Graphic({
-                                geometry: destinationPoint,
-                                symbol: {
-                                    type: "simple-marker",
-                                    color: "red",
-                                    size: "12px",
-                                    outline: {
-                                        color: "white",
-                                        width: 2
-                                    }
-                                }
-                            });
-
-                            routeLayer.add(destinationGraphic);
-
-                            const routeParams = new RouteParameters({
-                                stops: new FeatureSet({
-                                    features: [
-                                        new Graphic({ geometry: currentLocation }),
-                                        new Graphic({ geometry: destinationPoint })
-                                    ]
-                                }),
-                                directionsLanguage: "ro",
-                                returnDirections: true
-                            });
-
-                            route.solve(routeUrl, routeParams)
-                                .then(function (data) {
-                                    data.routeResults.forEach(function (result) {
-                                        result.route.symbol = {
-                                            type: "simple-line",
-                                            color: [0, 0, 255],
-                                            width: 3
-                                        };
-                                        routeLayer.add(result.route);
-                                    });
-
-                                    if (data.routeResults.length > 0) {
-                                        const directions = document.createElement("ol");
-                                        directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
-                                        directions.style.marginTop = "10px";
-                                        directions.style.padding = "15px 15px 15px 30px";
-                                        directions.style.backgroundColor = "white";
-
-                                        data.routeResults[0].directions.features.forEach(function (result, i) {
-                                            const direction = document.createElement("li");
-                                            direction.innerHTML = result.attributes.text + " (" + result.attributes.length.toFixed(2) + " km)";
-                                            directions.appendChild(direction);
-                                        });
-
-                                        view.ui.empty("top-right");
-                                        view.ui.add(directions, "top-right");
-                                    }
-                                })
-                                .catch(function (error) {
-                                    console.error("Eroare la generarea rutei:", error);
-                                    alert("Eroare la generarea rutei. Vă rugăm încercați din nou.");
-                                });
-                        } else {
-                            alert("Nu s-au găsit coordonatele pentru localitatea selectată.");
-                        }
-                    }).catch(function (error) {
-                        console.error("Eroare la geocodare:", error);
-                        alert("Eroare la găsirea localității. Vă rugăm încercați din nou.");
-                    });
-                });
-
-                // Location select change handler
-                // Location select change handler
-locationSelect.addEventListener("change", function () {
-    const selectedLocation = this.value;
-    if (selectedLocation) {
-        // Clear existing route and directions
-        routeLayer.removeAll();
-        view.ui.empty("top-right");
-        
-        // Găsește toate locațiile care au orașul selectat
-        fetch("GetVacationDetailsServlet")
-            .then(response => response.json())
-            .then(data => {
-                const locationsInCity = data.filter(loc => loc.city === selectedLocation);
-                if (locationsInCity.length > 0) {
-                    // Alege prima locație pentru centrarea hărții
-                    geocodeLocation(locationsInCity[0].address);
+                // Load initial points based on user type
+                if (userType == 3) {
+                    // Sef sees their department by default
+                    loadVacationPoints(userDep, null);
+                } else if (userType == 0 || (userType >= 12 && userType <= 19)) {
+                    // Director sees all departments by default
+                    loadVacationPoints(null, null);
+                } else {
+                    // Regular users see only their own vacations
+                    loadVacationPoints(null, userId);
                 }
-            })
-            .catch(error => {
-                console.error("Eroare la filtrarea locațiilor:", error);
-                // Fallback la geocodare directă
-                geocodeLocation(selectedLocation);
-            });
-    }
-});
 
-                // Geocode location function
-                function geocodeLocation(location) {
-                    locator.addressToLocations(locatorUrl, {
-                        address: {
-                            "SingleLine": location
-                        },
-                        countryCode: "RO",
-                        maxLocations: 1
-                    }).then(function (results) {
-                        if (results.length > 0) {
-                            const result = results[0].location;
-
-                            view.goTo({
-                                center: [result.x, result.y],
-                                zoom: 12
-                            });
-                        }
-                    }).catch(function (error) {
-                        console.error("Eroare la geocodare:", error);
-                    });
-                }
             });
         });
     </script>
@@ -570,4 +443,4 @@ locationSelect.addEventListener("change", function () {
                     }
     %>
 </body>
-</html> 
+</html>
