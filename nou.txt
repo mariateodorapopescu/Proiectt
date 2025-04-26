@@ -17,55 +17,47 @@ WHERE REFERENCED_TABLE_NAME IS NOT NULL
 AND TABLE_SCHEMA = DATABASE();
 
 -- 2. Ștergerea tuturor tabelelor existente
-DROP TABLE IF EXISTS aplicari;
-DROP TABLE IF EXISTS istoric_aici;
-DROP TABLE IF EXISTS pozitii;
-DROP TABLE IF EXISTS adeverinte;
-DROP TABLE IF EXISTS experienta;
-DROP TABLE IF EXISTS studii;
-DROP TABLE IF EXISTS limbi;
-DROP TABLE IF EXISTS taskuri;
-DROP TABLE IF EXISTS evenimente;
-DROP TABLE IF EXISTS useri;
-DROP TABLE IF EXISTS departament;
-DROP TABLE IF EXISTS tip_poz;
-DROP TABLE IF EXISTS tipcon;
-DROP TABLE IF EXISTS tipuri;
-DROP TABLE IF EXISTS joburi;
-DROP TABLE IF EXISTS statusuri;
-DROP TABLE IF EXISTS stare;
-DROP TABLE IF EXISTS locatii;
-DROP TABLE IF EXISTS tari;
-DROP TABLE IF EXISTS regiuni;
-DROP TABLE IF EXISTS libere;
-DROP TABLE IF EXISTS numbers;
-DROP TABLE IF EXISTS sarbatori;
-DROP TABLE IF EXISTS ciclu;
-DROP TABLE IF EXISTS plecati;
-DROP TABLE IF EXISTS restrictii;
-DROP TABLE IF EXISTS libere;
-DROP TABLE IF EXISTS statusuri;
-DROP TABLE IF EXISTS teme;
-DROP TABLE IF EXISTS sarbatori;
-DROP TABLE IF EXISTS testt;
-DROP TABLE IF EXISTS tipcon;
-DROP TABLE IF EXISTS tipuri;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS useri;
-DROP TABLE IF EXISTS angajati;
-DROP TABLE IF EXISTS appearance;
-DROP TABLE IF EXISTS image;
-DROP TABLE IF EXISTS mytable;
-DROP TABLE IF EXISTS login;
-DROP TABLE IF EXISTS concedii;
-DROP TABLE IF EXISTS tari;
-DROP TABLE IF EXISTS regiuni;
-DROP TABLE IF EXISTS locatii;
-DROP TABLE IF EXISTS departament;
-DROP TABLE IF EXISTS data;
-DROP TABLE IF EXISTS date_logs;
-DROP TABLE IF EXISTS numb;
-DROP TABLE IF EXISTS ticete;
+DROP TABLE IF EXISTS 
+	angajati, 
+	colors, 
+	departament, 
+	tipuri, 
+	useri, 
+	experienta, 
+	proiecte, 
+	echipe, 
+	tasks, 
+	statusuri2, 
+	studii, 
+	cicluri, 
+	limbi_ang, 
+	limbi, 
+	nivel, 
+	aplicari, 
+	joburi, 
+	tip_job, 
+	tip_adev, 
+	adeverinte, 
+	proiecte2, 
+	cv, 
+	tipcon, 
+	concedii, 
+	data, 
+	date_logs, 
+	libere, 
+	locatii_joburi, 
+	locatii_concedii, 
+	locatii_atractii, 
+	locatii_departamente, 
+	locatii_useri, 
+	restrictii, 
+	sarbatori, 
+	statusuri, 
+	teme, 
+	testt, 
+	tichete, 
+	users;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 3. Creare tabele
@@ -105,7 +97,28 @@ DROP TABLE IF EXISTS tipuri;
 CREATE TABLE IF NOT EXISTS tipuri (
   tip INT NOT NULL,
   denumire VARCHAR(25) NOT NULL,
+  salariu INT NOT NULL,
   PRIMARY KEY (tip));
+
+-- -----------------------------------------------------
+-- Tabel sporuri
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS tipuri_sporuri;
+CREATE TABLE tipuri_sporuri (
+    id INT PRIMARY KEY,
+    denumire VARCHAR(100) NOT NULL,
+    procent INT NOT NULL
+);
+
+-- -----------------------------------------------------
+-- Tabel penalizari
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS tipuri_penalizari;
+CREATE TABLE tipuri_penalizari (
+    id INT PRIMARY KEY,
+    denumire VARCHAR(100) NOT NULL,
+    procent INT NOT NULL
+);
 
 -- -----------------------------------------------------
 -- Tabel useri
@@ -131,7 +144,15 @@ CREATE TABLE IF NOT EXISTS useri (
   culoare VARCHAR(25) NOT NULL DEFAULT '#333',
   activ INT NULL DEFAULT '0',
   profil MEDIUMBLOB NULL DEFAULT NULL,
-  PRIMARY KEY (id)) AUTO_INCREMENT = 11;
+  salariu_brut INT NULL DEFAULT NULL,
+  sporuri INT NULL DEFAULT NULL,
+  penalizari INT NULL DEFAULT NULL,
+  data_ang DATE NULL DEFAULT NULL,
+  data_modif DATE NULL DEFAULT NULL,
+  FOREIGN KEY (sporuri) REFERENCES tipuri_sporuri(id),
+  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id),
+  PRIMARY KEY (id)) AUTO_INCREMENT = 11
+  ;
 
 CREATE UNIQUE INDEX username ON useri (username ASC) VISIBLE;
 
@@ -140,6 +161,222 @@ CREATE UNIQUE INDEX cnp ON useri (cnp ASC) VISIBLE;
 CREATE UNIQUE INDEX email ON useri (email ASC) VISIBLE;
 
 CREATE UNIQUE INDEX telefon ON useri (telefon ASC) VISIBLE;
+
+-- -----------------------------------------------------
+-- Tabel experienta
+-- -----------------------------------------------------
+CREATE TABLE experienta (
+    id INT PRIMARY KEY,
+    den_job VARCHAR(50),
+    instit VARCHAR(50),
+    tip INT,
+    id_dep INT,
+    domeniu VARCHAR(50),
+    subdomeniu VARCHAR(50),
+    start DATE,
+    end DATE,
+    descriere VARCHAR(1000),
+    id_ang INT,
+    FOREIGN KEY (tip) REFERENCES tipuri(tip),
+    FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- -----------------------------------------------------
+-- Tabel proiecte
+-- -----------------------------------------------------
+CREATE TABLE proiecte (
+    id INT PRIMARY KEY,
+    nume VARCHAR(50),
+    descriere VARCHAR(1000),
+    start DATE,
+    end DATE
+);
+
+-- -----------------------------------------------------
+-- Tabel echipe
+-- -----------------------------------------------------
+CREATE TABLE echipe (
+    id INT PRIMARY KEY,
+    nume VARCHAR(50),
+    supervizor INT,
+    id_prj INT,
+    FOREIGN KEY (supervizor) REFERENCES useri(id),
+    FOREIGN KEY (id_prj) REFERENCES proiecte(id)
+);
+
+-- -----------------------------------------------------
+-- Tabel statusuri2 -> pentru taskuri: 0, 25, 50, 75, 100
+-- -----------------------------------------------------
+CREATE TABLE statusuri2 (
+    id INT PRIMARY KEY,
+    procent INTEGER
+);
+
+-- -----------------------------------------------------
+-- Tabel taskuri
+-- -----------------------------------------------------
+CREATE TABLE tasks (
+    id INT PRIMARY KEY,
+    nume VARCHAR(50),
+    supervizor INT,
+    id_ang INT,
+    start DATE,
+    end DATE,
+    status INT DEFAULT 0,
+    id_prj INT,
+    FOREIGN KEY (supervizor) REFERENCES useri(id),
+    FOREIGN KEY (id_prj) REFERENCES proiecte(id),
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    FOREIGN KEY (status) REFERENCES statusuri2(id)
+);
+
+-- -----------------------------------------------------
+-- Tabel cicluri (liceal, post-liceal, licenta, masterat, doctorat, post-doctoral)
+-- -----------------------------------------------------
+CREATE TABLE cicluri (
+    id INT PRIMARY KEY,
+    semnificatie VARCHAR(12)
+);
+
+-- -----------------------------------------------------
+-- Tabel studii 
+-- -----------------------------------------------------
+CREATE TABLE studii (
+    id INT PRIMARY KEY,
+    facultate VARCHAR(50),
+    universitate VARCHAR(50),
+    ciclu INT,
+    start DATE,
+    end DATE,
+    id_ang INT,
+    FOREIGN KEY (ciclu) REFERENCES cicluri(id),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- -----------------------------------------------------
+-- Tabel limbi
+-- -----------------------------------------------------
+CREATE TABLE limbi (
+    id INT PRIMARY KEY,
+    limba VARCHAR(50)
+);
+
+-- -----------------------------------------------------
+-- Tabel nivel (limba): A1, A2, B1, B2, C1, C2
+-- -----------------------------------------------------
+CREATE TABLE nivel (
+    id INT PRIMARY KEY,
+    semnificatie VARCHAR(12)
+);
+
+-- -----------------------------------------------------
+-- Tabel limbi_ang (limbi angajati)
+-- -----------------------------------------------------
+CREATE TABLE limbi_ang (
+    id INT PRIMARY KEY,
+    id_limba INT,
+    nivel INT,
+    id_ang INT,
+    FOREIGN KEY (id_limba) REFERENCES limbi(id),
+    FOREIGN KEY (nivel) REFERENCES nivel(id),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- -----------------------------------------------------
+-- Tabel tipuri de job: fizic, hibrid, remote
+-- -----------------------------------------------------
+CREATE TABLE tip_job (
+    id INT PRIMARY KEY,
+    semnificatie VARCHAR(12)
+);
+
+-- -----------------------------------------------------
+-- Tabel locatii_joburi
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS locatii_joburi;
+CREATE TABLE IF NOT EXISTS locatii_joburi (
+  id_locatie INT NOT NULL AUTO_INCREMENT,
+  id_job INT NOT NULL,
+  strada VARCHAR(255) NOT NULL,
+  longitudine DOUBLE NULL DEFAULT NULL,
+  latitudine DOUBLE NULL DEFAULT NULL,
+  cod VARCHAR(12) NOT NULL,
+  oras VARCHAR(255) NOT NULL,
+  judet VARCHAR(255) NOT NULL,
+  tara VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id_locatie)); 
+  
+-- -----------------------------------------------------
+-- Tabel joburi, tip = part-time = 0, full-time = 1
+-- -----------------------------------------------------
+CREATE TABLE joburi (
+    id INT PRIMARY KEY,
+    titlu VARCHAR(50),
+    req VARCHAR(1000),
+    resp VARCHAR(1000),
+    dom VARCHAR(50),
+    subdom VARCHAR(50),
+    pozitie INT,
+    departament INT,
+    start DATE,
+    end DATE,
+    id_locatie INTEGER, 
+    activ BOOLEAN,
+    keywords VARCHAR(100),
+    id_team INTEGER,
+    id_prj INTEGER,
+    ore INTEGER,
+    tip BOOLEAN,
+	FOREIGN KEY (id_team) REFERENCES echipe(id), 
+	FOREIGN KEY (id_prj) REFERENCES proiecte(id),
+    FOREIGN KEY (pozitie) REFERENCES tipuri(tip),
+    FOREIGN KEY (departament) REFERENCES departament(id_dep),
+    FOREIGN KEY (id_locatie) REFERENCES locatii_joburi(id_locatie)
+);
+
+-- -----------------------------------------------------
+-- Tabel aplicari
+-- -----------------------------------------------------
+CREATE TABLE aplicari (
+    id INT PRIMARY KEY,
+    job_id INT,
+    data_apl DATE,
+    id_ang INT,
+    FOREIGN KEY (job_id) REFERENCES joburi(id),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- -----------------------------------------------------
+-- Tabel tipuri_adeverinte (1 - salariat, 2 - venit, 3 - medical, 4 - concediu
+-- 5 - experienta, 6 - delegare, 7 - somaj, 8 - generare carte de munca)
+-- -----------------------------------------------------
+CREATE TABLE tip_adev (
+    id INT PRIMARY KEY,
+    denumire VARCHAR(50)
+);
+
+-- -----------------------------------------------------
+-- Tabel proiecte-personale
+-- -----------------------------------------------------
+CREATE TABLE proiecte2 (
+    id INT PRIMARY KEY,
+    nume VARCHAR(50),
+    descriere VARCHAR(255),
+    start DATE,
+    end DATE
+);
+
+-- -----------------------------------------------------
+-- Tabel cv-uri
+-- -----------------------------------------------------
+CREATE TABLE cv (
+    id INT PRIMARY KEY,
+    id_ang INT,
+    calitati VARCHAR(255),
+    interese VARCHAR(255),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
 
 -- -----------------------------------------------------
 -- Tabel tipcon -> asta cred ca poate lipsi, dar am zis sa nu fie hardocdat
@@ -188,7 +425,7 @@ CREATE TABLE IF NOT EXISTS date_logs (
   date_checked DATE NULL DEFAULT NULL);
 
 -- -----------------------------------------------------
--- Tabel libere
+-- Tabel libere -> ???????????
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS libere;
 CREATE TABLE IF NOT EXISTS libere (
@@ -307,6 +544,20 @@ CREATE TABLE IF NOT EXISTS statusuri (
   PRIMARY KEY (status));
 
 -- -----------------------------------------------------
+-- Tabel adeverinte
+-- -----------------------------------------------------
+CREATE TABLE adeverinte (
+    id INT PRIMARY KEY,
+    tip INT,
+    motiv VARCHAR(255),
+    status INT,
+    creare DATE,
+    modif DATE,
+    FOREIGN KEY (tip) REFERENCES tip_adev(id),
+    FOREIGN KEY (status) REFERENCES statusuri(status)
+);
+
+-- -----------------------------------------------------
 -- Tabel teme
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS teme;
@@ -393,8 +644,6 @@ BEGIN
     END IF;
 END$$
 
-
-
 USE test$$
 DROP TRIGGER IF EXISTS after_mod $$
 
@@ -414,8 +663,6 @@ BEGIN
     END IF;
 END$$
 
-
-
 DELIMITER $$
 DROP TRIGGER IF EXISTS after_user_insert$$
 CREATE TRIGGER after_user_insert
@@ -428,7 +675,6 @@ BEGIN
 END$$
 
 DROP TRIGGER IF EXISTS aftrdel $$
-
 USE test$$
 CREATE
 DEFINER=root@localhost
@@ -438,8 +684,6 @@ FOR EACH ROW
 BEGIN
     delete from concedii where id_ang = old.id;
 END$$
-
-
 
 USE test$$
 DROP TRIGGER IF EXISTS before_insert_useri $$
@@ -457,8 +701,6 @@ BEGIN
     SET NEW.zileramase = IF(NEW.tip = 2, 30, 40);
 END$$
 
-
-
 USE test$$
 DROP TRIGGER IF EXISTS before_user_deleted $$
 
@@ -472,8 +714,6 @@ BEGIN
     DELETE FROM concedii WHERE id_ang = OLD.id;
 END$$
 
-
-
 USE test$$
 DROP TRIGGER IF EXISTS teme1 $$
 
@@ -486,8 +726,6 @@ FOR EACH ROW
 BEGIN
     INSERT INTO teme (id_usr) VALUES (NEW.id);
 END$$
-
-
 
 USE test$$
 DROP TRIGGER IF EXISTS teme2 $$
@@ -532,7 +770,6 @@ BEGIN
         WHERE id = OLD.id_ang;
     END IF;
 END$$
-
 
 -- -----------------------------------------------------
 -- Trigger care modifica numarul de zile de concedii dupa ce se adauga un concediu
@@ -731,19 +968,67 @@ DELIMITER ;
 -- INSERARI
 -- -----------------------------------------------------
 -- Inserarea datelor inițiale despre departamente
-INSERT INTO departament (id_dep, nume_dep) VALUES 
+INSERT INTO departament (id_dep, nume_dep) VALUES
 (1, 'HR'),
 (2, 'Finante'),
 (3, 'IT'),
-(4, 'Juridic');
+(4, 'Juridic'),
+(5, 'Marketing'),
+(6, 'Vanzari'),
+(7, 'Logistica'),
+(8, 'Productie'),
+(9, 'Achizitii'),
+(10, 'Cercetare si Dezvoltare'),
+(11, 'Customer Support'),
+(12, 'Administrativ'),
+(13, 'Comunicare'),
+(14, 'Training'),
+(15, 'Security'),
+(16, 'Management'),
+(17, 'Business Intelligence'),
+(18, 'Contabilitate'),
+(19, 'Control Intern'),
+(20, 'Servicii Generale');
 
 -- Inserarea datelor inițiale despre tipuri de angajati
-INSERT INTO tipuri (tip, denumire) VALUES 
-(0, 'Director'),
-(1, 'Tip1'),
-(2, 'Tip2'),
-(3, 'Sef'),
-(4, 'Administrator');
+INSERT INTO tipuri (tip, denumire, salariu) VALUES 
+(0, 'Director', 13000),
+(1, 'New Graduate', 3500),
+(2, 'Intern', 3000),
+(3, 'Sef', 11600),
+(4, 'CEO', 26000),
+(5, 'Junior', 4500),
+(6, 'lvl1', 5500),
+(7, 'lvl2', 6500),
+(8, 'Mid', 7500),
+(9, 'Senior', 8900),
+(10, 'Manager', 9200),
+(11, 'Principal', 11300),
+(12, 'Vice Presedinte', 16000),
+(13, 'Vice Presedinte Senior', 18000),
+(15, 'MP', 20000),
+(16, 'DC', 22000),
+(17, 'CHRO', 24000),
+(18, 'CFO', 26000),
+(19, 'COO', 26000)
+;
+
+-- Tabel sporuri
+INSERT INTO tipuri_sporuri (id, denumire, procent) VALUES
+(1, 'Spor de noapte', 25),
+(2, 'Spor de weekend', 15),
+(3, 'Spor de vechime', 10),
+(4, 'Spor de toxicitate', 20),
+(5, 'Spor de confidentialitate', 10),
+(6, 'Spor de periculozitate', 15),
+(7, 'Spor pentru ore suplimentare', 75);
+
+-- Tabel penalizari
+INSERT INTO tipuri_penalizari (id, denumire, procent) VALUES
+(1, 'Intarzieri repetate', 10),
+(2, 'Absent nemotivat', 20),
+(3, 'Nerespectare regulament', 15),
+(4, 'Pagube materiale', 30);
 
 -- Inserarea datelor inițiale despre status concediu
 INSERT INTO statusuri (status, nume_status) VALUES 
@@ -753,28 +1038,104 @@ INSERT INTO statusuri (status, nume_status) VALUES
 (1, 'Aprobat sef'),
 (2, 'Aprobat director');
 
+-- Tabel statusuri2
+INSERT INTO statusuri2 (id, procent) VALUES
+(0, 0),
+(1, 25),
+(2, 50),
+(3, 75),
+(4, 100);
+
+-- Tabel cicluri
+INSERT INTO cicluri (id, semnificatie) VALUES
+(1, 'liceal'),
+(2, 'post-liceal'),
+(3, 'licenta'),
+(4, 'masterat'),
+(5, 'doctorat'),
+(6, 'post-doc');
+
+-- Tabel limbi
+INSERT INTO limbi (id, limba) VALUES
+(1, 'romana'),
+(2, 'engleza'),
+(3, 'franceza'),
+(4, 'germana'),
+(5, 'spaniola'),
+(6, 'italiana'),
+(7, 'olandeza'),
+(8, 'japoneza');
+
+-- Tabel nivel
+INSERT INTO nivel (id, semnificatie) VALUES
+(1, 'A1'),
+(2, 'A2'),
+(3, 'B1'),
+(4, 'B2'),
+(5, 'C1'),
+(6, 'C2');
+
+-- Tabel tip_job
+INSERT INTO tip_job (id, semnificatie) VALUES
+(1, 'fizic'),
+(2, 'hibrid'),
+(3, 'remote');
+
+-- Tabel tip_adev
+INSERT INTO tip_adev (id, denumire) VALUES
+(1, 'adeverinta salariat'),
+(2, 'adeverinta venit'),
+(3, 'adeverinta medicala'),
+(4, 'adeverinta concediu'),
+(5, 'adeverinta experienta'),
+(6, 'adeverinta delegare'),
+(7, 'adeverinta somaj'),
+(8, 'adeverinta carte de munca'),
+(9, 'adeverinta cursuri'),
+(10, 'adeverinta participare proiect'),
+(11, 'adeverinta stagiu practica'),
+(12, 'adeverinta incetare contract'),
+(13, 'adeverinta vechime cumulata'),
+(14, 'adeverinta pentru pensie'),
+(15, 'adeverinta pentru banca/credit'),
+(16, 'adeverinta pentru locuinta'),
+(17, 'adeverinta pentru grad de handicap'),
+(18, 'adeverinta pentru crese/gradinite'),
+(19, 'adeverinta COVID-19 carantina'),
+(20, 'adeverinta indemnizatie crestere copil');
+
 -- Inserarea datelor inițiale despre tipuri de concedii
-INSERT INTO tipcon (motiv, nr_zile) VALUES 
-('Concediu odihnă', 14),
-('Concediu formare profesională', 21),
-('Concediu medical', 21),
-('Concediu risc maternal', 90),
-('Concediu maternitate', 720);
+INSERT INTO tipcon (motiv, nr_zile) VALUES
+('Concediu odihna', 21),
+('Concediu formare profesionala', 30),
+('Concediu medical', 90),
+('Concediu risc maternal', 126),
+('Concediu maternitate', 126),
+('Concediu paternal', 5),
+('Concediu crestere copil', 730),
+('Concediu pentru ingrijirea copilului bolnav', 45),
+('Concediu fara plata', 30),
+('Concediu pentru evenimente familiale', 5),
+('Concediu pentru studii', 30),
+('Concediu pentru donare de sange', 2),
+('Concediu pentru activitati de voluntariat', 5),
+('Concediu pentru forta majora', 5),
+('Concediu pentru carantina', 14);
 
 DROP TRIGGER IF EXISTS after_user_insert; -- nu stiu de ce a trebuit sa-l sterg pe asta, dar cred ca-mi dadea eroare -> sa vad cum rezolv
 
 -- Inserarea datelor inițiale despre angajati
-INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa, culoare) VALUES 
-('Vasile', 'Fabian', '1996-09-19', 'vasile.fabian@example.com', '0700000000', 'fvasile', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 0, 'Strada Unirii', '#3A8DFF'),
-('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății', '#FF5733'),
-('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii', '#42E695'),
-('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab', '#9B59B6'),
-('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății', '#FFD700'),
-('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei', '#E74C3C'),
-('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei', '#1ABC9C'),
-('Rebreanu', 'Andrei', '2003-07-07', 'andrei.rebreanu@example.com', '0700000006', 'andrei.rebreanu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei', '#F39C12'),
-('Ionescu', 'Lucian', '1989-04-18', 'lucion@example.com', '0700000007', 'lucian.i', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 3, 'Strada Alunului', '#8E44AD'),
-('Ciucioiu', 'Elena', '2002-09-11', 'elena.c@example.com', '0700000008', 'elena.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 4, 'Strada Izvorului', '#2ECC71')
+INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa, culoare, cnp) VALUES 
+('Vasile', 'Fabian', '1996-09-19', 'vasile.fabian@example.com', '0700000000', 'fvasile', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 0, 'Strada Unirii', '#3A8DFF', 1),
+('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății', '#FF5733', 2),
+('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii', '#42E695', 3),
+('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab', '#9B59B6', 4),
+('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății', '#FFD700', 5),
+('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei', '#E74C3C', 6),
+('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei', '#1ABC9C', 7),
+('Rebreanu', 'Andrei', '2003-07-07', 'andrei.rebreanu@example.com', '0700000006', 'andrei.rebreanu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei', '#F39C12', 8),
+('Ionescu', 'Lucian', '1989-04-18', 'lucion@example.com', '0700000007', 'lucian.i', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 3, 'Strada Alunului', '#8E44AD', 9),
+('Ciucioiu', 'Elena', '2002-09-11', 'elena.c@example.com', '0700000008', 'elena.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 4, 'Strada Izvorului', '#2ECC71', 10)
 ;
 
 -- niste update-uri de test pentru ca sa nu mai schimb de fiecare data cand refac baza =)))
@@ -952,6 +1313,10 @@ ORDER BY l.oras;
 -- -----------------------------------------------------
 -- test
 -- -----------------------------------------------------
+select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
 select * from useri;
+use test;
+SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
 desc locatii_concedii;
+desc concedii;
 SELECT strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;
