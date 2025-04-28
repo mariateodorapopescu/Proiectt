@@ -17,6 +17,8 @@ WHERE REFERENCED_TABLE_NAME IS NOT NULL
 AND TABLE_SCHEMA = DATABASE();
 
 -- 2. Ștergerea tuturor tabelelor existente
+
+-- 1. Ștergerea tuturor tabelelor existente
 DROP TABLE IF EXISTS 
 	angajati, 
 	colors, 
@@ -56,75 +58,138 @@ DROP TABLE IF EXISTS
 	teme, 
 	testt, 
 	tichete, 
-	users;
+	users,
+	tipuri_sporuri,
+	tipuri_penalizari,
+	istoric_penalizari,
+	istoric_sporuri,
+	istoric_incetari,
+	istoric_promovari,
+	istoric_concedii_suplimentare,
+	istoric_fluture;
 
-SET FOREIGN_KEY_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- 3. Creare tabele
--- -----------------------------------------------------
--- Tabel angajati
--- -----------------------------------------------------
-DROP TABLE IF EXISTS angajati;
-CREATE TABLE IF NOT EXISTS angajati (
-  id INT NOT NULL,
-  age INT NOT NULL,
-  first VARCHAR(255) NULL DEFAULT NULL,
-  last VARCHAR(255) NULL DEFAULT NULL);
+use test;
 
--- -----------------------------------------------------
--- Tabel colors -> chiar e necesar?
--- -----------------------------------------------------
-DROP TABLE IF EXISTS colors;
-CREATE TABLE IF NOT EXISTS colors (
-  culoare VARCHAR(25) NOT NULL,
-  cod VARCHAR(25) NOT NULL,
-  PRIMARY KEY (culoare));
-
+-- 1. Creare tabele de bază (fără foreign keys)
 -- -----------------------------------------------------
 -- Tabel departament
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS departament;
 CREATE TABLE IF NOT EXISTS departament (
   id_dep INT NOT NULL AUTO_INCREMENT,
   nume_dep VARCHAR(25) NOT NULL,
-  -- adresa VARCHAR(25) NOT NULL,
-  PRIMARY KEY (id_dep)) AUTO_INCREMENT = 5;
+  PRIMARY KEY (id_dep)
+) AUTO_INCREMENT = 5;
 
 -- -----------------------------------------------------
 -- Tabel tipuri
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS tipuri;
 CREATE TABLE IF NOT EXISTS tipuri (
   tip INT NOT NULL,
   denumire VARCHAR(25) NOT NULL,
   salariu INT NOT NULL,
-  PRIMARY KEY (tip));
-
+  PRIMARY KEY (tip)
+);
 
 -- -----------------------------------------------------
--- Tabel sporuri
+-- Tabel tipuri_sporuri
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS tipuri_sporuri;
-CREATE TABLE tipuri_sporuri (
+CREATE TABLE IF NOT EXISTS tipuri_sporuri (
     id INT PRIMARY KEY,
     denumire VARCHAR(100) NOT NULL,
     procent INT NOT NULL
 );
 
 -- -----------------------------------------------------
--- Tabel penalizari
+-- Tabel tipuri_penalizari
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS tipuri_penalizari;
-CREATE TABLE tipuri_penalizari (
+CREATE TABLE IF NOT EXISTS tipuri_penalizari (
     id INT PRIMARY KEY,
     denumire VARCHAR(100) NOT NULL,
     procent INT NOT NULL
 );
 
 -- -----------------------------------------------------
--- Tabel useri
+-- Tabel statusuri
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS useri;
+CREATE TABLE IF NOT EXISTS statusuri (
+  status INT NOT NULL,
+  nume_status VARCHAR(56) NOT NULL,
+  PRIMARY KEY (status)
+);
+
+-- -----------------------------------------------------
+-- Tabel statusuri2
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS statusuri2 (
+    id INT PRIMARY KEY,
+    procent INTEGER
+);
+
+-- -----------------------------------------------------
+-- Tabel cicluri
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cicluri (
+    id INT PRIMARY KEY,
+    semnificatie VARCHAR(12)
+);
+
+-- -----------------------------------------------------
+-- Tabel limbi
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS limbi (
+    id INT PRIMARY KEY,
+    limba VARCHAR(50)
+);
+
+-- -----------------------------------------------------
+-- Tabel nivel
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS nivel (
+    id INT PRIMARY KEY,
+    semnificatie VARCHAR(12)
+);
+
+-- -----------------------------------------------------
+-- Tabel tip_job
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS tip_job (
+    id INT PRIMARY KEY,
+    semnificatie VARCHAR(12)
+);
+
+-- -----------------------------------------------------
+-- Tabel tip_adev
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS tip_adev (
+    id INT PRIMARY KEY,
+    denumire VARCHAR(50)
+);
+
+-- -----------------------------------------------------
+-- Tabel tipcon
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS tipcon (
+  tip INT NOT NULL AUTO_INCREMENT,
+  motiv VARCHAR(255) NULL DEFAULT NULL,
+  nr_zile INT NULL DEFAULT '0',
+  PRIMARY KEY (tip)
+) AUTO_INCREMENT = 6;
+
+-- -----------------------------------------------------
+-- Tabel proiecte
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS proiecte (
+    id INT PRIMARY KEY,
+    nume VARCHAR(50),
+    descriere VARCHAR(1000),
+    start DATE,
+    end DATE
+);
+
+-- 2. Creare tabel useri
+-- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS useri (
   id INT NOT NULL AUTO_INCREMENT,
   nume VARCHAR(45) NOT NULL,
@@ -143,29 +208,31 @@ CREATE TABLE IF NOT EXISTS useri (
   conramase INT NULL DEFAULT '3',
   cnp VARCHAR(14) NULL DEFAULT NULL,
   culoare VARCHAR(25) NOT NULL DEFAULT '#333',
-  activ INT NULL DEFAULT '0',
+  activ INT NULL DEFAULT '1',
   profil MEDIUMBLOB NULL DEFAULT NULL,
   salariu_brut INT NULL DEFAULT NULL,
   sporuri INT NULL DEFAULT NULL,
   penalizari INT NULL DEFAULT NULL,
   data_ang DATE NULL DEFAULT NULL,
   data_modif DATE NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
+  FOREIGN KEY (tip) REFERENCES tipuri(tip),
   FOREIGN KEY (sporuri) REFERENCES tipuri_sporuri(id),
-  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id),
-  PRIMARY KEY (id)) AUTO_INCREMENT = 11
-  ;
+  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id)
+) AUTO_INCREMENT = 11;
 
-CREATE UNIQUE INDEX username ON useri (username ASC) VISIBLE;
+-- Creare indexuri pentru useri
+CREATE UNIQUE INDEX username ON useri (username ASC);
+CREATE UNIQUE INDEX cnp ON useri (cnp ASC);
+CREATE UNIQUE INDEX email ON useri (email ASC);
+CREATE UNIQUE INDEX telefon ON useri (telefon ASC);
 
-CREATE UNIQUE INDEX cnp ON useri (cnp ASC) VISIBLE;
-
-CREATE UNIQUE INDEX email ON useri (email ASC) VISIBLE;
-
-CREATE UNIQUE INDEX telefon ON useri (telefon ASC) VISIBLE;
-
--- Tabel istoric penalizări
-DROP TABLE IF EXISTS istoric_penalizari;
-CREATE TABLE istoric_penalizari (
+-- 3. Tabele care depind de useri
+-- -----------------------------------------------------
+-- Tabel istoric_penalizari
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS istoric_penalizari (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_ang INT NOT NULL,
     tip_penalizare INT NOT NULL,
@@ -177,9 +244,10 @@ CREATE TABLE istoric_penalizari (
     FOREIGN KEY (tip_penalizare) REFERENCES tipuri_penalizari(id)
 );
 
--- Tabel istoric sporuri
-DROP TABLE IF EXISTS istoric_sporuri;
-CREATE TABLE istoric_sporuri (
+-- -----------------------------------------------------
+-- Tabel istoric_sporuri
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS istoric_sporuri (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_ang INT NOT NULL,
     tip_spor INT NOT NULL,
@@ -191,9 +259,10 @@ CREATE TABLE istoric_sporuri (
     FOREIGN KEY (tip_spor) REFERENCES tipuri_sporuri(id)
 );
 
--- Tabel istoric încetări contract
-DROP TABLE IF EXISTS istoric_incetari;
-CREATE TABLE istoric_incetari (
+-- -----------------------------------------------------
+-- Tabel istoric_incetari
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS istoric_incetari (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_ang INT NOT NULL,
     data_incetare DATE NOT NULL,
@@ -203,9 +272,10 @@ CREATE TABLE istoric_incetari (
     FOREIGN KEY (id_ang) REFERENCES useri(id)
 );
 
--- Tabel istoric promovări
-DROP TABLE IF EXISTS istoric_promovari;
-CREATE TABLE istoric_promovari (
+-- -----------------------------------------------------
+-- Tabel istoric_promovari
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS istoric_promovari (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_ang INT NOT NULL,
     tip_vechi INT NOT NULL,
@@ -217,9 +287,10 @@ CREATE TABLE istoric_promovari (
     FOREIGN KEY (tip_nou) REFERENCES tipuri(tip)
 );
 
--- Tabel istoric concedii suplimentare
-DROP TABLE IF EXISTS istoric_concedii_suplimentare;
-CREATE TABLE istoric_concedii_suplimentare (
+-- -----------------------------------------------------
+-- Tabel istoric_concedii_suplimentare
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS istoric_concedii_suplimentare (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_ang INT NOT NULL,
     zile_acordate INT NOT NULL,
@@ -228,9 +299,10 @@ CREATE TABLE istoric_concedii_suplimentare (
     FOREIGN KEY (id_ang) REFERENCES useri(id)
 );
 
--- Tabel istoric fluturaș salariu
-DROP TABLE IF EXISTS istoric_fluture;
-CREATE TABLE istoric_fluture (
+-- -----------------------------------------------------
+-- Tabel istoric_fluture
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS istoric_fluture (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_ang INT NOT NULL,
     luna INT NOT NULL,
@@ -244,7 +316,7 @@ CREATE TABLE istoric_fluture (
 -- -----------------------------------------------------
 -- Tabel experienta
 -- -----------------------------------------------------
-CREATE TABLE experienta (
+CREATE TABLE IF NOT EXISTS experienta (
     id INT PRIMARY KEY,
     den_job VARCHAR(50),
     instit VARCHAR(50),
@@ -262,20 +334,9 @@ CREATE TABLE experienta (
 );
 
 -- -----------------------------------------------------
--- Tabel proiecte
--- -----------------------------------------------------
-CREATE TABLE proiecte (
-    id INT PRIMARY KEY,
-    nume VARCHAR(50),
-    descriere VARCHAR(1000),
-    start DATE,
-    end DATE
-);
-
--- -----------------------------------------------------
 -- Tabel echipe
 -- -----------------------------------------------------
-CREATE TABLE echipe (
+CREATE TABLE IF NOT EXISTS echipe (
     id INT PRIMARY KEY,
     nume VARCHAR(50),
     supervizor INT,
@@ -285,17 +346,9 @@ CREATE TABLE echipe (
 );
 
 -- -----------------------------------------------------
--- Tabel statusuri2 -> pentru taskuri: 0, 25, 50, 75, 100
+-- Tabel tasks
 -- -----------------------------------------------------
-CREATE TABLE statusuri2 (
-    id INT PRIMARY KEY,
-    procent INTEGER
-);
-
--- -----------------------------------------------------
--- Tabel taskuri
--- -----------------------------------------------------
-CREATE TABLE tasks (
+CREATE TABLE IF NOT EXISTS tasks (
     id INT PRIMARY KEY,
     nume VARCHAR(50),
     supervizor INT,
@@ -311,17 +364,9 @@ CREATE TABLE tasks (
 );
 
 -- -----------------------------------------------------
--- Tabel cicluri (liceal, post-liceal, licenta, masterat, doctorat, post-doctoral)
+-- Tabel studii
 -- -----------------------------------------------------
-CREATE TABLE cicluri (
-    id INT PRIMARY KEY,
-    semnificatie VARCHAR(12)
-);
-
--- -----------------------------------------------------
--- Tabel studii 
--- -----------------------------------------------------
-CREATE TABLE studii (
+CREATE TABLE IF NOT EXISTS studii (
     id INT PRIMARY KEY,
     facultate VARCHAR(50),
     universitate VARCHAR(50),
@@ -334,25 +379,9 @@ CREATE TABLE studii (
 );
 
 -- -----------------------------------------------------
--- Tabel limbi
+-- Tabel limbi_ang
 -- -----------------------------------------------------
-CREATE TABLE limbi (
-    id INT PRIMARY KEY,
-    limba VARCHAR(50)
-);
-
--- -----------------------------------------------------
--- Tabel nivel (limba): A1, A2, B1, B2, C1, C2
--- -----------------------------------------------------
-CREATE TABLE nivel (
-    id INT PRIMARY KEY,
-    semnificatie VARCHAR(12)
-);
-
--- -----------------------------------------------------
--- Tabel limbi_ang (limbi angajati)
--- -----------------------------------------------------
-CREATE TABLE limbi_ang (
+CREATE TABLE IF NOT EXISTS limbi_ang (
     id INT PRIMARY KEY,
     id_limba INT,
     nivel INT,
@@ -363,17 +392,8 @@ CREATE TABLE limbi_ang (
 );
 
 -- -----------------------------------------------------
--- Tabel tipuri de job: fizic, hibrid, remote
--- -----------------------------------------------------
-CREATE TABLE tip_job (
-    id INT PRIMARY KEY,
-    semnificatie VARCHAR(12)
-);
-
--- -----------------------------------------------------
 -- Tabel locatii_joburi
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS locatii_joburi;
 CREATE TABLE IF NOT EXISTS locatii_joburi (
   id_locatie INT NOT NULL AUTO_INCREMENT,
   id_job INT NOT NULL,
@@ -384,12 +404,13 @@ CREATE TABLE IF NOT EXISTS locatii_joburi (
   oras VARCHAR(255) NOT NULL,
   judet VARCHAR(255) NOT NULL,
   tara VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id_locatie)); 
-  
+  PRIMARY KEY (id_locatie)
+);
+
 -- -----------------------------------------------------
--- Tabel joburi, tip = part-time = 0, full-time = 1
+-- Tabel joburi
 -- -----------------------------------------------------
-CREATE TABLE joburi (
+CREATE TABLE IF NOT EXISTS joburi (
     id INT PRIMARY KEY,
     titlu VARCHAR(50),
     req VARCHAR(1000),
@@ -407,8 +428,8 @@ CREATE TABLE joburi (
     id_prj INTEGER,
     ore INTEGER,
     tip BOOLEAN,
-	FOREIGN KEY (id_team) REFERENCES echipe(id), 
-	FOREIGN KEY (id_prj) REFERENCES proiecte(id),
+    FOREIGN KEY (id_team) REFERENCES echipe(id), 
+    FOREIGN KEY (id_prj) REFERENCES proiecte(id),
     FOREIGN KEY (pozitie) REFERENCES tipuri(tip),
     FOREIGN KEY (departament) REFERENCES departament(id_dep),
     FOREIGN KEY (id_locatie) REFERENCES locatii_joburi(id_locatie)
@@ -417,7 +438,7 @@ CREATE TABLE joburi (
 -- -----------------------------------------------------
 -- Tabel aplicari
 -- -----------------------------------------------------
-CREATE TABLE aplicari (
+CREATE TABLE IF NOT EXISTS aplicari (
     id INT PRIMARY KEY,
     job_id INT,
     data_apl DATE,
@@ -427,18 +448,23 @@ CREATE TABLE aplicari (
 );
 
 -- -----------------------------------------------------
--- Tabel tipuri_adeverinte (1 - salariat, 2 - venit, 3 - medical, 4 - concediu
--- 5 - experienta, 6 - delegare, 7 - somaj, 8 - generare carte de munca)
+-- Tabel adeverinte
 -- -----------------------------------------------------
-CREATE TABLE tip_adev (
+CREATE TABLE IF NOT EXISTS adeverinte (
     id INT PRIMARY KEY,
-    denumire VARCHAR(50)
+    tip INT,
+    motiv VARCHAR(255),
+    status INT,
+    creare DATE,
+    modif DATE,
+    FOREIGN KEY (tip) REFERENCES tip_adev(id),
+    FOREIGN KEY (status) REFERENCES statusuri(status)
 );
 
 -- -----------------------------------------------------
--- Tabel proiecte-personale
+-- Tabel proiecte2
 -- -----------------------------------------------------
-CREATE TABLE proiecte2 (
+CREATE TABLE IF NOT EXISTS proiecte2 (
     id INT PRIMARY KEY,
     nume VARCHAR(50),
     descriere VARCHAR(255),
@@ -447,9 +473,9 @@ CREATE TABLE proiecte2 (
 );
 
 -- -----------------------------------------------------
--- Tabel cv-uri
+-- Tabel cv
 -- -----------------------------------------------------
-CREATE TABLE cv (
+CREATE TABLE IF NOT EXISTS cv (
     id INT PRIMARY KEY,
     id_ang INT,
     calitati VARCHAR(255),
@@ -458,19 +484,8 @@ CREATE TABLE cv (
 );
 
 -- -----------------------------------------------------
--- Tabel tipcon -> asta cred ca poate lipsi, dar am zis sa nu fie hardocdat
--- -----------------------------------------------------
-DROP TABLE IF EXISTS tipcon;
-CREATE TABLE IF NOT EXISTS tipcon (
-  tip INT NOT NULL AUTO_INCREMENT,
-  motiv VARCHAR(255) NULL DEFAULT NULL,
-  nr_zile INT NULL DEFAULT '0',
-  PRIMARY KEY (tip)) AUTO_INCREMENT = 6;
-
--- -----------------------------------------------------
 -- Tabel concedii
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS concedii;
 CREATE TABLE IF NOT EXISTS concedii (
   id INT NOT NULL AUTO_INCREMENT,
   id_ang INT NOT NULL,
@@ -485,36 +500,31 @@ CREATE TABLE IF NOT EXISTS concedii (
   modified DATE NULL DEFAULT NULL,
   acc_res DATE NULL DEFAULT NULL,
   mentiuni VARCHAR(256) default NULL,
-  PRIMARY KEY (id));
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_ang) REFERENCES useri(id),
+  FOREIGN KEY (status) REFERENCES statusuri(status),
+  FOREIGN KEY (tip) REFERENCES tipcon(tip)
+);
 
 -- -----------------------------------------------------
--- Tabel data -> ??????
+-- Tabel teme
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS data;
-CREATE TABLE IF NOT EXISTS data (
-  id INT NOT NULL AUTO_INCREMENT,
-  image LONGBLOB NOT NULL,
-  PRIMARY KEY (id));
+CREATE TABLE IF NOT EXISTS teme (
+  id_usr INT NOT NULL,
+  accent VARCHAR(25) NULL DEFAULT '#10439F',
+  clr VARCHAR(25) NULL DEFAULT '#d8d9e1',
+  sidebar VARCHAR(25) NULL DEFAULT '#ECEDFA',
+  card VARCHAR(25) NULL DEFAULT '#ECEDFA',
+  text VARCHAR(25) NULL DEFAULT '#333',
+  hover VARCHAR(25) NULL DEFAULT '#ECEDFA',
+  PRIMARY KEY (id_usr),
+  FOREIGN KEY (id_usr) REFERENCES useri(id)
+);
 
--- -----------------------------------------------------
--- Tabel date_logs -> ??????
--- -----------------------------------------------------
-DROP TABLE IF EXISTS date_logs;
-CREATE TABLE IF NOT EXISTS date_logs (
-  date_checked DATE NULL DEFAULT NULL);
-
--- -----------------------------------------------------
--- Tabel libere -> ???????????
--- -----------------------------------------------------
-DROP TABLE IF EXISTS libere;
-CREATE TABLE IF NOT EXISTS libere (
-  zi DATE NULL DEFAULT NULL,
-  nume VARCHAR(255) NULL DEFAULT NULL);
-  
+-- 4. Celelalte tabele
 -- -----------------------------------------------------
 -- Tabel locatii_concedii
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS locatii_concedii;
 CREATE TABLE IF NOT EXISTS locatii_concedii (
   id_locatie INT NOT NULL AUTO_INCREMENT,
   id_concediu INT NOT NULL,
@@ -525,12 +535,13 @@ CREATE TABLE IF NOT EXISTS locatii_concedii (
   oras VARCHAR(255) NOT NULL,
   judet VARCHAR(255) NOT NULL,
   tara VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id_locatie));
+  PRIMARY KEY (id_locatie),
+  FOREIGN KEY (id_concediu) REFERENCES concedii(id)
+);
 
 -- -----------------------------------------------------
 -- Tabel locatii_atractii
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS locatii_atractii;
 CREATE TABLE IF NOT EXISTS locatii_atractii (
   id_locatie INT NOT NULL AUTO_INCREMENT,
   nume varchar(255) not null,
@@ -541,12 +552,12 @@ CREATE TABLE IF NOT EXISTS locatii_atractii (
   oras VARCHAR(255) NOT NULL,
   judet VARCHAR(255) NOT NULL,
   tara VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id_locatie));
+  PRIMARY KEY (id_locatie)
+);
 
 -- -----------------------------------------------------
 -- Tabel locatii_departamente
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS locatii_departamente;
 CREATE TABLE IF NOT EXISTS locatii_departamente (
   id_dep INT NOT NULL,
   strada VARCHAR(255) NOT NULL,
@@ -556,13 +567,13 @@ CREATE TABLE IF NOT EXISTS locatii_departamente (
   oras VARCHAR(255) NOT NULL,
   judet VARCHAR(255) NOT NULL,
   tara VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id_dep)
-  );
+  PRIMARY KEY (id_dep),
+  FOREIGN KEY (id_dep) REFERENCES departament(id_dep)
+);
 
 -- -----------------------------------------------------
 -- Tabel locatii_useri
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS locatii_useri;
 CREATE TABLE IF NOT EXISTS locatii_useri (
   id_locatie INT NOT NULL AUTO_INCREMENT,
   id_user INT NOT NULL,
@@ -573,12 +584,13 @@ CREATE TABLE IF NOT EXISTS locatii_useri (
   oras VARCHAR(255) NOT NULL,
   judet VARCHAR(255) NOT NULL,
   tara VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id_locatie));
+  PRIMARY KEY (id_locatie),
+  FOREIGN KEY (id_user) REFERENCES useri(id)
+);
 
 -- -----------------------------------------------------
--- Tabel restrictii -> asta e o tentativa de a mea, nu stiu de ce l am mai pastrat
+-- Tabel restrictii
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS restrictii;
 CREATE TABLE IF NOT EXISTS restrictii (
   tip INT NOT NULL,
   decl_dep INT NULL DEFAULT NULL,
@@ -603,57 +615,63 @@ CREATE TABLE IF NOT EXISTS restrictii (
   raport INT NULL DEFAULT NULL,
   asoc_tip INT NULL DEFAULT NULL,
   asoc_dep INT NULL DEFAULT NULL,
-  PRIMARY KEY (tip));
+  PRIMARY KEY (tip)
+);
 
 -- -----------------------------------------------------
 -- Tabel sarbatori
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS sarbatori ;
 CREATE TABLE IF NOT EXISTS sarbatori (
   zi DATE NULL DEFAULT NULL,
-  nume VARCHAR(255) NULL DEFAULT NULL);
-
--- -----------------------------------------------------
--- Table statusuri
--- -----------------------------------------------------
-DROP TABLE IF EXISTS statusuri;
-CREATE TABLE IF NOT EXISTS statusuri (
-  status INT NOT NULL,
-  nume_status VARCHAR(56) NOT NULL,
-  PRIMARY KEY (status));
-
--- -----------------------------------------------------
--- Tabel adeverinte
--- -----------------------------------------------------
-CREATE TABLE adeverinte (
-    id INT PRIMARY KEY,
-    tip INT,
-    motiv VARCHAR(255),
-    status INT,
-    creare DATE,
-    modif DATE,
-    FOREIGN KEY (tip) REFERENCES tip_adev(id),
-    FOREIGN KEY (status) REFERENCES statusuri(status)
+  nume VARCHAR(255) NULL DEFAULT NULL
 );
 
 -- -----------------------------------------------------
--- Tabel teme
+-- Tabel libere
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS teme;
-CREATE TABLE IF NOT EXISTS teme (
-  id_usr INT NOT NULL,
-  accent VARCHAR(25) NULL DEFAULT '#10439F',
-  clr VARCHAR(25) NULL DEFAULT '#d8d9e1',
-  sidebar VARCHAR(25) NULL DEFAULT '#ECEDFA',
-  card VARCHAR(25) NULL DEFAULT '#ECEDFA',
-  text VARCHAR(25) NULL DEFAULT '#333',
-  hover VARCHAR(25) NULL DEFAULT '#ECEDFA',
-  PRIMARY KEY (id_usr));
+CREATE TABLE IF NOT EXISTS libere (
+  zi DATE NULL DEFAULT NULL,
+  nume VARCHAR(255) NULL DEFAULT NULL
+);
 
 -- -----------------------------------------------------
--- Tabel testt -> ??????
+-- Tabel angajati
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS testt;
+CREATE TABLE IF NOT EXISTS angajati (
+  id INT NOT NULL,
+  age INT NOT NULL,
+  first VARCHAR(255) NULL DEFAULT NULL,
+  last VARCHAR(255) NULL DEFAULT NULL
+);
+
+-- -----------------------------------------------------
+-- Tabel colors
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS colors (
+  culoare VARCHAR(25) NOT NULL,
+  cod VARCHAR(25) NOT NULL,
+  PRIMARY KEY (culoare)
+);
+
+-- -----------------------------------------------------
+-- Tabel data
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS data (
+  id INT NOT NULL AUTO_INCREMENT,
+  image LONGBLOB NOT NULL,
+  PRIMARY KEY (id)
+);
+
+-- -----------------------------------------------------
+-- Tabel date_logs
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS date_logs (
+  date_checked DATE NULL DEFAULT NULL
+);
+
+-- -----------------------------------------------------
+-- Tabel testt
+-- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS testt (
   id INT NOT NULL,
   first_name VARCHAR(25) NULL DEFAULT NULL,
@@ -662,29 +680,31 @@ CREATE TABLE IF NOT EXISTS testt (
   password VARCHAR(25) NULL DEFAULT NULL,
   address VARCHAR(45) NULL DEFAULT NULL,
   contact VARCHAR(25) NULL DEFAULT NULL,
-  PRIMARY KEY (id));
+  PRIMARY KEY (id)
+);
 
 -- -----------------------------------------------------
--- Table tichete -> va urma
+-- Tabel tichete
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS tichete;
 CREATE TABLE IF NOT EXISTS tichete (
   id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
   subiect VARCHAR(255) NULL DEFAULT NULL,
   continut VARCHAR(512) NULL DEFAULT NULL,
-  PRIMARY KEY (id)) AUTO_INCREMENT = 2;
+  PRIMARY KEY (id)
+) AUTO_INCREMENT = 2;
 
 -- -----------------------------------------------------
--- Tabel users ????????
+-- Tabel users
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
   id INT NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(45) NULL DEFAULT NULL,
   last_name VARCHAR(45) NULL DEFAULT NULL,
   photo MEDIUMBLOB NULL DEFAULT NULL,
-  PRIMARY KEY (id));
-  
+  PRIMARY KEY (id)
+);
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- 4. Creare triggeri
 -- -----------------------------------------------------
@@ -1095,6 +1115,7 @@ INSERT INTO tipuri (tip, denumire, salariu) VALUES
 
 -- Tabel sporuri
 INSERT INTO tipuri_sporuri (id, denumire, procent) VALUES
+(0, 'Niciun spor', 0),
 (1, 'Spor de noapte', 25),
 (2, 'Spor de weekend', 15),
 (3, 'Spor de vechime', 10),
@@ -1394,7 +1415,7 @@ ORDER BY l.oras;
 -- test
 -- -----------------------------------------------------
 select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
-select * from tipuri;
+select * from useri;
 use test;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
 desc locatii_concedii;

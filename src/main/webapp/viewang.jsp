@@ -119,6 +119,12 @@
        <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "viewangdep.jsp" style="text-decoration:none;">Vizualizare angajati dintr-un anumit departament</a></button>
        <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "viewcolegidep.jsp" style="text-decoration:none;">Vizualizare angajati din departamentul meu</a></button>
                <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "activi.jsp" style="text-decoration:none;">Vizualizare angajati activi</a></button>
+               <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "sporuri.jsp" style="text-decoration:none;">Acordare sporuri</a></button>
+               <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "penalizari.jsp" style="text-decoration:none;">Acordare penalizari</a></button>
+               <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "promovare.jsp" style="text-decoration:none;">Promovare angajat</a></button>
+               <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "fluturas.jsp" style="text-decoration:none;">Acordare salariu</a></button>
+               <button style="color:white; --bg:<%out.println(accent);%> ;"><a href = "incetare_contract.jsp" style="text-decoration:none;">Incetare contract angajat</a></button>
+               
                </div>
                </div>
    

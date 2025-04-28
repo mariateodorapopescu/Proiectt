@@ -1,14 +1,16 @@
 package Servlet;
+
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.DriverManager;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpServlet;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpServletRequest;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpServletResponse;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpSession;  // SCHIMBĂ DIN javax.servlet
 import java.sql.Date;
 
 public class PromovareServlet extends HttpServlet {
@@ -57,11 +59,26 @@ public class PromovareServlet extends HttpServlet {
             }
             
             conn.commit();
-            response.sendRedirect("promovare.jsp?success=true");
+            response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Promovare cu succes!');");
+	        out.println("window.location.href = 'promovare.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
             
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            response.sendRedirect("promovare.jsp?error=driverError");
+            response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Nu s-a putut promova!');");
+	        out.println("window.location.href = 'promovare.jsp?error=driverError';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
+            
         } catch (SQLException e) {
             try {
                 if (conn != null) {
@@ -71,7 +88,14 @@ public class PromovareServlet extends HttpServlet {
                 ex.printStackTrace();
             }
             e.printStackTrace();
-            response.sendRedirect("promovare.jsp?error=true");
+            response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Nu s-a putut promova!');");
+	        out.println("window.location.href = 'promovare.jsp?error=true';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
         } finally {
             if (conn != null) {
                 try { 

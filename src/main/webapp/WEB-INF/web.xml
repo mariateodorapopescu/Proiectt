@@ -581,4 +581,17 @@
     <servlet-name>ConcediiSuplimentareServlet</servlet-name>
     <url-pattern>/ConcediiSuplimentareServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>IncetareContractServlet</display-name>
+    <servlet-name>IncetareContractServlet</servlet-name>
+    <servlet-class>Servlet.IncetareContractServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>IncetareContractServlet</servlet-name>
+    <url-pattern>/IncetareContractServlet</url-pattern>
+  </servlet-mapping>
+  <listener>
+    <listener-class>scheduler.ContractTerminationScheduler</listener-class>
+  </listener>
 </web-app>

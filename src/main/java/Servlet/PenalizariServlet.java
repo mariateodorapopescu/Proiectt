@@ -1,17 +1,24 @@
 package Servlet;
+
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.DriverManager;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.sql.Date;
 
+// @WebServlet("/PenalizariServlet")
 public class PenalizariServlet extends HttpServlet {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+	    doPost(request, response);
+	}
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -31,10 +38,20 @@ public class PenalizariServlet extends HttpServlet {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
             
             // Actualizare penalizări angajat
-            String sql = "UPDATE useri SET penalizari = ? WHERE id = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, tipPenalizare);
-            pstmt.setInt(2, idAng);
+            String sql;
+            PreparedStatement pstmt;
+            
+            // Verifică dacă tipPenalizare este 0 și setează valoarea NULL în coloana penalizari
+            if (tipPenalizare == 0) {
+                sql = "UPDATE useri SET penalizari = NULL WHERE id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, idAng);
+            } else {
+                sql = "UPDATE useri SET penalizari = ? WHERE id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, tipPenalizare);
+                pstmt.setInt(2, idAng);
+            }
             
             int result = pstmt.executeUpdate();
             
@@ -50,19 +67,55 @@ public class PenalizariServlet extends HttpServlet {
                 pstmt.setString(5, motiv);
                 pstmt.executeUpdate();
                 
-                response.sendRedirect("penalizari.jsp?success=true");
+                response.setContentType("text/html;charset=UTF-8");
+    	        PrintWriter out = response.getWriter();
+    	        out.println("<script type='text/javascript'>");
+    	        if (tipPenalizare == 0) {
+    	            out.println("alert('Penalizare eliminată cu succes!');");
+    	        } else {
+    	            out.println("alert('Penalizare acordată cu succes!');");
+    	        }
+    	        out.println("window.location.href = 'viewang.jsp';");
+    	        out.println("</script>");
+    	        out.close();
+    	        return; 
             } else {
-                response.sendRedirect("penalizari.jsp?error=true");
+            	response.setContentType("text/html;charset=UTF-8");
+    	        PrintWriter out = response.getWriter();
+    	        out.println("<script type='text/javascript'>");
+    	        if (tipPenalizare == 0) {
+    	            out.println("alert('Nu s-a putut elimina penalizarea!');");
+    	        } else {
+    	            out.println("alert('Nu s-a putut adăuga penalizarea!');");
+    	        }
+    	        out.println("window.location.href = 'viewang.jsp';");
+    	        out.println("</script>");
+    	        out.close();
+    	        return; 
             }
             
-            pstmt.close();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            response.sendRedirect("penalizari.jsp?error=driverError");
+            response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Nu s-a putut modifica penalizarea!');");
+	        out.println("window.location.href = 'viewang.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendRedirect("penalizari.jsp?error=true");
+            response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Nu s-a putut modifica penalizarea!');");
+	        out.println("window.location.href = 'viewang.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
         } finally {
+        	 
             if (conn != null) {
                 try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
             }

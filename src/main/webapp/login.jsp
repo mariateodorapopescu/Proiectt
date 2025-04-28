@@ -54,11 +54,20 @@
         }
     }
    
-      input::-ms-reveal,
-      input::-ms-clear {
+    input::-ms-reveal,
+    input::-ms-clear {
         display: none;
-      }
-   
+    }
+    
+    .error-message {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        text-align: center;
+    }
 </style>
 </head>
 <body>
@@ -74,65 +83,70 @@
                 <input style="color: <%= text %>; background: <%= sidebar %>; border-color: <%= accent %>; " type="text" id="username" name="username" placeholder="Introduceti numele de utilizator" required class="login__input">
                 
                 <div>
-                                <label style="color: <%=text%>;" for="" class="login__label">Parola</label>
-    
-                                <div class="login__box">
-                                    <input style="color: <%=text%>; background:  <%=sidebar%>; border-color: <%=accent%>;" type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass" name="password">
-                                    <i class="ri-eye-off-line login__eye" id="input-icon"></i>
-                                    
-                                    
-                                </div>
-            </div>
-            <input style="color: <%= sidebar %>; margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
-                    class="login__button" type="submit" value="Conectare" class="login__button"><% 
-    String loginAttempts = request.getParameter("loginAttempts");
-    if (loginAttempts != null && Integer.parseInt(loginAttempts) >= 1) {
-        out.println("<a style='color: " + accent + ";' href='forgotpass.jsp?' class='login__forgot'>Am uitat parola</a>");
-    }
-%>
-                    </div>
-                    <input type="hidden" name="page" value="1">
-                </form>
-            </div>
-        </div>
+                    <label style="color: <%=text%>;" for="" class="login__label">Parola</label>
 
-   <%
+                    <div class="login__box">
+                        <input style="color: <%=text%>; background:  <%=sidebar%>; border-color: <%=accent%>;" type="password" placeholder="Introduceti parola" required class="login__input" id="input-pass" name="password">
+                        <i class="ri-eye-off-line login__eye" id="input-icon"></i>
+                    </div>
+                </div>
+                <input style="color: <%= sidebar %>; margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"
+                    class="login__button" type="submit" value="Conectare" class="login__button">
+                <% 
+                String loginAttempts = request.getParameter("loginAttempts");
+                if (loginAttempts != null && Integer.parseInt(loginAttempts) >= 1) {
+                    out.println("<a style='color: " + accent + ";' href='forgotpass.jsp?' class='login__forgot'>Am uitat parola</a>");
+                }
+                %>
+            </div>
+            <input type="hidden" name="page" value="1">
+        </form>
+    </div>
+
+    <%
     String logout = request.getParameter("logout");
     if ("true".equals(logout)) {
-    	out.println("<script type='text/javascript'>");
+        out.println("<script type='text/javascript'>");
         out.println("alert('Deconectare efectuata cu succes!');");
         out.println("</script>");
     }
 
     String wup = request.getParameter("wup");
     if ("true".equals(wup)) {
-    	out.println("<script type='text/javascript'>");
+        out.println("<script type='text/javascript'>");
         out.println("alert('Nume de utilizator sau parola gresite!');");
         out.println("</script>");
     }
 
     String rp = request.getParameter("rp");
     if ("true".equals(rp)) {
-    	out.println("<script type='text/javascript'>");
+        out.println("<script type='text/javascript'>");
         out.println("alert('Puteti modifica parola oricand!');");
         out.println("</script>");
     }
     
+    String inactive = request.getParameter("inactive");
+    if ("true".equals(inactive)) {
+        out.println("<div class='error-message'>Contul dumneavoastra este inactiv.</div>");
+    }
+    
+    String contractTerminated = request.getParameter("terminated");
+    if ("true".equals(contractTerminated)) {
+        out.println("<div class='error-message'>Contractul dumneavoastra a incetat. Nu mai aveti acces la platforma.</div>");
+    }
     %>
 
     <form name="postForm" action="dashboard.jsp" method="POST" style="display:none;">
         <input type="hidden" name="username" value="${param.username}">
     </form>
    
-</div>
-<script src="./responsive-login-form-main/assets/js/main.js"></script>
-<script>
-    // Check if the 'logout' query parameter is set to 'true'
-    if (new URLSearchParams(window.location.search).has('logout')) {
-        localStorage.removeItem('jwtToken');  // Remove the JWT from local storage
-        window.location.href = 'login.jsp';   // Optionally redirect to clean the URL
-    }
-</script>
-
+    <script src="./responsive-login-form-main/assets/js/main.js"></script>
+    <script>
+        // Check if the 'logout' query parameter is set to 'true'
+        if (new URLSearchParams(window.location.search).has('logout')) {
+            localStorage.removeItem('jwtToken');  // Remove the JWT from local storage
+            window.location.href = 'login.jsp';   // Optionally redirect to clean the URL
+        }
+    </script>
 </body>
 </html>

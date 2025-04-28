@@ -1,18 +1,24 @@
 package Servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.DriverManager;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpServlet;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpServletRequest;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpServletResponse;  // SCHIMBĂ DIN javax.servlet
+import jakarta.servlet.http.HttpSession;  // SCHIMBĂ DIN javax.servlet
 import java.sql.Date;
 
+// @WebServlet("/SporuriServlet")  // nu "/Project/SporuriServlet"
 public class SporuriServlet extends HttpServlet {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+	doPost(request, response);
+	}
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -32,10 +38,20 @@ public class SporuriServlet extends HttpServlet {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
             
             // Actualizare sporuri angajat
-            String sql = "UPDATE useri SET sporuri = ? WHERE id = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, tipSpor);
-            pstmt.setInt(2, idAng);
+            String sql;
+            PreparedStatement pstmt;
+            
+            // Verifică dacă tipSpor este 0 și setează valoarea NULL în coloana sporuri
+            if (tipSpor == 0) {
+                sql = "UPDATE useri SET sporuri = NULL WHERE id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, idAng);
+            } else {
+                sql = "UPDATE useri SET sporuri = ? WHERE id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, tipSpor);
+                pstmt.setInt(2, idAng);
+            }
             
             int result = pstmt.executeUpdate();
             
@@ -51,19 +67,56 @@ public class SporuriServlet extends HttpServlet {
                 pstmt.setString(5, motiv);
                 pstmt.executeUpdate();
                 
-                response.sendRedirect("sporuri.jsp?success=true");
+                response.setContentType("text/html;charset=UTF-8");
+    	        PrintWriter out = response.getWriter();
+    	        out.println("<script type='text/javascript'>");
+    	        if (tipSpor == 0) {
+    	            out.println("alert('Spor eliminat cu succes!');");
+    	        } else {
+    	            out.println("alert('Acordare spor cu succes!');");
+    	        }
+    	        out.println("window.location.href = 'viewang.jsp';");
+    	        out.println("</script>");
+    	        out.close();
+    	        return; 
             } else {
-                response.sendRedirect("sporuri.jsp?error=true");
+            	response.setContentType("text/html;charset=UTF-8");
+    	        PrintWriter out = response.getWriter();
+    	        out.println("<script type='text/javascript'>");
+    	        if (tipSpor == 0) {
+    	            out.println("alert('Nu s-a putut elimina sporul!');");
+    	        } else {
+    	            out.println("alert('Nu s-a putut adauga sporul!');");
+    	        }
+    	        out.println("window.location.href = 'viewang.jsp';");
+    	        out.println("</script>");
+    	        out.close();
+    	        return; 
             }
             
-            pstmt.close();
+            // pstmt.close();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            response.sendRedirect("sporuri.jsp?error=driverError");
+            response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Nu s-a putut modifica sporul!');");
+	        out.println("window.location.href = 'viewang.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendRedirect("sporuri.jsp?error=true");
+            response.setContentType("text/html;charset=UTF-8");
+	        PrintWriter out = response.getWriter();
+	        out.println("<script type='text/javascript'>");
+	        out.println("alert('Nu s-a putut modifica sporul!');");
+	        out.println("window.location.href = 'viewang.jsp';");
+	        out.println("</script>");
+	        out.close();
+	        return; 
         } finally {
+        	 
             if (conn != null) {
                 try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
