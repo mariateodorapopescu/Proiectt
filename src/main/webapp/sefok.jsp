@@ -610,6 +610,14 @@ body {
                         <div  class="sitextt">Notificari</div>
                     </a>
                 </li>
+                 <li style="--bg: <%out.println(accent); %>">
+                    <a href="actiuni2.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="today"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Adeverinte</div>
+                    </a>
+                </li>
                 <li style="--bg: <%out.println(accent); %>">
                      <a href="viewang2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">

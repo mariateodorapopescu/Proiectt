@@ -66,7 +66,8 @@ DROP TABLE IF EXISTS
 	istoric_incetari,
 	istoric_promovari,
 	istoric_concedii_suplimentare,
-	istoric_fluture;
+	istoric_fluture,
+    sedii;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -457,7 +458,10 @@ CREATE TABLE IF NOT EXISTS adeverinte (
     status INT,
     creare DATE,
     modif DATE,
+    id_ang INT NOT NULL,
+    pentru_servi VARCHAR(255),
     FOREIGN KEY (tip) REFERENCES tip_adev(id),
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
     FOREIGN KEY (status) REFERENCES statusuri(status)
 );
 
@@ -721,6 +725,29 @@ CREATE TABLE IF NOT EXISTS users (
   last_name VARCHAR(45) NULL DEFAULT NULL,
   photo MEDIUMBLOB NULL DEFAULT NULL,
   PRIMARY KEY (id)
+);
+
+-- Tabel pentru cereri de demisie
+CREATE TABLE cereri_demisie (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    motiv TEXT NOT NULL,
+    data_cerere DATE NOT NULL,
+    data_ultima_zi DATE NOT NULL,
+    status ENUM('IN_ASTEPTARE', 'APROBATA', 'RESPINSA') DEFAULT 'IN_ASTEPTARE',
+    data_procesare DATE,
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- Tabel pentru notificări generale
+CREATE TABLE notificari_general (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_destinatar INT NOT NULL,
+    tip VARCHAR(50) NOT NULL,
+    mesaj TEXT NOT NULL,
+    citit BOOLEAN DEFAULT FALSE,
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_destinatar) REFERENCES useri(id)
 );
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -1293,7 +1320,7 @@ INSERT INTO locatii_atractii (nume, strada, longitudine, latitudine, cod, oras, 
 -- Date inițiale pentru sediul principal
 INSERT INTO sedii (nume_sediu, tip_sediu, strada, cod, oras, judet, tara, telefon, email) 
 VALUES ('laaalalala', 'secundar', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro'),
-VALUES ('Sediu Central', 'principal', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro'),
+('Sediu Central', 'principal', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro')
 ;
 
 -- 6. Ready to use =) Enjoy
@@ -1441,7 +1468,7 @@ ORDER BY l.oras;
 -- -----------------------------------------------------
 select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
 select * from istoric_incetari;
-select * from useri;
+select * from sedii;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
 desc locatii_concedii;
 desc concedii;
