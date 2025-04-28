@@ -594,4 +594,44 @@
   <listener>
     <listener-class>scheduler.ContractTerminationScheduler</listener-class>
   </listener>
+  <servlet>
+    <description></description>
+    <display-name>AdaugaSediuServlet</display-name>
+    <servlet-name>AdaugaSediuServlet</servlet-name>
+    <servlet-class>Servlet.AdaugaSediuServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AdaugaSediuServlet</servlet-name>
+    <url-pattern>/AdaugaSediuServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>EditSediuServlet</display-name>
+    <servlet-name>EditSediuServlet</servlet-name>
+    <servlet-class>Servlet.EditSediuServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EditSediuServlet</servlet-name>
+    <url-pattern>/EditSediuServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DeleteSediuServlet</display-name>
+    <servlet-name>DeleteSediuServlet</servlet-name>
+    <servlet-class>Servlet.DeleteSediuServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteSediuServlet</servlet-name>
+    <url-pattern>/DeleteSediuServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetSediuServlet</display-name>
+    <servlet-name>GetSediuServlet</servlet-name>
+    <servlet-class>Servlet.GetSediuServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetSediuServlet</servlet-name>
+    <url-pattern>/GetSediuServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

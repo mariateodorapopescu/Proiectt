@@ -375,9 +375,9 @@
                                "JOIN departament d ON u.id_dep = d.id_dep " +
                                "LEFT JOIN tipuri_sporuri s ON u.sporuri = s.id " +
                                "LEFT JOIN tipuri_penalizari p ON u.penalizari = p.id " +
-                               "WHERE u.id = ?";
+                               "";
                     pstmt2 = conn2.prepareStatement(sql);
-                    pstmt2.setInt(1, idAng);
+                    // pstmt2.setInt(1, idAng);
                     rs4 = pstmt2.executeQuery();
                     
                     if (rs4.next()) {

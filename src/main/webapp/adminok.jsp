@@ -628,6 +628,15 @@
                         <div  class="sitextt">Departamente</div>
                     </a>
                 </li>
+                
+                  <li style="--bg: <%out.println(accent); %>">
+                    <a href="administrare_sedii.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="briefcase"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Sedii</div>
+                    </a>
+                </li>
                   
                <li style="--bg: <%out.println(accent); %>;">
                      <a href="setari.jsp" class="load-content" target="iframe">

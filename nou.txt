@@ -584,8 +584,10 @@ CREATE TABLE IF NOT EXISTS locatii_useri (
   oras VARCHAR(255) NOT NULL,
   judet VARCHAR(255) NOT NULL,
   tara VARCHAR(255) NOT NULL,
+  id_sediu INT DEFAULT NULL,
   PRIMARY KEY (id_locatie),
-  FOREIGN KEY (id_user) REFERENCES useri(id)
+  FOREIGN KEY (id_user) REFERENCES useri(id),
+FOREIGN KEY (id_sediu) REFERENCES sedii(id_sediu)
 );
 
 -- -----------------------------------------------------
@@ -667,6 +669,23 @@ CREATE TABLE IF NOT EXISTS data (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS date_logs (
   date_checked DATE NULL DEFAULT NULL
+);
+
+CREATE TABLE sedii (
+    id_sediu INT PRIMARY KEY AUTO_INCREMENT,
+    nume_sediu VARCHAR(255) NOT NULL,
+    tip_sediu ENUM('principal', 'secundar', 'punct_lucru') NOT NULL,
+    strada VARCHAR(255) NOT NULL,
+    cod VARCHAR(12) NOT NULL,
+    oras VARCHAR(255) NOT NULL,
+    judet VARCHAR(255) NOT NULL,
+    tara VARCHAR(255) NOT NULL,
+    telefon VARCHAR(20),
+    email VARCHAR(100),
+    latitudine DOUBLE,
+    longitudine DOUBLE,
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_modificare TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- -----------------------------------------------------
@@ -1271,6 +1290,12 @@ INSERT INTO locatii_atractii (nume, strada, longitudine, latitudine, cod, oras, 
 ('Teatrul Național "Marin Sorescu" din Craiova', 'Bulevardul Alexandru Ioan Cuza', 23.7898, 44.3176, 200585, 'Craiova', 'Dolj', 'România'),
 ('Cetatea Suceava', 'Strada Cetatea de Scaun', 26.2606, 47.6387, 720053, 'Suceava', 'Suceava', 'România');
 
+-- Date inițiale pentru sediul principal
+INSERT INTO sedii (nume_sediu, tip_sediu, strada, cod, oras, judet, tara, telefon, email) 
+VALUES ('laaalalala', 'secundar', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro'),
+VALUES ('Sediu Central', 'principal', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro'),
+;
+
 -- 6. Ready to use =) Enjoy
 -- -----------------------------------------------------
 -- QUERY-URI
@@ -1415,8 +1440,8 @@ ORDER BY l.oras;
 -- test
 -- -----------------------------------------------------
 select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
+select * from istoric_incetari;
 select * from useri;
-use test;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
 desc locatii_concedii;
 desc concedii;
