@@ -100,6 +100,7 @@
 		
 		<button > <a href = "cerere_adeverinta.jsp" style="text-decoration:none;">Trimitere cerere adeverinta</a></button>
 		<button > <a href = "cerere_demisie.jsp" style="text-decoration:none;">Trimitere cerere demisie</a></button>
+		<button > <a href = "adeverinte_mele.jsp" style="text-decoration:none;">Vizualizare adeverintele mele</a></button>
 		<%
 		if (userType == 3 || userType == 0 || userType >= 15) {
 			

@@ -22,16 +22,15 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Genereaza o adeverinta in format PDF si o trimite direct in browser-ul utilizatorului pentru descarcare.
+     * Generează o adeverință în format PDF și o trimite direct în browser-ul utilizatorului pentru descărcare.
      * @param conn Conexiunea la baza de date
-     * @param idAdeverinta ID-ul adeverintei de generat
-     * @param response Obiectul HttpServletResponse pentru trimiterea datelor catre browser
-     * @throws SQLException Daca apare o eroare in timpul interogarii bazei de date
-     * @throws IOException Daca apare o eroare la scrierea PDF-ului in stream
+     * @param idAdeverinta ID-ul adeverinței de generat
+     * @param response Obiectul HttpServletResponse pentru trimiterea datelor către browser
+     * @throws SQLException Dacă apare o eroare în timpul interogării bazei de date
+     * @throws IOException Dacă apare o eroare la scrierea PDF-ului în stream
      */
     public void genereazaAdeverinta(Connection conn, int idAdeverinta, HttpServletResponse response) throws SQLException, IOException {
-        // Metoda genereazaAdeverinta rămâne neschimbată
-        // (codil existent pentru generarea PDF)
+        // Obținem informațiile necesare pentru generarea adeverinței
         String sql = "SELECT a.*, ta.denumire as tip_adeverinta, u.nume, u.prenume, u.cnp, u.data_nasterii, " +
                     "u.adresa, u.email, u.telefon, d.nume_dep, tp.denumire as pozitie, u.salariu_brut, u.data_ang " +
                     "FROM adeverinte a " +
@@ -45,7 +44,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
             pstmt.setInt(1, idAdeverinta);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // Setam header-ele pentru descarcare
+                    // Setăm header-ele pentru descărcare
                     response.setContentType("application/pdf");
                     String fileName = String.format("adeverinta_%d_%s_%s.pdf", 
                             idAdeverinta, 
@@ -54,7 +53,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
                     response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
                     
                     try {
-                        // Cream documentul PDF direct in output stream
+                        // Creăm documentul PDF direct în output stream
                         com.itextpdf.text.Document document = new com.itextpdf.text.Document(com.itextpdf.text.PageSize.A4);
                         com.itextpdf.text.pdf.PdfWriter writer = com.itextpdf.text.pdf.PdfWriter.getInstance(document, response.getOutputStream());
                         document.open();
@@ -65,11 +64,11 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
                         com.itextpdf.text.Font normalFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, 12, com.itextpdf.text.Font.NORMAL);
                         
                         // Titlu
-                        com.itextpdf.text.Paragraph title = new com.itextpdf.text.Paragraph("ADEVERINTA", titleFont);
+                        com.itextpdf.text.Paragraph title = new com.itextpdf.text.Paragraph("ADEVERINȚĂ", titleFont);
                         title.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
                         document.add(title);
                         
-                        // Numar adeverinta si data
+                        // Număr adeverință și data
                         java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd.MM.yyyy");
                         String dataEmitere = dateFormat.format(new java.util.Date());
                         com.itextpdf.text.Paragraph nrAdeverinta = new com.itextpdf.text.Paragraph(
@@ -80,7 +79,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
                         document.add(com.itextpdf.text.Chunk.NEWLINE);
                         document.add(com.itextpdf.text.Chunk.NEWLINE);
                         
-                        // Continutul adeverintei in functie de tipul ei
+                        // Conținutul adeverinței în funcție de tipul ei
                         int tipAdeverinta = rs.getInt("tip");
                         String numePrenume = rs.getString("nume") + " " + rs.getString("prenume");
                         String cnp = rs.getString("cnp");
@@ -92,74 +91,74 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
                         content.setAlignment(com.itextpdf.text.Element.ALIGN_JUSTIFIED);
                         
                         switch (tipAdeverinta) {
-                            case 1: // Adeverinta de salariat
-                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adevereste faptul ca ", normalFont));
+                            case 1: // Adeverință de salariat
+                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adeverește faptul că ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(numePrenume, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", este angajat(a) al(a) companiei noastre, in functia de ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", este angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(functie, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" in cadrul departamentului ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" în cadrul departamentului ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(departament, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(".\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(".\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
                                 break;
                                 
-                            case 2: // Adeverinta de venit
+                            case 2: // Adeverință de venit
                                 int salariu = rs.getInt("salariu_brut");
-                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adevereste faptul ca ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adeverește faptul că ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(numePrenume, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", angajat(a) al(a) companiei noastre, in functia de ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(functie, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" in cadrul departamentului ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" în cadrul departamentului ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(departament, headerFont));
                                 content.add(new com.itextpdf.text.Chunk(", are un salariu brut de ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(String.format("%,d", salariu) + " RON", headerFont));
-                                content.add(new com.itextpdf.text.Chunk(".\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(".\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
                                 break;
                                 
-                            case 3: // Adeverinta medicala
-                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adevereste faptul ca ", normalFont));
+                            case 3: // Adeverință medicală
+                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adeverește faptul că ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(numePrenume, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", este angajat(a) al(a) companiei noastre, in functia de ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", este angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(functie, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" in cadrul departamentului ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" în cadrul departamentului ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(departament, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" si beneficiaza de asigurare medicala conform legii.", normalFont));
-                                content.add(new com.itextpdf.text.Chunk("\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" și beneficiază de asigurare medicală conform legii.", normalFont));
+                                content.add(new com.itextpdf.text.Chunk("\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
                                 break;
                                 
-                            case 4: // Adeverinta de concediu
-                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adevereste faptul ca ", normalFont));
+                            case 4: // Adeverință de concediu
+                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adeverește faptul că ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(numePrenume, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", angajat(a) al(a) companiei noastre, in functia de ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(functie, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" in cadrul departamentului ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" în cadrul departamentului ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(departament, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(", se afla in concediu aprobat, conform solicitarii sale.", normalFont));
-                                content.add(new com.itextpdf.text.Chunk("\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(", se află în concediu aprobat, conform solicitării sale.", normalFont));
+                                content.add(new com.itextpdf.text.Chunk("\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
                                 break;
                                 
-                            case 5: // Adeverinta de experienta
-                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adevereste faptul ca ", normalFont));
+                            case 5: // Adeverință de experiență
+                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, se adeverește faptul că ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(numePrenume, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", a fost/este angajat(a) al(a) companiei noastre, in functia de ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", a fost/este angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(functie, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" in cadrul departamentului ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" în cadrul departamentului ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(departament, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" si are o experienta profesionala totala in compania noastra de ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" și are o experiență profesională totală în compania noastră de ", normalFont));
                                 
-                                // Calculam experienta - verificam daca avem campul data_ang in useri
+                                // Calculăm experiența - verificăm dacă avem câmpul data_ang în useri
                                 String dataAngajarii = rs.getString("data_ang") != null ? rs.getString("data_ang") : "N/A";
                                 content.add(new com.itextpdf.text.Chunk(dataAngajarii, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(".\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(".\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
                                 break;
                                 
-                            default: // Alte tipuri de adeverinte
-                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, adeverim ca ", normalFont));
+                            default: // Alte tipuri de adeverințe
+                                content.add(new com.itextpdf.text.Chunk("Prin prezenta, adeverim că ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(numePrenume, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", este angajat(a) al(a) companiei noastre, in functia de ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(", CNP " + cnp + ", este angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(functie, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(" in cadrul departamentului ", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(" în cadrul departamentului ", normalFont));
                                 content.add(new com.itextpdf.text.Chunk(departament, headerFont));
-                                content.add(new com.itextpdf.text.Chunk(".\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
+                                content.add(new com.itextpdf.text.Chunk(".\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
                                 break;
                         }
                         
@@ -167,7 +166,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
                         document.add(com.itextpdf.text.Chunk.NEWLINE);
                         document.add(com.itextpdf.text.Chunk.NEWLINE);
                         
-                        // Data si semnatura
+                        // Data și semnătură
                         com.itextpdf.text.Paragraph dataEmitereParagraph = new com.itextpdf.text.Paragraph("Data: " + dataEmitere, normalFont);
                         dataEmitereParagraph.setAlignment(com.itextpdf.text.Element.ALIGN_LEFT);
                         document.add(dataEmitereParagraph);
@@ -192,16 +191,16 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
                         footer.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
                         document.add(footer);
                         
-                        // Informatii juridice
+                        // Informații juridice
                         com.itextpdf.text.Paragraph legal = new com.itextpdf.text.Paragraph(
-                                "Acest document a fost generat automat si nu necesita semnatura olografa conform art. 5 din Legea 455/2001.", 
+                                "Acest document a fost generat automat și nu necesită semnătură olografă conform art. 5 din Legea 455/2001.", 
                                 new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, 8, com.itextpdf.text.Font.ITALIC));
                         legal.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
                         document.add(legal);
                         
                         document.close();
                         
-                        // Marcam adeverinta ca generata in baza de date
+                        // Marcăm adeverința ca generată în baza de date
                         try (PreparedStatement updateStmt = conn.prepareStatement(
                                 "UPDATE adeverinte SET pdf_generated = 1 WHERE id = ?")) {
                             updateStmt.setInt(1, idAdeverinta);
@@ -216,7 +215,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
     }
     
     /**
-     * Metoda pentru generarea directa a PDF-ului cand este solicitat prin GET
+     * Metoda pentru generarea directă a PDF-ului când este solicitat prin GET
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -232,7 +231,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
         String idAdeverintaStr = request.getParameter("id");
         
         if (idAdeverintaStr == null || idAdeverintaStr.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID adeverinta lipsa");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID adeverință lipsă");
             return;
         }
         
@@ -243,7 +242,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
             
-            // Verificam daca adeverinta apartine utilizatorului curent sau daca utilizatorul este director/sef
+            // Verificăm dacă adeverința aparține utilizatorului curent sau dacă utilizatorul este director/șef
             String sql = "SELECT a.status, u.id as id_ang, u.id_dep " +
                         "FROM adeverinte a " +
                         "JOIN useri u ON a.id_ang = u.id " +
@@ -256,30 +255,30 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
                 
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next()) {
-                        // Verificare suplimentara pentru sefi de departament
+                        // Verificare suplimentară pentru șefi de departament
                         int idDep = rs.getInt("id_dep");
                         int status = rs.getInt("status");
                         
                         if (currentUser.getTip() == 3 && idDep != currentUser.getDepartament()) {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Nu aveti permisiunea sa accesati aceasta adeverinta");
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Nu aveți permisiunea să accesați această adeverință");
                             return;
                         }
                         
-                        // Verificam daca adeverinta este aprobata
+                        // Verificăm dacă adeverința este aprobată
                         if (status == 2) {
-                            // Generam PDF-ul si il trimitem
+                            // Generăm PDF-ul și îl trimitem
                             genereazaAdeverinta(conn, idAdeverinta, response);
                         } else {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Adeverinta nu este aprobata final");
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Adeverința nu este aprobată final");
                         }
                     } else {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Adeverinta nu exista sau nu aveti permisiunea sa o accesati");
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Adeverința nu există sau nu aveți permisiunea să o accesați");
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Eroare la generarea adeverintei: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Eroare la generarea adeverinței: " + e.getMessage());
         } finally {
             if (conn != null) {
                 try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
@@ -288,8 +287,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
     }
     
     /**
-     * Metoda pentru procesarea adeverintelor (aprobare/respingere)
-     * Aceasta metoda implementeaza flow-ul complet pentru diferite tipuri de angajati
+     * Metodă pentru procesarea adeverințelor (aprobare/respingere)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -303,7 +301,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
         
         if (currentUser == null) {
             json.put("success", false);
-            json.put("message", "Sesiune invalida. Va rugam sa va autentificati din nou.");
+            json.put("message", "Sesiune invalidă. Vă rugăm să vă autentificați din nou.");
             out.print(json.toString());
             return;
         }
@@ -311,10 +309,10 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
         int userTip = currentUser.getTip();
         int userId = currentUser.getId();
         
-        // Verificare permisiuni - doar directorul sau șefii pot procesa cereri
+        // Verificare permisiuni
         if (userTip != 0 && userTip != 3) {
             json.put("success", false);
-            json.put("message", "Nu aveti permisiuni pentru aceasta actiune");
+            json.put("message", "Nu aveți permisiuni pentru această acțiune");
             out.print(json.toString());
             return;
         }
@@ -325,17 +323,17 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
         
         if (idAdeverintaStr == null || statusStr == null) {
             json.put("success", false);
-            json.put("message", "Parametri lipsa sau invalizi");
+            json.put("message", "Parametri lipsă sau invalizi");
             out.print(json.toString());
             return;
         }
         
         int idAdeverinta;
-        int newStatus;
+        int status;
         
         try {
             idAdeverinta = Integer.parseInt(idAdeverintaStr);
-            newStatus = Integer.parseInt(statusStr);
+            status = Integer.parseInt(statusStr);
         } catch (NumberFormatException e) {
             json.put("success", false);
             json.put("message", "Format invalid pentru parametri");
@@ -349,131 +347,86 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
             conn.setAutoCommit(false);
             
-            System.out.println("Procesare adeverință #" + idAdeverinta + " cu status nou " + newStatus + " de către utilizator tip " + userTip);
-            
-            // Obținem informații despre adeverință și angajat
+            // Verificăm cererea și permisiunile
+            boolean allowedToProcess = false;
             int idAngajat = 0;
             int currentStatus = 0;
-            int departamentAngajat = 0;
-            int angajatTip = 0;
             
-            String checkSql = "SELECT a.id_ang, a.status, u.tip as angajat_tip, u.id_dep " +
-                             "FROM adeverinte a " +
-                             "JOIN useri u ON a.id_ang = u.id " +
-                             "WHERE a.id = ?";
-            
+            String checkSql = "SELECT a.id_ang, a.status FROM adeverinte a WHERE a.id = ?";
             try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
                 checkStmt.setInt(1, idAdeverinta);
                 
                 try (ResultSet rs = checkStmt.executeQuery()) {
-                    if (!rs.next()) {
-                        json.put("success", false);
-                        json.put("message", "Adeverința nu a fost găsită.");
-                        out.print(json.toString());
-                        conn.rollback();
-                        return;
+                    if (rs.next()) {
+                        idAngajat = rs.getInt("id_ang");
+                        currentStatus = rs.getInt("status");
+                        
+                        // Verificare permisiuni
+                        if (userTip == 3) { // Șef de departament
+                            // Poate aproba doar cereri cu status 0
+                            allowedToProcess = (currentStatus == 0 && (status == 1 || status == -1));
+                            
+                            // Verificăm dacă angajatul este în departamentul șefului
+                            if (allowedToProcess) {
+                                String departmentSql = "SELECT id_dep FROM useri WHERE id = ?";
+                                try (PreparedStatement deptStmt = conn.prepareStatement(departmentSql)) {
+                                    deptStmt.setInt(1, idAngajat);
+                                    try (ResultSet deptRs = deptStmt.executeQuery()) {
+                                        if (deptRs.next()) {
+                                            int angajatDep = deptRs.getInt("id_dep");
+                                            allowedToProcess = (angajatDep == currentUser.getDepartament());
+                                        } else {
+                                            allowedToProcess = false;
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (userTip == 0) { // Director
+                            // Directorul poate aproba cereri cu status 1
+                            if (currentStatus == 1 && (status == 2 || status == -2)) {
+                                allowedToProcess = true;
+                            }
+                            // Directorul poate auto-aproba/respinge cererile proprii cu status 0
+                            else if (currentStatus == 0 && idAngajat == userId) {
+                                // Permitem directorului să-și aprobe (status 2) sau să-și respingă (-1) propria cerere
+                                allowedToProcess = true;
+                            }
+                        }
                     }
-                    
-                    idAngajat = rs.getInt("id_ang");
-                    currentStatus = rs.getInt("status");
-                    angajatTip = rs.getInt("angajat_tip");
-                    departamentAngajat = rs.getInt("id_dep");
-                    
-                    System.out.println("Adeverință pentru angajat #" + idAngajat + ", status curent: " + currentStatus);
-                    System.out.println("Tip angajat: " + angajatTip + ", departament: " + departamentAngajat);
                 }
             }
             
-            boolean allowedToProcess = false;
-            
-            // SIMPLIFICĂM LOGICA - doar verificăm permisiunile de bază
-            if (userTip == 3) { // Șef departament
-                // Verificăm dacă angajatul este în departamentul șefului
-                if (departamentAngajat == currentUser.getDepartament()) {
-                    // Permitem procesarea doar pentru status 0 -> 1 sau 0 -> -1
-                    if (currentStatus == 0 && (newStatus == 1 || newStatus == -1)) {
-                        allowedToProcess = true;
-                        System.out.println("Șef aprobă/respinge adeverință din departamentul său");
-                    } else {
-                        json.put("success", false);
-                        json.put("message", "Șeful poate procesa doar adeverințe în starea inițială (0)");
-                        out.print(json.toString());
-                        conn.rollback();
-                        return;
-                    }
-                } else {
-                    json.put("success", false);
-                    json.put("message", "Nu puteți procesa adeverințe pentru angajați din alte departamente");
-                    out.print(json.toString());
-                    conn.rollback();
-                    return;
-                }
-            } 
-            else if (userTip == 0) { // Director
-                // Directorul poate procesa orice
-                if (idAngajat == userId) {
-                    // Auto-aprobare sau respingere
-                    if (newStatus == 2 || newStatus == -1) {
-                        allowedToProcess = true;
-                        System.out.println("Director auto-aprobă/respinge propria adeverință");
-                    }
-                }
-                else if (currentStatus == 1 && (newStatus == 2 || newStatus == -2)) {
-                    // Aprobare finală sau respingere după șef
-                    allowedToProcess = true;
-                    System.out.println("Director aprobă/respinge final adeverință după aprobarea șefului");
-                }
-                else if (currentStatus == 0 && (angajatTip == 3 || (angajatTip >= 10 && angajatTip <= 15))) {
-                    // Aprobare sau respingere directă pentru șefi/manageri
-                    if (newStatus == 2 || newStatus == -1) {
-                        allowedToProcess = true;
-                        System.out.println("Director aprobă/respinge direct adeverință pentru șef/manager");
-                    }
-                }
-                
-                if (!allowedToProcess) {
-                    json.put("success", false);
-                    json.put("message", "Operație nepermisă: status " + currentStatus + " -> " + newStatus);
-                    out.print(json.toString());
-                    conn.rollback();
-                    return;
-                }
+            if (!allowedToProcess) {
+                json.put("success", false);
+                json.put("message", "Nu aveți permisiunea de a procesa această cerere sau cererea nu există");
+                out.print(json.toString());
+                conn.rollback();
+                return;
             }
             
             // Actualizare status adeverință
             String sql = "UPDATE adeverinte SET status = ?, modif = CURDATE() WHERE id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setInt(1, newStatus);
+                pstmt.setInt(1, status);
                 pstmt.setInt(2, idAdeverinta);
-                int updated = pstmt.executeUpdate();
-                System.out.println("Rânduri actualizate: " + updated);
-                
-                if (updated == 0) {
-                    json.put("success", false);
-                    json.put("message", "Nu s-a putut actualiza statusul adeverinței");
-                    out.print(json.toString());
-                    conn.rollback();
-                    return;
-                }
+                pstmt.executeUpdate();
             }
             
-            // Dacă șeful aprobă, notifică directorul 
-            if (userTip == 3 && newStatus == 1) {
+            // Dacă șeful aprobă, notifică directorul (exceptând cazul când directorul își auto-aprobă cererea)
+            if (userTip == 3 && status == 1) {
                 notificaDirector(conn, idAdeverinta);
             }
             
-            // Notificăm angajatul în toate cazurile
-            notificaAngajat(conn, idAdeverinta, idAngajat, newStatus);
+            // Notificăm angajatul în toate cazurile (inclusiv când directorul își auto-procesează cererea)
+            notificaAngajat(conn, idAdeverinta, idAngajat, status);
             
             conn.commit();
             json.put("success", true);
             
-            if (newStatus == 2) {
+            if (status == 2) {
                 json.put("message", "Cererea a fost aprobată. PDF-ul poate fi descărcat din secțiunea de adeverințe.");
                 json.put("id", idAdeverinta);
-            } else if (newStatus == 1) {
-                json.put("message", "Cererea a fost aprobată și trimisă directorului pentru aprobarea finală.");
-            } else if (newStatus < 0) {
+            } else if (status < 0) {
                 json.put("message", "Cererea a fost respinsă.");
             } else {
                 json.put("message", "Statusul cererii a fost actualizat.");
@@ -506,21 +459,25 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
     }
     
     private void notificaDirector(Connection conn, int idAdeverinta) throws SQLException {
+        // Verificăm și creăm tabela dacă nu există
         createNotificationsTableIfNeeded(conn);
         
+        // Găsește directorul
         String sql = "SELECT id FROM useri WHERE tip = 0";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int idDirector = rs.getInt("id");
                     
+                    // Obține informații despre cerere pentru un mesaj mai descriptiv
                     String adeverintaInfo = getAdeverintaInfo(conn, idAdeverinta);
                     
+                    // Trimite notificare
                     String notifSql = "INSERT INTO notificari_general (id_destinatar, tip, mesaj) " +
                                     "VALUES (?, 'APROBARE_ADEVERINTA', ?)";
                     try (PreparedStatement notifPstmt = conn.prepareStatement(notifSql)) {
                         notifPstmt.setInt(1, idDirector);
-                        notifPstmt.setString(2, "Aveti o adeverinta noua de aprobat: " + adeverintaInfo);
+                        notifPstmt.setString(2, "Aveți o adeverință nouă de aprobat: " + adeverintaInfo);
                         notifPstmt.executeUpdate();
                     }
                 }
@@ -529,28 +486,31 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
     }
     
     private void notificaAngajat(Connection conn, int idAdeverinta, int idAngajat, int status) throws SQLException {
+        // Verificăm și creăm tabela dacă nu există
         createNotificationsTableIfNeeded(conn);
         
+        // Obține informații despre cerere pentru un mesaj mai descriptiv
         String adeverintaInfo = getAdeverintaInfo(conn, idAdeverinta);
         String mesaj = "";
         
         switch (status) {
             case 1:
-                mesaj = "Cererea dumneavoastra de adeverinta a fost aprobata de seful de departament si asteapta aprobarea directorului: " + adeverintaInfo;
+                mesaj = "Cererea dumneavoastră de adeverință a fost aprobată de șeful de departament și așteaptă aprobarea directorului: " + adeverintaInfo;
                 break;
             case 2:
-                mesaj = "Cererea dumneavoastra de adeverinta a fost aprobata si este disponibila pentru descarcare: " + adeverintaInfo;
+                mesaj = "Cererea dumneavoastră de adeverință a fost aprobată și este disponibilă pentru descărcare: " + adeverintaInfo;
                 break;
             case -1:
-                mesaj = "Cererea dumneavoastra de adeverinta a fost respinsa: " + adeverintaInfo;
+                mesaj = "Cererea dumneavoastră de adeverință a fost respinsă: " + adeverintaInfo;
                 break;
             case -2:
-                mesaj = "Cererea dumneavoastra de adeverinta a fost respinsa de director: " + adeverintaInfo;
+                mesaj = "Cererea dumneavoastră de adeverință a fost respinsă de director: " + adeverintaInfo;
                 break;
             default:
-                mesaj = "Status-ul cererii dumneavoastra de adeverinta a fost actualizat: " + adeverintaInfo;
+                mesaj = "Status-ul cererii dumneavoastră de adeverință a fost actualizat: " + adeverintaInfo;
         }
         
+        // Trimite notificare
         String notifSql = "INSERT INTO notificari_general (id_destinatar, tip, mesaj) " +
                          "VALUES (?, 'STATUS_ADEVERINTA', ?)";
         try (PreparedStatement notifPstmt = conn.prepareStatement(notifSql)) {
@@ -561,6 +521,7 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
     }
     
     private String getAdeverintaInfo(Connection conn, int idAdeverinta) throws SQLException {
+        // Obține detalii despre adeverință pentru mesaje mai descriptive
         String info = "";
         String sql = "SELECT ta.denumire, a.pentru_servi " +
                     "FROM adeverinte a " +
@@ -580,9 +541,11 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
     }
     
     private void createNotificationsTableIfNeeded(Connection conn) throws SQLException {
+        // Verifică dacă tabela notificari_general există
         try (PreparedStatement checkStmt = conn.prepareStatement("SHOW TABLES LIKE 'notificari_general'")) {
             ResultSet rs = checkStmt.executeQuery();
             if (!rs.next()) {
+                // Dacă tabela nu există, o creăm
                 try (PreparedStatement createStmt = conn.prepareStatement(
                         "CREATE TABLE notificari_general (" +
                         "id INT AUTO_INCREMENT PRIMARY KEY, " +

@@ -368,15 +368,6 @@
             display: flex;
             gap: 0.5rem;
         }
-        
-        /* Buton download */
-        .btn-download {
-            background-color: #3b82f6;
-        }
-        
-        .btn-download:hover {
-            opacity: 0.9;
-        }
     </style>
 </head>
 <body>
@@ -581,7 +572,6 @@
                                     <th>Data cererii</th>
                                     <th>Data procesării</th>
                                     <th>Status</th>
-                                    <th>Acțiuni</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -606,7 +596,7 @@
                                               "JOIN tip_adev ta ON a.tip = ta.id " +
                                               "JOIN statusuri s ON a.status = s.status " +
                                               "JOIN useri u ON a.id_ang = u.id " +
-                                              "WHERE u.id_dep = ? AND a.status IN (-1, 2) " + // Am adăugat și status 2 pentru adeverințe aprobate
+                                              "WHERE u.id_dep = ? AND a.status IN (-1) " +
                                               "ORDER BY a.modif DESC LIMIT 50";
                                     } else if (userType == 0) { // Director
                                         // Directorul vede toate cererile cu status final (2, -2, -1)
@@ -643,15 +633,6 @@
                                         <td><%= rs2.getDate("creare") %></td>
                                         <td><%= rs2.getDate("modif") != null ? rs2.getDate("modif") : "-" %></td>
                                         <td class="<%= statusClass %>"><%= rs2.getString("nume_status") %></td>
-                                        <td>
-                                            <% if (rs2.getInt("status") == 2) { %>
-                                                <a href="DescarcaAdeverintaServlet?id=<%= rs2.getInt("id") %>" class="btn btn-small btn-download">
-                                                    <i class="fas fa-download"></i> Descarcă
-                                                </a>
-                                            <% } else { %>
-                                                -
-                                            <% } %>
-                                        </td>
                                     </tr>
                                 <%
                                     }
@@ -659,7 +640,7 @@
                                     if (!hasAdeverinte) {
                                 %>
                                     <tr>
-                                        <td colspan="7">
+                                        <td colspan="6">
                                             <div class="empty-state">
                                                 <div class="empty-state-icon">
                                                     <i class="fas fa-history"></i>
@@ -673,7 +654,7 @@
                                     }
                                 } catch (SQLException | ClassNotFoundException e) {
                                     e.printStackTrace();
-                                    out.println("<tr><td colspan='7'><div class='alert alert-danger'><i class='fas fa-exclamation-circle'></i> Eroare la interogarea bazei de date: " + e.getMessage() + "</div></td></tr>");
+                                    out.println("<tr><td colspan='6'><div class='alert alert-danger'><i class='fas fa-exclamation-circle'></i> Eroare la interogarea bazei de date: " + e.getMessage() + "</div></td></tr>");
                                 } finally {
                                     // Închiderea resurselor în ordine inversă
                                     if (rs2 != null) try { rs2.close(); } catch (SQLException e) { e.printStackTrace(); }
@@ -729,40 +710,28 @@
                     dataType: 'json',
                     success: function(response) {
                         if (response && response.success) {
-                            showAlert('success', response.message || 'Cererea a fost procesată cu succes!');
-                            
-                            // Dacă adeverința a fost aprobată final și avem un ID pentru descărcare
-                            if (status === 2 && response.id) {
-                                // Întrebăm utilizatorul dacă dorește să descarce adeverința
-                                if (confirm('Adeverința a fost aprobată. Doriți să o descărcați acum?')) {
-                                    window.location.href = 'DescarcaAdeverintaServlet?id=' + response.id;
-                                } else {
-                                    // Reîncărcăm pagina pentru a actualiza listele
-                                    location.reload();
-                                }
-                            } else {
-                                // Eliminăm rândul din tabel
-                                $(`#adeverinta-${id}`).fadeOut(300, function() {
-                                    $(this).remove();
-                                    
-                                    // Verificăm dacă mai există rânduri în tabel
-                                    if ($('#pending-table-body tr').length === 0) {
-                                        $('#pending-table-body').html(`
-                                            <tr>
-                                                <td colspan="6">
-                                                    <div class="empty-state">
-                                                        <div class="empty-state-icon">
-                                                            <i class="fas fa-check-circle"></i>
-                                                        </div>
-                                                        <h3 class="empty-state-title">Nicio cerere în așteptare</h3>
-                                                        <p class="empty-state-description">Nu există cereri de adeverințe care necesită aprobarea dumneavoastră.</p>
+                            showAlert('success', 'Cererea a fost procesată cu succes!');
+                            // Eliminăm rândul din tabel
+                            $(`#adeverinta-${id}`).fadeOut(300, function() {
+                                $(this).remove();
+                                
+                                // Verificăm dacă mai există rânduri în tabel
+                                if ($('#pending-table-body tr').length === 0) {
+                                    $('#pending-table-body').html(`
+                                        <tr>
+                                            <td colspan="6">
+                                                <div class="empty-state">
+                                                    <div class="empty-state-icon">
+                                                        <i class="fas fa-check-circle"></i>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        `);
-                                    }
-                                });
-                            }
+                                                    <h3 class="empty-state-title">Nicio cerere în așteptare</h3>
+                                                    <p class="empty-state-description">Nu există cereri de adeverințe care necesită aprobarea dumneavoastră.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `);
+                                }
+                            });
                         } else {
                             actionsCell.html(originalContent);
                             showAlert('danger', response && response.message ? response.message : 'Eroare la procesarea cererii!');
