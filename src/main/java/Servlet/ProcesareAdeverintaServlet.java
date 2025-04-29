@@ -214,249 +214,191 @@ public class ProcesareAdeverintaServlet extends HttpServlet {
         }
     }
     
-    /**
-     * Metoda pentru generarea directă a PDF-ului când este solicitat prin GET
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("currentUser") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-        
-        MyUser currentUser = (MyUser) session.getAttribute("currentUser");
-        String idAdeverintaStr = request.getParameter("id");
-        
-        if (idAdeverintaStr == null || idAdeverintaStr.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID adeverință lipsă");
-            return;
-        }
-        
-        int idAdeverinta = Integer.parseInt(idAdeverintaStr);
-        
-        Connection conn = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-            
-            // Verificăm dacă adeverința aparține utilizatorului curent sau dacă utilizatorul este director/șef
-            String sql = "SELECT a.status, u.id as id_ang, u.id_dep " +
-                        "FROM adeverinte a " +
-                        "JOIN useri u ON a.id_ang = u.id " +
-                        "WHERE a.id = ? AND (a.id_ang = ? OR ? IN (0, 3))";
-            
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setInt(1, idAdeverinta);
-                pstmt.setInt(2, currentUser.getId());
-                pstmt.setInt(3, currentUser.getTip());
-                
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                        // Verificare suplimentară pentru șefi de departament
-                        int idDep = rs.getInt("id_dep");
-                        int status = rs.getInt("status");
-                        
-                        if (currentUser.getTip() == 3 && idDep != currentUser.getDepartament()) {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Nu aveți permisiunea să accesați această adeverință");
-                            return;
-                        }
-                        
-                        // Verificăm dacă adeverința este aprobată
-                        if (status == 2) {
-                            // Generăm PDF-ul și îl trimitem
-                            genereazaAdeverinta(conn, idAdeverinta, response);
-                        } else {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Adeverința nu este aprobată final");
-                        }
-                    } else {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Adeverința nu există sau nu aveți permisiunea să o accesați");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Eroare la generarea adeverinței: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-            }
-        }
-    }
     
-    /**
-     * Metodă pentru procesarea adeverințelor (aprobare/respingere)
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        JSONObject json = new JSONObject();
-        
-        HttpSession session = request.getSession();
-        MyUser currentUser = (MyUser) session.getAttribute("currentUser");
-        
-        if (currentUser == null) {
-            json.put("success", false);
-            json.put("message", "Sesiune invalidă. Vă rugăm să vă autentificați din nou.");
-            out.print(json.toString());
-            return;
-        }
-        
-        int userTip = currentUser.getTip();
-        int userId = currentUser.getId();
-        
-        // Verificare permisiuni
-        if (userTip != 0 && userTip != 3) {
-            json.put("success", false);
-            json.put("message", "Nu aveți permisiuni pentru această acțiune");
-            out.print(json.toString());
-            return;
-        }
-        
-        // Verificare parametri
-        String idAdeverintaStr = request.getParameter("id");
-        String statusStr = request.getParameter("status");
-        
-        if (idAdeverintaStr == null || statusStr == null) {
-            json.put("success", false);
-            json.put("message", "Parametri lipsă sau invalizi");
-            out.print(json.toString());
-            return;
-        }
-        
-        int idAdeverinta;
-        int status;
-        
-        try {
-            idAdeverinta = Integer.parseInt(idAdeverintaStr);
-            status = Integer.parseInt(statusStr);
-        } catch (NumberFormatException e) {
-            json.put("success", false);
-            json.put("message", "Format invalid pentru parametri");
-            out.print(json.toString());
-            return;
-        }
-        
-        Connection conn = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-            conn.setAutoCommit(false);
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+                throws ServletException, IOException {
             
-            // Verificăm cererea și permisiunile
-            boolean allowedToProcess = false;
-            int idAngajat = 0;
-            int currentStatus = 0;
+            response.setContentType("application/json;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+            JSONObject json = new JSONObject();
             
-            String checkSql = "SELECT a.id_ang, a.status FROM adeverinte a WHERE a.id = ?";
-            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
-                checkStmt.setInt(1, idAdeverinta);
-                
-                try (ResultSet rs = checkStmt.executeQuery()) {
-                    if (rs.next()) {
-                        idAngajat = rs.getInt("id_ang");
-                        currentStatus = rs.getInt("status");
-                        
-                        // Verificare permisiuni
-                        if (userTip == 3) { // Șef de departament
-                            // Poate aproba doar cereri cu status 0
-                            allowedToProcess = (currentStatus == 0 && (status == 1 || status == -1));
-                            
-                            // Verificăm dacă angajatul este în departamentul șefului
-                            if (allowedToProcess) {
-                                String departmentSql = "SELECT id_dep FROM useri WHERE id = ?";
-                                try (PreparedStatement deptStmt = conn.prepareStatement(departmentSql)) {
-                                    deptStmt.setInt(1, idAngajat);
-                                    try (ResultSet deptRs = deptStmt.executeQuery()) {
-                                        if (deptRs.next()) {
-                                            int angajatDep = deptRs.getInt("id_dep");
-                                            allowedToProcess = (angajatDep == currentUser.getDepartament());
-                                        } else {
-                                            allowedToProcess = false;
-                                        }
-                                    }
-                                }
-                            }
-                        } else if (userTip == 0) { // Director
-                            // Directorul poate aproba cereri cu status 1
-                            if (currentStatus == 1 && (status == 2 || status == -2)) {
-                                allowedToProcess = true;
-                            }
-                            // Directorul poate auto-aproba/respinge cererile proprii cu status 0
-                            else if (currentStatus == 0 && idAngajat == userId) {
-                                // Permitem directorului să-și aprobe (status 2) sau să-și respingă (-1) propria cerere
-                                allowedToProcess = true;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if (!allowedToProcess) {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("currentUser") == null) {
                 json.put("success", false);
-                json.put("message", "Nu aveți permisiunea de a procesa această cerere sau cererea nu există");
+                json.put("message", "Sesiune invalidă. Vă rugăm să vă autentificați din nou.");
                 out.print(json.toString());
-                conn.rollback();
                 return;
             }
             
-            // Actualizare status adeverință
-            String sql = "UPDATE adeverinte SET status = ?, modif = CURDATE() WHERE id = ?";
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setInt(1, status);
-                pstmt.setInt(2, idAdeverinta);
-                pstmt.executeUpdate();
+            MyUser currentUser = (MyUser) session.getAttribute("currentUser");
+            int userTip = currentUser.getTip();
+            int userId = currentUser.getId();
+            int userDepartment = currentUser.getDepartament();
+            
+            // Verificare permisiuni
+            if (userTip != 0 && userTip != 3) {
+                json.put("success", false);
+                json.put("message", "Nu aveți permisiuni pentru această acțiune");
+                out.print(json.toString());
+                return;
             }
             
-            // Dacă șeful aprobă, notifică directorul (exceptând cazul când directorul își auto-aprobă cererea)
-            if (userTip == 3 && status == 1) {
-                notificaDirector(conn, idAdeverinta);
+            // Verificare parametri
+            String idAdeverintaStr = request.getParameter("id");
+            String statusStr = request.getParameter("status");
+            
+            if (idAdeverintaStr == null || statusStr == null) {
+                json.put("success", false);
+                json.put("message", "Parametri lipsă sau invalizi");
+                out.print(json.toString());
+                return;
             }
             
-            // Notificăm angajatul în toate cazurile (inclusiv când directorul își auto-procesează cererea)
-            notificaAngajat(conn, idAdeverinta, idAngajat, status);
+            int idAdeverinta;
+            int status;
             
-            conn.commit();
-            json.put("success", true);
-            
-            if (status == 2) {
-                json.put("message", "Cererea a fost aprobată. PDF-ul poate fi descărcat din secțiunea de adeverințe.");
-                json.put("id", idAdeverinta);
-            } else if (status < 0) {
-                json.put("message", "Cererea a fost respinsă.");
-            } else {
-                json.put("message", "Statusul cererii a fost actualizat.");
-            }
-            
-        } catch (SQLException | ClassNotFoundException e) {
             try {
-                if (conn != null) {
+                idAdeverinta = Integer.parseInt(idAdeverintaStr);
+                status = Integer.parseInt(statusStr);
+            } catch (NumberFormatException e) {
+                json.put("success", false);
+                json.put("message", "Format invalid pentru parametri");
+                out.print(json.toString());
+                return;
+            }
+            
+            Connection conn = null;
+            
+            try {
+                // Conectare la baza de date
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                conn.setAutoCommit(false); // Activăm tranzacțiile
+                
+                // Verificăm cererea și permisiunile
+                String checkSql = "SELECT a.id_ang, a.status, u.id_dep, u.tip " +
+                                 "FROM adeverinte a " +
+                                 "JOIN useri u ON a.id_ang = u.id " +
+                                 "WHERE a.id = ?";
+                                 
+                boolean allowedToProcess = false;
+                int idAngajat = 0;
+                int currentStatus = 0;
+                int angajatDep = 0;
+                int angajatTip = 0;
+                
+                try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                    checkStmt.setInt(1, idAdeverinta);
+                    
+                    try (ResultSet rs = checkStmt.executeQuery()) {
+                        if (rs.next()) {
+                            idAngajat = rs.getInt("id_ang");
+                            currentStatus = rs.getInt("status");
+                            angajatDep = rs.getInt("id_dep");
+                            angajatTip = rs.getInt("tip");
+                            
+                            // Verificare permisiuni
+                            if (userTip == 3) { // Șef de departament
+                                // Verificăm dacă adeverința aparține unui angajat din departamentul șefului
+                                if (angajatDep == userDepartment) {
+                                    // Verificăm dacă status-ul actual este 0 (neprocesat) 
+                                    // și dacă noul status este 1 (aprobat) sau -1 (respins)
+                                    if (currentStatus == 0 && (status == 1 || status == -1)) {
+                                        allowedToProcess = true;
+                                    }
+                                }
+                            } else if (userTip == 0) { // Director
+                                // Directorul poate aproba sau respinge orice cerere
+                                allowedToProcess = true;
+                            }
+                        }
+                    }
+                }
+                
+                if (!allowedToProcess) {
+                    json.put("success", false);
+                    json.put("message", "Nu aveți permisiunea de a procesa această cerere sau cererea nu există");
+                    out.print(json.toString());
                     conn.rollback();
+                    return;
                 }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            e.printStackTrace();
-            json.put("success", false);
-            json.put("message", "Eroare la procesare: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try { 
-                    conn.setAutoCommit(true);
-                    conn.close(); 
-                } catch (SQLException e) { 
-                    e.printStackTrace(); 
+                
+                // Actualizare status adeverință
+                String sql = "UPDATE adeverinte SET status = ?, modif = CURDATE() WHERE id = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setInt(1, status);
+                    pstmt.setInt(2, idAdeverinta);
+                    int rowsUpdated = pstmt.executeUpdate();
+                    
+                    if (rowsUpdated == 0) {
+                        json.put("success", false);
+                        json.put("message", "Adeverința nu a putut fi actualizată");
+                        conn.rollback();
+                        out.print(json.toString());
+                        return;
+                    }
+                }
+                
+                // Notificare utilizator (opțional)
+                String notifSql = "INSERT INTO notificari_general (id_destinatar, tip, mesaj) VALUES (?, ?, ?)";
+                try (PreparedStatement notifStmt = conn.prepareStatement(notifSql)) {
+                    String mesaj = "";
+                    if (status == 1) {
+                        mesaj = "Cererea dumneavoastră de adeverință a fost aprobată de șeful de departament și așteaptă aprobarea finală";
+                    } else if (status == 2) {
+                        mesaj = "Cererea dumneavoastră de adeverință a fost aprobată final și poate fi descărcată";
+                    } else if (status < 0) {
+                        mesaj = "Cererea dumneavoastră de adeverință a fost respinsă";
+                    }
+                    
+                    notifStmt.setInt(1, idAngajat);
+                    notifStmt.setString(2, "STATUS_ADEVERINTA");
+                    notifStmt.setString(3, mesaj);
+                    
+                    try {
+                        notifStmt.executeUpdate();
+                    } catch (SQLException e) {
+                        // Ignorăm erorile de notificare - probabil tabela nu există
+                        System.out.println("Avertisment: notificarea nu a putut fi trimisă: " + e.getMessage());
+                    }
+                }
+                
+                conn.commit();
+                json.put("success", true);
+                
+                if (status > 0) {
+                    json.put("message", "Cererea a fost aprobată cu succes!");
+                } else {
+                    json.put("message", "Cererea a fost respinsă cu succes!");
+                }
+                
+            } catch (Exception e) {
+                try {
+                    if (conn != null) {
+                        conn.rollback();
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                
+                e.printStackTrace();
+                json.put("success", false);
+                json.put("message", "Eroare la procesare: " + e.getMessage());
+            } finally {
+                if (conn != null) {
+                    try { 
+                        conn.setAutoCommit(true);
+                        conn.close(); 
+                    } catch (SQLException e) { 
+                        e.printStackTrace(); 
+                    }
                 }
             }
+            
+            out.print(json.toString());
+            out.flush();
         }
-        
-        out.print(json.toString());
-        out.flush();
-    }
+    
     
     private void notificaDirector(Connection conn, int idAdeverinta) throws SQLException {
         // Verificăm și creăm tabela dacă nu există

@@ -555,119 +555,134 @@
             </div>
         </div>
         
-        <!-- Tab: Cereri procesate -->
-        <div id="processed-tab" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Cereri de adeverințe procesate</h2>
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table class="adeverinte-table">
-                            <thead>
-                                <tr>
-                                    <th>Angajat</th>
-                                    <th>Tip adeverință</th>
-                                    <th>Pentru a servi la</th>
-                                    <th>Data cererii</th>
-                                    <th>Data procesării</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%
-                                conn = null;
-                                pstmt = null;
-                                rs2 = null;
-                                
-                                try {
-                                    // Utilizăm DriverManager în loc de DBConn
-                                    Class.forName("com.mysql.cj.jdbc.Driver");
-                                    conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                                    
-                                    String sql = "";
-                                    
-                                    if (userType == 3) { // Șef de departament
-                                        // Șeful vede doar cererile procesate din departamentul său
-                                        // și care nu au un status final (aprobat/respins de director)
-                                        sql = "SELECT a.*, ta.denumire as tip_adeverinta, s.nume_status, " +
-                                              "u.nume, u.prenume " +
-                                              "FROM adeverinte a " +
-                                              "JOIN tip_adev ta ON a.tip = ta.id " +
-                                              "JOIN statusuri s ON a.status = s.status " +
-                                              "JOIN useri u ON a.id_ang = u.id " +
-                                              "WHERE u.id_dep = ? AND a.status IN (-1) " +
-                                              "ORDER BY a.modif DESC LIMIT 50";
-                                    } else if (userType == 0) { // Director
-                                        // Directorul vede toate cererile cu status final (2, -2, -1)
-                                        sql = "SELECT a.*, ta.denumire as tip_adeverinta, s.nume_status, " +
-                                              "u.nume, u.prenume " +
-                                              "FROM adeverinte a " +
-                                              "JOIN tip_adev ta ON a.tip = ta.id " +
-                                              "JOIN statusuri s ON a.status = s.status " +
-                                              "JOIN useri u ON a.id_ang = u.id " +
-                                              "WHERE a.status IN (2, -2, -1) " +
-                                              "ORDER BY a.modif DESC LIMIT 50";
-                                    }
-                                    
-                                    pstmt = conn.prepareStatement(sql);
-                                    if (userType == 3) {
-                                        pstmt.setInt(1, userDep);
-                                    }
-                                    rs2 = pstmt.executeQuery();
-                                    
-                                    boolean hasAdeverinte = false;
-                                    
-                                    while (rs2.next()) {
-                                        hasAdeverinte = true;
-                                        String statusClass = "";
-                                        switch (rs2.getInt("status")) {
-                                            case 2: statusClass = "status-aprobat"; break;
-                                            case -1: case -2: statusClass = "status-respins"; break;
-                                        }
-                                %>
-                                    <tr>
-                                        <td><%= rs2.getString("nume") %> <%= rs2.getString("prenume") %></td>
-                                        <td><%= rs2.getString("tip_adeverinta") %></td>
-                                        <td><%= rs2.getString("pentru_servi") %></td>
-                                        <td><%= rs2.getDate("creare") %></td>
-                                        <td><%= rs2.getDate("modif") != null ? rs2.getDate("modif") : "-" %></td>
-                                        <td class="<%= statusClass %>"><%= rs2.getString("nume_status") %></td>
-                                    </tr>
-                                <%
-                                    }
-                                    
-                                    if (!hasAdeverinte) {
-                                %>
-                                    <tr>
-                                        <td colspan="6">
-                                            <div class="empty-state">
-                                                <div class="empty-state-icon">
-                                                    <i class="fas fa-history"></i>
-                                                </div>
-                                                <h3 class="empty-state-title">Nicio cerere procesată</h3>
-                                                <p class="empty-state-description">Nu există cereri de adeverințe procesate în istoric.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <%
-                                    }
-                                } catch (SQLException | ClassNotFoundException e) {
-                                    e.printStackTrace();
-                                    out.println("<tr><td colspan='6'><div class='alert alert-danger'><i class='fas fa-exclamation-circle'></i> Eroare la interogarea bazei de date: " + e.getMessage() + "</div></td></tr>");
-                                } finally {
-                                    // Închiderea resurselor în ordine inversă
-                                    if (rs2 != null) try { rs2.close(); } catch (SQLException e) { e.printStackTrace(); }
-                                    if (pstmt != null) try { pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                                    if (conn != null) try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+       <!-- Tab: Cereri procesate -->
+<div id="processed-tab" class="tab-content">
+    <div class="card">
+        <div class="card-header">
+            <h2>Cereri de adeverințe procesate</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table class="adeverinte-table">
+                    <thead>
+                        <tr>
+                            <th>Angajat</th>
+                            <th>Tip adeverință</th>
+                            <th>Pentru a servi la</th>
+                            <th>Data cererii</th>
+                            <th>Data procesării</th>
+                            <th>Status</th>
+                            <% if (userType == 0) { %>
+                            <th>Acțiuni</th>
+                            <% } %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%
+                        conn = null;
+                        pstmt = null;
+                        rs2 = null;
+                        
+                        try {
+                            // Utilizăm DriverManager în loc de DBConn
+                            Class.forName("com.mysql.cj.jdbc.Driver");
+                            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                            
+                            String sql = "";
+                            
+                            if (userType == 3) { // Șef de departament
+                                // Modificare: Șeful vede cererile procesate de el (status 1 sau -1) din departamentul său
+                                sql = "SELECT a.*, ta.denumire as tip_adeverinta, s.nume_status, " +
+                                      "u.nume, u.prenume " +
+                                      "FROM adeverinte a " +
+                                      "JOIN tip_adev ta ON a.tip = ta.id " +
+                                      "JOIN statusuri s ON a.status = s.status " +
+                                      "JOIN useri u ON a.id_ang = u.id " +
+                                      "WHERE u.id_dep = ? AND a.status IN (1, -1) " + // Modificat: adăugat status 1
+                                      "ORDER BY a.modif DESC LIMIT 50";
+                            } else if (userType == 0) { // Director
+                                // Directorul vede toate cererile cu status final (2, -2, -1)
+                                sql = "SELECT a.*, ta.denumire as tip_adeverinta, s.nume_status, " +
+                                      "u.nume, u.prenume " +
+                                      "FROM adeverinte a " +
+                                      "JOIN tip_adev ta ON a.tip = ta.id " +
+                                      "JOIN statusuri s ON a.status = s.status " +
+                                      "JOIN useri u ON a.id_ang = u.id " +
+                                      "WHERE a.status IN (2, -2, -1) " +
+                                      "ORDER BY a.modif DESC LIMIT 50";
+                            }
+                            
+                            pstmt = conn.prepareStatement(sql);
+                            if (userType == 3) {
+                                pstmt.setInt(1, userDep);
+                            }
+                            rs2 = pstmt.executeQuery();
+                            
+                            boolean hasAdeverinte = false;
+                            
+                            while (rs2.next()) {
+                                hasAdeverinte = true;
+                                String statusClass = "";
+                                switch (rs2.getInt("status")) {
+                                    case 2: statusClass = "status-aprobat"; break;
+                                    case 1: statusClass = "status-asteptare"; break; // Pentru status 1 (aprobat de șef)
+                                    case -1: case -2: statusClass = "status-respins"; break;
                                 }
-                                %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                        %>
+                            <tr>
+                                <td><%= rs2.getString("nume") %> <%= rs2.getString("prenume") %></td>
+                                <td><%= rs2.getString("tip_adeverinta") %></td>
+                                <td><%= rs2.getString("pentru_servi") %></td>
+                                <td><%= rs2.getDate("creare") %></td>
+                                <td><%= rs2.getDate("modif") != null ? rs2.getDate("modif") : "-" %></td>
+                                <td class="<%= statusClass %>"><%= rs2.getString("nume_status") %></td>
+                                <% if (userType == 0) { %>
+                                <td>
+                                    <% if (rs2.getInt("status") == 2) { %>
+                                    <a href="DescarcaAdeverintaServlet?id=<%= rs2.getInt("id") %>" class="btn btn-small btn-primary">
+                                        <i class="fas fa-download"></i> Descarcă
+                                    </a>
+                                    <% } else { %>
+                                    <span>-</span>
+                                    <% } %>
+                                </td>
+                                <% } %>
+                            </tr>
+                        <%
+                            }
+                            
+                            if (!hasAdeverinte) {
+                        %>
+                            <tr>
+                                <td colspan="<%= userType == 0 ? 7 : 6 %>">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">
+                                            <i class="fas fa-history"></i>
+                                        </div>
+                                        <h3 class="empty-state-title">Nicio cerere procesată</h3>
+                                        <p class="empty-state-description">Nu există cereri de adeverințe procesate în istoric.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <%
+                            }
+                        } catch (SQLException | ClassNotFoundException e) {
+                            e.printStackTrace();
+                            out.println("<tr><td colspan='7'><div class='alert alert-danger'><i class='fas fa-exclamation-circle'></i> Eroare la interogarea bazei de date: " + e.getMessage() + "</div></td></tr>");
+                        } finally {
+                            // Închiderea resurselor în ordine inversă
+                            if (rs2 != null) try { rs2.close(); } catch (SQLException e) { e.printStackTrace(); }
+                            if (pstmt != null) try { pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+                            if (conn != null) try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+                        }
+                        %>
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
+</div>
+        
     </div>
   
     <script>
