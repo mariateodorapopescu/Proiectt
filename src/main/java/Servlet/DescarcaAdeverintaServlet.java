@@ -21,20 +21,34 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
         // Verificare sesiune
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("currentUser") == null) {
-            response.sendRedirect("login.jsp");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Sesiune invalida sau utilizator neautentificat");
             return;
         }
         
         // Preia informatii utilizator
         MyUser currentUser = (MyUser) session.getAttribute("currentUser");
+        
+        // Verifica ambele posibile nume de parametri (id si idadev)
         String idAdeverintaStr = request.getParameter("id");
+        if (idAdeverintaStr == null || idAdeverintaStr.isEmpty()) {
+            idAdeverintaStr = request.getParameter("idadev");
+        }
         
         if (idAdeverintaStr == null || idAdeverintaStr.isEmpty()) {
-            response.sendRedirect("adeverinte_mele.jsp?error=invalid_id");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID adeverinta lipsa sau invalid");
             return;
         }
         
-        int idAdeverinta = Integer.parseInt(idAdeverintaStr);
+        // Log pentru debugging
+        System.out.println("ID Adeverinta pentru descarcare: " + idAdeverintaStr);
+        
+        int idAdeverinta;
+        try {
+            idAdeverinta = Integer.parseInt(idAdeverintaStr);
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID adeverinta nu este un numar valid");
+            return;
+        }
         
         // Variabile pentru preluarea datelor
         String numePrenume = "";
@@ -54,7 +68,7 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             
             // Interogare pentru adeverinta
             String sql = "SELECT a.*, ta.denumire as tip_adeverinta, u.nume, u.prenume, u.cnp, " +
-                        "u.salariu_brut, u.data_ang, d.nume_dep, tp.denumire as pozitie " +
+                        "u.salariu_brut, u.data_ang, d.nume_dep, tp.denumire as pozitie, a.pentru_servi " +
                         "FROM adeverinte a " +
                         "JOIN tip_adev ta ON a.tip = ta.id " +
                         "JOIN useri u ON a.id_ang = u.id " +
@@ -67,6 +81,9 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             pstmt.setInt(2, currentUser.getId());
             pstmt.setInt(3, currentUser.getTip());
             
+            // Log pentru debugging
+            System.out.println("Executand query pentru id=" + idAdeverinta + ", user id=" + currentUser.getId() + ", tip=" + currentUser.getTip());
+            
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 // Preia datele necesare
@@ -78,8 +95,11 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
                 tipAdeverinta = rs.getInt("tip");
                 salariu = rs.getInt("salariu_brut");
                 dataAngajarii = rs.getString("data_ang") != null ? rs.getString("data_ang") : "N/A";
+                
+                System.out.println("Date gasite pentru adeverinta " + idAdeverinta + ": " + numePrenume);
             } else {
-                response.sendRedirect("adeverinte_mele.jsp?error=not_found");
+                System.out.println("Nu s-au gasit date pentru adeverinta " + idAdeverinta);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Adeverinta nu a fost gasita sau nu aveti acces la ea");
                 return;
             }
             
@@ -87,14 +107,20 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             rs.close();
             pstmt.close();
             
-            // Genereaza PDF-ul folosind datele preluate
-            generarePDF(response, idAdeverinta, numePrenume, cnp, functie, departament, 
+            // Genereaza PDF-ul direct in response
+            generarePDFDirect(response, idAdeverinta, numePrenume, cnp, functie, departament, 
                        motiv, tipAdeverinta, salariu, dataAngajarii);
             
         } catch (Exception e) {
             System.err.println("Eroare: " + e.getMessage());
             e.printStackTrace();
-            response.sendRedirect("adeverinte_mele.jsp?error=general");
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            out.println("<html><head><title>Eroare</title></head><body>");
+            out.println("<h1>A aparut o eroare la generarea adeverintei</h1>");
+            out.println("<p>Detalii eroare: " + e.getMessage() + "</p>");
+            out.println("<p><a href='adeverinte_mele.jsp'>inapoi la adeverintele mele</a></p>");
+            out.println("</body></html>");
         } finally {
             if (conn != null) {
                 try { conn.close(); } catch (SQLException e) { /* ignored */ }
@@ -102,29 +128,29 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
         }
     }
     
-    private void generarePDF(HttpServletResponse response, int idAdeverinta, 
+    private void generarePDFDirect(HttpServletResponse response, int idAdeverinta, 
                            String numePrenume, String cnp, String functie, 
                            String departament, String motiv, int tipAdeverinta, 
                            int salariu, String dataAngajarii) 
             throws IOException {
         
-        // Configurare temporar salvare in fisier (pentru depanare)
-        String fileName = "adeverinta_" + idAdeverinta + ".pdf";
-        File tempFile = new File(System.getProperty("java.io.tmpdir"), fileName);
-        
         try {
-            // Creaza document PDF
+            // Configuram response pentru a servi un PDF
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=\"adeverinta_" + idAdeverinta + ".pdf\"");
+            
+            // Cream documentul PDF direct in output stream-ul response-ului
             Document document = new Document(PageSize.A4);
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(tempFile));
+            PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
             
-            // Adaugam continutul (acelasi ca inainte)
+            // Adaugam continutul
             Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
             Font headerFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
             Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
             
             // Titlu
-            Paragraph title = new Paragraph("ADEVERINȚĂ", titleFont);
+            Paragraph title = new Paragraph("ADEVERINTA", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
             
@@ -143,37 +169,37 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             content.setAlignment(Element.ALIGN_JUSTIFIED);
             
             switch (tipAdeverinta) {
-                case 1: // Adeverință de salariat
-                    content.add(new Chunk("Prin prezenta, se adeverește faptul că ", normalFont));
+                case 1: // Adeverinta de salariat
+                    content.add(new Chunk("Prin prezenta, se adevereste faptul ca ", normalFont));
                     content.add(new Chunk(numePrenume, headerFont));
-                    content.add(new Chunk(", CNP " + cnp + ", este angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
+                    content.add(new Chunk(", CNP " + cnp + ", este angajat(a) al(a) companiei noastre, in functia de ", normalFont));
                     content.add(new Chunk(functie, headerFont));
-                    content.add(new Chunk(" în cadrul departamentului ", normalFont));
+                    content.add(new Chunk(" in cadrul departamentului ", normalFont));
                     content.add(new Chunk(departament, headerFont));
-                    content.add(new Chunk(".\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
+                    content.add(new Chunk(".\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
                     break;
                     
-                case 2: // Adeverință de venit
-                    content.add(new Chunk("Prin prezenta, se adeverește faptul că ", normalFont));
+                case 2: // Adeverinta de venit
+                    content.add(new Chunk("Prin prezenta, se adevereste faptul ca ", normalFont));
                     content.add(new Chunk(numePrenume, headerFont));
-                    content.add(new Chunk(", CNP " + cnp + ", angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
+                    content.add(new Chunk(", CNP " + cnp + ", angajat(a) al(a) companiei noastre, in functia de ", normalFont));
                     content.add(new Chunk(functie, headerFont));
-                    content.add(new Chunk(" în cadrul departamentului ", normalFont));
+                    content.add(new Chunk(" in cadrul departamentului ", normalFont));
                     content.add(new Chunk(departament, headerFont));
                     content.add(new Chunk(", are un salariu brut de ", normalFont));
                     content.add(new Chunk(String.format("%,d", salariu) + " RON", headerFont));
-                    content.add(new Chunk(".\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
+                    content.add(new Chunk(".\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
                     break;
                     
                 // Restul cazurilor (aceleasi ca anterior)
                 default:
-                    content.add(new Chunk("Prin prezenta, adeverim că ", normalFont));
+                    content.add(new Chunk("Prin prezenta, adeverim ca ", normalFont));
                     content.add(new Chunk(numePrenume, headerFont));
-                    content.add(new Chunk(", CNP " + cnp + ", este angajat(ă) al(a) companiei noastre, în funcția de ", normalFont));
+                    content.add(new Chunk(", CNP " + cnp + ", este angajat(a) al(a) companiei noastre, in functia de ", normalFont));
                     content.add(new Chunk(functie, headerFont));
-                    content.add(new Chunk(" în cadrul departamentului ", normalFont));
+                    content.add(new Chunk(" in cadrul departamentului ", normalFont));
                     content.add(new Chunk(departament, headerFont));
-                    content.add(new Chunk(".\n\nAceastă adeverință se eliberează pentru a-i servi la " + motiv + ".", normalFont));
+                    content.add(new Chunk(".\n\nAceasta adeverinta se elibereaza pentru a-i servi la " + motiv + ".", normalFont));
                     break;
             }
             
@@ -181,7 +207,7 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             document.add(Chunk.NEWLINE);
             document.add(Chunk.NEWLINE);
             
-            // Data și semnătură
+            // Data si semnatura
             Paragraph dataEmitereParagraph = new Paragraph("Data: " + dataEmitere, normalFont);
             dataEmitereParagraph.setAlignment(Element.ALIGN_LEFT);
             document.add(dataEmitereParagraph);
@@ -206,50 +232,23 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             footer.setAlignment(Element.ALIGN_CENTER);
             document.add(footer);
             
-            // Informații juridice
-            Paragraph legal = new Paragraph(
-                    "Acest document a fost generat automat și nu necesită semnătură olografă conform art. 5 din Legea 455/2001.", 
-                    new Font(Font.FontFamily.TIMES_ROMAN, 8, Font.ITALIC));
-            legal.setAlignment(Element.ALIGN_CENTER);
-            document.add(legal);
+//            // Informatii juridice
+//            Paragraph legal = new Paragraph(
+//                    "Acest document a fost generat automat si nu necesita semnatura olografa conform art. 5 din Legea 455/2001.", 
+//                    new Font(Font.FontFamily.TIMES_ROMAN, 8, Font.ITALIC));
+//            legal.setAlignment(Element.ALIGN_CENTER);
+//            document.add(legal);
             
+            // Finalizare document
             document.close();
             writer.close();
             
-            // Trimite fisierul catre browser
-            trimiteFisier(response, tempFile, "adeverinta_" + idAdeverinta + ".pdf");
+            System.out.println("PDF generat cu succes pentru adeverinta " + idAdeverinta);
             
         } catch (Exception e) {
-            System.err.println("Eroare la generarea PDF: " + e.getMessage());
+            System.err.println("Eroare la generarea PDF direct: " + e.getMessage());
             e.printStackTrace();
-            response.sendRedirect("adeverinte_mele.jsp?error=pdf_generation");
-        } finally {
-            // Sterge fisierul temporar
-            if (tempFile.exists()) {
-                tempFile.delete();
-            }
-        }
-    }
-    
-    private void trimiteFisier(HttpServletResponse response, File file, String numeFisier) 
-            throws IOException {
-        
-        response.reset();
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + numeFisier + "\"");
-        response.setContentLength((int) file.length());
-        
-        try (FileInputStream input = new FileInputStream(file);
-             OutputStream output = response.getOutputStream()) {
-            
-            byte[] buffer = new byte[4096];
-            int bytesRead = -1;
-            
-            while ((bytesRead = input.read(buffer)) != -1) {
-                output.write(buffer, 0, bytesRead);
-            }
-            
-            output.flush();
+            throw new IOException("Nu s-a putut genera adeverinta PDF: " + e.getMessage(), e);
         }
     }
 }
