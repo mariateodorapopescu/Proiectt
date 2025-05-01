@@ -97,7 +97,7 @@
 	<div class="main-content">
 	 <div class="intro" style="background:<%out.println(sidebar);%>; color:<%out.println(text);%>">
 		<h3>Ce doriti sa faceti?</h3>
-		
+		<!-- 
 		<button > <a href = "cerere_adeverinta.jsp" style="text-decoration:none;">Trimitere cerere adeverinta</a></button>
 		<button > <a href = "cerere_demisie.jsp" style="text-decoration:none;">Trimitere cerere demisie</a></button>
 		<button > <a href = "adeverinte_mele.jsp" style="text-decoration:none;">Vizualizare adeverintele mele</a></button>
@@ -108,6 +108,14 @@
 		%>
 		<button ><a href = "adeverinte.jsp" style="text-decoration:none;">Vizualizare cereri adeverinte</a></button>
 		<% } %>
+		-->
+		
+		<button > <a href = "addadev.jsp" style="text-decoration:none;">Trimitere cerere adeverinta</a></button>
+		<button > <a href = "adeverintenoiuser.jsp?pag=1" style="text-decoration:none;">Vizualizare adeverintele mele</a></button>
+		<button > <a href = "modifadev.jsp" style="text-decoration:none;">Modificare cerere adeverinta</a></button>
+		   <% if (userType == 3 || userType == 0) { %>
+   <button > <a href = "adeverintenoiuser.jsp" style="text-decoration:none;">Vizualizare cereri noi de adeverinte</a></button>
+    <% } %>
       </div>
    </div>
    

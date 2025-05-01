@@ -14,7 +14,411 @@ public class MailAsincron {
 	    return email != null && email.matches(emailRegex);
 	}
 
-	
+	// Adăugări pentru clasa MailAsincron.java pentru suportul adeverințelor
+
+		/**
+		 * Trimite notificare la crearea unei noi adeverințe
+		 * 
+		 * @param idAngajat ID-ul angajatului care a solicitat adeverința
+		 * @param idSef ID-ul șefului de departament care va aproba adeverința
+		 * @param tip Tipul adeverinței
+		 * @param motiv Motivul solicitării
+		 * @throws Exception în caz de eroare
+		 */
+		public static void trimitereNotificareAdeverintaNoua(int idAngajat, int idSef, int tip, String motiv) throws Exception {
+		    // Obține informații despre angajat
+		    String numeAngajat = "Necunoscut";
+		    String emailAngajat = "necunoscut@example.com";
+		    String departament = "Necunoscut";
+		    String tipAdeverinta = "Necunoscut";
+		    
+		    // Obține numele tipului de adeverință
+		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+		        // Obține informații despre angajat
+		        String queryAngajat = "SELECT nume, prenume, email, d.nume_dep FROM useri u " +
+		                             "JOIN departament d ON u.id_dep = d.id_dep " +
+		                             "WHERE u.id = ?";
+		        try (PreparedStatement stmt = con.prepareStatement(queryAngajat)) {
+		            stmt.setInt(1, idAngajat);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    numeAngajat = rs.getString("nume") + " " + rs.getString("prenume");
+		                    emailAngajat = rs.getString("email");
+		                    departament = rs.getString("nume_dep");
+		                }
+		            }
+		        }
+		        
+		        // Obține tipul adeverinței
+		        String queryTip = "SELECT denumire FROM tip_adev WHERE id = ?";
+		        try (PreparedStatement stmt = con.prepareStatement(queryTip)) {
+		            stmt.setInt(1, tip);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    tipAdeverinta = rs.getString("denumire");
+		                }
+		            }
+		        }
+		        
+		        // initializare trimitator
+	        	GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+	        
+		        // Email către angajat
+		        String subiectAngajat = "\uD83D\uDEA8 Confirmare solicitare adeverință \uD83D\uDEA8";
+		        String mesajAngajat = "<h1>Felicitări! &#x1F389; Solicitarea dumneavoastră a fost înregistrată! &#x1F389;</h1>" +
+	                              "<h2>Vă mulțumim pentru solicitarea adeverinței. &#x1F642;</h2>" +
+	                              "<h3>&#x1F4DD; Detalii despre solicitare:</h3>" +
+	                              "<p><b>Tip adeverință:</b> " + tipAdeverinta + "<br>" +
+	                              "<b>Motiv:</b> " + motiv + "<br></p>" +
+	                              "<p>Veți fi notificat când adeverința va fi aprobată.</p>" +
+	                              "<p>Vă dorim toate cele bune! &#x1F607;</p>" +
+	                              "<br><b><i>&#x2757; Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+		        
+		        // Verifică validarea adresei email
+		        if (!isValidEmail(emailAngajat)) {
+		            throw new IllegalArgumentException("Adresa de e-mail a angajatului este invalidă: " + emailAngajat);
+		        }
+		        
+		        // Trimitere email către angajat
+		        try {
+		            sender.send(subiectAngajat, mesajAngajat, "liviaaamp@gmail.com", emailAngajat);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        
+		        // Email către șef (dacă există)
+		        if (idSef > 0) {
+		            String emailSef = "necunoscut@example.com";
+		            String numeSef = "Necunoscut";
+		            
+		            // Obține informații despre șef
+		            String querySef = "SELECT nume, prenume, email FROM useri WHERE id = ?";
+		            try (PreparedStatement stmt = con.prepareStatement(querySef)) {
+		                stmt.setInt(1, idSef);
+		                try (ResultSet rs = stmt.executeQuery()) {
+		                    if (rs.next()) {
+		                        numeSef = rs.getString("nume") + " " + rs.getString("prenume");
+		                        emailSef = rs.getString("email");
+		                    }
+		                }
+		            }
+		            
+		            String subiectSef = "\uD83D\uDEA8 Solicitare nouă de adeverință care necesită aprobare \uD83D\uDEA8";
+		            String mesajSef = "<h1>&#x26A0;&#xFE0F; Aveți o nouă solicitare de adeverință de inspectat &#x26A0;&#xFE0F;</h1>" +
+	                              "<h2>O nouă solicitare de adeverință necesită aprobarea dumneavoastră:</h2>" +
+	                              "<h3>&#x1F4DD; Detalii despre solicitare:</h3>" +
+	                              "<p><b>Solicitant:</b> " + numeAngajat + "<br>" +
+	                              "<b>Departament:</b> " + departament + "<br>" +
+	                              "<b>Tip adeverință:</b> " + tipAdeverinta + "<br>" +
+	                              "<b>Motiv:</b> " + motiv + "<br></p>" +
+	                              "<p>Vă rugăm să vă autentificați în sistem pentru a aproba sau respinge această solicitare.</p>" +
+	                              "<p>Vă dorim toate cele bune! &#x1F607;</p>" +
+	                              "<br><b><i>&#x2757; Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+		            
+		            // Verifică validarea adresei email
+		            if (!isValidEmail(emailSef)) {
+		                throw new IllegalArgumentException("Adresa de e-mail a șefului este invalidă: " + emailSef);
+		            }
+		            
+		            // Trimitere email către șef
+		            try {
+		                sender.send(subiectSef, mesajSef, "liviaaamp@gmail.com", emailSef);
+		            } catch (Exception e) {
+		                e.printStackTrace();
+		            }
+		        }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		        throw new Exception("Eroare la obținerea informațiilor pentru email: " + e.getMessage());
+		    }
+		}
+
+		/**
+		 * Trimite notificare la aprobarea adeverinței de către șef
+		 * 
+		 * @param idAngajat ID-ul angajatului care a solicitat adeverința
+		 * @param idAdeverinta ID-ul adeverinței
+		 * @throws Exception în caz de eroare
+		 */
+		public static void trimitereNotificareAdeverintaAprobataSef(int idAngajat, int idAdeverinta) throws Exception {
+		    // Obține informații despre angajat și adeverință
+		    String numeAngajat = "Necunoscut";
+		    String emailAngajat = "necunoscut@example.com";
+		    String emailDirector = "necunoscut@example.com";
+		    String emailSef = "necunoscut@example.com";
+		    String numeDirector = "Necunoscut";
+		    String departament = "Necunoscut";
+		    String tipAdeverinta = "Necunoscut";
+		    String motiv = "Necunoscut";
+		    String dataCreare = "Necunoscut";
+		    
+		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+		        // Obține informații despre angajat, șef și director
+		        String queryUtilizatori = "SELECT ang.nume as nume_ang, ang.prenume as prenume_ang, ang.email as email_ang, " +
+		                              "d.nume_dep as departament, sef.email as email_sef, " +
+		                              "dir.email as email_dir, dir.nume as nume_dir, dir.prenume as prenume_dir " +
+		                              "FROM useri ang " +
+		                              "JOIN departament d ON ang.id_dep = d.id_dep " +
+		                              "JOIN useri sef ON ang.id_dep = sef.id_dep AND sef.tip = 3 " +
+		                              "JOIN useri dir ON ang.id_dep = dir.id_dep AND dir.tip = 0 " +
+		                              "WHERE ang.id = ?";
+		        
+		        try (PreparedStatement stmt = con.prepareStatement(queryUtilizatori)) {
+		            stmt.setInt(1, idAngajat);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    numeAngajat = rs.getString("nume_ang") + " " + rs.getString("prenume_ang");
+		                    emailAngajat = rs.getString("email_ang");
+		                    emailSef = rs.getString("email_sef");
+		                    emailDirector = rs.getString("email_dir");
+		                    numeDirector = rs.getString("nume_dir") + " " + rs.getString("prenume_dir");
+		                    departament = rs.getString("departament");
+		                }
+		            }
+		        }
+		        
+		        // Obține informații despre adeverință
+		        String queryAdeverinta = "SELECT a.motiv, a.creare, ta.denumire " +
+		                               "FROM adeverinte a " +
+		                               "JOIN tip_adev ta ON a.tip = ta.id " +
+		                               "WHERE a.id = ?";
+		                               
+		        try (PreparedStatement stmt = con.prepareStatement(queryAdeverinta)) {
+		            stmt.setInt(1, idAdeverinta);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    tipAdeverinta = rs.getString("denumire");
+		                    motiv = rs.getString("motiv");
+		                    dataCreare = rs.getString("creare");
+		                }
+		            }
+		        }
+		        
+		        // initializare trimitator
+	        	GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+	        
+		        // Email către angajat
+		        String subiectAngajat = "\uD83D\uDEA8 Adeverința dumneavoastră a fost aprobată parțial \uD83D\uDEA8";
+		        String mesajAngajat = "<h1>Felicitări! &#x1F389; Adeverința dumneavoastră a fost parțial aprobată! &#x1F389;</h1>" +
+		                          "<h2>Șeful de departament a aprobat solicitarea dumneavoastră. &#x1F642;</h2>" + 
+		                          "<h2>Acum mai este necesară aprobarea directorului. &#x1F607;</h2>" +
+		                          "<h3>&#x1F4DD; Detalii despre adeverință:</h3>" +
+		                          "<p><b>Tip adeverință:</b> " + tipAdeverinta + "<br>" +
+		                          "<b>Data solicitării:</b> " + dataCreare + "<br>" +
+		                          "<b>Motiv:</b> " + motiv + "<br></p>" +
+		                          "<p>Veți fi notificat când adeverința va fi aprobată final de către director.</p>" +
+		                          "<p>Vă dorim toate cele bune! &#x1F607;</p>" +
+		                          "<br><b><i>&#x2757; Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+		        
+		        // Verifică validarea adresei email
+		        if (!isValidEmail(emailAngajat)) {
+		            throw new IllegalArgumentException("Adresa de e-mail a angajatului este invalidă: " + emailAngajat);
+		        }
+		        
+		        // Trimitere email către angajat
+		        try {
+		            sender.send(subiectAngajat, mesajAngajat, "liviaaamp@gmail.com", emailAngajat);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        
+		        // Email către director
+		        String subiectDirector = "\uD83D\uDEA8 Solicitare de adeverință care necesită aprobare \uD83D\uDEA8";
+		        String mesajDirector = "<h1>&#x26A0;&#xFE0F; Aveți o solicitare de adeverință de inspectat &#x26A0;&#xFE0F;</h1>" +
+		                           "<h2>O solicitare de adeverință a fost aprobată de șeful de departament și necesită acum aprobarea dumneavoastră:</h2>" +
+		                           "<h3>&#x1F4DD; Detalii despre solicitare:</h3>" +
+		                           "<p><b>Solicitant:</b> " + numeAngajat + "<br>" +
+		                           "<b>Departament:</b> " + departament + "<br>" +
+		                           "<b>Tip adeverință:</b> " + tipAdeverinta + "<br>" +
+		                           "<b>Data solicitării:</b> " + dataCreare + "<br>" +
+		                           "<b>Motiv:</b> " + motiv + "<br></p>" +
+		                           "<p>Vă rugăm să vă autentificați în sistem pentru a aproba sau respinge această solicitare.</p>" +
+		                           "<p>Vă dorim toate cele bune! &#x1F607;</p>" +
+		                           "<br><b><i>&#x2757; Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+		        
+		        // Verifică validarea adresei email
+		        if (!isValidEmail(emailDirector)) {
+		            throw new IllegalArgumentException("Adresa de e-mail a directorului este invalidă: " + emailDirector);
+		        }
+		        
+		        // Trimitere email către director
+		        try {
+		            sender.send(subiectDirector, mesajDirector, "liviaaamp@gmail.com", emailDirector);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		        throw new Exception("Eroare la obținerea informațiilor pentru email: " + e.getMessage());
+		    }
+		}
+
+		/**
+		 * Trimite notificare la aprobarea adeverinței de către director
+		 * 
+		 * @param idAngajat ID-ul angajatului care a solicitat adeverința
+		 * @param idAdeverinta ID-ul adeverinței
+		 * @throws Exception în caz de eroare
+		 */
+		public static void trimitereNotificareAdeverintaAprobataDirector(int idAngajat, int idAdeverinta) throws Exception {
+		    // Obține informații despre angajat și adeverință
+		    String numeAngajat = "Necunoscut";
+		    String emailAngajat = "necunoscut@example.com";
+		    String tipAdeverinta = "Necunoscut";
+		    String motiv = "Necunoscut";
+		    String dataCreare = "Necunoscut";
+		    String dataModificare = "Necunoscut";
+		    
+		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+		        // Obține informații despre angajat
+		        String queryAngajat = "SELECT nume, prenume, email FROM useri WHERE id = ?";
+		        try (PreparedStatement stmt = con.prepareStatement(queryAngajat)) {
+		            stmt.setInt(1, idAngajat);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    numeAngajat = rs.getString("nume") + " " + rs.getString("prenume");
+		                    emailAngajat = rs.getString("email");
+		                }
+		            }
+		        }
+		        
+		        // Obține informații despre adeverință
+		        String queryAdeverinta = "SELECT a.motiv, a.creare, a.modif, ta.denumire " +
+		                               "FROM adeverinte a " +
+		                               "JOIN tip_adev ta ON a.tip = ta.id " +
+		                               "WHERE a.id = ?";
+		                               
+		        try (PreparedStatement stmt = con.prepareStatement(queryAdeverinta)) {
+		            stmt.setInt(1, idAdeverinta);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    tipAdeverinta = rs.getString("denumire");
+		                    motiv = rs.getString("motiv");
+		                    dataCreare = rs.getString("creare");
+		                    dataModificare = rs.getString("modif");
+		                }
+		            }
+		        }
+		        
+		        // initializare trimitator
+	        	GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+	        
+		        // Email către angajat
+		        String subiectAngajat = "\uD83D\uDEA8 Adeverința dumneavoastră a fost aprobată! \uD83D\uDEA8";
+		        String mesajAngajat = "<h1>Felicitări! &#x1F389; Adeverința dumneavoastră a fost aprobată final! &#x1F389;</h1>" +
+		                          "<h2>Atât șeful de departament cât și directorul au aprobat solicitarea dumneavoastră. &#x1F642;</h2>" +
+		                          "<h3>&#x1F4DD; Detalii despre adeverință:</h3>" +
+		                          "<p><b>Tip adeverință:</b> " + tipAdeverinta + "<br>" +
+		                          "<b>Data solicitării:</b> " + dataCreare + "<br>" +
+		                          "<b>Data aprobării:</b> " + dataModificare + "<br>" +
+		                          "<b>Motiv:</b> " + motiv + "<br></p>" +
+		                          "<p>Puteți descărca adeverința din secțiunea <b>Adeverințele Mele</b> din aplicație.</p>" +
+		                          "<p>Vă dorim toate cele bune! &#x1F607;</p>" +
+		                          "<br><b><i>&#x2757; Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+		        
+		        // Verifică validarea adresei email
+		        if (!isValidEmail(emailAngajat)) {
+		            throw new IllegalArgumentException("Adresa de e-mail a angajatului este invalidă: " + emailAngajat);
+		        }
+		        
+		        // Trimitere email către angajat
+		        try {
+		            sender.send(subiectAngajat, mesajAngajat, "liviaaamp@gmail.com", emailAngajat);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		        throw new Exception("Eroare la obținerea informațiilor pentru email: " + e.getMessage());
+		    }
+		}
+
+		/**
+		 * Trimite notificare la respingerea adeverinței
+		 * 
+		 * @param idAngajat ID-ul angajatului care a solicitat adeverința
+		 * @param idAdeverinta ID-ul adeverinței
+		 * @param respinsaDe cine a respins adeverința (șef sau director)
+		 * @param motiv motivul respingerii
+		 * @throws Exception în caz de eroare
+		 */
+		public static void trimitereNotificareAdeverintaRespinsa(int idAngajat, int idAdeverinta, String respinsaDe, String motivRespingere) throws Exception {
+		    // Obține informații despre angajat și adeverință
+		    String numeAngajat = "Necunoscut";
+		    String emailAngajat = "necunoscut@example.com";
+		    String tipAdeverinta = "Necunoscut";
+		    String motivSolicitare = "Necunoscut";
+		    String dataCreare = "Necunoscut";
+		    String dataModificare = "Necunoscut";
+		    
+		    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+		        // Obține informații despre angajat
+		        String queryAngajat = "SELECT nume, prenume, email FROM useri WHERE id = ?";
+		        try (PreparedStatement stmt = con.prepareStatement(queryAngajat)) {
+		            stmt.setInt(1, idAngajat);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    numeAngajat = rs.getString("nume") + " " + rs.getString("prenume");
+		                    emailAngajat = rs.getString("email");
+		                }
+		            }
+		        }
+		        
+		        // Obține informații despre adeverință
+		        String queryAdeverinta = "SELECT a.motiv, a.creare, a.modif, ta.denumire " +
+		                               "FROM adeverinte a " +
+		                               "JOIN tip_adev ta ON a.tip = ta.id " +
+		                               "WHERE a.id = ?";
+		                               
+		        try (PreparedStatement stmt = con.prepareStatement(queryAdeverinta)) {
+		            stmt.setInt(1, idAdeverinta);
+		            try (ResultSet rs = stmt.executeQuery()) {
+		                if (rs.next()) {
+		                    tipAdeverinta = rs.getString("denumire");
+		                    motivSolicitare = rs.getString("motiv");
+		                    dataCreare = rs.getString("creare");
+		                    dataModificare = rs.getString("modif");
+		                }
+		            }
+		        }
+		        
+		        // initializare trimitator
+	        	GMailServer sender = new GMailServer("liviaaamp@gmail.com", "rtmz fzcp onhv minb");
+	        
+		        // Email către angajat
+		        String subiectAngajat = "\uD83D\uDEA8 Adeverința dumneavoastră a fost respinsă \uD83D\uDEA8";
+		        String mesajAngajat = "<h1>Ne pare rău să venim cu asemenea vești, căci... &#x1F614;</h1>" +
+		                          "<h2>Solicitarea dumneavoastră de adeverință a fost respinsă de către " + respinsaDe + ". &#x1F614;</h2>" +
+		                          "<h3>&#x1F4DD; Detalii despre solicitare:</h3>" +
+		                          "<p><b>Tip adeverință:</b> " + tipAdeverinta + "<br>" +
+		                          "<b>Data solicitării:</b> " + dataCreare + "<br>" +
+		                          "<b>Data respingerii:</b> " + dataModificare + "<br>" +
+		                          "<b>Motivul solicitării:</b> " + motivSolicitare + "<br>" +
+		                          "<b>Motivul respingerii:</b> " + motivRespingere + "<br></p>" +
+		                          "<p>Nu uitați că puteți oricând să solicitați o nouă adeverință! &#x2728;</p>" +
+		                          "<p>Vă dorim toate cele bune! &#x1F607;</p>" +
+		                          "<br><b><i>&#x2757; Mesaj trimis automat.<br> Semnat, <br> Conducerea &#x1F642;</i></b>";
+		        
+		        // Verifică validarea adresei email
+		        if (!isValidEmail(emailAngajat)) {
+		            throw new IllegalArgumentException("Adresa de e-mail a angajatului este invalidă: " + emailAngajat);
+		        }
+		        
+		        // Trimitere email către angajat
+		        try {
+		            sender.send(subiectAngajat, mesajAngajat, "liviaaamp@gmail.com", emailAngajat);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		        
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		        throw new Exception("Eroare la obținerea informațiilor pentru email: " + e.getMessage());
+		    }
+		}
+		
 	/**
 	 * functie ce pregateste si trimmite mail in mod asincron pentru adaugarea unui concediu
 	 * @param id
