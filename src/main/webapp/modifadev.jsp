@@ -59,7 +59,13 @@ if (sesi != null) {
            if (rs1.next()) {
         	   int id = rs1.getInt("id");
                int tipAdeverinta = rs1.getInt("tip");
-               String motiv = rs1.getString("motiv");
+               
+               // Verifică ambele câmpuri și utilizează valoarea non-null
+               String motiv = rs1.getString("pentru_servi");
+               if (motiv == null || motiv.trim().isEmpty()) {
+                   motiv = rs1.getString("motiv");
+               }
+               
                String dataCreare = rs1.getString("creare");
                int status = rs1.getInt("status");
                
@@ -229,7 +235,7 @@ if (sesi != null) {
                         </select>
                     </div>
                     <div>
-                        <label style="color:<%out.println(text);%>" class="login__label">Motiv</label>
+                        <label style="color:<%out.println(text);%>" class="login__label">Pentru a servi la...</label>
                         <textarea style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" 
                                   required class="login__input" name="motiv" rows="4"><%=motiv%></textarea>
                     </div>

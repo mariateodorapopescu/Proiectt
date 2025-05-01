@@ -118,7 +118,7 @@ public class AddAdevServlet extends HttpServlet {
             Adeverinta adeverinta = new Adeverinta();
             adeverinta.setIdAngajat(idAngajat);
             adeverinta.setTip(tip);
-            adeverinta.setMotiv(motiv);
+            adeverinta.setMentiuni(motiv);
             adeverinta.setStatus(status); // Status stabilit în funcție de tipul angajatului
             
             // Adăugare în baza de date

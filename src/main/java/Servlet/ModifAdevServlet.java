@@ -25,11 +25,22 @@ public class ModifAdevServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private AdaugaAdeverintaDAO adeverintaDAO;
     
+    // Constante pentru configurarea conexiunii
+    private static final String URL = "jdbc:mysql://localhost:3306/test";
+    private static final String USER = "root";
+    private static final String PASSWORD = "student";
+    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
+    
     /**
      * Constructor
      */
     public ModifAdevServlet() {
         super();
+        try {
+            Class.forName(DRIVER);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -87,8 +98,7 @@ public class ModifAdevServlet extends HttpServlet {
         Connection conn = null;
         
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+            conn = DriverManager.getConnection(URL, USER, PASSWORD);
             
             // Verifică existența adeverinței și permisiunile
             String sqlVerificare = "SELECT a.*, u.tip AS tip_user FROM adeverinte a JOIN useri u ON a.id_ang = u.id WHERE a.id = ?";
@@ -111,7 +121,15 @@ public class ModifAdevServlet extends HttpServlet {
                 int status = rs.getInt("status");
                 int tipAngajat = rs.getInt("tip_user");
                 int tip = rs.getInt("tip");
+                
+                // Obține valorile din ambele câmpuri
                 String motiv = rs.getString("motiv");
+                String pentruServi = rs.getString("pentru_servi");
+                
+                // Folosește valoarea non-null
+                if ((motiv == null || motiv.trim().isEmpty()) && pentruServi != null && !pentruServi.trim().isEmpty()) {
+                    motiv = pentruServi;
+                }
                 
                 // Verifică permisiunile
                 int currentUserId = currentUser.getId();
@@ -140,7 +158,7 @@ public class ModifAdevServlet extends HttpServlet {
                 }
                 
                 // Directorul (tip=0) poate modifica orice adeverință
-                boolean isDirector = userType == 0 || userType > 15;
+                boolean isDirector = userType == 0 || userType == 4 || userType > 15;
                 if (isDirector) {
                     hasPermission = true;
                 }
@@ -256,8 +274,7 @@ public class ModifAdevServlet extends HttpServlet {
         PreparedStatement modifStmt = null;
         
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+            conn = DriverManager.getConnection(URL, USER, PASSWORD);
             conn.setAutoCommit(false); // Începe tranzacția
             
             // Verifică din nou permisiunile (în caz că ceva s-a schimbat între timp)
@@ -307,7 +324,7 @@ public class ModifAdevServlet extends HttpServlet {
             }
             
             // Directorul (tip=0) poate modifica orice adeverință
-            boolean isDirector = userType == 0 || userType > 15;
+            boolean isDirector = userType == 0 || userType == 4 || userType > 15;
             if (isDirector) {
                 hasPermission = true;
             }
@@ -324,12 +341,13 @@ public class ModifAdevServlet extends HttpServlet {
                 return;
             }
             
-            // Modifică adeverința
-            String sqlModificare = "UPDATE adeverinte SET tip = ?, motiv = ?, modif = CURDATE() WHERE id = ?";
+            // Modifică adeverința - actualizează ambele câmpuri motiv și pentru_servi
+            String sqlModificare = "UPDATE adeverinte SET tip = ?, motiv = ?, pentru_servi = ?, modif = CURDATE() WHERE id = ?";
             modifStmt = conn.prepareStatement(sqlModificare);
             modifStmt.setInt(1, tip);
             modifStmt.setString(2, motiv);
-            modifStmt.setInt(3, idAdeverinta);
+            modifStmt.setString(3, motiv); // Asigură actualizarea câmpului pentru_servi
+            modifStmt.setInt(4, idAdeverinta);
             
             int rezultat = modifStmt.executeUpdate();
             

@@ -50,13 +50,13 @@ public class AdaugaAdeverintaDAO {
             int nextId = getNextId(conexiune);
             
             // SQL pentru inserare
-            String sql = "INSERT INTO adeverinte (id, id_ang, tip, motiv, status, creare) VALUES (?, ?, ?, ?, ?, CURDATE())";
+            String sql = "INSERT INTO adeverinte (id, id_ang, tip, pentru_servi, status, creare) VALUES (?, ?, ?, ?, ?, CURDATE())";
             
             stmt = conexiune.prepareStatement(sql);
             stmt.setInt(1, nextId); // Folosim ID-ul generat
             stmt.setInt(2, adeverinta.getIdAngajat());
             stmt.setInt(3, adeverinta.getTip());
-            stmt.setString(4, adeverinta.getMotiv());
+            stmt.setString(4, adeverinta.getMentiuni());
             stmt.setInt(5, adeverinta.getStatus());
             
             // Executăm query-ul

@@ -5,7 +5,7 @@ import java.sql.*;
 public class AprobAdevDirDAO {
     
     public void aprobare(int idAdeverinta, String mentiuni) throws ClassNotFoundException {
-        String UPDATE_STATUS_SQL = "UPDATE adeverinte SET status = 2, modif = CURDATE(), mentiuni = ? WHERE id = ?";
+        String UPDATE_STATUS_SQL = "UPDATE adeverinte SET status = 2, modif = CURDATE(), motiv = ? WHERE id = ?";
         
         Class.forName("com.mysql.cj.jdbc.Driver");
 

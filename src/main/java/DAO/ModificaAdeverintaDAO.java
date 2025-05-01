@@ -6,13 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import bean.Adeverinta;
 
 /**
- * Clasa DAO pentru operațiile de modificare a adeverințelor
+ * Clasa DAO pentru modificarea adeverințelor
  */
 public class ModificaAdeverintaDAO {
     private Connection connection;
@@ -48,7 +46,7 @@ public class ModificaAdeverintaDAO {
     }
     
     /**
-     * Obține detaliile unei adeverințe specifice
+     * Obține o adeverință din baza de date
      * 
      * @param idAdeverinta ID-ul adeverinței
      * @return Obiectul Adeverinta sau null dacă nu a fost găsit
@@ -61,14 +59,11 @@ public class ModificaAdeverintaDAO {
             connection = getConnection();
             
             // Query pentru a obține detaliile adeverinței
-            String sql = "SELECT a.id, a.tip, a.motiv, a.status, a.creare, a.modif, " +
-                         "u.nume, u.prenume, u.id as id_ang, u.id_dep, t.denumire as tip_denumire, " +
-                         "d.nume_dep as departament, s.nume_status " +
+            String sql = "SELECT a.id, a.tip, a.motiv, a.pentru_servi, a.status, a.creare, a.modif, " +
+                         "u.nume, u.prenume, u.id as id_ang, u.id_dep, t.denumire as tip_denumire " +
                          "FROM adeverinte a " +
                          "JOIN useri u ON a.id_ang = u.id " +
                          "JOIN tip_adev t ON a.tip = t.id " +
-                         "JOIN departament d ON u.id_dep = d.id_dep " +
-                         "JOIN statusuri s ON a.status = s.status " +
                          "WHERE a.id = ?";
             
             preparedStatement = connection.prepareStatement(sql);
@@ -80,13 +75,19 @@ public class ModificaAdeverintaDAO {
                 adeverinta = new Adeverinta();
                 adeverinta.setId(resultSet.getInt("id"));
                 adeverinta.setTip(resultSet.getInt("tip"));
-                adeverinta.setMotiv(resultSet.getString("motiv"));
+                
+                // Verifică ambele câmpuri și utilizează valoarea non-null
+                String motiv = resultSet.getString("pentru_servi");
+                if (motiv == null || motiv.trim().isEmpty()) {
+                    motiv = resultSet.getString("motiv");
+                }
+                adeverinta.setMotiv(motiv);
+                adeverinta.setMentiuni(motiv); // Folosește aceeași valoare și pentru mențiuni
+                
                 adeverinta.setStatus(resultSet.getInt("status"));
                 adeverinta.setCreare(resultSet.getDate("creare"));
                 adeverinta.setModif(resultSet.getDate("modif"));
-                
                 adeverinta.setIdAngajat(resultSet.getInt("id_ang"));
-                
             }
             
         } catch (SQLException e) {
@@ -100,7 +101,7 @@ public class ModificaAdeverintaDAO {
     }
     
     /**
-     * Actualizează datele unei adeverințe
+     * Modifică o adeverință
      * 
      * @param adeverinta Adeverința cu datele actualizate
      * @return true dacă operația a avut succes, false în caz contrar
@@ -112,13 +113,21 @@ public class ModificaAdeverintaDAO {
             // Obține conexiunea direct prin DriverManager
             connection = getConnection();
             
-            // Query pentru a actualiza adeverința
-            String sql = "UPDATE adeverinte SET tip = ?, motiv = ?, modif = CURDATE() WHERE id = ?";
+            // Query pentru a actualiza adeverința - actualizează ambele câmpuri
+            String sql = "UPDATE adeverinte SET tip = ?, motiv = ?, pentru_servi = ?, modif = CURDATE() WHERE id = ?";
             
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, adeverinta.getTip());
-            preparedStatement.setString(2, adeverinta.getMotiv());
-            preparedStatement.setInt(3, adeverinta.getId());
+            
+            // Folosește fie motiv, fie mențiuni, în funcție de care nu este null
+            String textMotiv = adeverinta.getMotiv();
+            if (textMotiv == null || textMotiv.trim().isEmpty()) {
+                textMotiv = adeverinta.getMentiuni();
+            }
+            
+            preparedStatement.setString(2, textMotiv); // Actualizează câmpul motiv
+            preparedStatement.setString(3, textMotiv); // Actualizează câmpul pentru_servi
+            preparedStatement.setInt(4, adeverinta.getId());
             
             // Execută update-ul
             int rowsAffected = preparedStatement.executeUpdate();
@@ -139,73 +148,53 @@ public class ModificaAdeverintaDAO {
     }
     
     /**
-     * Actualizează statusul unei adeverințe
+     * Verifică dacă o adeverință poate fi modificată (statusul trebuie să fie 0 pentru utilizatori normali)
      * 
      * @param idAdeverinta ID-ul adeverinței
-     * @param newStatus Noul status
-     * @return true dacă operația a avut succes, false în caz contrar
+     * @param idUser ID-ul utilizatorului
+     * @param tipUser Tipul utilizatorului
+     * @return true dacă adeverința poate fi modificată, false în caz contrar
      */
-    public boolean updateAdeverintaStatus(int idAdeverinta, int newStatus) {
-        boolean success = false;
+    public boolean canModifyAdeverinta(int idAdeverinta, int idUser, int tipUser) {
+        boolean canModify = false;
         
         try {
             // Obține conexiunea direct prin DriverManager
             connection = getConnection();
             
-            // Query pentru a actualiza statusul adeverinței
-            String sql = "UPDATE adeverinte SET status = ?, modif = CURDATE() WHERE id = ?";
+            // Verifică adeverința și permisiunile utilizatorului
+            String sql = "SELECT a.status, a.id_ang, u.id_dep FROM adeverinte a " +
+                        "JOIN useri u ON a.id_ang = u.id WHERE a.id = ?";
             
             preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, newStatus);
-            preparedStatement.setInt(2, idAdeverinta);
+            preparedStatement.setInt(1, idAdeverinta);
+            resultSet = preparedStatement.executeQuery();
             
-            // Execută update-ul
-            int rowsAffected = preparedStatement.executeUpdate();
-            
-            // Verifică dacă update-ul a avut succes
-            if (rowsAffected > 0) {
-                success = true;
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Închide resursele
-            close();
-        }
-        
-        return success;
-    }
-    
-    /**
-     * Adaugă o nouă adeverință
-     * 
-     * @param adeverinta Noua adeverință
-     * @return ID-ul adeverinței adăugate sau -1 dacă operația a eșuat
-     */
-    public int addAdeverinta(Adeverinta adeverinta) {
-        int newId = -1;
-        
-        try {
-            // Obține conexiunea direct prin DriverManager
-            connection = getConnection();
-            
-            // Query pentru a adăuga o nouă adeverință
-            String sql = "INSERT INTO adeverinte (id_ang, tip, motiv, status, creare, modif) VALUES (?, ?, ?, 0, CURDATE(), CURDATE())";
-            
-            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1, adeverinta.getIdAngajat());
-            preparedStatement.setInt(2, adeverinta.getTip());
-            preparedStatement.setString(3, adeverinta.getMotiv());
-            
-            // Execută inserarea
-            int rowsAffected = preparedStatement.executeUpdate();
-            
-            // Obține ID-ul generat automat
-            if (rowsAffected > 0) {
-                resultSet = preparedStatement.getGeneratedKeys();
-                if (resultSet.next()) {
-                    newId = resultSet.getInt(1);
+            if (resultSet.next()) {
+                int status = resultSet.getInt("status");
+                int idAngajat = resultSet.getInt("id_ang");
+                int idDepartament = resultSet.getInt("id_dep");
+                
+                // Verifică permisiunile în funcție de tipul utilizatorului
+                if (idAngajat == idUser && status == 0) {
+                    // Utilizatorul poate modifica propriile adeverințe neaprobate
+                    canModify = true;
+                } else if ((tipUser == 3 || (tipUser >= 10 && tipUser <= 15)) && status <= 1) {
+                    // Șefii pot modifica adeverințele din departamentul lor
+                    // Verifică dacă utilizatorul este șef pentru departamentul angajatului
+                    String sqlDep = "SELECT 1 FROM useri WHERE id = ? AND id_dep = ?";
+                    PreparedStatement stmtDep = connection.prepareStatement(sqlDep);
+                    stmtDep.setInt(1, idUser);
+                    stmtDep.setInt(2, idDepartament);
+                    ResultSet rsDep = stmtDep.executeQuery();
+                    if (rsDep.next()) {
+                        canModify = true;
+                    }
+                    rsDep.close();
+                    stmtDep.close();
+                } else if (tipUser == 0 || tipUser == 4 || tipUser > 15) {
+                    // Directorii și administratorii pot modifica orice adeverință
+                    canModify = true;
                 }
             }
             
@@ -216,132 +205,7 @@ public class ModificaAdeverintaDAO {
             close();
         }
         
-        return newId;
-    }
-    
-    /**
-     * Verifică dacă o adeverință poate fi modificată (doar statusul 0 - neaprobat)
-     * 
-     * @param idAdeverinta ID-ul adeverinței
-     * @return true dacă adeverința poate fi modificată, false în caz contrar
-     */
-    public boolean canModifyAdeverinta(int idAdeverinta) {
-        boolean canModify = false;
-        
-        try {
-            // Obține conexiunea direct prin DriverManager
-            connection = getConnection();
-            
-            // Query pentru a verifica statusul adeverinței
-            String sql = "SELECT status FROM adeverinte WHERE id = ?";
-            
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, idAdeverinta);
-            resultSet = preparedStatement.executeQuery();
-            
-            if (resultSet.next()) {
-                int status = resultSet.getInt("status");
-                // Poate fi modificată doar dacă statusul este 0 (neaprobată)
-                canModify = (status == 0);
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Închide resursele
-            close();
-        }
-        
         return canModify;
-    }
-    
-    /**
-     * Obține toate tipurile de adeverințe disponibile
-     * 
-     * @return Lista de tipuri de adeverințe (id, denumire)
-     */
-    public List<Object[]> getAllTipuriAdeverinte() {
-        List<Object[]> tipuri = new ArrayList<>();
-        
-        try {
-            // Obține conexiunea direct prin DriverManager
-            connection = getConnection();
-            
-            // Query pentru a obține toate tipurile de adeverințe
-            String sql = "SELECT id, denumire FROM tip_adev ORDER BY denumire";
-            
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(sql);
-            
-            // Procesare rezultate
-            while (resultSet.next()) {
-                Object[] tip = new Object[2];
-                tip[0] = resultSet.getInt("id");
-                tip[1] = resultSet.getString("denumire");
-                tipuri.add(tip);
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Închide resursele
-            close();
-        }
-        
-        return tipuri;
-    }
-    
-    /**
-     * Obține adeverințele create de un anumit angajat
-     * 
-     * @param idAngajat ID-ul angajatului
-     * @return Lista de adeverințe ale angajatului
-     */
-    public List<Adeverinta> getAdeverinteByAngajat(int idAngajat) {
-        List<Adeverinta> adeverinte = new ArrayList<>();
-        
-        try {
-            // Obține conexiunea direct prin DriverManager
-            connection = getConnection();
-            
-            // Query pentru a obține adeverințele unui angajat
-            String sql = "SELECT a.id, a.tip, a.motiv, a.status, a.creare, a.modif, " +
-                         "u.nume, u.prenume, u.id as id_ang, u.id_dep, t.denumire as tip_denumire, " +
-                         "s.nume_status " +
-                         "FROM adeverinte a " +
-                         "JOIN useri u ON a.id_ang = u.id " +
-                         "JOIN tip_adev t ON a.tip = t.id " +
-                         "JOIN statusuri s ON a.status = s.status " +
-                         "WHERE a.id_ang = ? ORDER BY a.creare DESC";
-            
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, idAngajat);
-            resultSet = preparedStatement.executeQuery();
-            
-            // Procesare rezultate
-            while (resultSet.next()) {
-                Adeverinta adeverinta = new Adeverinta();
-                adeverinta.setId(resultSet.getInt("id"));
-                adeverinta.setTip(resultSet.getInt("tip"));
-                adeverinta.setMotiv(resultSet.getString("motiv"));
-                adeverinta.setStatus(resultSet.getInt("status"));
-                adeverinta.setCreare(resultSet.getDate("creare"));
-                adeverinta.setModif(resultSet.getDate("modif"));
-               
-                adeverinta.setIdAngajat(resultSet.getInt("id_ang"));
-                
-                
-                adeverinte.add(adeverinta);
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Închide resursele
-            close();
-        }
-        
-        return adeverinte;
     }
     
     /**

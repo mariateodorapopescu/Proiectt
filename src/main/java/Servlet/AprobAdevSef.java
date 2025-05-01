@@ -138,7 +138,7 @@ public class AprobAdevSef extends HttpServlet {
             }
             
             // Actualizează starea adeverinței la "Aprobat șef" (status = 1)
-            String sqlUpdate = "UPDATE adeverinte SET status = 1, modif = CURDATE(), pentru_servi = ? WHERE id = ?";
+            String sqlUpdate = "UPDATE adeverinte SET status = 1, modif = CURDATE(), motiv = ? WHERE id = ?";
             updateStmt = conn.prepareStatement(sqlUpdate);
             updateStmt.setString(1, motivAprobarii);
             updateStmt.setInt(2, idAdeverinta);

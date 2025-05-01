@@ -194,7 +194,7 @@
                     </select>
                 </div>
                 <div>
-                    <label style="color:<%out.println(text);%>" class="login__label">Motiv</label>
+                    <label style="color:<%out.println(text);%>" class="login__label">Pentru a servi la...</label>
                     <textarea style="border-color:<%out.println(accent);%>; background:<%out.println(clr);%>; color:<%out.println(text);%>" 
                               placeholder="Introduceți motivul solicitării și alte detalii necesare" 
                               required class="login__input" name='motiv' rows="4"></textarea>

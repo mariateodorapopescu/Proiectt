@@ -151,7 +151,7 @@ public class ResAdevSefServlet extends HttpServlet {
             
             
             // Actualizează starea adeverinței la "Respins de șef" (status = -1)
-            String sqlUpdate = "UPDATE adeverinte SET status = -1, modif = CURDATE(), pentru_servi = ? WHERE id = ?";
+            String sqlUpdate = "UPDATE adeverinte SET status = -1, modif = CURDATE(), motiv = ? WHERE id = ?";
             updateStmt = conn.prepareStatement(sqlUpdate);
             updateStmt.setString(1, motivRespingerii);
             updateStmt.setInt(2, idAdeverinta);

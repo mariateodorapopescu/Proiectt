@@ -352,10 +352,11 @@
                             <th style="color:white">Fct.</th>
                             <th style="color:white">Dep.</th>
                             <th style="color:white">Tip adeverință</th>
-                            <th style="color:white">Motiv</th>
+                            <th style="color:white">Pentru a servi la</th>
+                            
                             <th style="color:white">Creare</th>
                             <th style="color:white">Modif.</th>
-                            <th style="color:white">Mențiuni</th>
+                            <th style="color:white">Motiv</th>
                             <th style="color:white">Status</th>
                             
                             <%
@@ -479,10 +480,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 cellsHtml += "<td data-label='Functie'>" + (row.Fct || 'N/A') + "</td>";
                 cellsHtml += "<td data-label='Departament'>" + (row.Dep || 'N/A') + "</td>";
                 cellsHtml += "<td data-label='TipAdev'>" + (row.TipAdev || 'N/A') + "</td>";
-                cellsHtml += "<td data-label='Motiv'>" + (row.Motiv || 'N/A') + "</td>";
+                cellsHtml += "<td data-label='Pentru_servi'>" + (row.Pentru_servi || 'N/A') + "</td>";
+              
                 cellsHtml += "<td data-label='Creare'>" + (row.Creare || 'N/A') + "</td>";
                 cellsHtml += "<td data-label='Modif'>" + (row.Modif || 'N/A') + "</td>";
-                cellsHtml += "<td data-label='Pentru_servi'>" + (row.Pentru_servi || 'N/A') + "</td>";
+                cellsHtml += "<td data-label='Motiv'>" + (row.Motiv || 'N/A') + "</td>";
 
                 cellsHtml += "<td class='tooltip' data-label='Status'>" +
                             "<span class='tooltiptext'>" + row.Status + "</span>" +
