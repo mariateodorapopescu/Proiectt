@@ -834,4 +834,54 @@
     <servlet-name>AdaugaMembruEchipaServlet</servlet-name>
     <url-pattern>/AdaugaMembruEchipaServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AdaugaPostServlet</display-name>
+    <servlet-name>AdaugaPostServlet</servlet-name>
+    <servlet-class>Servlet.AdaugaPostServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AdaugaPostServlet</servlet-name>
+    <url-pattern>/AdaugaPostServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>EditPostServlet</display-name>
+    <servlet-name>EditPostServlet</servlet-name>
+    <servlet-class>Servlet.EditPostServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EditPostServlet</servlet-name>
+    <url-pattern>/EditPostServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DeletePostServlet</display-name>
+    <servlet-name>DeletePostServlet</servlet-name>
+    <servlet-class>Servlet.DeletePostServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeletePostServlet</servlet-name>
+    <url-pattern>/DeletePostServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>JudeteProxyServlet</display-name>
+    <servlet-name>JudeteProxyServlet</servlet-name>
+    <servlet-class>Servlet.JudeteProxyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JudeteProxyServlet</servlet-name>
+    <url-pattern>/JudeteProxyServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>LocalitatiProxyServlet</display-name>
+    <servlet-name>LocalitatiProxyServlet</servlet-name>
+    <servlet-class>Servlet.LocalitatiProxyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LocalitatiProxyServlet</servlet-name>
+    <url-pattern>/LocalitatiProxyServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

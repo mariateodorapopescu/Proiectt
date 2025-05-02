@@ -634,7 +634,15 @@
                         <div class="siiconn">
                             <ion-icon name="today"></ion-icon>
                         </div>
-                        <div  class="sitextt">Proiecte</div>
+                        <div  class="sitextt">Proiecte & Echipe de Proiect</div>
+                    </a>
+                </li>
+                <li style="--bg: <%out.println(accent); %>">
+                    <a href="administrare_posturi.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="today"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Posturi</div>
                     </a>
                 </li>
                  <li style="--bg: <%out.println(accent); %>">

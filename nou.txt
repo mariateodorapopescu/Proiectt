@@ -418,7 +418,7 @@ CREATE TABLE IF NOT EXISTS locatii_joburi (
 -- Tabel joburi
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS joburi (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY auto_increment,
     titlu VARCHAR(50),
     req VARCHAR(1000),
     resp VARCHAR(1000),
