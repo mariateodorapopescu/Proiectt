@@ -629,6 +629,14 @@
                         <div  class="sitextt">Angajati</div>
                     </a>
                 </li>
+                <li style="--bg: <%out.println(accent); %>">
+                    <a href="administrare_proiecte.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="today"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Proiecte</div>
+                    </a>
+                </li>
                  <li style="--bg: <%out.println(accent); %>">
                     <a href="actiuni2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">

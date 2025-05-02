@@ -67,7 +67,9 @@ DROP TABLE IF EXISTS
 	istoric_promovari,
 	istoric_concedii_suplimentare,
 	istoric_fluture,
-    sedii;
+    sedii, 
+    cerei_demisie, 
+    notificari_general;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -178,17 +180,6 @@ CREATE TABLE IF NOT EXISTS tipcon (
   PRIMARY KEY (tip)
 ) AUTO_INCREMENT = 6;
 
--- -----------------------------------------------------
--- Tabel proiecte
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS proiecte (
-    id INT PRIMARY KEY,
-    nume VARCHAR(50),
-    descriere VARCHAR(1000),
-    start DATE,
-    end DATE
-);
-
 -- 2. Creare tabel useri
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS useri (
@@ -211,16 +202,17 @@ CREATE TABLE IF NOT EXISTS useri (
   culoare VARCHAR(25) NOT NULL DEFAULT '#333',
   activ INT NULL DEFAULT '1',
   profil MEDIUMBLOB NULL DEFAULT NULL,
-  salariu_brut INT NULL DEFAULT NULL,
   sporuri INT NULL DEFAULT NULL,
   penalizari INT NULL DEFAULT NULL,
   data_ang DATE NULL DEFAULT NULL,
   data_modif DATE NULL DEFAULT NULL,
+  id_echipa INT NULL DEFAULT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
   FOREIGN KEY (tip) REFERENCES tipuri(tip),
   FOREIGN KEY (sporuri) REFERENCES tipuri_sporuri(id),
-  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id)
+  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id),
+  FOREIGN KEY (id_echipa) REFERENCES echipe(id)
 ) AUTO_INCREMENT = 11;
 
 -- Creare indexuri pentru useri
@@ -230,6 +222,20 @@ CREATE UNIQUE INDEX email ON useri (email ASC);
 CREATE UNIQUE INDEX telefon ON useri (telefon ASC);
 
 -- 3. Tabele care depind de useri
+
+-- -----------------------------------------------------
+-- Tabel proiecte
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS proiecte (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nume VARCHAR(50),
+    descriere VARCHAR(1000),
+    start DATE,
+    end DATE,
+    supervizor int,
+	FOREIGN KEY (supervizor) REFERENCES useri(id)
+);
+
 -- -----------------------------------------------------
 -- Tabel istoric_penalizari
 -- -----------------------------------------------------
@@ -338,7 +344,7 @@ CREATE TABLE IF NOT EXISTS experienta (
 -- Tabel echipe
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS echipe (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     nume VARCHAR(50),
     supervizor INT,
     id_prj INT,
@@ -728,7 +734,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Tabel pentru cereri de demisie
-CREATE TABLE cereri_demisie (
+CREATE TABLE IF NOT EXISTS cereri_demisie (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_ang INT NOT NULL,
     motiv TEXT NOT NULL,
@@ -740,7 +746,7 @@ CREATE TABLE cereri_demisie (
 );
 
 -- Tabel pentru notificări generale
-CREATE TABLE notificari_general (
+CREATE TABLE IF NOT EXISTS notificari_general (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_destinatar INT NOT NULL,
     tip VARCHAR(50) NOT NULL,
@@ -749,6 +755,7 @@ CREATE TABLE notificari_general (
     data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_destinatar) REFERENCES useri(id)
 );
+
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -1468,8 +1475,9 @@ ORDER BY l.oras;
 -- -----------------------------------------------------
 select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
 select * from istoric_incetari;
-select * from sedii;
+select * from useri;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
 desc locatii_concedii;
 desc concedii;
+update useri set tip = 10 where username = "irina.c";
 SELECT strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;
