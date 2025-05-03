@@ -16,18 +16,23 @@
     if (sesi != null) {
         MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
         if (currentUser != null) {
-            String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
+            String username = currentUser.getUsername();
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                	// extrag date despre userul curent
-                    int id = rs.getInt("id");
-                    int userType = rs.getInt("tip");
-                    int userdep = rs.getInt("id_dep");
-                    if (userType != 4) {  
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                            "dp.denumire_completa AS denumire FROM useri u " +
+                            "JOIN tipuri t ON u.tip = t.tip " +
+                            "JOIN departament d ON u.id_dep = d.id_dep " +
+                            "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                            "WHERE u.username = ?")) {
+                    preparedStatement.setString(1, username);
+                    ResultSet rs = preparedStatement.executeQuery();
+                    if (rs.next()) {
+                    	// extrag date despre userul curent
+                        int id = rs.getInt("id");
+                        int userType = rs.getInt("tip");
+                        int userdep = rs.getInt("id_dep");
+                        String functie = rs.getString("functie");
+                        if (functie.compareTo("Administrator") != 0) {  
                     	// aflu data curenta, tot ca o interogare bd =(
                     	String today = "";
                    	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
@@ -112,7 +117,7 @@
 		
 		<button > <a href = "addadev.jsp" style="text-decoration:none;">Trimitere cerere adeverinta</a></button>
 		<button > <a href = "adeverintenoiuser.jsp?pag=1" style="text-decoration:none;">Vizualizare adeverintele mele</a></button>
-		<button > <a href = "modifadev.jsp" style="text-decoration:none;">Modificare cerere adeverinta</a></button>
+		
 		   <% if (userType == 3 || userType == 0) { %>
    <button > <a href = "adeverintenoiuser.jsp" style="text-decoration:none;">Vizualizare cereri noi de adeverinte</a></button>
     <% } %>

@@ -33,10 +33,15 @@
     }
 
     String username = currentUser.getUsername();
-    Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
     
     try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+         PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                 "dp.denumire_completa AS denumire FROM useri u " +
+                 "JOIN tipuri t ON u.tip = t.tip " +
+                 "JOIN departament d ON u.id_dep = d.id_dep " +
+                 "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                 "WHERE u.username = ?")) {
         
         preparedStatement.setString(1, username);
         ResultSet rs = preparedStatement.executeQuery();
@@ -49,7 +54,7 @@
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Date introduse incorect sau nu exista date!');");
                 out.println("</script>");
-                response.sendRedirect("modifdeldep.jsp");
+                response.sendRedirect("modifdel.jsp");
             }
             return;
         }
@@ -57,18 +62,32 @@
         int id = rs.getInt("id");
         int userType = rs.getInt("tip");
         int userdep = rs.getInt("id_dep");
-        
-        if (userType != 4) {  // Only type 4 users can approve
+        int ierarhie = rs.getInt("ierarhie");
+        String functie = rs.getString("functie");
+        // Funcție helper pentru a determina rolul utilizatorului
+        boolean isDirector = (ierarhie < 3) ;
+        boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+        boolean isIncepator = (ierarhie >= 10);
+        boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+        boolean isAdmin = (functie.compareTo("Administrator") == 0);
+
+        if (!isAdmin) {  // Only type 4 users can approve
             if ("true".equals(request.getParameter("json"))) {
                 response.setContentType("application/json");
                 response.getWriter().write("{\"error\":\"Acces neautorizat\"}");
             } else {
-                switch (userType) {
-                    case 1: response.sendRedirect("tip1ok.jsp"); break;
-                    case 2: response.sendRedirect("tip1ok.jsp"); break;
-                    case 3: response.sendRedirect("sefok.jsp"); break;
-                    case 0: response.sendRedirect("dashboard.jsp"); break;
-                }
+            	 if (isDirector) {
+                     response.sendRedirect("dashboard.jsp");
+                 }
+                 if (isUtilizatorNormal) {
+                     response.sendRedirect("tip1ok.jsp");
+                 }
+                 if (isSef) {
+                     response.sendRedirect("sefok.jsp");
+                 }
+                 if (isIncepator) {
+                     response.sendRedirect("tip2ok.jsp");
+                 }
             }
             return;
         }

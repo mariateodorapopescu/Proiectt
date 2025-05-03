@@ -12,16 +12,22 @@
       MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
       if (currentUser != null) {
           String username = currentUser.getUsername();
-          Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-          try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-              preparedStatement.setString(1, username);
-              ResultSet rs = preparedStatement.executeQuery();
-              if (rs.next()) {
-                  int id = rs.getInt("id");
-                  int userType = rs.getInt("tip");
-                  int userdep = rs.getInt("id_dep");
-                  if (userType != 4) {  
+          try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                  PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                          "dp.denumire_completa AS denumire FROM useri u " +
+                          "JOIN tipuri t ON u.tip = t.tip " +
+                          "JOIN departament d ON u.id_dep = d.id_dep " +
+                          "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                          "WHERE u.username = ?")) {
+                  preparedStatement.setString(1, username);
+                  ResultSet rs = preparedStatement.executeQuery();
+                  if (rs.next()) {
+                  	// extrag date despre userul curent
+                      int id = rs.getInt("id");
+                      int userType = rs.getInt("tip");
+                      int userdep = rs.getInt("id_dep");
+                      String functie = rs.getString("functie");
+                      if (functie.compareTo("Administrator") != 0) {  
                   	// Obținerea datei curente
                   	String today = "";
                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
@@ -202,7 +208,7 @@
             </div>
             
             <% out.println("<input type='hidden' name='userId' value='" + id + "'/>"); %> 
-            <% out.println("<a href=\"actiuni.jsp\" style=\"color:" + accent + "\" class=\"login__forgot\">Înapoi</a>"); %>
+            <% out.println("<a href=\"actiuni2.jsp\" style=\"color:" + accent + "\" class=\"login__forgot\">Înapoi</a>"); %>
             
             <div class="login__buttons">
                 <input style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" 

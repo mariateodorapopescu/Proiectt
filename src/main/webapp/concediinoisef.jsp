@@ -42,18 +42,31 @@
 
     Class.forName("com.mysql.cj.jdbc.Driver");
 
-    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-
-        preparedStatement.setString(1, username);
+    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                    "dp.denumire_completa AS denumire FROM useri u " +
+                    "JOIN tipuri t ON u.tip = t.tip " +
+                    "JOIN departament d ON u.id_dep = d.id_dep " +
+                    "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                    "WHERE u.username = ?")) {
+            preparedStatement.setString(1, username);
         ResultSet rs = preparedStatement.executeQuery();
 
         if (rs.next()) {
             id = rs.getInt("id");
             userType = rs.getInt("tip");
             userdep = rs.getInt("id_dep");
+            String functie = rs.getString("functie");
+            int ierarhie = rs.getInt("ierarhie");
 
-            if (userType != 4) {
+            // Funcție helper pentru a determina rolul utilizatorului
+            boolean isDirector = (ierarhie < 3) ;
+            boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+            boolean isIncepator = (ierarhie >= 10);
+            boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+            boolean isAdmin = (functie.compareTo("Administrator") == 0);
+            
+            if (!isAdmin) {
                 String query = "SELECT * FROM teme WHERE id_usr = ?";
                 try (PreparedStatement stmt = connection.prepareStatement(query)) {
                     stmt.setInt(1, id);
@@ -447,7 +460,7 @@ try {
                     </div>
                     
                     <button id="generate" onclick="sendJsonToPDFServer()">Descarcati PDF</button>
-                   <button id="inapoi" ><a href ="viewang4.jsp">Inapoi</a></button>
+                   <button id="inapoi" ><a href ="actiuni.jsp">Inapoi</a></button>
                 
                 </div>
             </div>

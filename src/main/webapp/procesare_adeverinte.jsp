@@ -22,7 +22,13 @@
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT u.tip, u.id, u.id_dep, u.nume, u.prenume, d.nume_dep FROM useri u JOIN departament d ON u.id_dep = d.id_dep WHERE u.username = ?")) {
+                    PreparedStatement preparedStatement = connection.prepareStatement(
+                    		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                                    "dp.denumire_completa AS denumire FROM useri u " +
+                                    "JOIN tipuri t ON u.tip = t.tip " +
+                                    "JOIN departament d ON u.id_dep = d.id_dep " +
+                                    "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                                    "WHERE u.username = ?")) {
                     preparedStatement.setString(1, username);
                     ResultSet rs = preparedStatement.executeQuery();
                     if (!rs.next()) {
@@ -35,9 +41,19 @@
                         userDep = rs.getInt("id_dep");
                         numePrenume = rs.getString("nume") + " " + rs.getString("prenume");
                         departament = rs.getString("nume_dep");
+                        String functie = rs.getString("functie");
+                        int ierarhie = rs.getInt("ierarhie");
+
+                        // Funcție helper pentru a determina rolul utilizatorului
+                        boolean isDirector = (ierarhie < 3) ;
+                        boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                        boolean isIncepator = (ierarhie >= 10);
+                        boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                        boolean isAdmin = (functie.compareTo("Administrator") == 0);
+
                         
                         // Verificăm permisiunile - doar directorul (tip=0) și șefii de departament (tip=3) pot accesa această pagină
-                        if (userTip != 0 && userTip != 3) {
+                        if (!isDirector && !isSef) {
                             response.sendRedirect("dashboard.jsp");
                             return;
                         }

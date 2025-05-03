@@ -16,66 +16,61 @@ FROM information_schema.KEY_COLUMN_USAGE
 WHERE REFERENCED_TABLE_NAME IS NOT NULL
 AND TABLE_SCHEMA = DATABASE();
 
--- 2. Ștergerea tuturor tabelelor existente
-
--- 1. Ștergerea tuturor tabelelor existente
+-- Ștergerea tuturor tabelelor existente
 DROP TABLE IF EXISTS 
-	angajati, 
-	colors, 
-	departament, 
-	tipuri, 
-	useri, 
-	experienta, 
-	proiecte, 
-	echipe, 
-	tasks, 
-	statusuri2, 
-	studii, 
-	cicluri, 
-	limbi_ang, 
-	limbi, 
-	nivel, 
-	aplicari, 
-	joburi, 
-	tip_job, 
-	tip_adev, 
-	adeverinte, 
-	proiecte2, 
-	cv, 
-	tipcon, 
-	concedii, 
-	data, 
-	date_logs, 
-	libere, 
-	locatii_joburi, 
-	locatii_concedii, 
-	locatii_atractii, 
-	locatii_departamente, 
-	locatii_useri, 
-	restrictii, 
-	sarbatori, 
-	statusuri, 
-	teme, 
-	testt, 
-	tichete, 
-	users,
-	tipuri_sporuri,
-	tipuri_penalizari,
-	istoric_penalizari,
-	istoric_sporuri,
-	istoric_incetari,
-	istoric_promovari,
-	istoric_concedii_suplimentare,
-	istoric_fluture,
+    angajati, 
+    colors, 
+    departament, 
+    tipuri, 
+    useri, 
+    experienta, 
+    proiecte, 
+    echipe, 
+    tasks, 
+    statusuri2, 
+    studii, 
+    cicluri, 
+    limbi_ang, 
+    limbi, 
+    nivel, 
+    aplicari, 
+    joburi, 
+    tip_job, 
+    tip_adev, 
+    adeverinte, 
+    proiecte2, 
+    cv, 
+    tipcon, 
+    concedii, 
+    data, 
+    date_logs, 
+    libere, 
+    locatii_joburi, 
+    locatii_concedii, 
+    locatii_atractii, 
+    locatii_departamente, 
+    locatii_useri, 
+    restrictii, 
+    sarbatori, 
+    statusuri, 
+    teme, 
+    testt, 
+    tichete, 
+    users,
+    tipuri_sporuri,
+    tipuri_penalizari,
+    istoric_penalizari,
+    istoric_sporuri,
+    istoric_incetari,
+    istoric_promovari,
+    istoric_concedii_suplimentare,
+    istoric_fluture,
     sedii, 
-    cerei_demisie, 
-    notificari_general;
+    cereri_demisie, 
+    notificari_general,
+    denumiri_pozitii;
 
-SET FOREIGN_KEY_CHECKS = 0;
-
-use test;
-
--- 1. Creare tabele de bază (fără foreign keys)
+-- 1. Tabele de bază (fără foreign keys)
 -- -----------------------------------------------------
 -- Tabel departament
 -- -----------------------------------------------------
@@ -92,6 +87,10 @@ CREATE TABLE IF NOT EXISTS tipuri (
   tip INT NOT NULL,
   denumire VARCHAR(25) NOT NULL,
   salariu INT NOT NULL,
+  departament_specific INT NULL DEFAULT NULL,
+  ierarhie INT DEFAULT 0,
+  descriere VARCHAR(500) DEFAULT NULL,
+  FOREIGN KEY (departament_specific) REFERENCES departament(id_dep),
   PRIMARY KEY (tip)
 );
 
@@ -180,7 +179,28 @@ CREATE TABLE IF NOT EXISTS tipcon (
   PRIMARY KEY (tip)
 ) AUTO_INCREMENT = 6;
 
--- 2. Creare tabel useri
+-- -----------------------------------------------------
+-- Tabel sedii (fără foreign keys)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS sedii (
+    id_sediu INT PRIMARY KEY AUTO_INCREMENT,
+    nume_sediu VARCHAR(255) NOT NULL,
+    tip_sediu ENUM('principal', 'secundar', 'punct_lucru') NOT NULL,
+    strada VARCHAR(255) NOT NULL,
+    cod VARCHAR(12) NOT NULL,
+    oras VARCHAR(255) NOT NULL,
+    judet VARCHAR(255) NOT NULL,
+    tara VARCHAR(255) NOT NULL,
+    telefon VARCHAR(20),
+    email VARCHAR(100),
+    latitudine DOUBLE,
+    longitudine DOUBLE,
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_modificare TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 2. Rezolvare referințe circulare: useri -> echipe -> proiecte -> useri
+-- Creăm tabelul useri fără referința către echipe inițial
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS useri (
   id INT NOT NULL AUTO_INCREMENT,
@@ -211,9 +231,9 @@ CREATE TABLE IF NOT EXISTS useri (
   FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
   FOREIGN KEY (tip) REFERENCES tipuri(tip),
   FOREIGN KEY (sporuri) REFERENCES tipuri_sporuri(id),
-  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id),
-  FOREIGN KEY (id_echipa) REFERENCES echipe(id)
-) AUTO_INCREMENT = 11;
+  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id)
+  -- id_echipa va fi adăugat ca foreign key la final
+);
 
 -- Creare indexuri pentru useri
 CREATE UNIQUE INDEX username ON useri (username ASC);
@@ -221,10 +241,8 @@ CREATE UNIQUE INDEX cnp ON useri (cnp ASC);
 CREATE UNIQUE INDEX email ON useri (email ASC);
 CREATE UNIQUE INDEX telefon ON useri (telefon ASC);
 
--- 3. Tabele care depind de useri
-
 -- -----------------------------------------------------
--- Tabel proiecte
+-- Tabel proiecte (fără referință către echipe)
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS proiecte (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -232,10 +250,28 @@ CREATE TABLE IF NOT EXISTS proiecte (
     descriere VARCHAR(1000),
     start DATE,
     end DATE,
-    supervizor int,
-	FOREIGN KEY (supervizor) REFERENCES useri(id)
+    supervizor INT,
+    FOREIGN KEY (supervizor) REFERENCES useri(id)
 );
 
+-- -----------------------------------------------------
+-- Tabel echipe
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS echipe (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nume VARCHAR(50),
+    supervizor INT,
+    id_prj INT,
+    FOREIGN KEY (supervizor) REFERENCES useri(id),
+    FOREIGN KEY (id_prj) REFERENCES proiecte(id)
+);
+
+-- 3. Acum adăugăm foreign key-ul lipsă la useri
+ALTER TABLE useri
+ADD CONSTRAINT fk_useri_echipa
+FOREIGN KEY (id_echipa) REFERENCES echipe(id);
+
+-- 4. Restul tabelelor care depind de useri, proiecte sau echipe
 -- -----------------------------------------------------
 -- Tabel istoric_penalizari
 -- -----------------------------------------------------
@@ -338,18 +374,6 @@ CREATE TABLE IF NOT EXISTS experienta (
     FOREIGN KEY (tip) REFERENCES tipuri(tip),
     FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
     FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
-
--- -----------------------------------------------------
--- Tabel echipe
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS echipe (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nume VARCHAR(50),
-    supervizor INT,
-    id_prj INT,
-    FOREIGN KEY (supervizor) REFERENCES useri(id),
-    FOREIGN KEY (id_prj) REFERENCES proiecte(id)
 );
 
 -- -----------------------------------------------------
@@ -531,7 +555,7 @@ CREATE TABLE IF NOT EXISTS teme (
   FOREIGN KEY (id_usr) REFERENCES useri(id)
 );
 
--- 4. Celelalte tabele
+-- 5. Tabele care depind de alte tabele
 -- -----------------------------------------------------
 -- Tabel locatii_concedii
 -- -----------------------------------------------------
@@ -597,7 +621,21 @@ CREATE TABLE IF NOT EXISTS locatii_useri (
   id_sediu INT DEFAULT NULL,
   PRIMARY KEY (id_locatie),
   FOREIGN KEY (id_user) REFERENCES useri(id),
-FOREIGN KEY (id_sediu) REFERENCES sedii(id_sediu)
+  FOREIGN KEY (id_sediu) REFERENCES sedii(id_sediu)
+);
+
+-- -----------------------------------------------------
+-- Tabel denumiri_pozitii
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS denumiri_pozitii (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    tip_pozitie INT NOT NULL,
+    id_dep INT NOT NULL,
+    denumire_completa VARCHAR(255) NOT NULL,
+    activ BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (tip_pozitie) REFERENCES tipuri(tip),
+    FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
+    UNIQUE KEY uq_tip_dep (tip_pozitie, id_dep)
 );
 
 -- -----------------------------------------------------
@@ -681,21 +719,31 @@ CREATE TABLE IF NOT EXISTS date_logs (
   date_checked DATE NULL DEFAULT NULL
 );
 
-CREATE TABLE sedii (
-    id_sediu INT PRIMARY KEY AUTO_INCREMENT,
-    nume_sediu VARCHAR(255) NOT NULL,
-    tip_sediu ENUM('principal', 'secundar', 'punct_lucru') NOT NULL,
-    strada VARCHAR(255) NOT NULL,
-    cod VARCHAR(12) NOT NULL,
-    oras VARCHAR(255) NOT NULL,
-    judet VARCHAR(255) NOT NULL,
-    tara VARCHAR(255) NOT NULL,
-    telefon VARCHAR(20),
-    email VARCHAR(100),
-    latitudine DOUBLE,
-    longitudine DOUBLE,
+-- -----------------------------------------------------
+-- Tabel cereri_demisie
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS cereri_demisie (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    motiv TEXT NOT NULL,
+    data_cerere DATE NOT NULL,
+    data_ultima_zi DATE NOT NULL,
+    status ENUM('IN_ASTEPTARE', 'APROBATA', 'RESPINSA') DEFAULT 'IN_ASTEPTARE',
+    data_procesare DATE,
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+-- -----------------------------------------------------
+-- Tabel notificari_general
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS notificari_general (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_destinatar INT NOT NULL,
+    tip VARCHAR(50) NOT NULL,
+    mesaj TEXT NOT NULL,
+    citit BOOLEAN DEFAULT FALSE,
     data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_modificare TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    FOREIGN KEY (id_destinatar) REFERENCES useri(id)
 );
 
 -- -----------------------------------------------------
@@ -733,30 +781,7 @@ CREATE TABLE IF NOT EXISTS users (
   PRIMARY KEY (id)
 );
 
--- Tabel pentru cereri de demisie
-CREATE TABLE IF NOT EXISTS cereri_demisie (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_ang INT NOT NULL,
-    motiv TEXT NOT NULL,
-    data_cerere DATE NOT NULL,
-    data_ultima_zi DATE NOT NULL,
-    status ENUM('IN_ASTEPTARE', 'APROBATA', 'RESPINSA') DEFAULT 'IN_ASTEPTARE',
-    data_procesare DATE,
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
-
--- Tabel pentru notificări generale
-CREATE TABLE IF NOT EXISTS notificari_general (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_destinatar INT NOT NULL,
-    tip VARCHAR(50) NOT NULL,
-    mesaj TEXT NOT NULL,
-    citit BOOLEAN DEFAULT FALSE,
-    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_destinatar) REFERENCES useri(id)
-);
-
-
+-- Reactivează constrângerile FOREIGN KEY
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 4. Creare triggeri
@@ -1120,6 +1145,9 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- INSERARI
 -- -----------------------------------------------------
+-- Dezactivează constrângerile FOREIGN KEY pentru a evita problemele la inserare
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- Inserarea datelor inițiale despre departamente
 INSERT INTO departament (id_dep, nume_dep) VALUES
 (1, 'HR'),
@@ -1142,29 +1170,56 @@ INSERT INTO departament (id_dep, nume_dep) VALUES
 (18, 'Contabilitate'),
 (19, 'Control Intern'),
 (20, 'Servicii Generale');
-
 -- Inserarea datelor inițiale despre tipuri de angajati
-INSERT INTO tipuri (tip, denumire, salariu) VALUES 
-(0, 'Director', 13000),
-(1, 'New Graduate', 3500),
-(2, 'Intern', 3000),
-(3, 'Sef', 11600),
-(4, 'CEO', 26000),
-(5, 'Junior', 4500),
-(6, 'lvl1', 5500),
-(7, 'lvl2', 6500),
-(8, 'Mid', 7500),
-(9, 'Senior', 8900),
-(10, 'Manager', 9200),
-(11, 'Principal', 11300),
-(12, 'Vice Presedinte', 16000),
-(13, 'Vice Presedinte Senior', 18000),
-(15, 'MP', 20000),
-(16, 'DC', 22000),
-(17, 'CHRO', 24000),
-(18, 'CFO', 26000),
-(19, 'COO', 26000)
-;
+INSERT INTO tipuri (tip, denumire, salariu, ierarhie, descriere, departament_specific) VALUES 
+(0, 'Director', 13000, 2, 'Director de departament', 20),
+(1, 'New Graduate', 3500, 10, 'Angajat nou, fără experiență', 20),
+(2, 'Intern', 3000, 11, 'Stagiar', 20),
+(3, 'Sef', 11600, 4, 'Șef de echipă/departament', 20),
+(4, 'CEO', 26000, 1, 'Director General', 16), -- Management = 16
+(5, 'Junior', 4500, 9, 'Angajat junior', 20),
+(6, 'lvl1', 5500, 8, 'Nivel 1 de experiență', 20),
+(7, 'lvl2', 6500, 7, 'Nivel 2 de experiență', 20),
+(8, 'Mid', 7500, 6, 'Angajat cu experiență medie', 20),
+(9, 'Senior', 8900, 5, 'Angajat cu experiență avansată', 20),
+(10, 'Manager', 9200, 4, 'Manager de departament/echipă', 20),
+(11, 'Principal', 11300, 3, 'Manager principal', 20),
+(12, 'Vice Presedinte', 16000, 2, 'Vice Președinte', 16), -- Management = 16
+(13, 'Vice Presedinte Senior', 18000, 2, 'Vice Președinte Senior', 16), -- Management = 16
+(15, 'MP', 20000, 1, 'Managing Partner', 16), -- Management = 16
+(16, 'DC', 22000, 1, 'Director de Conformitate', 4), -- Juridic = 4
+(17, 'CHRO', 24000, 1, 'Director Resurse Umane', 1), -- HR = 1
+(18, 'CFO', 26000, 1, 'Director Financiar', 2), -- Finante = 2
+(19, 'COO', 26000, 1, 'Director Operațional', 16); -- Management = 16
+
+-- Nivel Director
+INSERT INTO tipuri (tip, denumire, salariu, ierarhie, descriere, departament_specific) VALUES
+(22, 'Director General', 30000, 1, 'Director General', 16), -- Management = 16
+(23, 'Director', 25000, 2, 'Director de departament', 20),
+(24, 'Director Adjunct', 20000, 3, 'Director adjunct de departament', 20);
+
+-- Nivel Management
+INSERT INTO tipuri (tip, denumire, salariu, ierarhie, descriere, departament_specific) VALUES
+(25, 'Manager', 15000, 4, 'Manager de echipă/departament', 20),
+(26, 'Coordonator', 12000, 5, 'Coordonator de activități', 20),
+(27, 'Responsabil', 10000, 6, 'Responsabil de domeniu/activitate', 20);
+
+-- Nivel Specialist
+INSERT INTO tipuri (tip, denumire, salariu, ierarhie, descriere, departament_specific) VALUES
+(28, 'Specialist Senior', 9000, 7, 'Specialist senior în domeniu', 20),
+(29, 'Specialist', 7000, 8, 'Specialist în domeniu', 20),
+(30, 'Analist Senior', 8500, 7, 'Analist senior în domeniu', 2), -- Finante = 2
+(31, 'Analist', 6500, 8, 'Analist în domeniu', 2), -- Finante = 2
+(32, 'Consultant Senior', 8000, 7, 'Consultant senior în domeniu', 20),
+(33, 'Consultant', 6000, 8, 'Consultant în domeniu', 20);
+
+-- Nivel Execuție
+INSERT INTO tipuri (tip, denumire, salariu, ierarhie, descriere, departament_specific) VALUES
+(34, 'Administrator', 5500, 9, 'Administrator în domeniu', 3), -- IT = 3
+(35, 'Asistent', 4500, 10, 'Asistent administrativ/operațional', 20),
+(36, 'Inginer', 7500, 8, 'Inginer în domeniu tehnic', 3), -- IT = 3
+(37, 'Tehnician', 5000, 9, 'Tehnician în domeniu', 3), -- IT = 3
+(38, 'Operator', 4000, 10, 'Operator în domeniu', 20);
 
 -- Tabel sporuri
 INSERT INTO tipuri_sporuri (id, denumire, procent) VALUES
@@ -1276,25 +1331,336 @@ INSERT INTO tipcon (motiv, nr_zile) VALUES
 ('Concediu pentru forta majora', 5),
 ('Concediu pentru carantina', 14);
 
-DROP TRIGGER IF EXISTS after_user_insert; -- nu stiu de ce a trebuit sa-l sterg pe asta, dar cred ca-mi dadea eroare -> sa vad cum rezolv
+-- Date inițiale pentru sediul principal
+INSERT INTO sedii (nume_sediu, tip_sediu, strada, cod, oras, judet, tara, telefon, email) VALUES
+('Sediu Central', 'principal', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro'),
+('Sediu Secundar', 'secundar', 'Strada Secundară nr. 5', '020202', 'Cluj-Napoca', 'Cluj', 'România', '0264-123-456', 'cluj@companie.ro');
 
--- Inserarea datelor inițiale despre angajati
-INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa, culoare, cnp) VALUES 
-('Vasile', 'Fabian', '1996-09-19', 'vasile.fabian@example.com', '0700000000', 'fvasile', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 0, 'Strada Unirii', '#3A8DFF', 1),
-('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății', '#FF5733', 2),
-('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii', '#42E695', 3),
-('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab', '#9B59B6', 4),
-('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății', '#FFD700', 5),
-('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei', '#E74C3C', 6),
-('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei', '#1ABC9C', 7),
-('Rebreanu', 'Andrei', '2003-07-07', 'andrei.rebreanu@example.com', '0700000006', 'andrei.rebreanu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei', '#F39C12', 8),
-('Ionescu', 'Lucian', '1989-04-18', 'lucion@example.com', '0700000007', 'lucian.i', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 3, 'Strada Alunului', '#8E44AD', 9),
-('Ciucioiu', 'Elena', '2002-09-11', 'elena.c@example.com', '0700000008', 'elena.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 4, 'Strada Izvorului', '#2ECC71', 10)
-;
+-- Dezactivează constrângerile FOREIGN KEY pentru a evita problemele la inserare
+SET FOREIGN_KEY_CHECKS = 0;
 
--- niste update-uri de test pentru ca sa nu mai schimb de fiecare data cand refac baza =)))
-update teme set accent="#C8BFE7" where id_usr = 14;
-update teme set accent="#C63C51", clr="#1a1a1a", sidebar="#2a2a2a", card="#2a2a2a", hover="#2a2a2a", text="#ececec" where id_usr=15;
+-- Șterge triggerii care creează conflictul
+DROP TRIGGER IF EXISTS teme1;
+DROP TRIGGER IF EXISTS teme2;
+DROP TRIGGER IF EXISTS after_user_insert;
+
+-- Șterge toate datele din teme înainte de a insera noile date
+TRUNCATE TABLE teme;
+
+-- Inserarea useri (fără id_echipa inițial)
+INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa, culoare, cnp, data_ang) VALUES 
+('Vasile', 'Fabian', '1996-09-19', 'vasile.fabian@example.com', '0700000000', 'fvasile', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 0, 'Strada Unirii', '#3A8DFF', '1960919123456', '2020-01-15'),
+('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății', '#FF5733', '2011228123456', '2021-03-10'),
+('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii', '#42E695', '2020418123456', '2022-05-20'),
+('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab', '#9B59B6', '2030519123456', '2022-01-05'),
+('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății', '#FFD700', '2020507123456', '2021-10-15'),
+('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei', '#E74C3C', '2020301123456', '2020-04-01'),
+('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei', '#1ABC9C', '1951004123456', '2019-11-01'),
+('Rebreanu', 'Andrei', '2003-07-07', 'andrei.rebreanu@example.com', '0700000006', 'andrei.rebreanu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei', '#F39C12', '2030707123456', '2023-01-10'),
+('Ionescu', 'Lucian', '1989-04-18', 'lucion@example.com', '0700000007', 'lucian.i', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 3, 'Strada Alunului', '#8E44AD', '1890418123456', '2018-06-15'),
+('Ciucioiu', 'Elena', '2002-09-11', 'elena.c@example.com', '0700000008', 'elena.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 4, 'Strada Izvorului', '#2ECC71', '2020911123456', '2021-07-01');
+
+-- Adaugăm utilizatori pentru departamentul IT
+INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, password, id_dep, tip, adresa, culoare, cnp, data_ang) VALUES 
+('Dumitrescu', 'Adrian', '1990-04-15', 'adrian.dumitrescu@example.com', '0712345678', 'adumitrescu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 3, 23, 'Strada Primăverii 10', '#4285F4', '1900415123456', '2018-03-01'),
+('Popa', 'Mihai', '1992-08-23', 'mihai.popa@example.com', '0723456789', 'mpopa', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 3, 36, 'Bulevardul Decebal 25', '#34A853', '1920823123456', '2019-05-15'),
+('Stanciu', 'Diana', '1995-02-10', 'diana.stanciu@example.com', '0734567890', 'dstanciu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 3, 31, 'Strada Victoriei 7', '#EA4335', '2950210123456', '2020-10-01'),
+('Barbu', 'Alexandru', '1988-11-30', 'alexandru.barbu@example.com', '0745678901', 'abarbu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 3, 34, 'Aleea Castanilor 3', '#FBBC05', '1881130123456', '2017-08-20'),
+('Dobre', 'Cristina', '1993-06-18', 'cristina.dobre@example.com', '0756789012', 'cdobre', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 3, 36, 'Strada Nucului 15', '#7B1FA2', '2930618123456', '2021-02-15');
+
+-- Inserează manual în teme pentru fiecare utilizator
+INSERT INTO teme (id_usr, accent, clr, sidebar, card, text, hover) 
+SELECT id, '#10439F', '#d8d9e1', '#ECEDFA', '#ECEDFA', '#333', '#ECEDFA' 
+FROM useri;
+
+-- Update specific pentru teme
+UPDATE teme SET accent="#C8BFE7" WHERE id_usr = 14;
+UPDATE teme SET accent="#C63C51", clr="#1a1a1a", sidebar="#2a2a2a", card="#2a2a2a", hover="#2a2a2a", text="#ececec" WHERE id_usr=15;
+
+-- Creează un nou trigger pentru inserări viitoare
+DELIMITER $$
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON useri
+FOR EACH ROW
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM teme WHERE id_usr = NEW.id) THEN
+        INSERT INTO teme (id_usr) VALUES (NEW.id);
+    END IF;
+END$$
+DELIMITER ;
+
+-- Adaugăm proiecte
+INSERT INTO proiecte (nume, descriere, start, end, supervizor) VALUES
+('ERP Implementation', 'Implementarea unui sistem ERP pentru gestionarea resurselor companiei', '2023-01-01', '2023-12-31', 11),
+('Website Redesign', 'Reproiectarea site-ului web al companiei pentru o experiență mai bună a utilizatorilor', '2023-03-15', '2023-08-31', 12),
+('Mobile App Development', 'Dezvoltarea unei aplicații mobile pentru clienți', '2023-04-01', '2023-10-31', 13),
+('HR Management System', 'Dezvoltarea unui sistem intern pentru managementul resurselor umane', '2023-02-01', '2023-07-31', 14),
+('Customer Support Portal', 'Crearea unui portal de asistență pentru clienți', '2023-05-01', '2023-11-30', 15);
+
+-- Adăugăm echipe
+INSERT INTO echipe (nume, supervizor, id_prj) VALUES
+('Echipa ERP', 11, 1),
+('Echipa Web', 12, 2),
+('Echipa Mobile', 13, 3),
+('Echipa HR', 14, 4),
+('Echipa Suport', 15, 5);
+
+-- Actualizăm useri pentru a adăuga id_echipa
+UPDATE useri SET id_echipa = 1 WHERE id IN (1, 6);
+UPDATE useri SET id_echipa = 2 WHERE id IN (2, 7);
+UPDATE useri SET id_echipa = 3 WHERE id IN (3, 8);
+UPDATE useri SET id_echipa = 4 WHERE id IN (4, 9);
+UPDATE useri SET id_echipa = 5 WHERE id IN (5, 10);
+UPDATE useri SET id_echipa = 1 WHERE id IN (11);
+UPDATE useri SET id_echipa = 2 WHERE id IN (12);
+UPDATE useri SET id_echipa = 3 WHERE id IN (13);
+UPDATE useri SET id_echipa = 4 WHERE id IN (14);
+UPDATE useri SET id_echipa = 5 WHERE id IN (15);
+
+-- Adăugăm sarcini (tasks)
+INSERT INTO tasks (id, nume, supervizor, id_ang, start, end, status, id_prj) VALUES
+(1, 'Analiza cerințelor ERP', 11, 1, '2023-01-10', '2023-02-28', 4, 1),
+(2, 'Implementare modul financiar', 11, 6, '2023-03-01', '2023-05-31', 3, 1),
+(3, 'Design interfață website', 12, 2, '2023-03-20', '2023-04-30', 4, 2),
+(4, 'Dezvoltare frontend', 12, 7, '2023-05-01', '2023-06-30', 2, 2),
+(5, 'Specificații aplicație mobilă', 13, 3, '2023-04-05', '2023-04-30', 4, 3),
+(6, 'Dezvoltare aplicație iOS', 13, 8, '2023-05-01', '2023-08-31', 1, 3),
+(7, 'Analiza proceselor HR', 14, 4, '2023-02-05', '2023-03-15', 4, 4),
+(8, 'Dezvoltare sistem de evaluare', 14, 9, '2023-03-16', '2023-05-31', 3, 4),
+(9, 'Design portal de suport', 15, 5, '2023-05-05', '2023-06-15', 4, 5),
+(10, 'Implementare sistem de tichete', 15, 10, '2023-06-16', '2023-08-31', 2, 5);
+
+-- Adăugăm studii pentru angajați
+INSERT INTO studii (id, facultate, universitate, ciclu, start, end, id_ang) VALUES
+(1, 'Facultatea de Management', 'ASE București', 3, '2015-09-01', '2019-07-01', 1),
+(2, 'Facultatea de Resurse Umane', 'Universitatea București', 3, '2019-09-01', '2022-07-01', 2),
+(3, 'Facultatea de Psihologie', 'Universitatea București', 3, '2020-09-01', '2023-07-01', 3),
+(4, 'Facultatea de Drept', 'Universitatea București', 3, '2021-09-01', NULL, 4),
+(5, 'Facultatea de Comunicare', 'SNSPA', 3, '2020-09-01', '2023-07-01', 5),
+(6, 'Facultatea de Finanțe', 'ASE București', 3, '2019-09-01', '2022-07-01', 6),
+(7, 'Facultatea de Contabilitate', 'ASE București', 3, '2014-09-01', '2018-07-01', 7),
+(8, 'Facultatea de Management', 'ASE București', 3, '2021-09-01', NULL, 8),
+(9, 'Facultatea de Finanțe', 'ASE București', 4, '2012-09-01', '2014-07-01', 9),
+(10, 'Facultatea de Marketing', 'ASE București', 3, '2020-09-01', '2023-07-01', 10);
+
+-- Adăugăm experiență pentru angajați
+INSERT INTO experienta (id, den_job, instit, tip, id_dep, domeniu, subdomeniu, start, end, descriere, id_ang) VALUES
+(1, 'Manager HR', 'Company ABC', 10, 1, 'HR', 'Management', '2018-01-01', '2019-12-31', 'Coordonarea departamentului de resurse umane', 1),
+(2, 'Asistent HR', 'Company XYZ', 35, 1, 'HR', 'Recrutare', '2022-01-01', '2022-12-31', 'Asistență în procesul de recrutare', 2),
+(3, 'Intern HR', 'Company DEF', 2, 1, 'HR', 'Administrare', '2022-06-01', '2022-09-30', 'Stagiu în departamentul HR', 3),
+(4, 'Asistent Juridic', 'Cabinet Avocatură', 35, 4, 'Juridic', 'Consultanță', '2022-07-01', '2022-12-31', 'Asistență juridică', 4),
+(5, 'Social Media Manager', 'Agency GHI', 26, 5, 'Marketing', 'Social Media', '2021-01-01', '2021-12-31', 'Gestionarea prezenței pe rețelele sociale', 5),
+(6, 'Director Financiar', 'Company JKL', 23, 2, 'Financiar', 'Management', '2018-01-01', '2020-03-31', 'Coordonarea departamentului financiar', 6),
+(7, 'Contabil', 'Company MNO', 33, 2, 'Financiar', 'Contabilitate', '2018-01-01', '2019-10-31', 'Contabilitate primară și avansată', 7),
+(8, 'Intern Finanțe', 'Company PQR', 2, 2, 'Financiar', 'Analiză', '2022-07-01', '2022-09-30', 'Stagiu în departamentul financiar', 8),
+(9, 'Manager Financiar', 'Company STU', 10, 2, 'Financiar', 'Management', '2015-01-01', '2018-05-31', 'Coordonarea echipei financiare', 9),
+(10, 'Specialist Marketing', 'Company VWX', 29, 5, 'Marketing', 'Digital', '2021-01-01', '2021-12-31', 'Marketing digital și analiză', 10);
+
+-- Adăugăm limbi pentru angajați
+INSERT INTO limbi_ang (id, id_limba, nivel, id_ang) VALUES
+(1, 1, 6, 1),  -- Română C2 pentru Vasile Fabian
+(2, 2, 5, 1),  -- Engleză C1 pentru Vasile Fabian
+(3, 3, 3, 1),  -- Franceză B1 pentru Vasile Fabian
+(4, 1, 6, 2),  -- Română C2 pentru Popescu Maria
+(5, 2, 4, 2),  -- Engleză B2 pentru Popescu Maria
+(6, 1, 6, 3),  -- Română C2 pentru Girnita Claudia
+(7, 2, 5, 3),  -- Engleză C1 pentru Girnita Claudia
+(8, 4, 2, 3),  -- Germană A2 pentru Girnita Claudia
+(9, 1, 6, 4),  -- Română C2 pentru Costache Irina
+(10, 2, 5, 4), -- Engleză C1 pentru Costache Irina
+(11, 1, 6, 5), -- Română C2 pentru Moise Monica
+(12, 2, 4, 5), -- Engleză B2 pentru Moise Monica
+(13, 5, 3, 5), -- Spaniolă B1 pentru Moise Monica
+(14, 1, 6, 6), -- Română C2 pentru Capra Cosmina
+(15, 2, 5, 6), -- Engleză C1 pentru Capra Cosmina
+(16, 1, 6, 7), -- Română C2 pentru Muedin Emin
+(17, 2, 5, 7), -- Engleză C1 pentru Muedin Emin
+(18, 6, 4, 7), -- Italiană B2 pentru Muedin Emin
+(19, 1, 6, 8), -- Română C2 pentru Rebreanu Andrei
+(20, 2, 3, 8), -- Engleză B1 pentru Rebreanu Andrei
+(21, 1, 6, 9), -- Română C2 pentru Ionescu Lucian
+(22, 2, 6, 9), -- Engleză C2 pentru Ionescu Lucian
+(23, 4, 5, 9), -- Germană C1 pentru Ionescu Lucian
+(24, 1, 6, 10), -- Română C2 pentru Ciucioiu Elena
+(25, 2, 4, 10); -- Engleză B2 pentru Ciucioiu Elena
+
+-- Adăugăm locații pentru joburi
+INSERT INTO locatii_joburi (id_locatie, id_job, strada, longitudine, latitudine, cod, oras, judet, tara) VALUES
+(1, 1, 'Strada Principală nr. 1', 26.1025, 44.4268, '010101', 'București', 'București', 'România'),
+(2, 2, 'Strada Secundară nr. 5', 23.6236, 46.7712, '400124', 'Cluj-Napoca', 'Cluj', 'România'),
+(3, 3, 'Bulevardul Revoluției nr. 10', 21.2257, 45.7494, '300034', 'Timișoara', 'Timiș', 'România'),
+(4, 4, 'Strada Alexandru Ioan Cuza nr. 8', 27.5730, 47.1733, '700052', 'Iași', 'Iași', 'România'),
+(5, 5, 'Strada Decebal nr. 15', 23.5348, 46.0470, '510093', 'Alba Iulia', 'Alba', 'România');
+
+-- Adăugăm joburi
+INSERT INTO joburi (id, titlu, req, resp, dom, subdom, pozitie, departament, start, end, id_locatie, activ, keywords, id_team, id_prj, ore, tip) VALUES
+(1, 'Specialist Recrutare', 'Experiență în recrutare minim 2 ani, cunoștințe HR', 'Recrutare personal, interviuri, onboarding', 'HR', 'Recrutare', 29, 1, '2023-05-01', '2023-06-30', 1, 1, 'HR, recrutare, interviuri', 4, 4, 40, 1),
+(2, 'Dezvoltator Web', 'Cunoștințe HTML, CSS, JavaScript, React', 'Dezvoltarea și întreținerea aplicațiilor web', 'IT', 'Web Development', 36, 3, '2023-05-01', '2023-06-30', 2, 1, 'IT, web, React, frontend', 2, 2, 40, 1),
+(3, 'Analist Financiar', 'Experiență în analiză financiară, Excel avansat', 'Analiză financiară, raportare, previziuni', 'Financiar', 'Analiză', 31, 2, '2023-05-01', '2023-06-30', 3, 1, 'financiar, analiză, raportare', 1, 1, 40, 1),
+(4, 'Contabil Junior', 'Studii economice, cunoștințe contabilitate primară', 'Înregistrări contabile, raportări', 'Financiar', 'Contabilitate', 5, 2, '2023-05-01', '2023-06-30', 4, 1, 'contabilitate, financiar, junior', 1, 1, 40, 1),
+(5, 'Tehnician IT', 'Cunoștințe hardware și software, troubleshooting', 'Suport tehnic, mentenanță echipamente', 'IT', 'Suport', 37, 3, '2023-05-01', '2023-06-30', 5, 1, 'IT, suport, hardware, software', 5, 5, 40, 1);
+
+-- Adăugăm aplicări pentru joburi
+INSERT INTO aplicari (id, job_id, data_apl, id_ang) VALUES
+(1, 1, '2023-05-10', 2),
+(2, 2, '2023-05-12', 3),
+(3, 3, '2023-05-15', 8),
+(4, 4, '2023-05-18', 10),
+(5, 5, '2023-05-20', 4);
+
+-- Adăugăm adeverințe
+INSERT INTO adeverinte (id, tip, motiv, status, creare, modif, id_ang, pentru_servi) VALUES
+(1, 1, 'Adeverință angajat pentru bancă', 2, '2023-04-01', '2023-04-02', 1, 'Banca Transilvania'),
+(2, 2, 'Adeverință venit pentru credit', 1, '2023-04-05', '2023-04-06', 6, 'BRD'),
+(3, 4, 'Adeverință concediu medical', 2, '2023-04-10', '2023-04-11', 3, 'Medic de familie'),
+(4, 15, 'Adeverință venit pentru credit ipotecar', 0, '2023-04-15', NULL, 9, 'ING Bank'),
+(5, 8, 'Adeverință vechime în muncă', 1, '2023-04-20', '2023-04-21', 7, 'Casa de Pensii');
+
+-- Adăugăm CV-uri
+INSERT INTO cv (id, id_ang, calitati, interese) VALUES
+(1, 1, 'Leadership, comunicare, organizare', 'Management, dezvoltare personală, călătorii'),
+(2, 2, 'Comunicare, empatie, organizare', 'HR, psihologie, dezvoltare personală'),
+(3, 3, 'Adaptabilitate, lucru în echipă, învățare rapidă', 'Psihologie, arte, voluntariat'),
+(4, 6, 'Analiză, decizie, leadership', 'Investiții, economie, tehnologie'),
+(5, 9, 'Planificare financiară, analiză, comunicare', 'Economie, finanțe, investiții');
+
+-- Adăugăm concedii
+INSERT INTO concedii (id_ang, start_c, end_c, motiv, locatie, status, tip, added, modified, acc_res, mentiuni) VALUES
+(1, '2023-07-01', '2023-07-10', 'Concediu de odihnă', 'Grecia', 2, 1, '2023-04-01', '2023-04-05', '2023-04-05', NULL),
+(2, '2023-07-15', '2023-07-25', 'Concediu de odihnă', 'Italia', 1, 1, '2023-04-05', '2023-04-08', '2023-04-08', NULL),
+(3, '2023-06-01', '2023-06-05', 'Concediu medical', 'Acasă', 2, 3, '2023-05-30', '2023-05-31', '2023-05-31', 'Recomandare medicală'),
+(6, '2023-08-01', '2023-08-15', 'Concediu de odihnă', 'Spania', 0, 1, '2023-05-01', NULL, NULL, NULL),
+(9, '2023-09-01', '2023-09-07', 'Concediu de odihnă', 'Franța', 1, 1, '2023-05-15', '2023-05-20', '2023-05-20', NULL);
+
+-- Adăugăm locații pentru concedii
+INSERT INTO locatii_concedii (id_concediu, strada, longitudine, latitudine, cod, oras, judet, tara) VALUES
+(1, 'Strada Plajei', 23.5, 39.5, '49100', 'Corfu', 'Corfu', 'Grecia'),
+(2, 'Via Roma', 12.5, 41.9, '00100', 'Roma', 'Lazio', 'Italia'),
+(3, 'Strada Principală', 26.1, 44.4, '010101', 'București', 'București', 'România'),
+(4, 'Calle Mayor', -3.7, 40.4, '28013', 'Madrid', 'Madrid', 'Spania'),
+(5, 'Rue de Rivoli', 2.3, 48.8, '75001', 'Paris', 'Île-de-France', 'Franța');
+
+-- Adăugăm locații pentru departamente
+INSERT INTO locatii_departamente (id_dep, strada, longitudine, latitudine, cod, oras, judet, tara) VALUES
+(1, 'Strada Principală nr. 1, et. 2', 26.1025, 44.4268, '010101', 'București', 'București', 'România'),
+(2, 'Strada Principală nr. 1, et. 3', 26.1025, 44.4268, '010101', 'București', 'București', 'România'),
+(3, 'Strada Secundară nr. 5, et. 1', 23.6236, 46.7712, '400124', 'Cluj-Napoca', 'Cluj', 'România'),
+(4, 'Strada Principală nr. 1, et. 1', 26.1025, 44.4268, '010101', 'București', 'București', 'România'),
+(5, 'Strada Principală nr. 1, et. 4', 26.1025, 44.4268, '010101', 'București', 'București', 'România');
+
+-- Adăugăm locații pentru useri
+INSERT INTO locatii_useri (id_user, strada, longitudine, latitudine, cod, oras, judet, tara, id_sediu) VALUES
+(1, 'Strada Unirii nr. 10', 26.1103, 44.4275, '030167', 'București', 'București', 'România', 1),
+(2, 'Strada Libertății nr. 5', 26.0920, 44.4320, '050706', 'București', 'București', 'România', 1),
+(3, 'Strada Unirii nr. 15', 26.1105, 44.4278, '030168', 'București', 'București', 'România', 1),
+(4, 'Strada Basarab nr. 8', 26.0658, 44.4462, '010203', 'București', 'București', 'România', 1),
+(5, 'Strada Libertății nr. 10', 26.0925, 44.4325, '050707', 'București', 'București', 'România', 1),
+(6, 'Strada Doamnei nr. 3', 26.0978, 44.4338, '030016', 'București', 'București', 'România', 1),
+(7, 'Strada Doamnei nr. 5', 26.0980, 44.4340, '030017', 'București', 'București', 'România', 1),
+(8, 'Strada Frunzei nr. 12', 26.1220, 44.4390, '031478', 'București', 'București', 'România', 1),
+(9, 'Strada Alunului nr. 7', 26.1150, 44.4350, '031256', 'București', 'București', 'România', 1),
+(10, 'Strada Izvorului nr. 9', 26.0880, 44.4290, '050781', 'București', 'București', 'România', 1);
+
+-- Adăugăm istorice de penalizări
+INSERT INTO istoric_penalizari (id_ang, tip_penalizare, data_start, data_final, motiv) VALUES
+(8, 1, '2023-03-01', '2023-05-31', 'Întârzieri repetate la program'),
+(3, 3, '2023-04-01', '2023-06-30', 'Nerespectarea procedurilor interne'),
+(10, 2, '2023-05-15', '2023-08-14', 'Absență nemotivată în data de 15.05.2023');
+
+-- Adăugăm istorice de sporuri
+INSERT INTO istoric_sporuri (id_ang, tip_spor, data_start, data_final, motiv) VALUES
+(1, 3, '2023-01-01', '2023-12-31', 'Spor de vechime pentru peste 3 ani în companie'),
+(6, 3, '2023-01-01', '2023-12-31', 'Spor de vechime pentru peste 3 ani în companie'),
+(9, 3, '2023-01-01', '2023-12-31', 'Spor de vechime pentru peste 5 ani în companie'),
+(4, 5, '2023-03-01', '2023-12-31', 'Spor de confidențialitate pentru acces la date sensibile'),
+(7, 5, '2023-03-01', '2023-12-31', 'Spor de confidențialitate pentru acces la date financiare');
+
+-- Adăugăm istoric de promovări
+INSERT INTO istoric_promovari (id_ang, tip_vechi, tip_nou, tip_promovare, data_promovare) VALUES
+(1, 3, 0, 'Promovare internă', '2022-06-01'),
+(6, 10, 0, 'Promovare internă', '2022-04-01'),
+(9, 8, 3, 'Promovare internă', '2022-01-15'),
+(7, 5, 1, 'Promovare performanță', '2022-10-01');
+
+-- Adăugăm istoric de concedii suplimentare
+INSERT INTO istoric_concedii_suplimentare (id_ang, zile_acordate, motiv, data_acordare) VALUES
+(1, 5, 'Performanță deosebită în Q1 2023', '2023-04-01'),
+(6, 3, 'Finalizare proiect important', '2023-03-15'),
+(9, 4, 'Vechime în companie peste 5 ani', '2023-01-01');
+
+-- Adăugăm istoric fluture (salariu)
+INSERT INTO istoric_fluture (id_ang, luna, an, salariu_brut, salariu_net, data_generare) VALUES
+(1, 1, 2023, 13000.00, 7605.00, '2023-02-01'),
+(1, 2, 2023, 13000.00, 7605.00, '2023-03-01'),
+(1, 3, 2023, 13000.00, 7605.00, '2023-04-01'),
+(1, 4, 2023, 13000.00, 7605.00, '2023-05-01'),
+(6, 1, 2023, 13000.00, 7605.00, '2023-02-01'),
+(6, 2, 2023, 13000.00, 7605.00, '2023-03-01'),
+(6, 3, 2023, 13000.00, 7605.00, '2023-04-01'),
+(6, 4, 2023, 13000.00, 7605.00, '2023-05-01'),
+(9, 1, 2023, 11600.00, 6786.00, '2023-02-01'),
+(9, 2, 2023, 11600.00, 6786.00, '2023-03-01'),
+(9, 3, 2023, 11600.00, 6786.00, '2023-04-01'),
+(9, 4, 2023, 11600.00, 6786.00, '2023-05-01');
+
+-- Adăugăm cereri de demisie
+INSERT INTO cereri_demisie (id_ang, motiv, data_cerere, data_ultima_zi, status) VALUES
+(5, 'Ofertă mai bună de la altă companie', '2023-05-15', '2023-06-15', 'IN_ASTEPTARE'),
+(8, 'Relocare în altă țară', '2023-05-01', '2023-05-31', 'APROBATA');
+
+-- Adăugăm notificări generale
+INSERT INTO notificari_general (id_destinatar, tip, mesaj, citit) VALUES
+(1, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 0),
+(2, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 1),
+(3, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 0),
+(4, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 1),
+(5, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 0),
+(6, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 0),
+(7, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 1),
+(8, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 0),
+(9, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 1),
+(10, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 0);
+
+-- Șterge toate datele din denumiri_pozitii
+TRUNCATE TABLE denumiri_pozitii;
+
+-- Inserează datele pentru denumiri poziții verificând unicitatea
+INSERT IGNORE INTO denumiri_pozitii (tip_pozitie, id_dep, denumire_completa) VALUES
+-- Departamentul Financiar (id_dep = 2)
+(23, 2, 'Director Financiar'),
+(27, 2, 'Contabil Șef'),  -- Prima apariție pentru (27, 2)
+(29, 2, 'Analist Financiar'),
+(33, 2, 'Contabil'),
+(31, 2, 'Specialist Control Intern'),
+(30, 2, 'Specialist în Facturare și Colectare'),
+-- A doua apariție pentru (27, 2) a fost eliminată pentru a evita duplicarea
+-- (27, 2, 'Responsabil Bugete și Planificare Financiară'),
+
+-- Resurse Umane (id_dep = 1)
+(25, 1, 'Manager Resurse Umane'),
+(29, 1, 'Specialist Recrutare și Selecție'),
+(31, 1, 'Specialist Salarizare și Administrare Personal'),
+(27, 1, 'Responsabil Formare și Dezvoltare'),
+(28, 1, 'Responsabil Relații de Muncă'),
+-- Am schimbat această înregistrare pentru a evita alt duplicat potențial
+(26, 1, 'Specialist Compensații și Beneficii'),
+
+-- Departamentul IT (id_dep = 3)
+(23, 3, 'Director IT'),
+(34, 3, 'Administrator de Rețea și Sisteme'),
+(36, 3, 'Programator / Dezvoltator Software'),
+(31, 3, 'Analist IT'),
+(37, 3, 'Administrator de Bază de Date'),
+-- Am schimbat această înregistrare pentru a evita alt duplicat potențial
+(35, 3, 'Inginer de Securitate Cibernetică'),
+
+-- Departamentul Comercial și Vânzări (id_dep = 6)
+(23, 6, 'Director de Vânzări'),
+(25, 6, 'Manager Regional de Vânzări'),
+(33, 6, 'Consultant Vânzări'),
+(31, 6, 'Analist de Piață'),
+(26, 6, 'Coordonator E-commerce'),
+(27, 6, 'Responsabil Relații Clienți');
 
 -- Inserarea datelor inițiale despre atractii turistice
 INSERT INTO locatii_atractii (nume, strada, longitudine, latitudine, cod, oras, judet, tara) VALUES 
@@ -1307,28 +1673,60 @@ INSERT INTO locatii_atractii (nume, strada, longitudine, latitudine, cod, oras, 
 ('Muzeul Astra', 'Strada Pădurea Dumbrava', 24.1256, 45.7879, 550399, 'Sibiu', 'Sibiu', 'România'),
 ('Castelul Corvinilor', 'Strada Castelului', 22.8892, 45.7499, 331141, 'Hunedoara', 'Hunedoara', 'România'),
 ('Biserica Neagră', 'Curtea Johannes Honterus', 25.5877, 45.6427, 500025, 'Brașov', 'Brașov', 'România'),
-('Cetatea Râșnov', 'Strada Cetății', 25.4606, 45.5909, 505400, 'Râșnov', 'Brașov', 'România'),
-('Muzeul Național al Satului "Dimitrie Gusti"', 'Șoseaua Pavel Dimitrievici Kiseleff', 26.0640, 44.4731, 011347, 'București', 'București', 'România'),
-('Casa Memorială George Enescu', 'Calea Victoriei', 26.0975, 44.4416, 010071, 'București', 'București', 'România'),
-('Cetatea Alba Carolina', 'Piața Cetății', 23.5727, 46.0737, 510134, 'Alba Iulia', 'Alba', 'România'),
-('Castelul de Lut Valea Zânelor', 'Porumbacu de Sus', 24.5488, 45.6543, 557192, 'Porumbacu de Sus', 'Sibiu', 'România'),
-('Muzeul de Artă din Cluj-Napoca', 'Piața Unirii', 23.5914, 46.7712, 400113, 'Cluj-Napoca', 'Cluj', 'România'),
-('Catedrala Mitropolitană din Iași', 'Bulevardul Ștefan cel Mare și Sfânt', 27.5826, 47.1585, 700064, 'Iași', 'Iași', 'România'),
-('Biserica Sfântul Mihail din Cluj-Napoca', 'Piața Unirii', 23.5899, 46.7704, 400015, 'Cluj-Napoca', 'Cluj', 'România'),
-('Muzeul Brukenthal', 'Piața Mare', 24.1505, 45.7983, 550178, 'Sibiu', 'Sibiu', 'România'),
-('Cetatea Deva', 'Cetatea Deva', 22.9081, 45.8839, 330013, 'Deva', 'Hunedoara', 'România'),
-('Grădina Botanică din Cluj-Napoca', 'Strada Republicii', 23.5952, 46.7587, 400015, 'Cluj-Napoca', 'Cluj', 'România'),
-('Mănăstirea Horezu', 'Strada Mănăstirii', 24.0166, 45.1570, 245800, 'Horezu', 'Vâlcea', 'România'),
-('Muzeul Olteniei', 'Strada Popa Șapcă', 23.7957, 44.3165, 200585, 'Craiova', 'Dolj', 'România'),
-('Palatul Culturii din Iași', 'Piața Palat', 27.5870, 47.1573, 700113, 'Iași', 'Iași', 'România'),
-('Teatrul Național "Marin Sorescu" din Craiova', 'Bulevardul Alexandru Ioan Cuza', 23.7898, 44.3176, 200585, 'Craiova', 'Dolj', 'România'),
-('Cetatea Suceava', 'Strada Cetatea de Scaun', 26.2606, 47.6387, 720053, 'Suceava', 'Suceava', 'România');
+('Cetatea Râșnov', 'Strada Cetății', 25.4606, 45.5909, 505400, 'Râșnov', 'Brașov', 'România');
 
--- Date inițiale pentru sediul principal
-INSERT INTO sedii (nume_sediu, tip_sediu, strada, cod, oras, judet, tara, telefon, email) 
-VALUES ('laaalalala', 'secundar', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro'),
-('Sediu Central', 'principal', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro')
-;
+-- Inserarea datelor pentru sărbători
+INSERT INTO sarbatori (zi, nume) VALUES
+('2023-01-01', 'Anul Nou'),
+('2023-01-02', 'A doua zi de Anul Nou'),
+('2023-01-24', 'Ziua Unirii Principatelor Române'),
+('2023-04-14', 'Vinerea Mare'),
+('2023-04-16', 'Paștele Ortodox'),
+('2023-04-17', 'A doua zi de Paște Ortodox'),
+('2023-05-01', 'Ziua Muncii'),
+('2023-06-04', 'Rusaliile'),
+('2023-06-05', 'A doua zi de Rusalii'),
+('2023-08-15', 'Adormirea Maicii Domnului'),
+('2023-11-30', 'Sfântul Andrei'),
+('2023-12-01', 'Ziua Națională a României'),
+('2023-12-25', 'Crăciunul'),
+('2023-12-26', 'A doua zi de Crăciun');
+
+-- Inserarea datelor pentru zile libere suplimentare
+INSERT INTO libere (zi, nume) VALUES
+('2023-01-23', 'Punte Ziua Unirii'),
+('2023-04-18', 'Punte Paște'),
+('2023-06-01', 'Ziua Copilului'),
+('2023-06-02', 'Punte Weekend'),
+('2023-12-27', 'Punte Crăciun');
+
+-- Inserarea datelor pentru culori
+INSERT INTO colors (culoare, cod) VALUES
+('Albastru', '#3A8DFF'),
+('Roșu', '#FF5733'),
+('Verde', '#42E695'),
+('Mov', '#9B59B6'),
+('Galben', '#FFD700'),
+('Portocaliu', '#E74C3C'),
+('Turcoaz', '#1ABC9C'),
+('Auriu', '#F39C12'),
+('Indigo', '#8E44AD'),
+('Verde Smarald', '#2ECC71');
+
+-- Actualizare culoare pentru utilizatori
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Albastru') WHERE id = 1;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Roșu') WHERE id = 2;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Verde') WHERE id = 3;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Mov') WHERE id = 4;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Galben') WHERE id = 5;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Portocaliu') WHERE id = 6;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Turcoaz') WHERE id = 7;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Auriu') WHERE id = 8;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Indigo') WHERE id = 9;
+UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Verde Smarald') WHERE id = 10;
+
+-- Reactivează constrângerile FOREIGN KEY
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- 6. Ready to use =) Enjoy
 -- -----------------------------------------------------
@@ -1481,3 +1879,4 @@ desc locatii_concedii;
 desc concedii;
 update useri set tip = 10 where username = "irina.c";
 SELECT strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;
+select * from tipuri;

@@ -29,7 +29,7 @@
     }
 
     String username = currentUser.getUsername();
-    int userdep = 0, id = 0, userType = 0;
+    int userdep = 0, id = 0, userType = 0, ierarhie = 0;
 
     // Setăm culorile implicite
     String accent = "#10439F";
@@ -38,21 +38,29 @@
     String text = "#333";
     String card = "#ECEDFA";
     String hover = "#ECEDFA";
+    String functie = "";
 
     Class.forName("com.mysql.cj.jdbc.Driver");
 
-    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-
-        preparedStatement.setString(1, username);
-        ResultSet rs = preparedStatement.executeQuery();
-
-        if (rs.next()) {
-            id = rs.getInt("id");
-            userType = rs.getInt("tip");
-            userdep = rs.getInt("id_dep");
-
-            if (userType != 4) {
+    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                    "dp.denumire_completa AS denumire FROM useri u " +
+                    "JOIN tipuri t ON u.tip = t.tip " +
+                    "JOIN departament d ON u.id_dep = d.id_dep " +
+                    "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                    "WHERE u.username = ?")) {
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+            	// extrag date despre userul curent
+                id = rs.getInt("id");
+                userType = rs.getInt("tip");
+                userdep = rs.getInt("id_dep");
+                functie = rs.getString("functie");
+                ierarhie = rs.getInt("ierarhie");
+                if (functie.compareTo("Administrator") != 0) {  
+                  
+                      
                 String query = "SELECT * FROM teme WHERE id_usr = ?";
                 try (PreparedStatement stmt = connection.prepareStatement(query)) {
                     stmt.setInt(1, id);
@@ -72,8 +80,8 @@
     }
 
     // Funcție helper pentru a determina rolul utilizatorului
-    boolean isDirector = userType == 0 || userType > 15;
-    boolean isSef = userType == 3 || (userType >= 10 && userType <= 15);
+    boolean isDirector = (ierarhie < 3) ;
+    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
     boolean isUtilizatorNormal = !isDirector && !isSef; // tipuri 1, 2, 5-9
 
     // Debug userType
@@ -390,7 +398,7 @@
             </div>
             
             <button id="generate" onclick="sendJsonToPDFServer()">Descarcă PDF</button>
-            <button id="inapoi"><a href="viewang4.jsp">Înapoi</a></button>
+            <button id="inapoi"><a href="actiuni2.jsp">Înapoi</a></button>
         </div>
     </div>
 </div>

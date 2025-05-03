@@ -17,7 +17,13 @@
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+                 PreparedStatement preparedStatement = connection.prepareStatement(
+                		 "SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                                 "dp.denumire_completa AS denumire FROM useri u " +
+                                 "JOIN tipuri t ON u.tip = t.tip " +
+                                 "JOIN departament d ON u.id_dep = d.id_dep " +
+                                 "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                                 "WHERE u.username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
@@ -28,7 +34,17 @@
                 } else {
                     int userType = rs.getInt("tip");
                     int userdep = rs.getInt("id_dep");
-                    if (userType != 4) {
+                    String functie = rs.getString("functie");
+                    int ierarhie = rs.getInt("ierarhie");
+
+                    // Funcție helper pentru a determina rolul utilizatorului
+                    boolean isDirector = (ierarhie < 3) ;
+                    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                    boolean isIncepator = (ierarhie >= 10);
+                    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                    boolean isAdmin = (functie.compareTo("Administrator") == 0);
+
+                    if (!isAdmin) {
                         out.println("<h1>Vizualizarea tuturor concediilor din departamentul meu pe anul curent</h1><br>");
                         out.println("<table border='1'><tr><th>Nr. crt</th><th>Departament</th><th>Nume</th><th>Prenume</th>" +
                         "<th>Functie</th><th>Inceput</th><th>Final</th><th>Motiv</th><th>Locatie</th><th>Tip concediu</th><th>Status</th></tr>");

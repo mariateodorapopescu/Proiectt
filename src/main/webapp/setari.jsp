@@ -18,9 +18,7 @@
                 if (rs.next()) {
                     int id = rs.getInt("id");
                     int userType = rs.getInt("tip");
-                    if (userType == 5) {
-                        response.sendRedirect("adminok.jsp");
-                    } else {
+                    
                         String accent = null;
                         String clr = null;
                         String sidebar = null;
@@ -243,7 +241,7 @@ if ("#d8d9e1".equals(clr)) {
 </body>
 </html>
 <%
-                    }
+                    
                 } else {
                 	// #88D66C #10439F #C8BFE7 #E6AF3C
                     out.println("<script type='text/javascript'>");

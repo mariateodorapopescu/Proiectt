@@ -53,7 +53,12 @@
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
 
         try {
-            PreparedStatement userStmt = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?");
+            PreparedStatement userStmt = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                    "dp.denumire_completa AS denumire FROM useri u " +
+                    "JOIN tipuri t ON u.tip = t.tip " +
+                    "JOIN departament d ON u.id_dep = d.id_dep " +
+                    "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                    "WHERE u.username = ?");
             userStmt.setString(1, username);
             ResultSet userRs = userStmt.executeQuery();
 
@@ -64,8 +69,17 @@
             int userType = userRs.getInt("tip");
             int userId = userRs.getInt("id");
             int userDep = userRs.getInt("id_dep");
+            String prenume = userRs .getString("prenume");
+            String functie = userRs .getString("functie");
+            int ierarhie = userRs .getInt("ierarhie");
+            // Funcție helper pentru a determina rolul utilizatorului
+            boolean isDirector = (ierarhie < 3) ;
+            boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+            boolean isIncepator = (ierarhie >= 10);
+            boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+            boolean isAdmin = (functie.compareTo("Administrator") == 0);
 
-            if (userType == 4) {
+            if (isAdmin) {
                 throw new Exception("Acces restricționat pentru administratori");
             }
 

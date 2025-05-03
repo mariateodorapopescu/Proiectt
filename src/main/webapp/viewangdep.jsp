@@ -13,18 +13,38 @@
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select id, tip, prenume from useri where username = ?")) {
+                 PreparedStatement preparedStatement = connection.prepareStatement(
+                		 "SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                                 "dp.denumire_completa AS denumire FROM useri u " +
+                                 "JOIN tipuri t ON u.tip = t.tip " +
+                                 "JOIN departament d ON u.id_dep = d.id_dep " +
+                                 "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                                 "WHERE u.username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
                     int userId = rs.getInt("id");
                     int userType = rs.getInt("tip");
-                    if (userType != 0 && userType != 4) {
-                        switch (userType) {
-                            case 1: response.sendRedirect("tip1ok.jsp"); break;
-                            case 2: response.sendRedirect("tip2ok.jsp"); break;
-                            case 3: response.sendRedirect("sefok.jsp"); break;
-                           
+                    String functie = rs.getString("functie");
+                    int ierarhie = rs.getInt("ierarhie");
+
+                    // Funcție helper pentru a determina rolul utilizatorului
+                    boolean isDirector = (ierarhie < 3) ;
+                    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                    boolean isIncepator = (ierarhie >= 10);
+                    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                    boolean isAdmin = (functie.compareTo("Administrator") == 0);
+                    
+                    if (!isAdmin && !isDirector) {
+                    	
+                        if (isUtilizatorNormal) {
+                            response.sendRedirect("tip1ok.jsp");
+                        }
+                        if (isSef) {
+                            response.sendRedirect("sefok.jsp");
+                        }
+                        if (isIncepator) {
+                            response.sendRedirect("tip2ok.jsp");
                         }
                     } else {
                     	

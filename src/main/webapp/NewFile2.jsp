@@ -7,48 +7,53 @@
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <%
-    HttpSession sesi = request.getSession(false);
 
+//structura unei pagini este astfel
+//verificare daca exista sesiune activa, utilizator conectat, 
+//extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
+//se mai extrag temele de culoare ale fiecarui utilizator
+//apoi se incarca pagina in sine
+
+    HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
     if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
-
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
         if (currentUser != null) {
-            String username = currentUser.getUsername();
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement = connection.prepareStatement("select tip, id, prenume from useri where username = ?")) {
+            String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                                "dp.denumire_completa AS denumire FROM useri u " +
+                                "JOIN tipuri t ON u.tip = t.tip " +
+                                "JOIN departament d ON u.id_dep = d.id_dep " +
+                                "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                                "WHERE u.username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                    out.println("<script type='text/javascript'>");
-                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                    out.println("</script>");
-                } else {
-                    if (rs.getString("tip").compareTo("4") == 0) {
-                        
-                            response.sendRedirect("adminok.jsp");
-                        
-                    } else {
-                        int id = rs.getInt("id");
-                        String prenume = rs.getString("prenume");
-                        String accent = null;
-                        String clr = null;
-                        String sidebar = null;
-                        String text = null;
-                        String card = null;
-                        String hover = null;
-                        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                            String query = "SELECT * from teme where id_usr = ?";
+                if (rs.next()) {
+                	// extrag date despre userul curent
+                    int id = rs.getInt("id");
+                    int userType = rs.getInt("tip");
+                    int userdep = rs.getInt("id_dep");
+                    String functie = rs.getString("functie");
+                    int ierarhie = rs.getInt("ierarhie");
+
+                    // Funcție helper pentru a determina rolul utilizatorului
+                    boolean isDirector = (ierarhie < 3) ;
+                    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                    boolean isIncepator = (ierarhie >= 10);
+                    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                    boolean isAdmin = (functie.compareTo("Administrator") == 0);
+
+                    if (!isAdmin) {  
+                    	// aflu data curenta, tot ca o interogare bd =(
+                    	String today = "";
+                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                stmt.setInt(1, id);
-                                try (ResultSet rs2 = stmt.executeQuery()) {
+                               try (ResultSet rs2 = stmt.executeQuery()) {
                                     if (rs2.next()) {
-                                        accent = rs2.getString("accent");
-                                        clr = rs2.getString("clr");
-                                        sidebar = rs2.getString("sidebar");
-                                        text = rs2.getString("text");
-                                        card = rs2.getString("card");
-                                        hover = rs2.getString("hover");
+                                      today =  rs2.getString("today");
                                     }
                                 }
                             }
@@ -56,7 +61,33 @@
                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                             e.printStackTrace();
                         }
-%>
+                   	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                   	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                  	 String clr = "#d8d9e1";
+                  	 String sidebar = "#ECEDFA";
+                  	 String text = "#333";
+                  	 String card = "#ECEDFA";
+                  	 String hover = "#ECEDFA";
+                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                         String query = "SELECT * from teme where id_usr = ?";
+                         try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                             stmt.setInt(1, id);
+                             try (ResultSet rs2 = stmt.executeQuery()) {
+                                 if (rs2.next()) {
+                                   accent =  rs2.getString("accent");
+                                   clr =  rs2.getString("clr");
+                                   sidebar =  rs2.getString("sidebar");
+                                   text = rs2.getString("text");
+                                   card =  rs2.getString("card");
+                                   hover = rs2.getString("hover");
+                                 }
+                             }
+                         }
+                    } catch (SQLException e) {
+                         out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                         e.printStackTrace();
+                     }
+                    	%>
 <html lang="en">
 <head>
   <meta charset="UTF-8">

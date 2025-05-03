@@ -10,28 +10,24 @@
     if (sesi != null) {
         MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
         if (currentUser != null) {
-            String username = currentUser.getUsername();
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?")) {
-                    preparedStatement.setString(1, username);
-                    ResultSet rs = preparedStatement.executeQuery();
-                    if (!rs.next()) {
-                        out.println("<script type='text/javascript'>");
-                        out.println("alert('Date introduse incorect sau nu exista date!');");
-                        out.println("</script>");
-                    } else {
-                        int userType = rs.getInt("tip");
-                        int userId = rs.getInt("id");
-                        int userDep = rs.getInt("id_dep");
-                        
-                        // Verifică dacă utilizatorul este director (tip=0) sau șef departament (tip=3)
-                        if (userType != 0 && userType != 3) {
-                            response.sendRedirect("dashboard.jsp?unauthorized=true");
-                            return;
-                        }
-                        
+            String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                        "dp.denumire_completa AS denumire FROM useri u " +
+                        "JOIN tipuri t ON u.tip = t.tip " +
+                        "JOIN departament d ON u.id_dep = d.id_dep " +
+                        "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                        "WHERE u.username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	// extrag date despre userul curent
+                    int userId = rs.getInt("id");
+                    int userType = rs.getInt("tip");
+                    int userDep = rs.getInt("id_dep");
+                    String functie = rs.getString("functie");
+                  
                         // Obținere preferințe de temă
                         String accent = "#4F46E5"; // Culoare implicită
                         String clr = "#f9fafb";
@@ -780,7 +776,7 @@
 </body>
 </html>
 <%
-                    }
+                   
                 }
             } catch (Exception e) {
                 e.printStackTrace();

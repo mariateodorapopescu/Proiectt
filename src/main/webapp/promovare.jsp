@@ -17,7 +17,13 @@
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?")) {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                                "dp.denumire_completa AS denumire FROM useri u " +
+                                "JOIN tipuri t ON u.tip = t.tip " +
+                                "JOIN departament d ON u.id_dep = d.id_dep " +
+                                "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                                "WHERE u.username = ?")) {
                 preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (!rs.next()) {
@@ -28,10 +34,20 @@
                     int userType = rs.getInt("tip");
                     int userId = rs.getInt("id");
                     int userDep = rs.getInt("id_dep");
+                    String functie = rs.getString("functie");
+                    int ierarhie = rs.getInt("ierarhie");
+
+                    // Funcție helper pentru a determina rolul utilizatorului
+                    boolean isDirector = (ierarhie < 3) ;
+                    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                    boolean isIncepator = (ierarhie >= 10);
+                    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                    boolean isAdmin = (functie.compareTo("Administrator") == 0);
+
                     // Doar Director poate accesa
-                    if (userType != 0) {
-                        response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
-                    } else {
+                    if (!isDirector) {
+                        response.sendRedirect(isUtilizatorNormal ? "tip1ok.jsp" : isIncepator ? "tip2ok.jsp" : isSef ? "sefok.jsp" : "adminok.jsp");
+                    }  else {
                         String accent = null;
                         String clr = null;
                         String sidebar = null;

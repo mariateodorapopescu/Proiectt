@@ -23,7 +23,12 @@
           String username = currentUser.getUsername(); // extrag usernameul, care e unic si asta cam transmit in formuri (mai transmit si id dar deocmadata ma bazez pe username)
           Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
           try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
-              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+              PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                      "dp.denumire_completa AS denumire FROM useri u " +
+                      "JOIN tipuri t ON u.tip = t.tip " +
+                      "JOIN departament d ON u.id_dep = d.id_dep " +
+                      "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                      "WHERE u.username = ?")) {
               preparedStatement.setString(1, username);
               ResultSet rs = preparedStatement.executeQuery();
               if (rs.next()) {
@@ -31,7 +36,8 @@
                   int id = rs.getInt("id");
                   int userType = rs.getInt("tip");
                   int userdep = rs.getInt("id_dep");
-                  if (userType == 4) {  
+                  String functie = rs.getString("functie");
+                  if (functie.compareTo("Administrator") == 0) {  
                   	
                  	 // aflu tematica de culoare ce variaza de la un utilizator la celalalt
                  	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date

@@ -12,21 +12,24 @@
         if (currentUser != null) {
             String username = currentUser.getUsername();
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT tip, id, id_dep FROM useri WHERE username = ?")) {
-                preparedStatement.setString(1, username);
-                ResultSet rs = preparedStatement.executeQuery();
-                if (!rs.next()) {
-                    out.println("<script type='text/javascript'>");
-                    out.println("alert('Date introduse incorect sau nu exista date!');");
-                    out.println("</script>");
-                } else {
-                    int userType = rs.getInt("tip");
-                    int userId = rs.getInt("id");
-                    int userDep = rs.getInt("id_dep");
-                    
-                    // Verificare restricții de acces
-                    if (userType != 4 || userType >= 15) {
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                            "dp.denumire_completa AS denumire FROM useri u " +
+                            "JOIN tipuri t ON u.tip = t.tip " +
+                            "JOIN departament d ON u.id_dep = d.id_dep " +
+                            "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                            "WHERE u.username = ?")) {
+                    preparedStatement.setString(1, username);
+                    ResultSet rs = preparedStatement.executeQuery();
+                    if (rs.next()) {
+                    	// extrag date despre userul curent
+                        int userId = rs.getInt("id");
+                        int userType = rs.getInt("tip");
+                        int userDep = rs.getInt("id_dep");
+                        String functie = rs.getString("functie");
+                        int ierarhie = rs.getInt("ierarhie");
+                        if (functie.compareTo("Administrator") != 0) {  
+                          
                         response.sendRedirect(userType == 1 ? "tip1ok.jsp" : userType == 2 ? "tip2ok.jsp" : userType == 3 ? "sefok.jsp" : "adminok.jsp");
                     } else {
                         // Obținere preferințe de temă

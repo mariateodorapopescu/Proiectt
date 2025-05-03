@@ -40,18 +40,23 @@
 
     Class.forName("com.mysql.cj.jdbc.Driver");
 
-    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-
-        preparedStatement.setString(1, username);
-        ResultSet rs = preparedStatement.executeQuery();
-
-        if (rs.next()) {
-            id = rs.getInt("id");
-            userType = rs.getInt("tip");
-            userdep = rs.getInt("id_dep");
-
-            if (userType != 4) {
+    
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                        "dp.denumire_completa AS denumire FROM useri u " +
+                        "JOIN tipuri t ON u.tip = t.tip " +
+                        "JOIN departament d ON u.id_dep = d.id_dep " +
+                        "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                        "WHERE u.username = ?")) {
+                preparedStatement.setString(1, username);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	// extrag date despre userul curent
+                    id = rs.getInt("id");
+                    userType = rs.getInt("tip");
+                    userdep = rs.getInt("id_dep");
+                    String functie = rs.getString("functie");
+                    if (functie.compareTo("Administrator") != 0) {  
                 String query = "SELECT * FROM teme WHERE id_usr = ?";
                 try (PreparedStatement stmt = connection.prepareStatement(query)) {
                     stmt.setInt(1, id);

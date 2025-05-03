@@ -3,7 +3,7 @@
 <%@ page import="java.time.LocalDate, java.time.format.DateTimeFormatter" %>
 
 <%
-    // Obținem sesiunea curentă
+    // Validare sesiune
     HttpSession sesi = request.getSession(false);
     if (sesi == null) {
         out.println("<script>alert('Nu există sesiune activă!');</script>");
@@ -19,7 +19,7 @@
     }
 
     String username = currentUser.getUsername();
-    int userdep = 0, id = 0, userType = 0;
+    int userdep = 0, id = 0, userType = 0, ierarhie = 0;
 
     // Setăm culorile implicite
     String accent = "#10439F";
@@ -28,53 +28,66 @@
     String text = "#333";
     String card = "#ECEDFA";
     String hover = "#ECEDFA";
+    String functie = "";
 
-    // Obținem acțiunea din URL (parametrul "action")
+    // Obținem acțiunea din URL
     String action = request.getParameter("action");
     if (action == null) {
-        action = "view"; // Acțiunea implicită
+        action = "view";
     }
 
-    // Stocăm tipul utilizatorului în sesiune pentru servleturi
+    // Încărcăm datele utilizatorului
     Class.forName("com.mysql.cj.jdbc.Driver");
-
-    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
-
-        preparedStatement.setString(1, username);
-        ResultSet rs = preparedStatement.executeQuery();
-
-        if (rs.next()) {
-            id = rs.getInt("id");
-            userType = rs.getInt("tip");
-            userdep = rs.getInt("id_dep");
-            
-            // Stocăm tipul utilizatorului în sesiune
-            sesi.setAttribute("userTip", userType);
-
-            if (userType != 4) {
-                String query = "SELECT * FROM teme WHERE id_usr = ?";
-                try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                    stmt.setInt(1, id);
-                    try (ResultSet rs2 = stmt.executeQuery()) {
-                        if (rs2.next()) {
-                            accent = rs2.getString("accent");
-                            clr = rs2.getString("clr");
-                            sidebar = rs2.getString("sidebar");
-                            text = rs2.getString("text");
-                            card = rs2.getString("card");
-                            hover = rs2.getString("hover");
+    
+    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+        String query = "SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                "dp.denumire_completa AS denumire FROM useri u " +
+                "JOIN tipuri t ON u.tip = t.tip " +
+                "JOIN departament d ON u.id_dep = d.id_dep " +
+                "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                "WHERE u.username = ?";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, username);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    id = rs.getInt("id");
+                    userType = rs.getInt("tip");
+                    userdep = rs.getInt("id_dep");
+                    sesi.setAttribute("userTip", userType);
+                    sesi.setAttribute("userDep", userdep);
+                    functie = rs.getString("functie");
+                    ierarhie = rs.getInt("ierarhie");
+                    if (functie.equals("Administrator")) {
+                        String query2 = "SELECT * FROM teme WHERE id_usr = ?";
+                        try (PreparedStatement stmt = connection.prepareStatement(query2)) {
+                            stmt.setInt(1, id);
+                            try (ResultSet rs2 = stmt.executeQuery()) {
+                                if (rs2.next()) {
+                                    accent = rs2.getString("accent");
+                                    clr = rs2.getString("clr");
+                                    sidebar = rs2.getString("sidebar");
+                                    text = rs2.getString("text");
+                                    card = rs2.getString("card");
+                                    hover = rs2.getString("hover");
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
 
     // Funcție helper pentru a determina rolul utilizatorului
-    boolean isDirector = userType == 0 || userType > 15;
-    boolean isSef = userType == 3 || (userType >= 10 && userType <= 15);
-    boolean isUtilizatorNormal = !isDirector && !isSef; // tipuri 1, 2, 5-9
+    boolean isDirector = (ierarhie < 3) ;
+    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+    boolean isIncepator = (ierarhie >= 10);
+    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+    boolean isAdmin = (functie.compareTo("Administrator") == 0);
+    
 %>
 
 <!DOCTYPE html>
@@ -84,72 +97,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!--=============== REMIXICONS ===============-->
+    <!-- External Resources -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
-    
-    <!--=============== jQuery ===============-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!--=============== icon ===============-->
     <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     
     <style>
+        :root {
+            --accent: <%= accent %>;
+            --clr: <%= clr %>;
+            --sidebar: <%= sidebar %>;
+            --text: <%= text %>;
+            --card: <%= card %>;
+            --hover: <%= hover %>;
+        }
+        
         body {
             font-family: 'Arial', sans-serif;
-            background-color: <%= clr %>;
-            color: <%= text %>;
+            background-color: var(--clr);
+            color: var(--text);
             margin: 0;
             padding: 0;
         }
         
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: <%=clr%>;
-            border-radius: 2rem;
-        }
-        
-        .modal-content {
-            background-color: <%=sidebar%>;
-            border-radius: 2rem;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-        }
-        
-        .close {
-            background-color: <%=sidebar%>;
-            color: <%=accent%>;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        a, a:visited, a:hover, a:active {
-            color: #eaeaea !important;
-            text-decoration: none;
-        }
-        
         .main-container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 40px auto;
             padding: 20px;
             background: white;
@@ -158,67 +132,94 @@
         }
         
         .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin-bottom: 30px;
         }
         
         .action-button {
-            width: 100%;
             padding: 15px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background-color: <%=accent%>;
+            background-color: var(--accent);
             color: white;
+            text-align: center;
+            text-decoration: none;
         }
         
         .action-button:hover {
             opacity: 0.9;
-            background-color: <%=hover%>;
+            transform: translateY(-2px);
         }
         
         .form-container {
             background: #f5f5f5;
             padding: 30px;
-            border-radius: 20px;
+            border-radius: 8px;
             margin-top: 20px;
         }
         
-        .form-container h2 {
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
-        
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
+            color: var(--text);
         }
         
-        .form-group input, .form-group select, .form-group textarea {
+        .form-control {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
+            transition: border-color 0.3s;
         }
         
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
+        .form-control:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(90, 86, 185, 0.2);
         }
         
-        .submit-button {
-            background-color: <%=accent%>;
+        .proiecte-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .proiecte-table th, .proiecte-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        
+        .proiecte-table th {
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .proiecte-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .proiecte-table tr:hover {
+            background-color: var(--hover);
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
             color: white;
             padding: 12px 24px;
             border: none;
@@ -226,58 +227,40 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 20px;
+            transition: all 0.3s ease;
         }
         
-        .submit-button:hover {
-            background-color: <%=hover%>;
-        }
-        
-        .proiecte-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .proiecte-table th, .proiecte-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        
-        .proiecte-table th {
-            background-color: <%=accent%>;
-            color: white;
-        }
-        
-        .proiecte-table tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
         }
         
         .table-button {
-            padding: 5px 10px;
+            padding: 8px 12px;
             margin: 0 5px;
             border: none;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            transition: all 0.3s ease;
         }
         
-        .modify-button {
+        .btn-edit {
             background-color: #4CAF50;
             color: white;
         }
         
-        .team-button {
+        .btn-team {
             background-color: #2196F3;
             color: white;
         }
         
-        .delete-button {
+        .btn-delete {
             background-color: #f44336;
             color: white;
         }
         
-        .back-button {
+        .btn-back {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
@@ -285,22 +268,27 @@
             color: white !important;
             text-decoration: none;
             border-radius: 5px;
+            transition: all 0.3s ease;
         }
         
-        .member-checkbox {
-            margin-right: 10px;
+        .btn-back:hover {
+            background-color: #555;
         }
         
         .members-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 10px;
-            text-align: left;
             margin-top: 15px;
         }
         
+        .member-checkbox {
+            margin-right: 10px;
+        }
+        
         h1, h2, h3 {
-            color: <%=accent%>;
+            color: var(--accent);
+            margin-bottom: 20px;
         }
         
         .alert {
@@ -321,9 +309,45 @@
             background-color: #f2dede;
             border-color: #ebccd1;
         }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: var(--sidebar);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+        }
+        
+        .close {
+            color: var(--accent);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
     </style>
 </head>
-<body style="--bg:<%=accent%>; --clr:<%=clr%>; --sd:<%=sidebar%>;">
+<body>
     <div class="main-container">
         <h1>Administrare Proiecte</h1>
         
@@ -359,12 +383,12 @@
         
         <% if ("view".equals(action)) { %>
             <div class="action-buttons">
-                <button class="action-button" onclick="window.location.href='administrare_proiecte.jsp?action=add'">
-                    Adaugă proiect
-                </button>
-                <button class="action-button" onclick="window.location.href='administrare_proiecte.jsp?action=list'">
-                    Vizualizare și modificare proiecte
-                </button>
+                <a href="administrare_proiecte.jsp?action=add" class="action-button">
+                    <i class="ri-add-line"></i> Adaugă proiect
+                </a>
+                <a href="administrare_proiecte.jsp?action=list" class="action-button">
+                    <i class="ri-list-check"></i> Vizualizare și modificare proiecte
+                </a>
             </div>
             
         <% } else if ("add".equals(action)) { %>
@@ -373,23 +397,23 @@
                 <form method="POST" action="AAA">
                     <div class="form-group">
                         <label for="nume">Nume proiect:</label>
-                        <input type="text" id="nume" name="nume" required>
+                        <input type="text" id="nume" name="nume" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="descriere">Descriere:</label>
-                        <textarea id="descriere" name="descriere" required></textarea>
+                        <textarea id="descriere" name="descriere" class="form-control" rows="4" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="start">Data început:</label>
-                        <input type="date" id="start" name="start" required>
+                        <input type="date" id="start" name="start" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="end">Data sfârșit:</label>
-                        <input type="date" id="end" name="end" required>
+                        <input type="date" id="end" name="end" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="manager">Manager proiect:</label>
-                        <select id="manager" name="supervizor" required>
+                        <select id="manager" name="supervizor" class="form-control" required>
                             <option value="">-- Selectați --</option>
                             <%
                             try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
@@ -412,69 +436,73 @@
                         </select>
                     </div>
                     <div style="text-align: center;">
-                        <button type="submit" class="submit-button">Adaugă Proiect</button>
+                        <button type="submit" class="btn-primary">Adaugă Proiect</button>
                     </div>
                 </form>
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="administrare_proiecte.jsp" class="back-button">Înapoi</a>
+                <div style="text-align: center;">
+                    <a href="administrare_proiecte.jsp" class="btn-back">← Înapoi</a>
                 </div>
             </div>
             
         <% } else if ("list".equals(action)) { %>
             <h2>Vizualizare și modificare proiecte</h2>
-            <table class="proiecte-table">
-                <thead>
-                    <tr>
-                        <th>Nr. crt</th>
-                        <th>Nume proiect</th>
-                        <th>Modificare</th>
-                        <th>Echipe</th>
-                        <th>Ștergere</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%
-                    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                        String sql = "SELECT p.id, p.nume FROM proiecte p ORDER BY p.nume";
-                        try (Statement stmt = conn.createStatement();
-                             ResultSet rs = stmt.executeQuery(sql)) {
-                            
-                            int counter = 1;
-                            while (rs.next()) {
-                    %>
+            <div class="table-responsive">
+                <table class="proiecte-table">
+                    <thead>
                         <tr>
-                            <td><%= counter++ %></td>
-                            <td><%= rs.getString("nume") %></td>
-                            <td>
-                                <button class="table-button modify-button" 
-                                        onclick="window.location.href='administrare_proiecte.jsp?action=edit&id=<%= rs.getInt("id") %>'">
-                                    ✏
-                                </button>
-                            </td>
-                            <td>
-                                <button class="table-button team-button" 
-                                        onclick="window.location.href='administrare_proiecte.jsp?action=teams&id=<%= rs.getInt("id") %>'">
-                                    👥
-                                </button>
-                            </td>
-                            <td>
-                                <button class="table-button delete-button" 
-                                        onclick="deleteProiect(<%= rs.getInt("id") %>)">
-                                    ❌
-                                </button>
-                            </td>
+                            <th>Nr. crt</th>
+                            <th>Nume proiect</th>
+                            <th>Manager</th>
+                            <th>Acțiuni</th>
                         </tr>
-                    <%
+                    </thead>
+                    <tbody>
+                        <%
+                        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            String sql = "SELECT p.id, p.nume, u.nume as manager_nume, u.prenume as manager_prenume " +
+                                       "FROM proiecte p " +
+                                       "LEFT JOIN useri u ON p.supervizor = u.id " +
+                                       "ORDER BY p.nume";
+                            try (Statement stmt = conn.createStatement();
+                                 ResultSet rs = stmt.executeQuery(sql)) {
+                                
+                                int counter = 1;
+                                while (rs.next()) {
+                        %>
+                            <tr>
+                                <td><%= counter++ %></td>
+                                <td><%= rs.getString("nume") %></td>
+                                <td><%= rs.getString("manager_nume") %> <%= rs.getString("manager_prenume") %></td>
+                                <td>
+                                    <button class="table-button btn-edit" 
+                                            onclick="window.location.href='administrare_proiecte.jsp?action=edit&id=<%= rs.getInt("id") %>'"
+                                            title="Modifică">
+                                        <i class="ri-pencil-line"></i>
+                                    </button>
+                                    <button class="table-button btn-team" 
+                                            onclick="window.location.href='administrare_proiecte.jsp?action=teams&id=<%= rs.getInt("id") %>'"
+                                            title="Echipe">
+                                        <i class="ri-team-line"></i>
+                                    </button>
+                                    <button class="table-button btn-delete" 
+                                            onclick="deleteProiect(<%= rs.getInt("id") %>)"
+                                            title="Șterge">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <%
+                                }
                             }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
                         }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    %>
-                </tbody>
-            </table>
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="administrare_proiecte.jsp" class="back-button">Înapoi</a>
+                        %>
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center;">
+                <a href="administrare_proiecte.jsp" class="btn-back">← Înapoi</a>
             </div>
             
         <% } else if ("edit".equals(action)) { 
@@ -492,23 +520,23 @@
                     <input type="hidden" name="id" value="<%= idProiect %>">
                     <div class="form-group">
                         <label for="nume">Nume proiect:</label>
-                        <input type="text" id="nume" name="nume" value="<%= rs.getString("nume") %>" required>
+                        <input type="text" id="nume" name="nume" class="form-control" value="<%= rs.getString("nume") %>" required>
                     </div>
                     <div class="form-group">
                         <label for="descriere">Descriere:</label>
-                        <textarea id="descriere" name="descriere" required><%= rs.getString("descriere") %></textarea>
+                        <textarea id="descriere" name="descriere" class="form-control" rows="4" required><%= rs.getString("descriere") %></textarea>
                     </div>
                     <div class="form-group">
                         <label for="start">Data început:</label>
-                        <input type="date" id="start" name="start" value="<%= rs.getDate("start") %>" required>
+                        <input type="date" id="start" name="start" class="form-control" value="<%= rs.getDate("start") %>" required>
                     </div>
                     <div class="form-group">
                         <label for="end">Data sfârșit:</label>
-                        <input type="date" id="end" name="end" value="<%= rs.getDate("end") %>" required>
+                        <input type="date" id="end" name="end" class="form-control" value="<%= rs.getDate("end") %>" required>
                     </div>
                     <div class="form-group">
                         <label for="manager">Manager proiect:</label>
-                        <select id="manager" name="supervizor" required>
+                        <select id="manager" name="supervizor" class="form-control" required>
                             <%
                             String sql2 = "SELECT id, nume, prenume FROM useri WHERE tip >= 10 AND activ = 1 ORDER BY nume, prenume";
                             try (Statement stmt2 = conn.createStatement();
@@ -527,11 +555,11 @@
                         </select>
                     </div>
                     <div style="text-align: center;">
-                        <button type="submit" class="submit-button">Salvează Modificările</button>
+                        <button type="submit" class="btn-primary">Salvează Modificările</button>
                     </div>
                 </form>
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="administrare_proiecte.jsp?action=list" class="back-button">Înapoi</a>
+                <div style="text-align: center;">
+                    <a href="administrare_proiecte.jsp?action=list" class="btn-back">← Înapoi</a>
                 </div>
             </div>
         <%
@@ -559,11 +587,11 @@
                     <input type="hidden" name="id_prj" value="<%= idProiect %>">
                     <div class="form-group">
                         <label for="nume_echipa">Nume echipă:</label>
-                        <input type="text" id="nume_echipa" name="nume" required>
+                        <input type="text" id="nume_echipa" name="nume" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="supervizor_echipa">Supervizor echipă:</label>
-                        <select id="supervizor_echipa" name="supervizor" required>
+                        <select id="supervizor_echipa" name="supervizor" class="form-control" required>
                             <option value="">-- Selectați --</option>
                             <%
                             String sqlSupervizori = "SELECT id, nume, prenume FROM useri WHERE tip >= 8 AND activ = 1 ORDER BY nume, prenume";
@@ -604,7 +632,7 @@
                     </div>
                     
                     <div style="text-align: center;">
-                        <button type="submit" class="submit-button">Adaugă Echipă</button>
+                        <button type="submit" class="btn-primary">Adaugă Echipă</button>
                     </div>
                 </form>
                 
@@ -635,13 +663,15 @@
                                 <td><%= rsEchipe.getString("nume") %></td>
                                 <td><%= rsEchipe.getString("supervizor_nume") %> <%= rsEchipe.getString("supervizor_prenume") %></td>
                                 <td>
-                                    <button class="table-button team-button" 
-                                            onclick="window.location.href='administrare_proiecte.jsp?action=members&id_echipa=<%= rsEchipe.getInt("id") %>&id_prj=<%= idProiect %>'">
-                                        👥 Membri
+                                    <button class="table-button btn-team" 
+                                            onclick="window.location.href='administrare_proiecte.jsp?action=members&id_echipa=<%= rsEchipe.getInt("id") %>&id_prj=<%= idProiect %>'"
+                                            title="Membri">
+                                        <i class="ri-team-line"></i> Membri
                                     </button>
-                                    <button class="table-button delete-button" 
-                                            onclick="deleteEchipa(<%= rsEchipe.getInt("id") %>, <%= idProiect %>)">
-                                        ❌
+                                    <button class="table-button btn-delete" 
+                                            onclick="deleteEchipa(<%= rsEchipe.getInt("id") %>, <%= idProiect %>)"
+                                            title="Șterge">
+                                        <i class="ri-delete-bin-line"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -661,7 +691,7 @@
                 </table>
                 
                 <div style="text-align: center; margin-top: 20px;">
-                    <a href="administrare_proiecte.jsp?action=list" class="back-button">Înapoi</a>
+                    <a href="administrare_proiecte.jsp?action=list" class="btn-back">← Înapoi</a>
                 </div>
             </div>
         <%
@@ -698,7 +728,6 @@
                         <label>Adaugă membri noi:</label>
                         <div class="members-list">
                             <%
-                            // Selectează angajații care nu sunt deja în echipă
                             String sqlAngajatiNeinclusi = "SELECT u.id, u.nume, u.prenume FROM useri u " +
                                                         "WHERE u.activ = 1 " +
                                                         "AND u.id_echipa IS NULL " +
@@ -722,7 +751,7 @@
                                     } else {
                             %>
                                 <div style="text-align: center; margin-top: 20px;">
-                                    <button type="submit" class="submit-button">Adaugă Membri</button>
+                                    <button type="submit" class="btn-primary">Adaugă Membri</button>
                                 </div>
                             <%
                                     }
@@ -762,9 +791,10 @@
                                 <td><%= rsMembri.getString("prenume") %></td>
                                 <td><%= rsMembri.getString("pozitie") %></td>
                                 <td>
-                                    <button class="table-button delete-button" 
-                                            onclick="removeMembru(<%= rsMembri.getInt("id") %>, <%= idEchipa %>, <%= idProiect %>)">
-                                        Elimină
+                                    <button class="table-button btn-delete" 
+                                            onclick="removeMembru(<%= rsMembri.getInt("id") %>, <%= idEchipa %>, <%= idProiect %>)"
+                                            title="Elimină">
+                                        <i class="ri-delete-bin-line"></i> Elimină
                                     </button>
                                 </td>
                             </tr>
@@ -784,7 +814,7 @@
                 </table>
                 
                 <div style="text-align: center; margin-top: 20px;">
-                    <a href="administrare_proiecte.jsp?action=teams&id=<%= idProiect %>" class="back-button">Înapoi la echipe</a>
+                    <a href="administrare_proiecte.jsp?action=teams&id=<%= idProiect %>" class="btn-back">← Înapoi la echipe</a>
                 </div>
             </div>
         <%
@@ -797,85 +827,85 @@
         }
         %>
     </div>
-   
+
     <script>
-    function deleteProiect(idProiect) {
-        if (confirm('Sigur doriți să ștergeți acest proiect? Se vor șterge și echipele asociate!')) {
-            console.log("Trimitem cerere de ștergere pentru proiectul ID: " + idProiect);
-            $.ajax({
-                url: 'DeleteProiectServlet',
-                type: 'POST',
-                data: { id: idProiect },
-                dataType: 'json',
-                success: function(response) {
-                    console.log("Răspuns primit:", response);
-                    if (response.success) {
-                        alert('Proiectul a fost șters cu succes!');
-                        window.location.href = 'administrare_proiecte.jsp?action=list&success=true';
-                    } else {
-                        alert(response.message || 'Eroare la ștergerea proiectului!');
+        function deleteProiect(idProiect) {
+            if (confirm('Sigur doriți să ștergeți acest proiect? Se vor șterge și echipele asociate!')) {
+                console.log("Trimitem cerere de ștergere pentru proiectul ID: " + idProiect);
+                $.ajax({
+                    url: 'DeleteProiectServlet',
+                    type: 'POST',
+                    data: { id: idProiect },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log("Răspuns primit:", response);
+                        if (response.success) {
+                            alert('Proiectul a fost șters cu succes!');
+                            window.location.href = 'administrare_proiecte.jsp?action=list&success=true';
+                        } else {
+                            alert(response.message || 'Eroare la ștergerea proiectului!');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Eroare AJAX:", status, error);
+                        console.log("Răspuns XHR:", xhr.responseText);
+                        alert('Eroare la conectarea cu serverul: ' + error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Eroare AJAX:", status, error);
-                    console.log("Răspuns XHR:", xhr.responseText);
-                    alert('Eroare la conectarea cu serverul: ' + error);
-                }
-            });
+                });
+            }
         }
-    }
         
-    function deleteEchipa(idEchipa, idProiect) {
-        if (confirm('Sigur doriți să ștergeți această echipă?')) {
-            console.log("Trimitem cerere de ștergere pentru echipa ID: " + idEchipa);
-            $.ajax({
-                url: 'DeleteEchipaServlet',
-                type: 'POST',
-                data: { id: idEchipa },
-                dataType: 'json',
-                success: function(response) {
-                    console.log("Răspuns primit:", response);
-                    if (response.success) {
-                        alert('Echipa a fost ștearsă cu succes!');
-                        window.location.href = 'administrare_proiecte.jsp?action=teams&id=' + idProiect + '&success=true';
-                    } else {
-                        alert(response.message || 'Eroare la ștergerea echipei!');
+        function deleteEchipa(idEchipa, idProiect) {
+            if (confirm('Sigur doriți să ștergeți această echipă?')) {
+                console.log("Trimitem cerere de ștergere pentru echipa ID: " + idEchipa);
+                $.ajax({
+                    url: 'DeleteEchipaServlet',
+                    type: 'POST',
+                    data: { id: idEchipa },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log("Răspuns primit:", response);
+                        if (response.success) {
+                            alert('Echipa a fost ștearsă cu succes!');
+                            window.location.href = 'administrare_proiecte.jsp?action=teams&id=' + idProiect + '&success=true';
+                        } else {
+                            alert(response.message || 'Eroare la ștergerea echipei!');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Eroare AJAX:", status, error);
+                        console.log("Răspuns XHR:", xhr.responseText);
+                        alert('Eroare la conectarea cu serverul: ' + error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Eroare AJAX:", status, error);
-                    console.log("Răspuns XHR:", xhr.responseText);
-                    alert('Eroare la conectarea cu serverul: ' + error);
-                }
-            });
+                });
+            }
         }
-    }
         
-    function removeMembru(idMembru, idEchipa, idProiect) {
-        if (confirm('Sigur doriți să eliminați acest membru din echipă?')) {
-            console.log("Trimitem cerere de eliminare pentru membrul ID: " + idMembru);
-            $.ajax({
-                url: 'RemoveMembruEchipaServlet',
-                type: 'POST',
-                data: { id: idMembru },
-                dataType: 'json',
-                success: function(response) {
-                    console.log("Răspuns primit:", response);
-                    if (response.success) {
-                        alert('Membrul a fost eliminat cu succes!');
-                        window.location.href = 'administrare_proiecte.jsp?action=members&id_echipa=' + idEchipa + '&id_prj=' + idProiect + '&success=true';
-                    } else {
-                        alert(response.message || 'Eroare la eliminarea membrului!');
+        function removeMembru(idMembru, idEchipa, idProiect) {
+            if (confirm('Sigur doriți să eliminați acest membru din echipă?')) {
+                console.log("Trimitem cerere de eliminare pentru membrul ID: " + idMembru);
+                $.ajax({
+                    url: 'RemoveMembruEchipaServlet',
+                    type: 'POST',
+                    data: { id: idMembru },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log("Răspuns primit:", response);
+                        if (response.success) {
+                            alert('Membrul a fost eliminat cu succes!');
+                            window.location.href = 'administrare_proiecte.jsp?action=members&id_echipa=' + idEchipa + '&id_prj=' + idProiect + '&success=true';
+                        } else {
+                            alert(response.message || 'Eroare la eliminarea membrului!');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Eroare AJAX:", status, error);
+                        console.log("Răspuns XHR:", xhr.responseText);
+                        alert('Eroare la conectarea cu serverul: ' + error);
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Eroare AJAX:", status, error);
-                    console.log("Răspuns XHR:", xhr.responseText);
-                    alert('Eroare la conectarea cu serverul: ' + error);
-                }
-            });
+                });
+            }
         }
-    }
     </script>
 </body>
 </html>

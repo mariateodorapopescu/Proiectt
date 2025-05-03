@@ -47,7 +47,13 @@ if (sesi != null) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-            preparedStatement = connection.prepareStatement("SELECT tip, prenume, id FROM useri WHERE username = ?");
+            preparedStatement = connection.prepareStatement(
+            		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie" +
+                            "dp.denumire_completa AS denumire_specifică FROM useri u " +
+                            "JOIN tipuri t ON u.tip = t.tip " +
+                            "JOIN departament d ON u.id_dep = d.id_dep " +
+                            "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                            "WHERE u.username = ?");
             preparedStatement.setString(1, username);
             rs = preparedStatement.executeQuery();
 
@@ -60,7 +66,16 @@ if (sesi != null) {
                 int userType = 0;
                 userType = rs.getInt("tip");
                 System.out.println(userType); // ok
-                
+                String functie = rs.getString("functie");
+                int ierarhie = rs.getInt("ierarhie");
+
+                // Funcție helper pentru a determina rolul utilizatorului
+                boolean isDirector = (ierarhie < 3) ;
+                boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                boolean isIncepator = (ierarhie >= 10);
+                boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                boolean isAdmin = (functie.compareTo("Administrator") == 0);
+
                 String accent = "##03346E";
                 String clr = "#d8d9e1";
                 String sidebar =  "#ecedfa";
@@ -86,7 +101,7 @@ if (sesi != null) {
                 }
 
                 // Check if the user type is not admin
-                if (userType != 4) {
+                if (!isAdmin) {
                     // Logic for non-admin users
                      try (PreparedStatement stmt = connection.prepareStatement("SELECT id FROM useri WHERE cnp = ?")) {
                             stmt.setString(1, cnp);

@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*, java.util.*, com.fasterxml.jackson.databind.ObjectMapper, bean.MyUser, jakarta.servlet.http.HttpSession" %>
 <%@ page import="java.time.LocalDate, java.time.format.DateTimeFormatter" %>
 
@@ -44,37 +43,54 @@
 
     Class.forName("com.mysql.cj.jdbc.Driver");
 
-    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM useri WHERE username = ?")) {
+    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+        // Corregeam query-ul - lipsea spațiul între ierarhie și dp
+        PreparedStatement userStmt = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                "dp.denumire_completa AS denumire FROM useri u " +
+                "JOIN tipuri t ON u.tip = t.tip " +
+                "JOIN departament d ON u.id_dep = d.id_dep " +
+                "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                "WHERE u.username = ?");
+        userStmt.setString(1, username);
+        ResultSet userRs = userStmt.executeQuery();
 
-        preparedStatement.setString(1, username);
-        ResultSet rs = preparedStatement.executeQuery();
+        if (!userRs.next()) {
+            throw new Exception("Utilizator negăsit");
+        }
 
-        if (rs.next()) {
-            id = rs.getInt("id");
-            userType = rs.getInt("tip");
-            userdep = rs.getInt("id_dep");
+        userType = userRs.getInt("tip");  // corectare: era int userType din nou
+        int userId = userRs.getInt("id");  // corectare: fără int
+        int userDep = userRs.getInt("id_dep");  // corectare: fără int
+        String prenume = userRs.getString("prenume");  // eliminat spațiul
+        String functie = userRs.getString("functie");  // eliminat spațiul
+        int ierarhie = userRs.getInt("ierarhie");  // eliminat spațiul
+        
+        // Funcție helper pentru a determina rolul utilizatorului
+        boolean isDirector = (ierarhie < 3);
+        boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+        boolean isIncepator = (ierarhie >= 10);
+        boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+        boolean isAdmin = (functie.compareTo("Administrator") == 0);
 
-            if (userType != 4) {
-                String query = "SELECT * FROM teme WHERE id_usr = ?";
-                try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                    stmt.setInt(1, id);
-                    try (ResultSet rs2 = stmt.executeQuery()) {
-                        if (rs2.next()) {
-                            accent = rs2.getString("accent");
-                            clr = rs2.getString("clr");
-                            sidebar = rs2.getString("sidebar");
-                            text = rs2.getString("text");
-                            card = rs2.getString("card");
-                            hover = rs2.getString("hover");
-                        }
+        if (!isAdmin) {
+            String query = "SELECT * FROM teme WHERE id_usr = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, userId);  // corectare: era id, trebuie userId
+                try (ResultSet rs2 = stmt.executeQuery()) {
+                    if (rs2.next()) {
+                        accent = rs2.getString("accent");
+                        clr = rs2.getString("clr");
+                        sidebar = rs2.getString("sidebar");
+                        text = rs2.getString("text");
+                        card = rs2.getString("card");
+                        hover = rs2.getString("hover");
                     }
                 }
             }
         }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-
-  
 %>
 
 <!DOCTYPE html>
@@ -85,7 +101,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
         <!--=============== REMIXICONS ===============-->
-        <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/remixicons@2.5.0/fonts/remixicon.css" rel="stylesheet">
     
         <!--=============== CSS ===============-->
         <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css"> 
