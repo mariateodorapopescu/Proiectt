@@ -68,7 +68,13 @@ DROP TABLE IF EXISTS
     sedii, 
     cereri_demisie, 
     notificari_general,
-    denumiri_pozitii;
+    denumiri_pozitii,
+    prezenta,
+    tipuri_evenimente,
+    evenimente,
+    participanti_evenimente,
+    notificari_task,
+    interviuri;
 
 -- 1. Tabele de bază (fără foreign keys)
 -- -----------------------------------------------------
@@ -744,6 +750,75 @@ CREATE TABLE IF NOT EXISTS notificari_general (
     citit BOOLEAN DEFAULT FALSE,
     data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_destinatar) REFERENCES useri(id)
+);
+
+CREATE TABLE interviuri (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    aplicare_id INT NOT NULL,
+    data_interviu DATE NOT NULL,
+    ora_interviu TIME NOT NULL,
+    locatie VARCHAR(255),
+    comentarii TEXT,
+    status VARCHAR(50) DEFAULT 'PROGRAMAT',
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (aplicare_id) REFERENCES aplicari(id)
+);
+
+-- Tabel prezență
+CREATE TABLE prezenta (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_ang INT NOT NULL,
+    data DATE NOT NULL,
+    ora TIME NOT NULL,
+    comentariu VARCHAR(500),
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    UNIQUE KEY uq_ang_data (id_ang, data)
+);
+
+-- Tabel tipuri evenimente
+CREATE TABLE tipuri_evenimente (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    denumire VARCHAR(50) NOT NULL
+);
+
+-- Tabel evenimente
+CREATE TABLE evenimente (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nume VARCHAR(255) NOT NULL,
+    tip INT NOT NULL,
+    data_start DATE NOT NULL,
+    ora_start TIME NOT NULL,
+    data_end DATE,
+    ora_end TIME,
+    locuri_max INT NOT NULL DEFAULT 30,
+    descriere TEXT,
+    locatie VARCHAR(255),
+    FOREIGN KEY (tip) REFERENCES tipuri_evenimente(id)
+);
+
+-- Tabel participanți evenimente
+CREATE TABLE participanti_evenimente (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_event INT NOT NULL,
+    id_ang INT NOT NULL,
+    data_inscriere TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    prezent BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_event) REFERENCES evenimente(id),
+    FOREIGN KEY (id_ang) REFERENCES useri(id),
+    UNIQUE KEY uq_event_ang (id_event, id_ang)
+);
+
+-- Tabel notificări task
+CREATE TABLE notificari_task (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_task INT NOT NULL,
+    id_ang INT NOT NULL,
+    tip_notificare VARCHAR(50) NOT NULL,
+    mesaj TEXT,
+    citit BOOLEAN DEFAULT FALSE,
+    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_task) REFERENCES tasks(id),
+    FOREIGN KEY (id_ang) REFERENCES useri(id)
 );
 
 -- -----------------------------------------------------
@@ -1725,6 +1800,11 @@ UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Auriu') WHER
 UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Indigo') WHERE id = 9;
 UPDATE useri SET culoare = (SELECT cod FROM colors WHERE culoare = 'Verde Smarald') WHERE id = 10;
 
+INSERT INTO tipuri_evenimente (id, denumire) VALUES
+(1, 'Workshop'),
+(2, 'Training'),
+(3, 'Conferință');
+
 -- Reactivează constrângerile FOREIGN KEY
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -1873,10 +1953,19 @@ ORDER BY l.oras;
 -- -----------------------------------------------------
 select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
 select * from istoric_incetari;
-select * from useri;
+SELECT DISTINCT u.*,  
+                t.denumire AS functie, 
+                t.ierarhie as ierarhie,
+                d.nume_dep,
+                dp.denumire_completa AS denumire_specifică
+FROM useri u 
+JOIN tipuri t ON u.tip = t.tip 
+JOIN departament d ON u.id_dep = d.id_dep 
+LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep;
+select * from denumiri_pozitii;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
 desc locatii_concedii;
 desc concedii;
 update useri set tip = 10 where username = "irina.c";
 SELECT strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;
-select * from tipuri;
+select * from tipuri join denumiri_pozitii on tip = tip_pozitie;
