@@ -6,11 +6,11 @@
 <%@ page import="jakarta.servlet.http.HttpSession" %>
 <%
 
-//structura unei pagini este astfel
-//verificare daca exista sesiune activa, utilizator conectat, 
-//extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
-//se mai extrag temele de culoare ale fiecarui utilizator
-//apoi se incarca pagina in sine
+//Structura unei pagini este astfel
+//Verificare daca exista sesiune activa, utilizator conectat, 
+//Extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
+//Se mai extrag temele de culoare ale fiecarui utilizator
+//Apoi se incarca pagina in sine
 
     HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
     if (sesi != null) {
@@ -27,15 +27,15 @@
                     preparedStatement.setString(1, username);
                     ResultSet rs = preparedStatement.executeQuery();
                     if (rs.next()) {
-                    	// extrag date despre userul curent
+                        // extrag date despre userul curent
                         int id = rs.getInt("id");
                         int userType = rs.getInt("tip");
                         int userdep = rs.getInt("id_dep");
                         String functie = rs.getString("functie");
                         if (functie.compareTo("Administrator") != 0) {   
-                    	// aflu data curenta, tot ca o interogare bd =(
-                    	String today = "";
-                   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                        // aflu data curenta, tot ca o interogare bd =(
+                        String today = "";
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
                             String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                                try (ResultSet rs2 = stmt.executeQuery()) {
@@ -48,33 +48,34 @@
                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                             e.printStackTrace();
                         }
-                   	 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
-                   	 String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
-                  	 String clr = "#d8d9e1";
-                  	 String sidebar = "#ECEDFA";
-                  	 String text = "#333";
-                  	 String card = "#ECEDFA";
-                  	 String hover = "#ECEDFA";
-                  	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                         String query = "SELECT * from teme where id_usr = ?";
-                         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                             stmt.setInt(1, id);
-                             try (ResultSet rs2 = stmt.executeQuery()) {
-                                 if (rs2.next()) {
-                                   accent =  rs2.getString("accent");
-                                   clr =  rs2.getString("clr");
-                                   sidebar =  rs2.getString("sidebar");
-                                   text = rs2.getString("text");
-                                   card =  rs2.getString("card");
-                                   hover = rs2.getString("hover");
+                        // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                        String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                        String clr = "#d8d9e1";
+                        String sidebar = "#ECEDFA";
+                        String text = "#333";
+                        String card = "#ECEDFA";
+                        String hover = "#ECEDFA";
+                        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
                                  }
                              }
+                        } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
                          }
-                    } catch (SQLException e) {
-                         out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                         e.printStackTrace();
-                     }
-                    	%>
+                        %>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
@@ -86,68 +87,55 @@
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
+    
+    <!-- =============== JQUERY =============== -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- =============== ANIMATIONS =============== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <style>
         a, a:visited, a:hover, a:active{color:white !important}
+        
+        /* Suggestions styling */
         .suggestions-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 10px 20px;
-}
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 20px;
+            animation: fadeIn 0.5s;
+        }
 
-.suggestion-button {
-    background-color: #f1f1f1;
-    border: 1px solid #ddd;
-    border-radius: 18px;
-    padding: 8px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    white-space: nowrap;
-}
+        .suggestion-button {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 18px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-.suggestion-button:hover {
-    background-color: #e6e6e6;
-    transform: translateY(-1px);
-}
+        .suggestion-button:hover {
+            background-color: #e6e6e6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
 
-.suggestion-button:active {
-    transform: translateY(1px);
-}
+        .suggestion-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
 
-.input-container {
-    display: flex;
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .suggestions-container {
-        justify-content: center;
-    }
-    
-    .suggestion-button {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-}
-    </style>
-    
-   <!--=============== icon ===============-->
-    <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
-    
-    <!--=============== titlu ===============-->
-    <title>Acasa</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
+        .input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
         }
         
+        /* Chat container and messages */
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -157,7 +145,7 @@
         .chat-container {
             background-color: #fff;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -165,39 +153,51 @@
         }
         
         .chat-header {
-            background-color: #007bff;
+            background-color: var(--bg, #007bff);
             color: white;
             padding: 15px 20px;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 22px;
             border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-status {
+            font-size: 14px;
+            opacity: 0.8;
         }
         
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            scroll-behavior: smooth;
         }
         
         .message {
             margin-bottom: 15px;
             max-width: 80%;
-            animation: fadeIn 0.3s;
+            animation: fadeInUp 0.3s;
+            position: relative;
         }
         
         .user-message {
             margin-left: auto;
-            background-color: #007bff;
+            background-color: var(--bg, #007bff);
             color: white;
             border-radius: 18px 18px 3px 18px;
-            padding: 10px 15px;
+            padding: 12px 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .bot-message {
             margin-right: auto;
             background-color: #f1f1f1;
             border-radius: 18px 18px 18px 3px;
-            padding: 10px 15px;
+            padding: 12px 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .message-time {
@@ -217,6 +217,9 @@
         .typing-indicator {
             display: flex;
             align-items: center;
+            padding: 10px 15px;
+            background-color: #f1f1f1;
+            border-radius: 18px;
         }
         
         .typing-dot {
@@ -225,38 +228,47 @@
             background-color: #888;
             border-radius: 50%;
             margin: 0 2px;
-            animation: pulse 1.5s infinite;
+            animation: bounce 1.5s infinite;
         }
         
         .typing-dot:nth-child(2) {
-            animation-delay: 0.5s;
+            animation-delay: 0.3s;
         }
         
         .typing-dot:nth-child(3) {
-            animation-delay: 1s;
+            animation-delay: 0.6s;
         }
         
+        /* Input area */
         .chat-input {
             display: flex;
             padding: 15px;
             border-top: 1px solid #e0e0e0;
             background-color: #fff;
+            position: relative;
         }
         
         .chat-input textarea {
             flex: 1;
             border: 1px solid #ddd;
-            border-radius: 20px;
-            padding: 12px 15px;
+            border-radius: 22px;
+            padding: 12px 45px 12px 15px;
             font-size: 16px;
             resize: none;
             outline: none;
             max-height: 120px;
             min-height: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .chat-input textarea:focus {
+            border-color: var(--bg, #007bff);
+            box-shadow: 0 1px 5px rgba(0,123,255,0.3);
         }
         
         .chat-input button {
-            background-color: #007bff;
+            background-color: var(--bg, #007bff);
             color: white;
             border: none;
             border-radius: 50%;
@@ -267,16 +279,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         .chat-input button:hover {
             background-color: #0069d9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .chat-input button:active {
+            transform: translateY(0);
         }
         
         .chat-input button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         /* Table styling */
@@ -287,18 +308,20 @@
             font-size: 14px;
             border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .result-table th {
-            background-color: #f1f1f1;
+            background-color: #f5f5f5;
             color: #333;
             font-weight: bold;
             text-align: left;
-            padding: 10px;
+            padding: 12px;
+            border-bottom: 2px solid #ddd;
         }
         
         .result-table td {
-            padding: 8px 10px;
+            padding: 10px 12px;
             border-top: 1px solid #eee;
         }
         
@@ -306,49 +329,169 @@
             background-color: #f9f9f9;
         }
         
-        /* Pre formatted text */
-        pre {
-            background-color: #f8f8f8;
-            padding: 10px;
-            border-radius: 5px;
-            white-space: pre-wrap;
-            font-family: Consolas, Monaco, 'Andale Mono', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            max-width: 100%;
+        .result-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        /* Scrollable table container for larger datasets */
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        /* Action buttons near tables for export, etc. */
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin: 5px 0 15px;
+        }
+        
+        .table-action-button {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .table-action-button:hover {
+            background-color: #e6e6e6;
         }
         
         /* Animations */
         @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* Help tooltip */
+        .help-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .help-icon {
+            width: 22px;
+            height: 22px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .tooltip-content {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: white;
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 250px;
+            z-index: 10;
+            display: none;
+            font-weight: normal;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .help-tooltip:hover .tooltip-content {
+            display: block;
+            animation: fadeIn 0.3s;
         }
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
             .message {
                 max-width: 90%;
             }
+            
+            .suggestions-container {
+                justify-content: center;
+            }
+            
+            .suggestion-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            .chat-header {
+                padding: 12px 15px;
+                font-size: 18px;
+            }
         }
     </style>
-  
+    
+    <!--=============== icon ===============-->
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <!--=============== titlu ===============-->
+    <title>Asistent HR</title>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
     <div class="container">
         <div class="chat-container">
             <div class="chat-header">
-                HR Chat Assistant
+                <div>Asistent HR</div>
+                <div class="chat-status">
+                    <span id="statusText">Online</span>
+                    <div class="help-tooltip">
+                        <div class="help-icon">?</div>
+                        <div class="tooltip-content">
+                            <strong>Cum să folosești asistentul:</strong><br>
+                            - Întreabă despre angajați, departamente, concedii<br>
+                            - Solicită informații specifice sau statistici<br>
+                            - Folosește limbaj natural în întrebări<br>
+                            - Spune "Da" pentru a vedea detalii<br>
+                            - Încearcă sugestiile de mai jos
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot-message">
-                    Bine ați venit! Sunt asistentul HR virtual. Îmi puteți adresa întrebări despre angajați, departamente, concedii, adeverințe sau proiecte, iar eu voi extrage informațiile necesare din baza de date. Cum vă pot ajuta astăzi?
+                    <p>Bine ați venit! Sunt asistentul HR virtual. Vă pot oferi informații despre:</p>
+                    <ul>
+                        <li>Angajați și departamente</li>
+                        <li>Concedii și adeverințe</li>
+                        <li>Poziții, roluri și salarii</li>
+                        <li>Proiecte și echipe</li>
+                    </ul>
+                    <p>Cum vă pot ajuta astăzi?</p>
                 </div>
+            </div>
+            <div class="suggestions-container" id="suggestionsContainer">
+                <!-- Suggestions will be added here dynamically -->
             </div>
             <div class="chat-input">
                 <textarea id="userInput" placeholder="Scrieți un mesaj..." rows="1" oninput="adjustTextareaHeight(this)"></textarea>
@@ -362,23 +505,161 @@
     </div>
     
     <script>
- // Add a console debug line to check if script is loading
-    console.log('Chat script initialized');
-
+    // Chat component initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Chat interface initialized');
+        
+        // Add default suggestions
+        addDefaultSuggestions();
+        
+        // Focus input field
+        document.getElementById('userInput').focus();
+        
+        // Set up event listeners
+        setupEventListeners();
+    });
+    
     // DOM elements
     const chatMessages = document.getElementById('chatMessages');
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
+    const suggestionsContainer = document.getElementById('suggestionsContainer');
+    
+    // Setup event listeners
+    function setupEventListeners() {
+        // Enter key to send message
+        userInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Click event for send button
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Click event for chat messages (for handling follow-ups)
+        chatMessages.addEventListener('click', function(event) {
+            if (event.target && event.target.closest('.user-message')) {
+                const text = event.target.closest('.user-message').textContent.toLowerCase().trim();
+                if (isFollowUpResponse(text)) {
+                    handleFollowUp();
+                }
+            }
+        });
+    }
 
-    // Add event listener for Enter key
-    userInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            sendMessage();
+    // Add default suggestions
+    function addDefaultSuggestions() {
+        const suggestions = [
+            'Câți angajați sunt în departamentul HR?',
+            'Cine este în concediu astăzi?',
+            'Arată-mi departamentele din firmă',
+            'Care sunt salariile pozițiilor din IT?',
+            'Ce tipuri de poziții există în departamentul HR?',
+            'Proiecte active în prezent',
+            'Adeverințe în așteptare'
+        ];
+        
+        suggestionsContainer.innerHTML = '';
+        
+        suggestions.forEach(suggestion => {
+            const button = document.createElement('button');
+            button.className = 'suggestion-button';
+            button.textContent = suggestion;
+            button.addEventListener('click', function() {
+                userInput.value = suggestion;
+                adjustTextareaHeight(userInput);
+                sendMessage();
+            });
+            
+            suggestionsContainer.appendChild(button);
+        });
+    }
+    
+    // Add context-aware suggestions based on previous interactions
+    function addContextSuggestions(context) {
+        const contextSuggestions = {
+            'angajați': [
+                'Câți angajați sunt în total?',
+                'Care sunt angajații din departamentul IT?',
+                'Angajații cu cele mai mari salarii'
+            ],
+            'departamente': [
+                'Care departament are cei mai mulți angajați?',
+                'Câte departamente avem în firmă?',
+                'Locațiile departamentelor'
+            ],
+            'concedii': [
+                'Cine este în concediu astăzi?',
+                'Concedii planificate pentru luna aceasta',
+                'Concedii de Crăciun'
+            ],
+            'poziții': [
+                'Ce tipuri de poziții există?',
+                'Care sunt pozițiile din IT?',
+                'Pozițiile cu cele mai mari salarii'
+            ],
+            'salarii': [
+                'Care este salariul mediu în firmă?',
+                'Top 5 cele mai mari salarii',
+                'Salarii pe departamente'
+            ],
+            'proiecte': [
+                'Câte proiecte active avem?',
+                'Cine lucrează la proiectele active?',
+                'Status-ul taskurilor din proiecte'
+            ]
+        };
+        
+        // Find the appropriate context
+        let suggestions = [];
+        for (const [key, value] of Object.entries(contextSuggestions)) {
+            if (context.toLowerCase().includes(key)) {
+                suggestions = value;
+                break;
+            }
         }
-    });
-
-    // Function to send user message
+        
+        // If no specific context found, use default suggestions
+        if (suggestions.length === 0) {
+            return;
+        }
+        
+        // Update suggestions
+        suggestionsContainer.innerHTML = '';
+        
+        suggestions.forEach(suggestion => {
+            const button = document.createElement('button');
+            button.className = 'suggestion-button';
+            button.textContent = suggestion;
+            button.addEventListener('click', function() {
+                userInput.value = suggestion;
+                adjustTextareaHeight(userInput);
+                sendMessage();
+            });
+            
+            suggestionsContainer.appendChild(button);
+        });
+    }
+    
+    // Check if text is a follow-up response
+    function isFollowUpResponse(text) {
+        const followUpPhrases = [
+            'da', 'te rog', 'sigur', 'bineințeles', 'bineinteles', 'vreau', 
+            'arata-mi mai multe', 'arată-mi mai multe', 'detalii'
+        ];
+        
+        return followUpPhrases.some(phrase => text.includes(phrase));
+    }
+    
+    // Handle follow-up responses
+    function handleFollowUp() {
+        // This will be handled by the server when the message is sent
+        // The server has stored the previous query context and data
+    }
+    
+    // Send message to server
     function sendMessage() {
         const message = userInput.value.trim();
         if (message === '') return;
@@ -388,12 +669,15 @@
         // Add user message to chat
         addMessage(message, 'user');
         
-        // Clear input
+        // Clear input and adjust height
         userInput.value = '';
         adjustTextareaHeight(userInput);
         
         // Show typing indicator
         showTypingIndicator();
+        
+        // Disable input while processing
+        setInputEnabled(false);
         
         // Get the context path
         const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
@@ -430,27 +714,53 @@
             // Hide typing indicator
             hideTypingIndicator();
             
+            // Re-enable input
+            setInputEnabled(true);
+            
             // Handle different response types
             if (data.type === 'text') {
                 // Simple text response
                 addMessage(data.message, 'bot');
+                
+                // Update suggestions based on message context
+                if (data.message && data.message.length > 10) {
+                    addContextSuggestions(data.message);
+                }
             } else if (data.type === 'table') {
                 // Table response with initial message
                 addMessage(data.message, 'bot');
                 
                 // If data is available and the message is asking for confirmation,
-                // store the data for later use in follow-up responses
+                // show the confirmation buttons
                 if (data.data && data.data.length > 0 && 
                     (data.message.includes('Doriți') || data.message.includes('doriti'))) {
+                    
+                    // Store data for possible confirmation
                     window.lastQueryData = data.data;
+                    
+                    // Add confirmation buttons
+                    addConfirmationButtons();
+                    
+                    // Update suggestions based on data context
+                    let contextString = getContextFromData(data.data);
+                    addContextSuggestions(contextString);
+                    
                 } else if (data.data && data.data.length > 0) {
                     // If the message is not asking for confirmation, show the data immediately
                     setTimeout(() => {
-                        addMessage({
-                            content: createTableFromData(data.data)
-                        }, 'bot');
-                    }, 1000);
+                        addTableMessage(data.data, 'bot');
+                        
+                        // Update suggestions based on data context
+                        let contextString = getContextFromData(data.data);
+                        addContextSuggestions(contextString);
+                    }, 500);
                 }
+            } else if (data.type === 'error') {
+                // Error response
+                addMessage(data.message, 'bot', 'error');
+                
+                // Reset to default suggestions
+                setTimeout(addDefaultSuggestions, 500);
             }
         })
         .catch(error => {
@@ -459,36 +769,100 @@
             // Hide typing indicator
             hideTypingIndicator();
             
-            // Show error message
-            addMessage('Îmi pare rău, a apărut o eroare în comunicarea cu serverul: ' + error.message, 'bot');
+            // Re-enable input
+            setInputEnabled(true);
             
-            // Fallback to local processing
-            console.warn('Falling back to local processing due to server error');
-            processQueryLocally(message);
+            // Show error message
+            addMessage('Îmi pare rău, a apărut o eroare în comunicarea cu serverul: ' + error.message, 'bot', 'error');
+            
+            // Reset to default suggestions
+            setTimeout(addDefaultSuggestions, 500);
         });
     }
-
-    // Function to process query locally as a fallback
-    function processQueryLocally(query) {
-        setTimeout(() => {
-            const response = processQuery(query);
-            hideTypingIndicator();
-            addMessage(response, 'bot');
-        }, 1000);
+    
+    // Try to determine context from data for suggestion generation
+    function getContextFromData(data) {
+        if (!data || data.length === 0) return '';
+        
+        // Get the first row as a sample
+        const sample = data[0];
+        let contextString = '';
+        
+        // Check for known column names to determine context
+        if (sample.departament) contextString += ' departamente';
+        if (sample.nume && sample.prenume) contextString += ' angajați';
+        if (sample.data_inceput || sample.start_c) contextString += ' concedii';
+        if (sample.functie || sample.denumire || sample.salariu) contextString += ' poziții salarii';
+        if (sample.nume_proiect || sample.nume_task) contextString += ' proiecte';
+        if (sample.tip_adeverinta) contextString += ' adeverințe';
+        
+        return contextString;
+    }
+    
+    // Add confirmation buttons after a table response that needs confirmation
+    function addConfirmationButtons() {
+        const confirmationDiv = document.createElement('div');
+        confirmationDiv.className = 'confirmation-buttons';
+        confirmationDiv.style.display = 'flex';
+        confirmationDiv.style.gap = '10px';
+        confirmationDiv.style.marginTop = '10px';
+        
+        const yesButton = document.createElement('button');
+        yesButton.className = 'suggestion-button';
+        yesButton.textContent = 'Da, vreau să văd detaliile';
+        yesButton.style.backgroundColor = '#4CAF50';
+        yesButton.style.color = 'white';
+        yesButton.addEventListener('click', function() {
+            // Remove confirmation buttons
+            confirmationDiv.remove();
+            
+            // Show the table
+            if (window.lastQueryData && window.lastQueryData.length > 0) {
+                addTableMessage(window.lastQueryData, 'bot');
+                window.lastQueryData = null;
+            }
+        });
+        
+        const noButton = document.createElement('button');
+        noButton.className = 'suggestion-button';
+        noButton.textContent = 'Nu, mulțumesc';
+        noButton.addEventListener('click', function() {
+            // Remove confirmation buttons
+            confirmationDiv.remove();
+            
+            // Clear stored data
+            window.lastQueryData = null;
+            
+            // Add a confirmation message
+            addMessage('În regulă. Cu ce altceva vă pot ajuta?', 'bot');
+        });
+        
+        confirmationDiv.appendChild(yesButton);
+        confirmationDiv.appendChild(noButton);
+        
+        // Add to the last bot message
+        const lastBotMessage = Array.from(chatMessages.querySelectorAll('.bot-message'))
+            .filter(el => !el.classList.contains('bot-typing'))
+            .pop();
+            
+        if (lastBotMessage) {
+            lastBotMessage.appendChild(confirmationDiv);
+        }
     }
 
-    // Function to add a message to the chat
-    function addMessage(message, sender) {
+    // Add a text message to chat
+    function addMessage(message, sender, type) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
         messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
         
-        if (typeof message === 'string') {
-            messageElement.innerHTML = message;
-        } else {
-            // If message is an object with HTML content
-            messageElement.innerHTML = message.content;
+        if (type === 'error') {
+            messageElement.style.backgroundColor = '#ffebee';
+            messageElement.style.color = '#c62828';
+            messageElement.style.borderLeft = '3px solid #c62828';
         }
+        
+        messageElement.innerHTML = formatMessage(message);
         
         chatMessages.appendChild(messageElement);
         
@@ -501,10 +875,61 @@
         messageElement.appendChild(timeElement);
         
         // Scroll to bottom
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        scrollToBottom();
     }
-
-    // Function to show typing indicator
+    
+    // Add a table message to chat
+    function addTableMessage(data, sender) {
+        if (!data || data.length === 0) {
+            addMessage('Nu există date disponibile.', sender);
+            return;
+        }
+        
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        
+        // Table container for scrollability
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'table-container';
+        
+        // Create table
+        const tableHTML = createTableFromData(data);
+        tableContainer.innerHTML = tableHTML;
+        
+        // Table actions (export, etc.)
+        const tableActions = document.createElement('div');
+        tableActions.className = 'table-actions';
+        
+        // Export button
+        const exportButton = document.createElement('button');
+        exportButton.className = 'table-action-button';
+        exportButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export CSV';
+        exportButton.addEventListener('click', function() {
+            exportTableToCSV(data);
+        });
+        
+        tableActions.appendChild(exportButton);
+        
+        // Add to message element
+        messageElement.appendChild(tableContainer);
+        messageElement.appendChild(tableActions);
+        
+        chatMessages.appendChild(messageElement);
+        
+        // Add timestamp
+        const timeElement = document.createElement('div');
+        timeElement.classList.add('message-time');
+        const now = new Date();
+        timeElement.textContent = now.getHours().toString().padStart(2, '0') + ':' + 
+                                 now.getMinutes().toString().padStart(2, '0');
+        messageElement.appendChild(timeElement);
+        
+        // Scroll to bottom
+        scrollToBottom();
+    }
+    
+    // Show typing indicator
     function showTypingIndicator() {
         const typingElement = document.createElement('div');
         typingElement.classList.add('message', 'bot-message', 'bot-typing');
@@ -523,18 +948,65 @@
         chatMessages.appendChild(typingElement);
         
         // Scroll to bottom
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        scrollToBottom();
     }
-
-    // Function to hide typing indicator
+    
+    // Hide typing indicator
     function hideTypingIndicator() {
         const typingIndicator = document.getElementById('typingIndicator');
         if (typingIndicator) {
             typingIndicator.remove();
         }
     }
-
-    // Function to create HTML table from data
+    
+    // Format message with links, lists, etc.
+    function formatMessage(message) {
+        if (typeof message !== 'string') {
+            return message;
+        }
+        
+        // Convert URLs to links
+        message = message.replace(
+            /(https?:\/\/[^\s]+)/g,
+            '<a href="$1" target="_blank" style="color: #0078d4; text-decoration: underline;">$1</a>'
+        );
+        
+        // Convert bullet points (* or -) to HTML lists
+        if ((message.includes('* ') || message.includes('- ')) && message.includes('\n')) {
+            let lines = message.split('\n');
+            let inList = false;
+            let formattedLines = [];
+            
+            for (let line of lines) {
+                if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
+                    if (!inList) {
+                        formattedLines.push('<ul style="margin: 5px 0; padding-left: 20px;">');
+                        inList = true;
+                    }
+                    formattedLines.push('<li>' + line.trim().substring(2) + '</li>');
+                } else {
+                    if (inList) {
+                        formattedLines.push('</ul>');
+                        inList = false;
+                    }
+                    formattedLines.push(line);
+                }
+            }
+            
+            if (inList) {
+                formattedLines.push('</ul>');
+            }
+            
+            message = formattedLines.join('\n');
+        }
+        
+        // Convert newlines to <br>
+        message = message.replace(/\n/g, '<br>');
+        
+        return message;
+    }
+    
+    // Create HTML table from data
     function createTableFromData(data) {
         if (!data || data.length === 0) return '<p>Nu există date disponibile.</p>';
         
@@ -556,7 +1028,20 @@
         data.forEach(row => {
             tableHTML += '<tr>';
             columns.forEach(column => {
-                tableHTML += `<td>${row[column] != null ? row[column] : ''}</td>`;
+                let cellValue = row[column] != null ? row[column] : '';
+                
+                // Format dates if they look like dates
+                if (typeof cellValue === 'string' && 
+                    (cellValue.match(/^\d{4}-\d{2}-\d{2}$/) || 
+                     cellValue.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/))) {
+                    cellValue = formatDateString(cellValue);
+                }
+                
+                // Format boolean values
+                if (cellValue === true) cellValue = 'Da';
+                if (cellValue === false) cellValue = 'Nu';
+                
+                tableHTML += `<td>${cellValue}</td>`;
             });
             tableHTML += '</tr>';
         });
@@ -564,8 +1049,8 @@
         tableHTML += '</table>';
         return tableHTML;
     }
-
-    // Function to format column names for display
+    
+    // Format column names for display
     function formatColumnName(columnName) {
         // Replace underscores with spaces
         let result = columnName.replace(/_/g, ' ');
@@ -575,361 +1060,85 @@
         
         return result;
     }
-
-    // Function to adjust textarea height
+    
+    // Format date strings to Romanian format
+    function formatDateString(dateString) {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            
+            return date.toLocaleDateString('ro-RO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return dateString;
+        }
+    }
+    
+    // Export table data to CSV
+    function exportTableToCSV(data) {
+        if (!data || data.length === 0) return;
+        
+        // Get column names
+        const columns = Object.keys(data[0]);
+        
+        // Create CSV content
+        let csvContent = columns.map(formatColumnName).join(',') + '\n';
+        
+        data.forEach(row => {
+            let rowContent = columns.map(column => {
+                let value = row[column] != null ? row[column] : '';
+                
+                // Quote values with commas
+                if (typeof value === 'string' && value.includes(',')) {
+                    return `"${value}"`;
+                }
+                
+                return value;
+            }).join(',');
+            
+            csvContent += rowContent + '\n';
+        });
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'export_' + new Date().toISOString().slice(0, 10) + '.csv');
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    // Enable/disable input while processing
+    function setInputEnabled(enabled) {
+        userInput.disabled = !enabled;
+        sendButton.disabled = !enabled;
+        
+        if (enabled) {
+            userInput.focus();
+            document.getElementById('statusText').textContent = 'Online';
+        } else {
+            document.getElementById('statusText').textContent = 'Procesează...';
+        }
+    }
+    
+    // Adjust textarea height based on content
     function adjustTextareaHeight(textarea) {
         textarea.style.height = 'auto';
         textarea.style.height = (textarea.scrollHeight) + 'px';
     }
-
-    // Listen for click on user messages with "da" to handle follow-up
-    document.addEventListener('click', function(event) {
-        if (event.target && event.target.closest('.user-message')) {
-            const text = event.target.closest('.user-message').textContent.toLowerCase().trim();
-            if (text === 'da' || text.includes('detalii')) {
-                handleFollowUp();
-            }
-        }
-    });
-
-    // Function to handle follow-up responses when user clicks "yes"
-    function handleFollowUp() {
-        if (window.lastQueryData && window.lastQueryData.length > 0) {
-            addMessage({
-                content: createTableFromData(window.lastQueryData)
-            }, 'bot');
-            
-            // Clear the stored data after showing it
-            window.lastQueryData = null;
-        } else {
-            addMessage('Îmi pare rău, nu am informații suplimentare disponibile.', 'bot');
-        }
-    }
-
-    // Initialize when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set up conversation context storage
-        window.lastQueryData = null;
-        console.log('DOM fully loaded, chat ready');
-        
-        // Add some helpful suggestions
-        addSuggestions();
-    });
-
-    // Local fallback methods (for when the server is not available)
-    // Sample data for fallback mode
-    const sampleData = {
-        angajati: [
-            { id: 1, nume: "Vasile", prenume: "Fabian", departament: "HR", functie: "Director", email: "vasile.fabian@example.com", telefon: "0700000000" },
-            { id: 2, nume: "Popescu", prenume: "Maria", departament: "HR", functie: "New Graduate", email: "maria.popescu2812@example.com", telefon: "0787763178" },
-            { id: 3, nume: "Girnita", prenume: "Claudia", departament: "HR", functie: "Intern", email: "claudia.girnita@example.com", telefon: "0771000002" },
-            { id: 4, nume: "Costache", prenume: "Irina", departament: "HR", functie: "Sef", email: "irina.costache@example.com", telefon: "0700000001" },
-            { id: 5, nume: "Moise", prenume: "Monica", departament: "HR", functie: "CEO", email: "monica.moise@example.com", telefon: "0736000003" }
-        ],
-        concedii: [
-            { id: 1, id_ang: 1, nume: "Vasile", prenume: "Fabian", departament: "HR", functie: "Director", start_c: "2024-12-24", end_c: "2024-12-29", durata: 6, motiv: "Concediu odihna", locatie: "Brasov", status: "Aprobat director" },
-            { id: 2, id_ang: 3, nume: "Girnita", prenume: "Claudia", departament: "HR", functie: "Intern", start_c: "2024-12-24", end_c: "2024-12-26", durata: 3, motiv: "Concediu odihna", locatie: "Cluj", status: "Aprobat director" }
-        ],
-        departamente: [
-            { id_dep: 1, nume_dep: "HR", nr_angajati: 5 },
-            { id_dep: 2, nume_dep: "Finante", nr_angajati: 5 },
-            { id_dep: 3, nume_dep: "IT", nr_angajati: 10 }
-        ]
-    };
-
-    // Keep track of last response for follow-up questions in local mode
-    let lastResponse = null;
-
-    // Main function to process the query locally (fallback)
-    function processQuery(query) {
-        const normalizedQuery = query.toLowerCase();
-        
-        // Check if it's a follow-up question
-        if (normalizedQuery.includes('da') && lastResponse && lastResponse.type) {
-            return handleLocalFollowUp();
-        }
-        
-        // Check for greeting
-        if (containsGreeting(normalizedQuery)) {
-            return "Bună ziua! Cu ce vă pot ajuta astăzi? Puteți să-mi adresați întrebări despre angajați, departamente, concedii, adeverințe sau proiecte.";
-        }
-        
-        // Check query type
-        if (normalizedQuery.includes('concediu') && normalizedQuery.includes('craciun')) {
-            return handleLocalChristmasLeaveQuery();
-        } else if (normalizedQuery.includes('angajati') || normalizedQuery.includes('angajații')) {
-            return handleLocalEmployeeQuery(normalizedQuery);
-        } else if (normalizedQuery.includes('departament') || normalizedQuery.includes('departamente')) {
-            return handleLocalDepartmentQuery(normalizedQuery);
-        } else if (normalizedQuery.includes('concediu') || normalizedQuery.includes('concedii')) {
-            return handleLocalLeaveQuery(normalizedQuery);
-        } else {
-            return "Îmi pare rău, nu am înțeles întrebarea. Puteți să-mi adresați întrebări despre angajați, departamente, concedii, adeverințe sau proiecte. De exemplu: \"Câți angajați sunt în departamentul HR?\" sau \"Cine este în concediu de Crăciun?\"";
-        }
-    }
-
-    // Helper functions for local processing
-    function containsGreeting(text) {
-        const greetings = ['buna', 'salut', 'hello', 'hi', 'hey', 'bună ziua', 'neața', 'ziua bună'];
-        return greetings.some(greeting => text.includes(greeting));
-    }
-
-    function formatLocalDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('ro-RO');
-    }
-
-    // Handle Christmas leave query locally
-    function handleLocalChristmasLeaveQuery() {
-        // Filter concedii that overlap with Christmas (24-25 December)
-        const christmasLeave = sampleData.concedii.filter(c => {
-            const startDate = new Date(c.start_c);
-            const endDate = new Date(c.end_c);
-            const christmasStart = new Date('2024-12-24');
-            const christmasEnd = new Date('2024-12-25');
-            
-            return (startDate <= christmasEnd && endDate >= christmasStart);
-        });
-        
-        // Store this for follow-up questions
-        lastResponse = {
-            type: 'christmas_leave',
-            data: christmasLeave
-        };
-        
-        return `Desigur, imediat. După o analiză detaliată, am descoperit că ${christmasLeave.length} angajați au luat concediu care include perioada Crăciunului. Doriți să aflați mai multe detalii?`;
-    }
-
- // Handle local follow-up questions
-    function handleLocalFollowUp() {
-        if (!lastResponse) {
-            return "Îmi pare rău, nu înțeleg la ce vă referiți. Puteți să-mi adresați o întrebare mai detaliată?";
-        }
-        
-        if (lastResponse.type === 'christmas_leave') {
-            const data = lastResponse.data;
-            if (data.length === 0) {
-                return "Nu sunt angajați în concediu în această perioadă.";
-            }
-            
-            let tableHTML = `<p>Imediat. Mai jos aveți un tabel cu numele angajaților, departamentul, funcția, locația concediului, motivul concediului, data de început și numărul de zile ale concediului:</p>`;
-            
-            tableHTML += createTableFromData(data);
-            return { content: tableHTML };
-        } else if (lastResponse.type === 'employee_query') {
-            return { content: createTableFromData(lastResponse.data) };
-        } else if (lastResponse.type === 'department_query') {
-            return { content: createTableFromData(lastResponse.data) };
-        }
-        
-        return "Îmi pare rău, nu am informații suplimentare disponibile.";
-    }
-
-    // Handle employee queries locally
-    function handleLocalEmployeeQuery(query) {
-        let filteredEmployees = sampleData.angajati;
-        
-        // Apply filters based on query
-        if (query.includes('hr')) {
-            filteredEmployees = filteredEmployees.filter(emp => emp.departament.toLowerCase() === 'hr');
-        } else if (query.includes('finante') || query.includes('finanțe')) {
-            filteredEmployees = filteredEmployees.filter(emp => emp.departament.toLowerCase() === 'finante');
-        } else if (query.includes('it')) {
-            filteredEmployees = filteredEmployees.filter(emp => emp.departament.toLowerCase() === 'it');
-        }
-        
-        if (query.includes('director')) {
-            filteredEmployees = filteredEmployees.filter(emp => emp.functie.toLowerCase() === 'director');
-        } else if (query.includes('intern')) {
-            filteredEmployees = filteredEmployees.filter(emp => emp.functie.toLowerCase() === 'intern');
-        }
-        
-        // Store for follow-up
-        lastResponse = {
-            type: 'employee_query',
-            data: filteredEmployees
-        };
-        
-        // Count results
-        const count = filteredEmployees.length;
-        
-        if (query.includes('câți') || query.includes('cati') || query.includes('număr') || query.includes('numar')) {
-            return `În urma analizei, am găsit ${count} angajați care corespund criteriilor dvs. Doriți să vedeți detaliile acestora?`;
-        } else {
-            return `Am găsit informații despre ${count} angajați. Doriți să vedeți detaliile complete?`;
-        }
-    }
-
-    // Handle department queries locally
-    function handleLocalDepartmentQuery(query) {
-        let filteredDepartments = sampleData.departamente;
-        
-        // Apply filters based on query
-        if (query.includes('hr')) {
-            filteredDepartments = filteredDepartments.filter(dep => dep.nume_dep.toLowerCase() === 'hr');
-        } else if (query.includes('finante') || query.includes('finanțe')) {
-            filteredDepartments = filteredDepartments.filter(dep => dep.nume_dep.toLowerCase() === 'finante');
-        } else if (query.includes('it')) {
-            filteredDepartments = filteredDepartments.filter(dep => dep.nume_dep.toLowerCase() === 'it');
-        }
-        
-        // Store for follow-up
-        lastResponse = {
-            type: 'department_query',
-            data: filteredDepartments
-        };
-        
-        // Count results
-        const count = filteredDepartments.length;
-        
-        if (query.includes('câți') || query.includes('cati') || query.includes('număr') || query.includes('numar')) {
-            if (query.includes('angajați') || query.includes('angajati')) {
-                // Calculate total employees if asking about employee count
-                const totalEmployees = filteredDepartments.reduce((sum, dep) => sum + dep.nr_angajati, 0);
-                return `În departamentele selectate lucrează un total de ${totalEmployees} angajați. Doriți să vedeți detaliile fiecărui departament?`;
-            } else {
-                return `Am găsit ${count} departamente care corespund criteriilor dvs. Doriți să vedeți detaliile acestora?`;
-            }
-        } else {
-            return `Am găsit informații despre ${count} departamente. Doriți să vedeți detaliile complete?`;
-        }
-    }
-
-    // Handle leave queries locally
-    function handleLocalLeaveQuery(query) {
-        let filteredLeaves = sampleData.concedii;
-        
-        // Apply filters based on query
-        if (query.includes('decembrie') || query.includes('decembrie')) {
-            filteredLeaves = filteredLeaves.filter(leave => {
-                const startDate = new Date(leave.start_c);
-                return startDate.getMonth() === 11; // December is month 11 (0-indexed)
-            });
-        }
-        
-        if (query.includes('hr')) {
-            filteredLeaves = filteredLeaves.filter(leave => leave.departament.toLowerCase() === 'hr');
-        } else if (query.includes('finante') || query.includes('finanțe')) {
-            filteredLeaves = filteredLeaves.filter(leave => leave.departament.toLowerCase() === 'finante');
-        }
-        
-        // Store for follow-up
-        lastResponse = {
-            type: 'leave_query',
-            data: filteredLeaves
-        };
-        
-        // Count results
-        const count = filteredLeaves.length;
-        
-        if (query.includes('câți') || query.includes('cati') || query.includes('număr') || query.includes('numar')) {
-            return `În urma analizei, am găsit ${count} concedii care corespund criteriilor dvs. Doriți să vedeți detaliile acestora?`;
-        } else {
-            return `Am găsit informații despre ${count} concedii. Doriți să vedeți detaliile complete?`;
-        }
-    }
-
-    // Add a greeting message when the chat starts
-    function addInitialMessage() {
-        setTimeout(() => {
-            addMessage('Bună ziua! Sunt asistentul virtual al departamentului HR. Cu ce vă pot ajuta astăzi?', 'bot');
-        }, 500);
-    }
-
-    // Enhanced textarea auto-resize
-    userInput.addEventListener('input', function() {
-        adjustTextareaHeight(this);
-    });
-
-    // Initialize the chat with greeting
-    // addInitialMessage(); - already added in HTML
-
-    // Add click event listener to sendButton
-    sendButton.addEventListener('click', sendMessage);
-
-    // Function to show error message
-    function showError(message) {
-        const errorElement = document.createElement('div');
-        errorElement.classList.add('error-message');
-        errorElement.textContent = message;
-        
-        document.querySelector('.chat-container').appendChild(errorElement);
-        
-        // Remove after 5 seconds
-        setTimeout(() => {
-            errorElement.remove();
-        }, 5000);
-    }
-
-    // Function to save chat history
-    function saveChatHistory() {
-        const messages = Array.from(chatMessages.children).map(el => {
-            const isUser = el.classList.contains('user-message');
-            const text = el.textContent.trim();
-            return { sender: isUser ? 'user' : 'bot', message: text, timestamp: new Date().toISOString() };
-        });
-        
-        localStorage.setItem('chatHistory', JSON.stringify(messages));
-    }
-
-    // Function to load chat history
-    function loadChatHistory() {
-        const history = localStorage.getItem('chatHistory');
-        if (history) {
-            try {
-                const messages = JSON.parse(history);
-                // Clear existing messages
-                chatMessages.innerHTML = '';
-                // Add saved messages
-                messages.forEach(msg => {
-                    addMessage(msg.message, msg.sender === 'user' ? 'user' : 'bot');
-                });
-            } catch (e) {
-                console.error('Failed to load chat history:', e);
-            }
-        }
-    }
-
-    // Save chat history periodically
-    setInterval(saveChatHistory, 30000);
-
-    // Optional: Function to clear chat history
-    function clearChatHistory() {
-        localStorage.removeItem('chatHistory');
-        chatMessages.innerHTML = '';
-        addInitialMessage();
-    }
-
-    // Add some helpful suggestions that the user can click on
-    function addSuggestions() {
-        const suggestions = [
-            'Câți angajați sunt în departamentul HR?',
-            'Cine este în concediu de Crăciun?',
-            'Arată-mi departamentele',
-            'Informații despre concedii'
-        ];
-        
-        const suggestionsContainer = document.createElement('div');
-        suggestionsContainer.classList.add('suggestions-container');
-        
-        suggestions.forEach(suggestion => {
-            const suggestionButton = document.createElement('button');
-            suggestionButton.classList.add('suggestion-button');
-            suggestionButton.textContent = suggestion;
-            suggestionButton.addEventListener('click', () => {
-                userInput.value = suggestion;
-                adjustTextareaHeight(userInput);
-                sendMessage();
-            });
-            
-            suggestionsContainer.appendChild(suggestionButton);
-        });
-        
-        // Insert the suggestions before the chat input area
-        document.querySelector('.chat-container').insertBefore(
-            suggestionsContainer, 
-            document.querySelector('.chat-input')
-        );
+    
+    // Scroll chat to bottom
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
     </script>
          <%

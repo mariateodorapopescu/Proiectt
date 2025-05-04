@@ -233,7 +233,9 @@ CREATE TABLE IF NOT EXISTS useri (
   data_ang DATE NULL DEFAULT NULL,
   data_modif DATE NULL DEFAULT NULL,
   id_echipa INT NULL DEFAULT NULL,
+  id_sediu INT NULL DEFAULT NULL,
   PRIMARY KEY (id),
+  FOREIGN KEY (id_sediu) REFERENCES sedii(id_sediu),
   FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
   FOREIGN KEY (tip) REFERENCES tipuri(tip),
   FOREIGN KEY (sporuri) REFERENCES tipuri_sporuri(id),
@@ -1964,8 +1966,137 @@ JOIN departament d ON u.id_dep = d.id_dep
 LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep;
 select * from denumiri_pozitii;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
-desc locatii_concedii;
-desc concedii;
+desc locatii_useri;
+desc sedii;
 update useri set tip = 10 where username = "irina.c";
 SELECT strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;
 select * from tipuri join denumiri_pozitii on tip = tip_pozitie;
+-- ce tipuri de angajati exista in departamentul IT?
+select * from locatii_useri;
+-- id_echipa si id_sediu
+select distinct tipuri.denumire from useri join departament on useri.id_dep = departament.id_dep join tipuri on tipuri.tip = useri.tip where upper(departament.nume_dep) like "%IT%";
+SELECT 
+    u.id, 
+    u.nume, 
+    u.prenume, 
+    u.data_nasterii, 
+    u.email, 
+    u.telefon, 
+    u.conluate, 
+    u.zilecons, 
+    u.data_ang, 
+    u.data_modif, 
+    d.nume_dep,
+    t.salariu, 
+    t.denumire AS denumire_pozitie, -- Using existing column instead of denumiri_pozitii.denumire_completa
+    ts.denumire AS denumire_spor,
+    tp.denumire AS denumire_penalizare,
+    l.strada, 
+    l.oras, 
+    l.judet, 
+    l.tara,
+    'N/A' AS nume_sediu, -- Placeholder for the missing sedii.nume_sediu
+    e.nume AS nume_echipa -- From echipe table, but note that useri doesn't have id_echipa
+FROM 
+    useri u
+LEFT JOIN 
+    departament d ON u.id_dep = d.id_dep
+LEFT JOIN 
+    tipuri t ON u.tip = t.tip
+LEFT JOIN 
+    tipuri_sporuri ts ON ts.id = u.sporuri
+LEFT JOIN 
+    tipuri_penalizari tp ON tp.id = u.penalizari
+LEFT JOIN 
+    locatii_useri l ON u.id = l.id_user
+LEFT JOIN
+    echipe e ON e.id = u.id_echipa; 
+SELECT 
+    c.id AS id_concediu,
+    u.nume, 
+    u.prenume, 
+    d.nume_dep AS departament,
+    t.denumire AS pozitie,
+    u.email, 
+    u.telefon, 
+    u.data_nasterii, 
+    l.strada, 
+    l.oras, 
+    l.judet, 
+    l.tara,
+    c.motiv, 
+    s.nume_status AS status_concediu,
+    tc.motiv AS tip_concediu,
+    c.durata, 
+    c.added AS data_adaugare, 
+    c.modified AS data_modificare, 
+    c.acc_res AS data_aprobare_respingere, 
+    c.mentiuni,
+    u.conluate, 
+    u.zilecons,
+    e.nume AS nume_echipa,
+    sd.nume_sediu AS nume_sediu,
+    lc.oras, 
+    lc.judet, 
+    lc.tara
+FROM 
+    concedii c
+LEFT JOIN useri u ON u.id = c.id_ang
+LEFT JOIN locatii_useri l ON u.id = l.id_user
+LEFT JOIN sedii sd ON sd.id_sediu = u.id_sediu
+LEFT JOIN departament d ON u.id_dep = d.id_dep
+LEFT JOIN tipuri t ON u.tip = t.tip
+LEFT JOIN statusuri s ON c.status = s.status
+LEFT JOIN tipcon tc ON c.tip = tc.tip
+LEFT JOIN locatii_concedii lc ON c.id = lc.id_concediu
+LEFT JOIN echipe e ON e.id = u.id_echipa
+WHERE c.id IS NOT NULL;
+SELECT 
+    a.id AS id_adeverinta,
+    a.motiv,
+    ta.denumire AS tip_adeverinta,
+    s.nume_status AS status_adeverinta,
+    a.creare AS data_creare,
+    a.modif AS data_modificare,
+    u.nume,
+    u.prenume,
+    u.email,
+    u.telefon,
+    u.data_nasterii,
+    u.cnp,
+    d.nume_dep AS departament,
+    t.denumire AS pozitie,
+    u.data_ang AS data_angajare,
+    u.data_modif AS data_modificare_angajat,
+    lu.oras AS oras_angajat,
+    lu.judet AS judet_angajat,
+    lu.tara AS tara_angajat,
+    e.nume AS nume_echipa,
+    sd.nume_sediu AS nume_sediu
+FROM 
+    adeverinte a
+LEFT JOIN 
+    useri u ON u.id = a.id_ang
+LEFT JOIN
+	sedii sd ON sd.id_sediu = u.id_sediu
+LEFT JOIN 
+    tip_adev ta ON a.tip = ta.id
+LEFT JOIN 
+    statusuri s ON a.status = s.status
+LEFT JOIN 
+    departament d ON u.id_dep = d.id_dep
+LEFT JOIN 
+    tipuri t ON u.tip = t.tip
+LEFT JOIN 
+    tipuri_sporuri ts ON ts.id = u.sporuri
+LEFT JOIN 
+    tipuri_penalizari tp ON tp.id = u.penalizari
+LEFT JOIN 
+    locatii_useri lu ON u.id = lu.id_user
+LEFT JOIN 
+    echipe e ON e.id = u.id_echipa
+LEFT JOIN 
+    proiecte p ON p.id = e.id_prj
+WHERE 
+    a.id IS NOT NULL;
+select u.nume, u.prenume, u.data_nasterii, u.email, u.telefon from useri u join departament d on u.id_dep = d.id_dep where upper(d.nume_dep) like "%HR%";
