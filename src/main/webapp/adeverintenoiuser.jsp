@@ -81,7 +81,8 @@
 
     // Funcție helper pentru a determina rolul utilizatorului
     boolean isDirector = (ierarhie < 3) ;
-    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+    boolean isAdmin = (userType==4);
+    boolean isSef = (ierarhie > 4 && ierarhie <=5);
     boolean isUtilizatorNormal = !isDirector && !isSef; // tipuri 1, 2, 5-9
 
     // Debug userType

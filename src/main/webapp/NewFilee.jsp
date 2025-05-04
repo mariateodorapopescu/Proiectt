@@ -22,7 +22,7 @@
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
             try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
                 PreparedStatement preparedStatement = connection.prepareStatement(
-                		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie" +
+                		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
                                 "dp.denumire_completa AS denumire_specifică FROM useri u " +
                                 "JOIN tipuri t ON u.tip = t.tip " +
                                 "JOIN departament d ON u.id_dep = d.id_dep " +
@@ -45,7 +45,7 @@
                     boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
                     boolean isAdmin = (functie.compareTo("Administrator") == 0);
 
-                    if (!isAdmin) {  
+                    if (isAdmin) {  
                     	// aflu data curenta, tot ca o interogare bd =(
                     	String today = "";
                    	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {

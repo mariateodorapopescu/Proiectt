@@ -115,7 +115,7 @@
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            
             background-color: var(--clr);
             color: var(--text);
             margin: 0;
@@ -126,9 +126,9 @@
             max-width: 1200px;
             margin: 40px auto;
             padding: 20px;
-            background: white;
+            background: <%=sidebar%>;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            
         }
         
         .action-buttons {
@@ -157,7 +157,7 @@
         }
         
         .form-container {
-            background: #f5f5f5;
+            background: <%=clr%>;
             padding: 30px;
             border-radius: 8px;
             margin-top: 20px;
@@ -186,21 +186,21 @@
         .form-control:focus {
             border-color: var(--accent);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(90, 86, 185, 0.2);
+            
         }
         
         .proiecte-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            background: white;
+            background: <%=clr%>;
             border-radius: 8px;
             overflow: hidden;
         }
         
         .proiecte-table th, .proiecte-table td {
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=clr%>;
             text-align: center;
         }
         
@@ -211,11 +211,12 @@
         }
         
         .proiecte-table tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: <%=sidebar%>;
         }
         
         .proiecte-table tr:hover {
-            background-color: var(--hover);
+            background-color: var(--accent);
+            color: white;
         }
         
         .btn-primary {
@@ -231,7 +232,7 @@
         }
         
         .btn-primary:hover {
-            opacity: 0.9;
+            background-color: black;
             transform: translateY(-2px);
         }
         
@@ -260,11 +261,16 @@
             color: white;
         }
         
+        .btn-edit:hover, .btn-team:hover, .btn-delete:hover{
+        	background-color: black;
+        }
+        
         .btn-back {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #666;
+             background-color: <%=accent%>;
+            color: white;
             color: white !important;
             text-decoration: none;
             border-radius: 5px;
@@ -272,7 +278,8 @@
         }
         
         .btn-back:hover {
-            background-color: #555;
+             background-color: black;
+            color: white;
         }
         
         .members-list {

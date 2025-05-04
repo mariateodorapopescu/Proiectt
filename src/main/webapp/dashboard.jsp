@@ -622,9 +622,9 @@
             <li class="logo" style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>">
                 <a href="#">
                     <div class="siicon" style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>">
-                        <ion-icon name="airplane"></ion-icon>
+                        <ion-icon name="business"></ion-icon>
                     </div>
-                    <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="sitext">Concedii</div>
+                    <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="sitext">Platforma</div>
                 </a>
             </li>
             <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="menuToggle"></div>
@@ -640,7 +640,7 @@
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="viewang.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
-                            <ion-icon name="people"></ion-icon>
+                           <ion-icon name="body"></ion-icon>
                         </div>
                         <div  class="sitextt">Angajati</div>
                     </a>
@@ -648,7 +648,7 @@
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="administrare_proiecte.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
-                            <ion-icon name="today"></ion-icon>
+                            <ion-icon name="people"></ion-icon>
                         </div>
                         <div  class="sitextt">Proiecte & Echipe de Proiect</div>
                     </a>
@@ -656,7 +656,7 @@
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="administrare_posturi.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
-                            <ion-icon name="today"></ion-icon>
+                            <ion-icon name="albums"></ion-icon>
                         </div>
                         <div  class="sitextt">Posturi</div>
                     </a>
@@ -672,7 +672,7 @@
                 <li style="--bg: <%out.println(accent); %>">
                      <a href="concediinoisef.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
-                            <ion-icon name="today"></ion-icon>
+                            <ion-icon name="alert"></ion-icon>
                         </div>
                         <div  class="sitextt">Notificari</div>
                     </a>
@@ -715,9 +715,9 @@
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="chat.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
-                            <ion-icon name="briefcase"></ion-icon>
+                            <ion-icon name="chatbubbles"></ion-icon>
                         </div>
-                        <div  class="sitextt">Chat</div>
+                        <div  class="sitextt">Asistent virtual</div>
                     </a>
                 </li>
                 
@@ -825,18 +825,7 @@ document.getElementById('logout_btn').addEventListener('click', (event) => {
                 out.println("alert('Eroare la baza de date!');");
                 out.println("alert('" + e.getMessage() + "');");
                 out.println("</script>");
-                if (currentUser.getTip() == 1) {
-                    response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
-                    response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
-                    response.sendRedirect("sefok.jsp");
-                }
-                if (currentUser.getTip() == 0) {
-                    response.sendRedirect("dashboard.jsp");
-                }
+               
                 e.printStackTrace();
             }
         } else {

@@ -1430,7 +1430,7 @@ INSERT INTO useri (nume, prenume, data_nasterii, email, telefon, username, passw
 ('Popescu', 'Maria', '2001-12-28', 'maria.popescu2812@example.com', '0787763178', 'mariap', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 1, 'Strada Libertății', '#FF5733', '2011228123456', '2021-03-10'),
 ('Girnita', 'Claudia', '2002-04-18', 'claudia.girnita@example.com', '0771000002', 'claudia.g', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 2,'Strada Unirii', '#42E695', '2020418123456', '2022-05-20'),
 ('Costache', 'Irina', '2003-05-19', 'irina.costache@example.com', '0700000001', 'irina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 3,'Strada Basarab', '#9B59B6', '2030519123456', '2022-01-05'),
-('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 4,'Strada Libertății', '#FFD700', '2020507123456', '2021-10-15'),
+('Moise', 'Monica', '2002-05-07', 'monica.moise@example.com', '0736000003', 'monica.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 1, 34,'Strada Libertății', '#FFD700', '2020507123456', '2021-10-15'),
 ('Capra', 'Cosmina', '2002-03-01', 'cosmina.capra@example.com', '0700000004', 'cosmina.c', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 0, 'Strada Doamnei', '#E74C3C', '2020301123456', '2020-04-01'),
 ('Muedin', 'Emin', '1995-10-04', 'emin.m@example.com', '0700000005', 'emin.m', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 1, 'Strada Doamnei', '#1ABC9C', '1951004123456', '2019-11-01'),
 ('Rebreanu', 'Andrei', '2003-07-07', 'andrei.rebreanu@example.com', '0700000006', 'andrei.rebreanu', '$2a$10$gPdSQ5MuTzI7K1vaHDXVhOyk19Mehd.gZO42NvN/MZmLTfJ8kezoq', 2, 2, 'Strada Frunzei', '#F39C12', '2030707123456', '2023-01-10'),
@@ -2099,4 +2099,6 @@ LEFT JOIN
     proiecte p ON p.id = e.id_prj
 WHERE 
     a.id IS NOT NULL;
+select * from tipuri;
 select u.nume, u.prenume, u.data_nasterii, u.email, u.telefon from useri u join departament d on u.id_dep = d.id_dep where upper(d.nume_dep) like "%HR%";
+SELECT c.id, u.nume, u.prenume, d.nume_dep AS departament, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, c.durata, tc.motiv AS tip_concediu FROM concedii c JOIN useri u ON c.id_ang = u.id JOIN departament d ON u.id_dep = d.id_dep JOIN tipuri t ON u.tip = t.tip JOIN statusuri s ON c.status = s.status JOIN tipcon tc ON c.tip = tc.tip  ORDER BY c.start_c DESC;

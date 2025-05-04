@@ -39,11 +39,9 @@
                     boolean isAdmin = (functie.compareTo("Administrator") == 0);
 
                     // Redirect based on user type
-                    if (!isAdmin) {  
+                    if (!isAdmin && !isDirector) {  
                                     
-                                    if (isDirector) {
-                                        response.sendRedirect("dashboard.jsp");
-                                    }
+                                   
                                     if (isUtilizatorNormal) {
                                         response.sendRedirect("tip1ok.jsp");
                                     }
@@ -187,18 +185,7 @@
                     out.println("alert('Eroare la baza de date!');");
                     
                     out.println("</script>");
-                if (currentUser.getTip() == 1) {
-                	response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
-                	response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
-                	response.sendRedirect("sefok.jsp");
-                }
-                if (currentUser.getTip() == 0) {
-                	response.sendRedirect("dashboard.jsp");
-                }
+                
                 e.printStackTrace();
             }
         } else {

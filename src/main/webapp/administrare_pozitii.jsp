@@ -124,7 +124,7 @@
         }
         
         .modal-content {
-            background-color: #fefefe;
+            background-color: <%=card%>;
             margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
@@ -138,6 +138,7 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            color: <%=accent%>
         }
         
         .close:hover,
@@ -147,7 +148,7 @@
         }
         
         a, a:visited, a:hover, a:active {
-            color: #eaeaea !important;
+            color: <%=clr%> !important;
             text-decoration: none;
         }
         
@@ -155,7 +156,7 @@
             max-width: 900px;
             margin: 40px auto;
             padding: 20px;
-            background: white;
+            background: <%=card%>;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -185,7 +186,7 @@
         }
         
         .form-container {
-            background: #f5f5f5;
+            background: <%=card%>;
             padding: 30px;
             border-radius: 20px;
             margin-top: 20px;
@@ -193,7 +194,7 @@
         
         .form-container h2 {
             margin-bottom: 20px;
-            color: #333;
+            color: <%=text%>;
             text-align: center;
         }
         
@@ -210,7 +211,7 @@
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=card%>;
             border-radius: 5px;
             font-size: 16px;
         }
@@ -232,7 +233,7 @@
         }
         
         .submit-button:hover, .btn:hover {
-            background-color: <%=hover%>;
+            background-color: black;
         }
         
         .pozitii-table {
@@ -242,7 +243,7 @@
         }
         
         .pozitii-table th, .pozitii-table td {
-            border: 1px solid #ddd;
+            border: 1px solid <%=card%>;
             padding: 8px;
             text-align: left;
         }
@@ -253,7 +254,7 @@
         }
         
         .pozitii-table tr:hover {
-            background-color: #f9f9f9;
+            background-color: <%=accent%>;
         }
         
         .btn-small {

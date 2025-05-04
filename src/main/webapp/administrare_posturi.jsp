@@ -105,7 +105,7 @@
     
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            
             background-color: <%= clr %>;
             color: <%= text %>;
             margin: 0;
@@ -130,7 +130,7 @@
             border-radius: 2rem;
             margin: 15% auto;
             padding: 20px;
-            border: 1px solid #888;
+            border: 1px solid <%=sidebar%>;
             width: 80%;
         }
         
@@ -150,7 +150,7 @@
         }
         
         a, a:visited, a:hover, a:active {
-            color: #eaeaea !important;
+            color: <%=text%> !important;
             text-decoration: none;
         }
         
@@ -158,9 +158,9 @@
             max-width: 900px;
             margin: 40px auto;
             padding: 20px;
-            background: white;
+            background: <%=sidebar%>;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            
         }
         
         .action-buttons {
@@ -183,12 +183,12 @@
         }
         
         .action-button:hover {
-            opacity: 0.9;
-            background-color: <%=hover%>;
+            color: white;
+            background-color: black;
         }
         
         .form-container {
-            background: #f5f5f5;
+            background: <%=clr%>;
             padding: 30px;
             border-radius: 20px;
             margin-top: 20px;
@@ -196,7 +196,7 @@
         
         .form-container h2 {
             margin-bottom: 20px;
-            color: #333;
+            color: <%=accent%>;
             text-align: center;
         }
         
@@ -213,7 +213,7 @@
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=sidebar%>;
             border-radius: 5px;
             font-size: 16px;
         }
@@ -235,7 +235,7 @@
         }
         
         .submit-button:hover {
-            background-color: <%=hover%>;
+            background-color: black;
         }
         
         .proiecte-table {
@@ -246,7 +246,7 @@
         
         .proiecte-table th, .proiecte-table td {
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=text%>;
             text-align: center;
         }
         
@@ -256,7 +256,7 @@
         }
         
         .proiecte-table tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: <%=sidebar%>;
         }
         
         .table-button {
@@ -287,7 +287,7 @@
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #666;
+            background-color: <%=accent%>;
             color: white !important;
             text-decoration: none;
             border-radius: 5px;
@@ -331,9 +331,8 @@
             max-width: 800px;
             margin: 40px auto;
             padding: 20px;
-            background: white;
+            background: <%=sidebar%>;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .action-buttons {
             display: flex;
@@ -351,18 +350,18 @@
             transition: all 0.3s ease;
         }
         .action-button.active {
-            background-color: #6c5ce7;
+            background-color: <%=accent%>;
             color: white;
         }
         .action-button:not(.active) {
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: black;
+            color: white;
         }
         .action-button:hover {
             opacity: 0.9;
         }
         .form-container {
-            background: #f5f5f5;
+            background: <%=clr%>;
             padding: 30px;
             border-radius: 20px;
             margin-top: 20px;
@@ -370,7 +369,7 @@
         }
         .form-container h2 {
             margin-bottom: 20px;
-            color: #333;
+            color: <%=text%>;
         }
         .form-group {
             margin-bottom: 15px;
@@ -383,7 +382,7 @@
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=text%>;
             border-radius: 5px;
             font-size: 16px;
         }
@@ -392,7 +391,7 @@
             resize: vertical;
         }
         .submit-button {
-            background-color: #6c5ce7;
+            background-color: <%=accent%>;
             color: white;
             padding: 12px 24px;
             border: none;
@@ -402,7 +401,7 @@
             margin-top: 20px;
         }
         .submit-button:hover {
-            background-color: #5a4bd1;
+            background-color: black;
         }
         .posturi-table {
             width: 100%;
@@ -411,13 +410,23 @@
         }
         .posturi-table th, .posturi-table td {
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=clr%>;
             text-align: center;
         }
         .posturi-table th {
-            background-color: #6c5ce7;
+            background-color: <%=accent%>;
             color: white;
         }
+        
+        .posturi-table tr:nth-child(even) {
+            background-color: <%=clr%>;
+        }
+        
+        .posturi-table tr:hover {
+            background-color: <%=accent%>;
+            color: white;
+        }
+        
         .table-button {
             padding: 5px 10px;
             margin: 0 5px;
@@ -438,10 +447,14 @@
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #666;
-            color: white;
+            background-color: <%=accent%>;
+            color: white !important;
             text-decoration: none;
             border-radius: 5px;
+        }
+        .table-button:hover, .modify-button:hover, .delete-button:hover, .back-button:hover {
+        	background-color: black;
+        	color: white;
         }
         .status-activ {
             color: green;
@@ -469,16 +482,16 @@
                 
             <% } else if ("add".equals(action)) { %>
                 <div class="form-container">
-                    <h2>Adaugă post de angajare</h2>
+                    <h2 style="color:<%=accent%>">Adaugă post de angajare</h2>
                     <form method="POST" action="AdaugaPostServlet">
                         <div class="form-group">
                             <label for="titlu">Titlu post:</label>
-                            <input type="text" id="titlu" name="titlu" required>
+                            <input style="border-color:<%=accent%>;" type="text" id="titlu" name="titlu" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="departament">Departament:</label>
-                            <select id="departament" name="departament" required>
+                            <select style="border-color:<%=accent%>;" id="departament" name="departament" required>
                                 <option value="">-- Selectați --</option>
                                 <%
                                 Connection conn = null;
@@ -510,7 +523,7 @@
                         
                         <div class="form-group">
                             <label for="pozitie">Poziție:</label>
-                            <select id="pozitie" name="pozitie" required>
+                            <select style="border-color:<%=accent%>;" id="pozitie" name="pozitie" required>
                                 <option value="">-- Selectați --</option>
                                 <%
                                 try {
@@ -541,38 +554,38 @@
                         
                         <div class="form-group">
                             <label for="req">Cerințe:</label>
-                            <textarea id="req" name="req" required></textarea>
+                            <textarea style="border-color:<%=accent%>;" id="req" name="req" required></textarea>
                         </div>
                         
                         <div class="form-group">
                             <label for="resp">Responsabilități:</label>
-                            <textarea id="resp" name="resp" required></textarea>
+                            <textarea style="border-color:<%=accent%>;" id="resp" name="resp" required></textarea>
                         </div>
                         
                         <div class="form-group">
                             <label for="dom">Domeniu:</label>
-                            <input type="text" id="dom" name="dom" required>
+                            <input style="border-color:<%=accent%>;" type="text" id="dom" name="dom" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="subdom">Subdomeniu:</label>
-                            <input type="text" id="subdom" name="subdom">
+                            <input style="border-color:<%=accent%>;" type="text" id="subdom" name="subdom">
                         </div>
                         
                         <div class="form-group">
                             <label for="start">Data început:</label>
-                            <input type="date" id="start" name="start" required>
+                            <input style="border-color:<%=accent%>;" type="date" id="start" name="start" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="end">Data sfârșit:</label>
-                            <input type="date" id="end" name="end" required>
+                            <input style="border-color:<%=accent%>;" type="date" id="end" name="end" required>
                         </div>
                         
                         <!-- Județe și Localități din Roloca API -->
                         <div class="form-group">
                             <label for="judet">Județ:</label>
-                            <select id="judet" name="judet" required onchange="loadLocalitati()">
+                            <select style="border-color:<%=accent%>;" id="judet" name="judet" required onchange="loadLocalitati()">
                                 <option value="">-- Selectați județul --</option>
                                 <!-- Județele vor fi încărcate prin JavaScript -->
                             </select>
@@ -580,24 +593,24 @@
                         
                         <div class="form-group">
                             <label for="localitate">Localitate:</label>
-                            <select id="localitate" name="localitate" required disabled>
+                            <select style="border-color:<%=accent%>;" id="localitate" name="localitate" required disabled>
                                 <option value="">-- Selectați mai întâi județul --</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label for="strada">Adresa (strada, număr, etc.):</label>
-                            <input type="text" id="strada" name="strada" required>
+                            <input style="border-color:<%=accent%>;" type="text" id="strada" name="strada" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="ore">Ore pe săptămână:</label>
-                            <input type="number" id="ore" name="ore" min="1" max="40" required>
+                            <input style="border-color:<%=accent%>;" type="number" id="ore" name="ore" min="1" max="40" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="tip">Tip:</label>
-                            <select id="tip" name="tip" required>
+                            <select style="border-color:<%=accent%>;" id="tip" name="tip" required>
                                 <option value="1">Full-time</option>
                                 <option value="0">Part-time</option>
                             </select>
@@ -605,12 +618,12 @@
                         
                         <div class="form-group">
                             <label for="keywords">Cuvinte cheie:</label>
-                            <input type="text" id="keywords" name="keywords" placeholder="Separate prin virgulă">
+                            <input style="border-color:<%=accent%>;" type="text" id="keywords" name="keywords" placeholder="Separate prin virgulă">
                         </div>
                         
                         <button type="submit" class="submit-button">Adaugă Post</button>
                     </form>
-                    <a href="administrare_posturi.jsp" class="back-button">Înapoi</a>
+                    <a style="color:white;" href="administrare_posturi.jsp" class="back-button">Înapoi</a>
                 </div>
                 
             <% } else if ("list".equals(action)) { %>

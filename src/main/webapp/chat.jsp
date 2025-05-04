@@ -107,26 +107,27 @@
         }
 
         .suggestion-button {
-            background-color: #f1f1f1;
-            border: 1px solid #ddd;
+            background-color: <%=clr%>;
+            border: 1px solid <%=accent%>;
             border-radius: 18px;
             padding: 8px 16px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+           color: <%=text%>;
         }
 
         .suggestion-button:hover {
-            background-color: #e6e6e6;
+            background-color: black;
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+           
         }
 
         .suggestion-button:active {
             transform: translateY(0);
-            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+            
         }
 
         .input-container {
@@ -142,24 +143,24 @@
             padding: 20px;
         }
         
+        
         .chat-container {
-            background-color: #fff;
+            background-color: <%=sidebar%>;
             border-radius: 10px;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            
             overflow: hidden;
             display: flex;
             flex-direction: column;
             height: calc(100vh - 40px);
-            z-index: 2;
         }
         
         .chat-header {
-            background-color: var(--bg, #007bff);
+            background-color: <%=accent%>;
             color: white;
             padding: 15px 20px;
             font-weight: bold;
             font-size: 22px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid <%=clr%>;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -175,7 +176,6 @@
             overflow-y: auto;
             padding: 20px;
             scroll-behavior: smooth;
-            z-index: 1;
         }
         
         .message {
@@ -183,35 +183,27 @@
             max-width: 80%;
             animation: fadeInUp 0.3s;
             position: relative;
-            z-index: 1;
         }
         
         .user-message {
             margin-left: auto;
-            background-color: var(--bg, #007bff);
+            background-color: <%=accent%>;
             color: white;
             border-radius: 18px 18px 3px 18px;
             padding: 12px 18px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 1;
         }
         
         .bot-message {
             margin-right: auto;
-            background-color: #f1f1f1;
+            background-color: <%=clr%>;
+            color: <%=text%>;
             border-radius: 18px 18px 18px 3px;
-            padding: 12px 18px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            z-index: 1;
+            padding: 12px 18px;        
         }
-        
-        .message.bot-message, .message.user-message {
-        	z-index: 1;
-        }
-        
+
         .message-time {
             font-size: 12px;
-            color: #888;
+            color: white;
             margin-top: 5px;
             text-align: right;
         }
@@ -227,14 +219,14 @@
             display: flex;
             align-items: center;
             padding: 10px 15px;
-            background-color: #f1f1f1;
+            background-color: <%=accent%>;
             border-radius: 18px;
         }
         
         .typing-dot {
             height: 8px;
             width: 8px;
-            background-color: #888;
+            background-color: <%=accent%>;
             border-radius: 50%;
             margin: 0 2px;
             animation: bounce 1.5s infinite;
@@ -252,15 +244,14 @@
         .chat-input {
             display: flex;
             padding: 15px;
-            border-top: 1px solid #e0e0e0;
-            background-color: #fff;
+            border-top: 1px solid <%=accent%>;
+            background-color: <%=accent%>;
             position: relative;
-      
         }
         
         .chat-input textarea {
             flex: 1;
-            border: 1px solid #ddd;
+            border: 1px solid <%=accent%>;
             border-radius: 22px;
             padding: 12px 45px 12px 15px;
             font-size: 16px;
@@ -268,18 +259,18 @@
             outline: none;
             max-height: 120px;
             min-height: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             transition: all 0.3s;
+            background-color: <%=clr%>;
+            color: white;
         }
         
-        .chat-input textarea:focus {
-            border-color: var(--bg, #007bff);
-            box-shadow: 0 1px 5px rgba(0,123,255,0.3);
+        .chat-input textarea:focus, .chat-input textarea:active, .chat-input textarea:hover {
+            background-color: <%=sidebar%>;
         }
         
         .chat-input button {
-            background-color: var(--bg, #007bff);
-            color: white;
+            background-color: <%=sidebar%>;
+            color: <%=accent%>;
             border: none;
             border-radius: 50%;
             width: 48px;
@@ -290,13 +281,13 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         .chat-input button:hover {
-            background-color: #0069d9;
+            background-color: black;
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            
         }
         
         .chat-input button:active {
@@ -311,36 +302,36 @@
         }
         
         /* Table styling */
-        .result-table {
+        table {
             width: 100%;
             border-collapse: collapse;
             margin: 10px 0;
             font-size: 14px;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            
         }
         
-        .result-table th {
-            background-color: #f5f5f5;
+        table th {
+            background-color: <%=clr%>;
             color: #333;
             font-weight: bold;
             text-align: left;
             padding: 12px;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 2px solid <%=clr%>;
         }
         
-        .result-table td {
+        table td {
             padding: 10px 12px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid <%=accent%>;
         }
         
-        .result-table tr:nth-child(even) {
-            background-color: #f9f9f9;
+        table tr:nth-child(even) {
+            background-color: <%=sidebar%>;
         }
         
-        .result-table tr:hover {
-            background-color: #f1f1f1;
+        table tr:hover {
+            background-color: <%=accent%>;
         }
         
         /* Scrollable table container for larger datasets */
@@ -349,7 +340,7 @@
             overflow-y: auto;
             margin: 10px 0;
             border-radius: 8px;
-            border: 1px solid #eee;
+            border: 1px solid <%=accent%>;
         }
         
         /* Action buttons near tables for export, etc. */
@@ -361,7 +352,8 @@
         }
         
         .table-action-button {
-            background-color: #f1f1f1;
+            background-color: <%=accent%>;
+            color: white;
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 5px 10px;
@@ -373,7 +365,7 @@
         }
         
         .table-action-button:hover {
-            background-color: #e6e6e6;
+            background-color: black;
         }
         
         /* Animations */
@@ -421,7 +413,7 @@
             color: #333;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+           
             width: 250px;
             z-index: 100;
             display: none;
@@ -429,22 +421,21 @@
             text-align: left;
             font-size: 13px;
             line-height: 1.4;
-            z-index: 200;
+            
         }
         
         .help-tooltip:hover .tooltip-content {
             display: block;
             animation: fadeIn 0.3s;
-            z-index: 200;
+           
         }
         
         .help-tooltip.tooltip-content {
             display: block;
             animation: fadeIn 0.3s;
-            z-index: 200;
+            
         }
-        
-        
+                
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -468,72 +459,7 @@
                 padding: 12px 15px;
                 font-size: 18px;
             }
-            
-            /* Pentru tooltip */
-.help-tooltip {
-    z-index: 1000 !important; /* Valoare mult mai mare decât celelalte elemente */
-}
-
-.tooltip-content {
-    z-index: 1000 !important;
-}
-
-/* Pentru mesaje - asigurați-vă că au un z-index mai mic */
-.message {
-    z-index: 1 !important;
-}
-
-.chat-messages {
-    z-index: 1 !important;
-}
-
-.chat-container {
-    position: relative; /* Asigurați-vă că containerul are o poziție relativă */
-}
-        }
-        /* Pentru tooltip */
-.help-tooltip {
-    z-index: 1000 !important; /* Valoare mult mai mare decât celelalte elemente */
-}
-
-.tooltip-content {
-    z-index: 1000 !important;
-}
-
-/* Pentru mesaje - asigurați-vă că au un z-index mai mic */
-.message {
-    z-index: 1 !important;
-}
-
-.chat-messages {
-    z-index: 1 !important;
-}
-
-.chat-container {
-    position: relative; /* Asigurați-vă că containerul are o poziție relativă */
-}
-.table-container {
-    max-height: 400px;
-    overflow-y: auto !important;
-    overflow-x: auto !important; /* Adăugați și scroll orizontal dacă este necesar */
-    width: 100%;
-    display: block;
-}
-.result-table th, .result-table td {
-    color: #333 !important; /* Culoare text închisă */
-    background-color: #fff !important; /* Fundal luminos */
-    border: 1px solid #ddd !important; /* Border vizibil */
-}
-
-.result-table tr:nth-child(even) {
-    background-color: #f2f2f2 !important; /* Fundal alternativ pentru lizibilitate */
-}
-
-.table-container {
-    border: 1px solid #ddd !important;
-    padding: 5px !important;
-    background-color: #fff !important;
-}
+       
     </style>
     
     <!--=============== icon ===============-->
