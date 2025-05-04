@@ -150,6 +150,7 @@
             display: flex;
             flex-direction: column;
             height: calc(100vh - 40px);
+            z-index: 2;
         }
         
         .chat-header {
@@ -174,6 +175,7 @@
             overflow-y: auto;
             padding: 20px;
             scroll-behavior: smooth;
+            z-index: 1;
         }
         
         .message {
@@ -181,6 +183,7 @@
             max-width: 80%;
             animation: fadeInUp 0.3s;
             position: relative;
+            z-index: 1;
         }
         
         .user-message {
@@ -190,6 +193,7 @@
             border-radius: 18px 18px 3px 18px;
             padding: 12px 18px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1;
         }
         
         .bot-message {
@@ -198,6 +202,11 @@
             border-radius: 18px 18px 18px 3px;
             padding: 12px 18px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 1;
+        }
+        
+        .message.bot-message, .message.user-message {
+        	z-index: 1;
         }
         
         .message-time {
@@ -246,6 +255,7 @@
             border-top: 1px solid #e0e0e0;
             background-color: #fff;
             position: relative;
+      
         }
         
         .chat-input textarea {
@@ -388,6 +398,7 @@
             display: inline-block;
             margin-left: 10px;
             cursor: pointer;
+            z-index: 200;
         }
         
         .help-icon {
@@ -412,18 +423,27 @@
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             width: 250px;
-            z-index: 10;
+            z-index: 100;
             display: none;
             font-weight: normal;
             text-align: left;
             font-size: 13px;
             line-height: 1.4;
+            z-index: 200;
         }
         
         .help-tooltip:hover .tooltip-content {
             display: block;
             animation: fadeIn 0.3s;
+            z-index: 200;
         }
+        
+        .help-tooltip.tooltip-content {
+            display: block;
+            animation: fadeIn 0.3s;
+            z-index: 200;
+        }
+        
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -448,7 +468,72 @@
                 padding: 12px 15px;
                 font-size: 18px;
             }
+            
+            /* Pentru tooltip */
+.help-tooltip {
+    z-index: 1000 !important; /* Valoare mult mai mare decât celelalte elemente */
+}
+
+.tooltip-content {
+    z-index: 1000 !important;
+}
+
+/* Pentru mesaje - asigurați-vă că au un z-index mai mic */
+.message {
+    z-index: 1 !important;
+}
+
+.chat-messages {
+    z-index: 1 !important;
+}
+
+.chat-container {
+    position: relative; /* Asigurați-vă că containerul are o poziție relativă */
+}
         }
+        /* Pentru tooltip */
+.help-tooltip {
+    z-index: 1000 !important; /* Valoare mult mai mare decât celelalte elemente */
+}
+
+.tooltip-content {
+    z-index: 1000 !important;
+}
+
+/* Pentru mesaje - asigurați-vă că au un z-index mai mic */
+.message {
+    z-index: 1 !important;
+}
+
+.chat-messages {
+    z-index: 1 !important;
+}
+
+.chat-container {
+    position: relative; /* Asigurați-vă că containerul are o poziție relativă */
+}
+.table-container {
+    max-height: 400px;
+    overflow-y: auto !important;
+    overflow-x: auto !important; /* Adăugați și scroll orizontal dacă este necesar */
+    width: 100%;
+    display: block;
+}
+.result-table th, .result-table td {
+    color: #333 !important; /* Culoare text închisă */
+    background-color: #fff !important; /* Fundal luminos */
+    border: 1px solid #ddd !important; /* Border vizibil */
+}
+
+.result-table tr:nth-child(even) {
+    background-color: #f2f2f2 !important; /* Fundal alternativ pentru lizibilitate */
+}
+
+.table-container {
+    border: 1px solid #ddd !important;
+    padding: 5px !important;
+    background-color: #fff !important;
+}
     </style>
     
     <!--=============== icon ===============-->
@@ -465,22 +550,21 @@
                 <div>Asistent HR</div>
                 <div class="chat-status">
                     <span id="statusText">Online</span>
-                    <div class="help-tooltip">
-                        <div class="help-icon">?</div>
-                        <div class="tooltip-content">
-                            <strong>Cum să folosești asistentul:</strong><br>
+                    
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                <strong>Cum să folosești asistentul:</strong><br>
                             - Întreabă despre angajați, departamente, concedii<br>
                             - Solicită informații specifice sau statistici<br>
                             - Folosește limbaj natural în întrebări<br>
                             - Spune "Da" pentru a vedea detalii<br>
                             - Încearcă sugestiile de mai jos
-                        </div>
-                    </div>
+                    
                 </div>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="message bot-message">
-                    <p>Bine ați venit! Sunt asistentul HR virtual. Vă pot oferi informații despre:</p>
+                 <div class="message bot-message">
+                <p>Bine ați venit! Sunt asistentul HR virtual. Vă pot oferi informații despre:</p>
                     <ul>
                         <li>Angajați și departamente</li>
                         <li>Concedii și adeverințe</li>
@@ -488,7 +572,7 @@
                         <li>Proiecte și echipe</li>
                     </ul>
                     <p>Cum vă pot ajuta astăzi?</p>
-                </div>
+                    </div>
             </div>
             <div class="suggestions-container" id="suggestionsContainer">
                 <!-- Suggestions will be added here dynamically -->
@@ -878,43 +962,90 @@
         scrollToBottom();
     }
     
-    // Add a table message to chat
     function addTableMessage(data, sender) {
         if (!data || data.length === 0) {
             addMessage('Nu există date disponibile.', sender);
             return;
         }
         
+        console.log('Rendering table with data:', data);
+        
+        // Creăm containerul pentru mesaj
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
         messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        messageElement.style.maxWidth = "95%";
+        messageElement.style.width = "auto";
+        messageElement.style.overflowX = "auto";
         
-        // Table container for scrollability
+        // Get column names from first row
+        const columns = Object.keys(data[0]);
+        
+        // Build table HTML directly using StringBuilder pattern
+        let tableHTML = '';
+        tableHTML += '<div style="overflow-x:auto; margin:10px 0;">';
+        tableHTML += '<table style="width:100%; border-collapse:collapse; color:#000; background-color:#fff; border:1px solid #ddd;">';
+        
+        // Create header row
+        tableHTML += '<thead>';
+        tableHTML += '<tr>';
+        columns.forEach(column => {
+            // Convert column names to friendly format
+            const friendlyName = formatColumnName(column);
+            tableHTML += '<th style="padding:8px; text-align:left; background-color:#f5f5f5; color:#333; border:1px solid #ddd;">' + friendlyName + '</th>';
+        });
+        tableHTML += '</tr>';
+        tableHTML += '</thead>';
+        
+        // Create data rows
+        tableHTML += '<tbody>';
+        data.forEach((row, index) => {
+            const bgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+            tableHTML += '<tr style="background-color:' + bgColor + ';">';
+            columns.forEach(column => {
+                let cellValue = row[column] != null ? row[column] : '';
+                
+                // Format dates if they look like dates
+                if (typeof cellValue === 'string' && 
+                    (cellValue.match(/^\d{4}-\d{2}-\d{2}$/) || 
+                     cellValue.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/))) {
+                    cellValue = formatDateString(cellValue);
+                }
+                
+                // Format boolean values
+                if (cellValue === true) cellValue = 'Da';
+                if (cellValue === false) cellValue = 'Nu';
+                
+                tableHTML += '<td style="padding:8px; border:1px solid #ddd; color:#333;">' + cellValue + '</td>';
+            });
+            tableHTML += '</tr>';
+        });
+        tableHTML += '</tbody>';
+        tableHTML += '</table>';
+        tableHTML += '</div>';
+        
+        // Create the table element and add it to the message
         const tableContainer = document.createElement('div');
-        tableContainer.className = 'table-container';
-        
-        // Create table
-        const tableHTML = createTableFromData(data);
         tableContainer.innerHTML = tableHTML;
-        
-        // Table actions (export, etc.)
-        const tableActions = document.createElement('div');
-        tableActions.className = 'table-actions';
+        messageElement.appendChild(tableContainer);
         
         // Export button
         const exportButton = document.createElement('button');
-        exportButton.className = 'table-action-button';
-        exportButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export CSV';
+        exportButton.textContent = 'Export CSV';
+        exportButton.style.backgroundColor = '#f1f1f1';
+        exportButton.style.border = '1px solid #ddd';
+        exportButton.style.borderRadius = '4px';
+        exportButton.style.padding = '5px 10px';
+        exportButton.style.fontSize = '12px';
+        exportButton.style.cursor = 'pointer';
+        exportButton.style.margin = '5px 0';
         exportButton.addEventListener('click', function() {
             exportTableToCSV(data);
         });
         
-        tableActions.appendChild(exportButton);
+        messageElement.appendChild(exportButton);
         
-        // Add to message element
-        messageElement.appendChild(tableContainer);
-        messageElement.appendChild(tableActions);
-        
+        // Add to chat
         chatMessages.appendChild(messageElement);
         
         // Add timestamp
@@ -922,11 +1053,11 @@
         timeElement.classList.add('message-time');
         const now = new Date();
         timeElement.textContent = now.getHours().toString().padStart(2, '0') + ':' + 
-                                 now.getMinutes().toString().padStart(2, '0');
+                                  now.getMinutes().toString().padStart(2, '0');
         messageElement.appendChild(timeElement);
         
-        // Scroll to bottom
-        scrollToBottom();
+        // Ensure good scrolling
+        setTimeout(scrollToBottom, 100);
     }
     
     // Show typing indicator
@@ -1006,27 +1137,30 @@
         return message;
     }
     
-    // Create HTML table from data
     function createTableFromData(data) {
         if (!data || data.length === 0) return '<p>Nu există date disponibile.</p>';
+        
+        // Log datele pentru debugging
+        console.log("Date pentru tabel:", data);
         
         // Get column names from first row
         const columns = Object.keys(data[0]);
         
-        let tableHTML = '<table class="result-table">';
+        let tableHTML = '<table class="result-table" style="width:100%; border-collapse:collapse; margin:10px 0; color:#333; background-color:#fff;">';
         
         // Create header row
         tableHTML += '<tr>';
         columns.forEach(column => {
             // Convert column names to friendly format
             const friendlyName = formatColumnName(column);
-            tableHTML += `<th>${friendlyName}</th>`;
+            tableHTML += `<th style="background-color:#f5f5f5; color:#333; text-align:left; padding:10px; border:1px solid #ddd;">${friendlyName}</th>`;
         });
         tableHTML += '</tr>';
         
         // Create data rows
-        data.forEach(row => {
-            tableHTML += '<tr>';
+        data.forEach((row, rowIndex) => {
+            const bgColor = rowIndex % 2 === 0 ? '#fff' : '#f9f9f9';
+            tableHTML += `<tr style="background-color:${bgColor};">`;
             columns.forEach(column => {
                 let cellValue = row[column] != null ? row[column] : '';
                 
@@ -1041,12 +1175,13 @@
                 if (cellValue === true) cellValue = 'Da';
                 if (cellValue === false) cellValue = 'Nu';
                 
-                tableHTML += `<td>${cellValue}</td>`;
+                tableHTML += `<td style="padding:8px; border:1px solid #ddd; color:#333;">${cellValue}</td>`;
             });
             tableHTML += '</tr>';
         });
         
         tableHTML += '</table>';
+        
         return tableHTML;
     }
     
