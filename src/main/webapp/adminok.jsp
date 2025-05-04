@@ -664,6 +664,15 @@
                     </a>
                 </li>
                   
+                   <li style="--bg: <%out.println(accent); %>">
+                    <a href="chat.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="chatbubbles"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Asistent virtual</div>
+                    </a>
+                </li>
+                  
                <li style="--bg: <%out.println(accent); %>;">
                      <a href="setari.jsp" class="load-content" target="iframe">
                         <div class="siiconn">

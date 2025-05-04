@@ -595,9 +595,9 @@ body {
             <li class="logo" style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>">
                 <a href="#">
                     <div class="siicon" style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>">
-                        <ion-icon name="airplane"></ion-icon>
+                        <ion-icon name="business"></ion-icon>
                     </div>
-                    <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="sitext">Concedii</div>
+                    <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="sitext">Platforma</div>
                 </a>
             </li>
             <div style="background:<%out.println(sidebar); %>; color: <%out.println(text); %>" class="menuToggle"></div>
@@ -610,6 +610,16 @@ body {
                         <div  class="sitextt">Acasa</div>
                     </a>
                 </li>
+                
+                 <li style="--bg: <%out.println(accent); %>">
+                     <a href="concediinoisef.jsp" class="load-content" target="iframe">
+                         <div class="siiconn">
+                            <ion-icon name="alert"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Notificari</div>
+                    </a>
+                </li>
+                
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="viewang4.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -618,14 +628,7 @@ body {
                         <div  class="sitextt">Angajati</div>
                     </a>
                 </li>
-                <li style="--bg: <%out.println(accent); %>">
-                     <a href="concediinoisef.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="today"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Notificari</div>
-                    </a>
-                </li>
+               
                  <li style="--bg: <%out.println(accent); %>">
                     <a href="actiuni2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -634,7 +637,18 @@ body {
                         <div  class="sitextt">Adeverinte</div>
                     </a>
                 </li>
+               
+                
                 <li style="--bg: <%out.println(accent); %>">
+                    <a href="actiuni.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="moon"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Concedii</div>
+                    </a>
+                </li>
+                
+                 <li style="--bg: <%out.println(accent); %>">
                      <a href="viewang2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="stats"></ion-icon>
@@ -643,20 +657,21 @@ body {
                     </a>
                 </li>
                 
-                <li style="--bg: <%out.println(accent); %>">
-                    <a href="actiuni.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="apps"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Actiuni</div>
-                    </a>
-                </li>
                        <li style="--bg: <%out.println(accent); %>;">
                     <a href="actiuni_harti.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="globe"></ion-icon>
                         </div>
                         <div  class="sitextt">Harti</div>
+                    </a>
+                </li>
+                 
+                    <li style="--bg: <%out.println(accent); %>">
+                    <a href="chat.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="chatbubbles"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Asistent virtual</div>
                     </a>
                 </li>
                  

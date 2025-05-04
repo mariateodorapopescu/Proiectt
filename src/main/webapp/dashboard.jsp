@@ -637,6 +637,16 @@
                         <div  class="sitextt">Acasa</div>
                     </a>
                 </li>
+                
+                <li style="--bg: <%out.println(accent); %>">
+                     <a href="concediinoisef.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="alert"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Notificari</div>
+                    </a>
+                </li>
+                
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="viewang.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -661,6 +671,16 @@
                         <div  class="sitextt">Posturi</div>
                     </a>
                 </li>
+                
+                 <li style="--bg: <%out.println(accent); %>">
+                    <a href="viewdep.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="briefcase"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Departamente</div>
+                    </a>
+                </li>
+                
                  <li style="--bg: <%out.println(accent); %>">
                     <a href="actiuni2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -669,15 +689,17 @@
                         <div  class="sitextt">Adeverinte</div>
                     </a>
                 </li>
-                <li style="--bg: <%out.println(accent); %>">
-                     <a href="concediinoisef.jsp" class="load-content" target="iframe">
+                
+                <li style="--bg: <%out.println(accent); %>;">
+                    <a href="actiuni.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
-                            <ion-icon name="alert"></ion-icon>
+                            <ion-icon name="moon"></ion-icon>
                         </div>
-                        <div  class="sitextt">Notificari</div>
+                        <div  class="sitextt">Concedii</div>
                     </a>
                 </li>
-                <li style="--bg: <%out.println(accent); %>">
+                
+                 <li style="--bg: <%out.println(accent); %>">
                      <a href="vizualizareconcedii.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                             <ion-icon name="stats"></ion-icon>
@@ -686,14 +708,6 @@
                     </a>
                 </li>
                 
-                <li style="--bg: <%out.println(accent); %>;">
-                    <a href="actiuni.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="apps"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Actiuni</div>
-                    </a>
-                </li>
                         <li style="--bg: <%out.println(accent); %>;">
                     <a href="actiuni_harti.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -703,15 +717,6 @@
                     </a>
                 </li>
                  
-                <li style="--bg: <%out.println(accent); %>">
-                    <a href="viewdep.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="briefcase"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Departamente</div>
-                    </a>
-                </li>
-                
                 <li style="--bg: <%out.println(accent); %>">
                     <a href="chat.jsp" class="load-content" target="iframe">
                         <div class="siiconn">

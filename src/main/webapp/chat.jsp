@@ -32,7 +32,7 @@
                         int userType = rs.getInt("tip");
                         int userdep = rs.getInt("id_dep");
                         String functie = rs.getString("functie");
-                        if (functie.compareTo("Administrator") != 0) {   
+                          
                         // aflu data curenta, tot ca o interogare bd =(
                         String today = "";
                          try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
@@ -459,6 +459,9 @@
                 padding: 12px 15px;
                 font-size: 18px;
             }
+            
+            .message.bot-message.div.div.table.thread.tr {
+background-color: red;}
        
     </style>
     
@@ -1204,7 +1207,7 @@
     </script>
          <%
                     }
-                }
+                
             } catch (Exception e) {
                 out.println("<script type='text/javascript'>");
                 out.println("alert('Eroare la baza de date!');");
