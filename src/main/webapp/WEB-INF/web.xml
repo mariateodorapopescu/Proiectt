@@ -1284,4 +1284,14 @@
     <servlet-name>GetUserWorkplaceServlet</servlet-name>
     <url-pattern>/GetUserWorkplaceServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AdaugaEchipaServlet</display-name>
+    <servlet-name>AdaugaEchipaServlet</servlet-name>
+    <servlet-class>Servlet.AdaugaEchipaServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AdaugaEchipaServlet</servlet-name>
+    <url-pattern>/AdaugaEchipaServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

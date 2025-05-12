@@ -341,11 +341,42 @@ public class AddConServlet extends HttpServlet {
 			    e.printStackTrace();
 			}
 	    }
-	    
-	    // daca utilizatorul este director sau sef, atunci concediul este deja aprobat sef, altfel este neaprobat
-	    if (tip2 == 0 || tip2 == 3) {
-	    	concediul.setStatus(1);
-	    } else {
+	    try {
+			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                        "dp.denumire_completa AS denumire FROM useri u " +
+                        "JOIN tipuri t ON u.tip = t.tip " +
+                        "JOIN departament d ON u.id_dep = d.id_dep " +
+                        "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                        "WHERE u.id = ?")) {
+                preparedStatement.setInt(1, id);
+                ResultSet rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                	// extrag date despre userul curent
+                    
+                    int userType = rs.getInt("tip");
+                    int userDep = rs.getInt("id_dep");
+                    String functie = rs.getString("functie");
+                    int ierarhie = rs.getInt("ierarhie");
+
+                    // Funcție helper pentru a determina rolul utilizatorului
+                    boolean isDirector = (ierarhie < 3) ;
+                    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                    boolean isIncepator = (ierarhie >= 10);
+                    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                    boolean isAdmin = (functie.compareTo("Administrator") == 0);
+                    
+        
+        // Dacă utilizatorul este șef (tip = 3), director (tip = 4) sau alt rol superior (tip >= 9),
+        // statusul va fi direct 1 (aprobat de șef)
+        if (isDirector || isSef) {
+        	concediul.setStatus(1); // Aprobat de șef
+        } else {
 	    	concediul.setStatus(0);
 	    }
 	    
@@ -437,6 +468,17 @@ public class AddConServlet extends HttpServlet {
 	        out.println("</script>");
 	        out.close();
 	    }
+	} 
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Eroare la adăugarea adeverinței: " + e.getMessage() + "');");
+            out.println("window.location.href = 'addadev.jsp';");
+            out.println("</script>");
+            out.close();
+        }
 	}
 	
 	/**

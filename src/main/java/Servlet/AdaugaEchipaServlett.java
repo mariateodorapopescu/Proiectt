@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -11,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-public class AdaugaMembruEchipaServlet extends HttpServlet {
+public class AdaugaEchipaServlett extends HttpServlet {
     // Database connection constants
     private static final String DB_URL = "jdbc:mysql://localhost:3306/test?useSSL=false";
     private static final String DB_USER = "root";
@@ -21,16 +22,16 @@ public class AdaugaMembruEchipaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-       
+      
 
-        int idEchipa = Integer.parseInt(request.getParameter("id_echipa"));
+        String nume = request.getParameter("nume");
         int idProiect = Integer.parseInt(request.getParameter("id_prj"));
+        int supervizor = Integer.parseInt(request.getParameter("supervizor"));
         String[] membri = request.getParameterValues("membri");
 
-        // Verifică dacă există membri selectați
-        if (membri == null || membri.length == 0) {
-            response.sendRedirect("administrare_proiecte.jsp?action=members&id_echipa=" + idEchipa 
-                    + "&id_prj=" + idProiect + "&error=noMembersSelected");
+        // Validări de bază
+        if (nume == null || nume.trim().isEmpty()) {
+            response.sendRedirect("administrare_proiecte.jsp?action=teams&id=" + idProiect + "&error=invalidTeamName");
             return;
         }
 
@@ -45,39 +46,49 @@ public class AdaugaMembruEchipaServlet extends HttpServlet {
             // Disable auto-commit for transaction
             conn.setAutoCommit(false);
 
-            // Adaugă membri în echipă folosind tabela membrii_echipe
-            String sql = "INSERT INTO membrii_echipe (id_ang, id_echipa) VALUES (?, ?)";
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                
+            // Adaugă echipa
+            String sql = "INSERT INTO echipe (nume, supervizor, id_prj) VALUES (?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, nume);
+            pstmt.setInt(2, supervizor);
+            pstmt.setInt(3, idProiect);
+            pstmt.executeUpdate();
+
+            // Obține ID-ul echipei nou create
+            ResultSet rs = pstmt.getGeneratedKeys();
+            int idEchipa = 0;
+            if (rs.next()) {
+                idEchipa = rs.getInt(1);
+            }
+            rs.close();
+            pstmt.close();
+
+            // Dacă nu s-a creat ID echipă, facem rollback și returnăm eroare
+            if (idEchipa == 0) {
+                conn.rollback();
+                response.sendRedirect("administrare_proiecte.jsp?action=teams&id=" + idProiect + "&error=teamCreationFailed");
+                return;
+            }
+
+            // Adaugă membrii în echipă - folosind tabela membrii_echipe
+            if (membri != null && membri.length > 0) {
+                sql = "INSERT INTO membrii_echipe (id_ang, id_echipa) VALUES (?, ?)";
+                pstmt = conn.prepareStatement(sql);
+
                 for (String idMembru : membri) {
                     pstmt.setInt(1, Integer.parseInt(idMembru));
                     pstmt.setInt(2, idEchipa);
                     pstmt.addBatch();
                 }
-                
-                int[] results = pstmt.executeBatch();
-                boolean allSuccessful = true;
-                
-                for (int result : results) {
-                    if (result <= 0) {
-                        allSuccessful = false;
-                        break;
-                    }
-                }
-                
-                if (!allSuccessful) {
-                    conn.rollback();
-                    response.sendRedirect("administrare_proiecte.jsp?action=members&id_echipa=" + idEchipa 
-                            + "&id_prj=" + idProiect + "&error=insertFailed");
-                    return;
-                }
+
+                pstmt.executeBatch();
+                pstmt.close();
             }
 
             // Commit transaction
             conn.commit();
-            getServletContext().log("Membri adăugați cu succes la echipa: " + idEchipa);
-            response.sendRedirect("administrare_proiecte.jsp?action=members&id_echipa=" + idEchipa 
-                    + "&id_prj=" + idProiect + "&success=true");
+            getServletContext().log("Echipa creată cu succes: " + idEchipa);
+            response.sendRedirect("administrare_proiecte.jsp?action=teams&id=" + idProiect + "&success=true");
 
         } catch (ClassNotFoundException e) {
             // Log the error
@@ -92,8 +103,7 @@ public class AdaugaMembruEchipaServlet extends HttpServlet {
                 getServletContext().log("Error during rollback", ex);
             }
             
-            response.sendRedirect("administrare_proiecte.jsp?action=members&id_echipa=" + idEchipa 
-                    + "&id_prj=" + idProiect + "&error=driverNotFound");
+            response.sendRedirect("administrare_proiecte.jsp?action=teams&id=" + idProiect + "&error=driverNotFound");
         } catch (SQLException e) {
             // Log the error
             getServletContext().log("Database error", e);
@@ -107,8 +117,7 @@ public class AdaugaMembruEchipaServlet extends HttpServlet {
                 getServletContext().log("Error during rollback", ex);
             }
             
-            response.sendRedirect("administrare_proiecte.jsp?action=members&id_echipa=" + idEchipa 
-                    + "&id_prj=" + idProiect + "&error=databaseError");
+            response.sendRedirect("administrare_proiecte.jsp?action=teams&id=" + idProiect + "&error=databaseError");
         } catch (Exception e) {
             // Log the error
             getServletContext().log("Unexpected error", e);
@@ -122,8 +131,7 @@ public class AdaugaMembruEchipaServlet extends HttpServlet {
                 getServletContext().log("Error during rollback", ex);
             }
             
-            response.sendRedirect("administrare_proiecte.jsp?action=members&id_echipa=" + idEchipa 
-                    + "&id_prj=" + idProiect + "&error=unexpectedError");
+            response.sendRedirect("administrare_proiecte.jsp?action=teams&id=" + idProiect + "&error=unexpectedError");
         } finally {
             // Reset auto-commit and close connection
             if (conn != null) {

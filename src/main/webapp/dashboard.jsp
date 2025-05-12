@@ -639,15 +639,6 @@
                 </li>
                 
                 <li style="--bg: <%out.println(accent); %>">
-                     <a href="concediinoisef.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="alert"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Notificari</div>
-                    </a>
-                </li>
-                
-                <li style="--bg: <%out.println(accent); %>">
                     <a href="viewang.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
                            <ion-icon name="body"></ion-icon>
@@ -660,7 +651,7 @@
                         <div class="siiconn">
                             <ion-icon name="people"></ion-icon>
                         </div>
-                        <div  class="sitextt">Proiecte & Echipe de Proiect</div>
+                        <div  class="sitextt">Proiecte & Echipe</div>
                     </a>
                 </li>
                 <li style="--bg: <%out.println(accent); %>">

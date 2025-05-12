@@ -74,7 +74,8 @@ DROP TABLE IF EXISTS
     evenimente,
     participanti_evenimente,
     notificari_task,
-    interviuri;
+    interviuri, 
+    membrii_echipe;
 
 -- 1. Tabele de bază (fără foreign keys)
 -- -----------------------------------------------------
@@ -226,20 +227,15 @@ CREATE TABLE IF NOT EXISTS useri (
   conramase INT NULL DEFAULT '3',
   cnp VARCHAR(14) NULL DEFAULT NULL,
   culoare VARCHAR(25) NOT NULL DEFAULT '#333',
-  activ INT NULL DEFAULT '1',
+  activ INT NULL DEFAULT '0',
   profil MEDIUMBLOB NULL DEFAULT NULL,
-  sporuri INT NULL DEFAULT NULL,
-  penalizari INT NULL DEFAULT NULL,
   data_ang DATE NULL DEFAULT NULL,
   data_modif DATE NULL DEFAULT NULL,
-  id_echipa INT NULL DEFAULT NULL,
   id_sediu INT NULL DEFAULT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (id_sediu) REFERENCES sedii(id_sediu),
   FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
-  FOREIGN KEY (tip) REFERENCES tipuri(tip),
-  FOREIGN KEY (sporuri) REFERENCES tipuri_sporuri(id),
-  FOREIGN KEY (penalizari) REFERENCES tipuri_penalizari(id)
+  FOREIGN KEY (tip) REFERENCES tipuri(tip)
   -- id_echipa va fi adăugat ca foreign key la final
 );
 
@@ -274,12 +270,6 @@ CREATE TABLE IF NOT EXISTS echipe (
     FOREIGN KEY (id_prj) REFERENCES proiecte(id)
 );
 
--- 3. Acum adăugăm foreign key-ul lipsă la useri
-ALTER TABLE useri
-ADD CONSTRAINT fk_useri_echipa
-FOREIGN KEY (id_echipa) REFERENCES echipe(id);
-
--- 4. Restul tabelelor care depind de useri, proiecte sau echipe
 -- -----------------------------------------------------
 -- Tabel istoric_penalizari
 -- -----------------------------------------------------
@@ -675,6 +665,18 @@ CREATE TABLE IF NOT EXISTS restrictii (
   asoc_dep INT NULL DEFAULT NULL,
   PRIMARY KEY (tip)
 );
+
+-- -----------------------------------------------------
+-- Tabel membrii_echipe
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS membrii_echipe (
+  id INT NOT NULL AUTO_INCREMENT,
+  id_ang int NOT NULL,
+  id_echipa int not null,
+  FOREIGN KEY (id_ang) REFERENCES useri(id),
+  FOREIGN KEY (id_echipa) REFERENCES echipe(id),
+  PRIMARY KEY (id)  
+) AUTO_INCREMENT = 5;
 
 -- -----------------------------------------------------
 -- Tabel sarbatori
@@ -1468,10 +1470,10 @@ DELIMITER ;
 
 -- Adaugăm proiecte
 INSERT INTO proiecte (nume, descriere, start, end, supervizor) VALUES
-('ERP Implementation', 'Implementarea unui sistem ERP pentru gestionarea resurselor companiei', '2023-01-01', '2023-12-31', 11),
-('Website Redesign', 'Reproiectarea site-ului web al companiei pentru o experiență mai bună a utilizatorilor', '2023-03-15', '2023-08-31', 12),
-('Mobile App Development', 'Dezvoltarea unei aplicații mobile pentru clienți', '2023-04-01', '2023-10-31', 13),
-('HR Management System', 'Dezvoltarea unui sistem intern pentru managementul resurselor umane', '2023-02-01', '2023-07-31', 14),
+('ERP Implementation', 'Implementarea unui sistem ERP pentru gestionarea resurselor companiei', '2025-01-01', '2025-12-31', 11),
+('Website Redesign', 'Reproiectarea site-ului web al companiei pentru o experiență mai bună a utilizatorilor', '2025-03-15', '2023-08-31', 12),
+('Mobile App Development', 'Dezvoltarea unei aplicații mobile pentru clienți', '2025-04-01', '2025-10-31', 13),
+('HR Management System', 'Dezvoltarea unui sistem intern pentru managementul resurselor umane', '2025-02-01', '2025-07-31', 14),
 ('Customer Support Portal', 'Crearea unui portal de asistență pentru clienți', '2023-05-01', '2023-11-30', 15);
 
 -- Adăugăm echipe
@@ -1481,18 +1483,6 @@ INSERT INTO echipe (nume, supervizor, id_prj) VALUES
 ('Echipa Mobile', 13, 3),
 ('Echipa HR', 14, 4),
 ('Echipa Suport', 15, 5);
-
--- Actualizăm useri pentru a adăuga id_echipa
-UPDATE useri SET id_echipa = 1 WHERE id IN (1, 6);
-UPDATE useri SET id_echipa = 2 WHERE id IN (2, 7);
-UPDATE useri SET id_echipa = 3 WHERE id IN (3, 8);
-UPDATE useri SET id_echipa = 4 WHERE id IN (4, 9);
-UPDATE useri SET id_echipa = 5 WHERE id IN (5, 10);
-UPDATE useri SET id_echipa = 1 WHERE id IN (11);
-UPDATE useri SET id_echipa = 2 WHERE id IN (12);
-UPDATE useri SET id_echipa = 3 WHERE id IN (13);
-UPDATE useri SET id_echipa = 4 WHERE id IN (14);
-UPDATE useri SET id_echipa = 5 WHERE id IN (15);
 
 -- Adăugăm sarcini (tasks)
 INSERT INTO tasks (id, nume, supervizor, id_ang, start, end, status, id_prj) VALUES
@@ -1646,44 +1636,45 @@ INSERT INTO istoric_penalizari (id_ang, tip_penalizare, data_start, data_final, 
 
 -- Adăugăm istorice de sporuri
 INSERT INTO istoric_sporuri (id_ang, tip_spor, data_start, data_final, motiv) VALUES
-(1, 3, '2023-01-01', '2023-12-31', 'Spor de vechime pentru peste 3 ani în companie'),
-(6, 3, '2023-01-01', '2023-12-31', 'Spor de vechime pentru peste 3 ani în companie'),
-(9, 3, '2023-01-01', '2023-12-31', 'Spor de vechime pentru peste 5 ani în companie'),
-(4, 5, '2023-03-01', '2023-12-31', 'Spor de confidențialitate pentru acces la date sensibile'),
-(7, 5, '2023-03-01', '2023-12-31', 'Spor de confidențialitate pentru acces la date financiare');
+(1, 3, '2025-01-01', '2025-12-31', 'Spor de vechime pentru peste 3 ani în companie'),
+(6, 3, '2025-01-01', '2025-12-31', 'Spor de vechime pentru peste 3 ani în companie'),
+(9, 3, '2025-01-01', '2025-12-31', 'Spor de vechime pentru peste 5 ani în companie'),
+(4, 5, '2025-03-01', '2025-12-31', 'Spor de confidențialitate pentru acces la date sensibile'),
+(6, 5, '2025-03-01', '2025-12-31', 'Spor de confidențialitate pentru acces la date sensibile'),
+(7, 5, '2025-03-01', '2025-12-31', 'Spor de confidențialitate pentru acces la date financiare');
 
 -- Adăugăm istoric de promovări
 INSERT INTO istoric_promovari (id_ang, tip_vechi, tip_nou, tip_promovare, data_promovare) VALUES
-(1, 3, 0, 'Promovare internă', '2022-06-01'),
-(6, 10, 0, 'Promovare internă', '2022-04-01'),
-(9, 8, 3, 'Promovare internă', '2022-01-15'),
-(7, 5, 1, 'Promovare performanță', '2022-10-01');
+(1, 3, 0, 'Promovare internă', '2024-06-01'),
+(6, 10, 0, 'Promovare internă', '2025-04-01'),
+(9, 8, 3, 'Promovare internă', '2025-01-15'),
+(7, 5, 1, 'Promovare performanță', '2024-10-01');
 
 -- Adăugăm istoric de concedii suplimentare
 INSERT INTO istoric_concedii_suplimentare (id_ang, zile_acordate, motiv, data_acordare) VALUES
-(1, 5, 'Performanță deosebită în Q1 2023', '2023-04-01'),
-(6, 3, 'Finalizare proiect important', '2023-03-15'),
-(9, 4, 'Vechime în companie peste 5 ani', '2023-01-01');
+(1, 5, 'Performanță deosebită în Q1 2023', '2025-04-01'),
+(6, 3, 'Finalizare proiect important', '2025-03-15'),
+(9, 4, 'Vechime în companie peste 5 ani', '2025-01-01');
 
 -- Adăugăm istoric fluture (salariu)
 INSERT INTO istoric_fluture (id_ang, luna, an, salariu_brut, salariu_net, data_generare) VALUES
-(1, 1, 2023, 13000.00, 7605.00, '2023-02-01'),
-(1, 2, 2023, 13000.00, 7605.00, '2023-03-01'),
-(1, 3, 2023, 13000.00, 7605.00, '2023-04-01'),
-(1, 4, 2023, 13000.00, 7605.00, '2023-05-01'),
-(6, 1, 2023, 13000.00, 7605.00, '2023-02-01'),
-(6, 2, 2023, 13000.00, 7605.00, '2023-03-01'),
-(6, 3, 2023, 13000.00, 7605.00, '2023-04-01'),
-(6, 4, 2023, 13000.00, 7605.00, '2023-05-01'),
-(9, 1, 2023, 11600.00, 6786.00, '2023-02-01'),
-(9, 2, 2023, 11600.00, 6786.00, '2023-03-01'),
-(9, 3, 2023, 11600.00, 6786.00, '2023-04-01'),
-(9, 4, 2023, 11600.00, 6786.00, '2023-05-01');
+(1, 1, 2023, 13000.00, 7605.00, '2025-02-01'),
+(1, 2, 2023, 13000.00, 7605.00, '2025-03-01'),
+(1, 3, 2023, 13000.00, 7605.00, '2025-04-01'),
+(1, 4, 2023, 13000.00, 7605.00, '2025-05-01'),
+(6, 1, 2023, 13000.00, 7605.00, '2025-02-01'),
+(6, 2, 2023, 13000.00, 7605.00, '2025-03-01'),
+(6, 3, 2023, 13000.00, 7605.00, '2025-04-01'),
+(6, 4, 2023, 13000.00, 7605.00, '2025-05-01'),
+(9, 1, 2023, 11600.00, 6786.00, '2025-02-01'),
+(9, 2, 2023, 11600.00, 6786.00, '2025-03-01'),
+(9, 3, 2023, 11600.00, 6786.00, '2025-04-01'),
+(9, 4, 2023, 11600.00, 6786.00, '2025-05-01');
 
 -- Adăugăm cereri de demisie
 INSERT INTO cereri_demisie (id_ang, motiv, data_cerere, data_ultima_zi, status) VALUES
-(5, 'Ofertă mai bună de la altă companie', '2023-05-15', '2023-06-15', 'IN_ASTEPTARE'),
-(8, 'Relocare în altă țară', '2023-05-01', '2023-05-31', 'APROBATA');
+(5, 'Ofertă mai bună de la altă companie', '2025-04-15', '2025-05-10', 'IN_ASTEPTARE'),
+(8, 'Relocare în altă țară', '2025-05-01', '2025-04-30', 'APROBATA');
 
 -- Adăugăm notificări generale
 INSERT INTO notificari_general (id_destinatar, tip, mesaj, citit) VALUES
@@ -1945,16 +1936,11 @@ where c.id_ang = 11
 and u.username <> "test" 
 and YEAR(c.start_c) = YEAR(CURDATE()); 
 
-SELECT DISTINCT l.oras, l.judet FROM locatii_useri l
+SELECT DISTINCT l.strada, l.oras, l.judet FROM locatii_useri l
 join useri u on u.id=l.id_user
 where u.id_dep = (select u1.id_dep from useri u1 where u1.id = 14) 
 ORDER BY l.oras;
 
--- -----------------------------------------------------
--- test
--- -----------------------------------------------------
-select * from concedii join useri on concedii.id_ang = useri.id where id_dep = 1;
-select * from istoric_incetari;
 SELECT DISTINCT u.*,  
                 t.denumire AS functie, 
                 t.ierarhie as ierarhie,
@@ -1964,17 +1950,22 @@ FROM useri u
 JOIN tipuri t ON u.tip = t.tip 
 JOIN departament d ON u.id_dep = d.id_dep 
 LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep;
-select * from denumiri_pozitii;
+
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, ct.motiv as tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip  WHERE u.username <> 'test' AND YEAR(c.start_c) = YEAR(CURDATE());
-desc locatii_useri;
-desc sedii;
-update useri set tip = 10 where username = "irina.c";
+
 SELECT strada, oras, judet, nume, prenume, nume_dep FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on useri.id = concedii.id_ang join departament on useri.id_dep = departament.id_dep ORDER BY oras;
-select * from tipuri join denumiri_pozitii on tip = tip_pozitie;
 -- ce tipuri de angajati exista in departamentul IT?
-select * from locatii_useri;
--- id_echipa si id_sediu
 select distinct tipuri.denumire from useri join departament on useri.id_dep = departament.id_dep join tipuri on tipuri.tip = useri.tip where upper(departament.nume_dep) like "%IT%";
+
+-- select group_concat(denumire separator ', ') as penalizari from istoric_penalizari join tipuri_penalizari on istoric_penalizari.tip_penalizare = tipuri_penalizari.id where id_ang = ? and istoric_penalizari.data_start < current_date() and istoric_penalizari.data_final > current_date();
+-- select group_concat(denumire separator ', ') as sporuri from istoric_sporuri join tipuri_sporuri on istoric_sporuri.tip_spor = tipuri_sporuri.id where id_ang = ? and istoric_sporuri.data_start < current_date() and istoric_sporuri.data_final > current_date();
+-- select group_concat(nume separator ', ') as echipe from membrii_echipe join echipe on echipe.id = membrii_echipe.id_echipa join proiecte on echipe.id_prj = proiecte.id where membrii_echipe.id_ang = ?;
+-- select group_concat(echipe.nume separator ', ') as echipe from membrii_echipe join echipe on echipe.id = membrii_echipe.id_echipa join proiecte on echipe.id_prj = proiecte.id;
+
+select group_concat(echipe.nume separator ', ') as nume_echipe from membrii_echipe join echipe on echipe.id = membrii_echipe.id_echipa join proiecte on echipe.id_prj = proiecte.id join useri u on u.id = membrii_echipe.id_ang where proiecte.start < current_date() and proiecte.end > current_date();
+
+select group_concat(nume separator ', ') as proiecte from proiecte where proiecte.start < current_date() and proiecte.end > current_date();
+
 SELECT 
     u.id, 
     u.nume, 
@@ -1988,29 +1979,26 @@ SELECT
     u.data_modif, 
     d.nume_dep,
     t.salariu, 
+    (select group_concat(denumire separator ', ') as sporuri from istoric_sporuri join tipuri_sporuri on istoric_sporuri.tip_spor = tipuri_sporuri.id where id_ang = u.id and istoric_sporuri.data_start < current_date() and istoric_sporuri.data_final > current_date()) as sporuri,
+    (select group_concat(denumire separator ', ') as penalizari from istoric_penalizari join tipuri_penalizari on istoric_penalizari.tip_penalizare = tipuri_penalizari.id where id_ang = u.id and istoric_penalizari.data_start < current_date() and istoric_penalizari.data_final > current_date()) as penalizari,
     t.denumire AS denumire_pozitie, -- Using existing column instead of denumiri_pozitii.denumire_completa
-    ts.denumire AS denumire_spor,
-    tp.denumire AS denumire_penalizare,
     l.strada, 
     l.oras, 
     l.judet, 
     l.tara,
-    'N/A' AS nume_sediu, -- Placeholder for the missing sedii.nume_sediu
-    e.nume AS nume_echipa -- From echipe table, but note that useri doesn't have id_echipa
+	sd.nume_sediu AS nume_sediu,
+    (select group_concat(echipe.nume separator ', ') as nume_echipe from membrii_echipe join echipe on echipe.id = membrii_echipe.id_echipa join proiecte on echipe.id_prj = proiecte.id join useri u on u.id = membrii_echipe.id_ang where proiecte.start < current_date() and proiecte.end > current_date() and membrii_echipe.id_ang = u.id) as nume_echipe
 FROM 
     useri u
+LEFT JOIN
+	sedii sd ON sd.id_sediu = u.id_sediu
 LEFT JOIN 
     departament d ON u.id_dep = d.id_dep
 LEFT JOIN 
     tipuri t ON u.tip = t.tip
 LEFT JOIN 
-    tipuri_sporuri ts ON ts.id = u.sporuri
-LEFT JOIN 
-    tipuri_penalizari tp ON tp.id = u.penalizari
-LEFT JOIN 
-    locatii_useri l ON u.id = l.id_user
-LEFT JOIN
-    echipe e ON e.id = u.id_echipa; 
+    locatii_useri l ON u.id = l.id_user; 
+
 SELECT 
     c.id AS id_concediu,
     u.nume, 
@@ -2024,9 +2012,8 @@ SELECT
     l.oras, 
     l.judet, 
     l.tara,
-    c.motiv, 
+    tc.motiv as tip_concediu, 
     s.nume_status AS status_concediu,
-    tc.motiv AS tip_concediu,
     c.durata, 
     c.added AS data_adaugare, 
     c.modified AS data_modificare, 
@@ -2034,7 +2021,7 @@ SELECT
     c.mentiuni,
     u.conluate, 
     u.zilecons,
-    e.nume AS nume_echipa,
+    (select group_concat(echipe.nume separator ', ') as nume_echipe from membrii_echipe join echipe on echipe.id = membrii_echipe.id_echipa join proiecte on echipe.id_prj = proiecte.id join useri u on u.id = membrii_echipe.id_ang where proiecte.start < current_date() and proiecte.end > current_date() and membrii_echipe.id_ang = u.id) as nume_echipe,
     sd.nume_sediu AS nume_sediu,
     lc.oras, 
     lc.judet, 
@@ -2049,8 +2036,8 @@ LEFT JOIN tipuri t ON u.tip = t.tip
 LEFT JOIN statusuri s ON c.status = s.status
 LEFT JOIN tipcon tc ON c.tip = tc.tip
 LEFT JOIN locatii_concedii lc ON c.id = lc.id_concediu
-LEFT JOIN echipe e ON e.id = u.id_echipa
 WHERE c.id IS NOT NULL;
+
 SELECT 
     a.id AS id_adeverinta,
     a.motiv,
@@ -2071,7 +2058,7 @@ SELECT
     lu.oras AS oras_angajat,
     lu.judet AS judet_angajat,
     lu.tara AS tara_angajat,
-    e.nume AS nume_echipa,
+    (select group_concat(echipe.nume separator ', ') as nume_echipe from membrii_echipe join echipe on echipe.id = membrii_echipe.id_echipa join proiecte on echipe.id_prj = proiecte.id join useri u on u.id = membrii_echipe.id_ang where proiecte.start < current_date() and proiecte.end > current_date() and membrii_echipe.id_ang = u.id) as nume_echipe,
     sd.nume_sediu AS nume_sediu
 FROM 
     adeverinte a
@@ -2088,17 +2075,14 @@ LEFT JOIN
 LEFT JOIN 
     tipuri t ON u.tip = t.tip
 LEFT JOIN 
-    tipuri_sporuri ts ON ts.id = u.sporuri
-LEFT JOIN 
-    tipuri_penalizari tp ON tp.id = u.penalizari
-LEFT JOIN 
     locatii_useri lu ON u.id = lu.id_user
-LEFT JOIN 
-    echipe e ON e.id = u.id_echipa
-LEFT JOIN 
-    proiecte p ON p.id = e.id_prj
 WHERE 
     a.id IS NOT NULL;
-select * from tipuri;
+
 select u.nume, u.prenume, u.data_nasterii, u.email, u.telefon from useri u join departament d on u.id_dep = d.id_dep where upper(d.nume_dep) like "%HR%";
+
 SELECT c.id, u.nume, u.prenume, d.nume_dep AS departament, t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, s.nume_status AS status, c.durata, tc.motiv AS tip_concediu FROM concedii c JOIN useri u ON c.id_ang = u.id JOIN departament d ON u.id_dep = d.id_dep JOIN tipuri t ON u.tip = t.tip JOIN statusuri s ON c.status = s.status JOIN tipcon tc ON c.tip = tc.tip  ORDER BY c.start_c DESC;
+
+-- -----------------------------------------------------
+-- test
+-- -----------------------------------------------------

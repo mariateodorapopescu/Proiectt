@@ -32,6 +32,15 @@
                         int userType = rs.getInt("tip");
                         int userdep = rs.getInt("id_dep");
                         String functie = rs.getString("functie");
+                        int ierarhie = rs.getInt("ierarhie");
+
+                        // Funcție helper pentru a determina rolul utilizatorului
+                        boolean isDirector = (ierarhie < 3) ;
+                        boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                        boolean isIncepator = (ierarhie >= 10);
+                        boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                        boolean isAdmin = (functie.compareTo("Administrator") == 0);
+                        
                         if (functie.compareTo("Administrator") != 0) {  
                     	// aflu data curenta, tot ca o interogare bd =(
                     	String today = "";
@@ -104,7 +113,9 @@
 		<h3>Ce doriti sa faceti?</h3>
 		<button > <a href = "addc.jsp" style="text-decoration:none;">Adaugare concediu</a></button>
 		<button ><a href = "concediinoisef.jsp?pag=1" style="text-decoration:none;">Modificare si stergere concedii</a></button>
-		
+		<% if (isDirector || isSef) { %>
+		<button ><a href = "concediinoisef.jsp?" style="text-decoration:none;">Vizualizare concedii noi</a></button>
+		<% } %>
       </div>
    </div>
    

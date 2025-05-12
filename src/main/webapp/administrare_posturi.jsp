@@ -371,6 +371,11 @@
             margin-bottom: 20px;
             color: <%=text%>;
         }
+        a {
+        color: white;
+        }
+        a.back-button {
+        color: white !important;}
         .form-group {
             margin-bottom: 15px;
         }
@@ -692,7 +697,7 @@
                         %>
                     </tbody>
                 </table>
-                <a href="administrare_posturi.jsp" class="back-button">Înapoi</a>
+                <a style="color:white;" href="administrare_posturi.jsp" class="back-button">Înapoi</a>
                 
             <% } else if ("edit".equals(action)) { 
                 int idPost = Integer.parseInt(request.getParameter("id"));
@@ -848,7 +853,7 @@
                         
                         <button type="submit" class="submit-button">Salvează Modificările</button>
                     </form>
-                    <a href="administrare_posturi.jsp?action=list" class="back-button">Înapoi</a>
+                    <a style="color:white;" href="administrare_posturi.jsp?action=list" class="back-button">Înapoi</a>
                 </div>
             <%
                     

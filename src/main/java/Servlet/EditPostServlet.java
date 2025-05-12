@@ -18,17 +18,7 @@ public class EditPostServlet extends HttpServlet {
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        Integer userTip = (Integer) session.getAttribute("userTip");
-        Integer userDep = (Integer) session.getAttribute("userDep");
-        
-        // Verificare permisiuni
-        if (userTip == null || (userTip != 0 && (userTip != 3 && userDep != 1))) {
-            response.sendRedirect("Access.jsp?error=accessDenied");
-            return;
-        }
-        
+    
         // Obținerea parametrilor postului
         int idPost = Integer.parseInt(request.getParameter("id"));
         String titlu = request.getParameter("titlu");

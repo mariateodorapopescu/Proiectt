@@ -21,15 +21,7 @@ public class DeleteEchipaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        Integer userTip = (Integer) session.getAttribute("userTip");
-
-        // Verificare permisiuni
-        if (userTip == null || (userTip != 0 && userTip != 3 && userTip != 10)) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"success\": false, \"message\": \"Nu aveți permisiunile necesare.\"}");
-            return;
-        }
+      
 
         int idEchipa = Integer.parseInt(request.getParameter("id"));
 
@@ -44,12 +36,12 @@ public class DeleteEchipaServlet extends HttpServlet {
             // Disable auto-commit for transaction
             conn.setAutoCommit(false);
 
-            // Mai întâi eliminăm relația cu membrii echipei
-            String sqlUpdateMembri = "UPDATE useri SET id_echipa = NULL WHERE id_echipa = ?";
-            try (PreparedStatement pstmtUpdateMembri = conn.prepareStatement(sqlUpdateMembri)) {
-                pstmtUpdateMembri.setInt(1, idEchipa);
-                pstmtUpdateMembri.executeUpdate();
-                getServletContext().log("Membrii echipei " + idEchipa + " au fost actualizați");
+            // Mai întâi ștergem relațiile cu membrii din tabela membrii_echipe
+            String sqlDeleteMembri = "DELETE FROM membrii_echipe WHERE id_echipa = ?";
+            try (PreparedStatement pstmtDeleteMembri = conn.prepareStatement(sqlDeleteMembri)) {
+                pstmtDeleteMembri.setInt(1, idEchipa);
+                pstmtDeleteMembri.executeUpdate();
+                getServletContext().log("Membrii echipei " + idEchipa + " au fost șterși");
             }
 
             // Apoi ștergem echipa

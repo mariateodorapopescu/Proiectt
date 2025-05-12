@@ -22,13 +22,7 @@ public class AdaugaEchipaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        Integer userTip = (Integer) session.getAttribute("userTip");
-
-        // Verificare permisiuni
-        if (userTip == null || (userTip != 0 && userTip != 3 && userTip != 10)) {
-            response.sendRedirect("Access.jsp?error=accessDenied");
-            return;
-        }
+      
 
         String nume = request.getParameter("nume");
         int idProiect = Integer.parseInt(request.getParameter("id_prj"));
@@ -76,14 +70,14 @@ public class AdaugaEchipaServlet extends HttpServlet {
                 return;
             }
 
-            // Adaugă membrii în echipă - actualizăm câmpul id_echipa din tabela useri
-            if (membri != null && idEchipa > 0) {
-                sql = "UPDATE useri SET id_echipa = ? WHERE id = ?";
+            // Adaugă membrii în echipă - folosind tabela membrii_echipe
+            if (membri != null && membri.length > 0) {
+                sql = "INSERT INTO membrii_echipe (id_ang, id_echipa) VALUES (?, ?)";
                 pstmt = conn.prepareStatement(sql);
 
                 for (String idMembru : membri) {
-                    pstmt.setInt(1, idEchipa);
-                    pstmt.setInt(2, Integer.parseInt(idMembru));
+                    pstmt.setInt(1, Integer.parseInt(idMembru));
+                    pstmt.setInt(2, idEchipa);
                     pstmt.addBatch();
                 }
 

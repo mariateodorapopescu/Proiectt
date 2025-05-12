@@ -57,8 +57,16 @@
                     sesi.setAttribute("userTip", userType);
                     sesi.setAttribute("userDep", userdep);
                     functie = rs.getString("functie");
-                    ierarhie = rs.getInt("ierarhie");
-                    if (functie.equals("Administrator")) {
+                 	ierarhie = rs.getInt("ierarhie");
+
+                    // Funcție helper pentru a determina rolul utilizatorului
+                    boolean isDirector = (ierarhie < 3) ;
+                    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                    boolean isIncepator = (ierarhie >= 10);
+                    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                    boolean isAdmin = (functie.compareTo("Administrator") == 0);
+                    
+                    if (isDirector) {
                         String query2 = "SELECT * FROM teme WHERE id_usr = ?";
                         try (PreparedStatement stmt = connection.prepareStatement(query2)) {
                             stmt.setInt(1, id);
@@ -80,13 +88,6 @@
     } catch (SQLException e) {
         e.printStackTrace();
     }
-
-    // Funcție helper pentru a determina rolul utilizatorului
-    boolean isDirector = (ierarhie < 3) ;
-    boolean isSef = (ierarhie >= 4 && ierarhie <=5);
-    boolean isIncepator = (ierarhie >= 10);
-    boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
-    boolean isAdmin = (functie.compareTo("Administrator") == 0);
     
 %>
 
@@ -424,7 +425,7 @@
                             <option value="">-- Selectați --</option>
                             <%
                             try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                                String sql = "SELECT id, nume, prenume FROM useri WHERE tip >= 10 AND activ = 1 ORDER BY nume, prenume";
+                                String sql = "SELECT id, nume, prenume FROM useri WHERE tip >= 10 ORDER BY nume, prenume";
                                 try (Statement stmt = conn.createStatement();
                                      ResultSet rs = stmt.executeQuery(sql)) {
                                     
@@ -545,7 +546,7 @@
                         <label for="manager">Manager proiect:</label>
                         <select id="manager" name="supervizor" class="form-control" required>
                             <%
-                            String sql2 = "SELECT id, nume, prenume FROM useri WHERE tip >= 10 AND activ = 1 ORDER BY nume, prenume";
+                            String sql2 = "SELECT id, nume, prenume FROM useri WHERE tip >= 10 ORDER BY nume, prenume";
                             try (Statement stmt2 = conn.createStatement();
                                  ResultSet rs2 = stmt2.executeQuery(sql2)) {
                                 
@@ -590,7 +591,7 @@
                 <h2>Gestionare echipe - <%= rsProiect.getString("nume") %></h2>
                 
                 <!-- Formular adăugare echipă nouă -->
-                <form method="POST" action="moaradevant">
+                <form method="POST" action="AdaugaEchipaServlet">
                     <input type="hidden" name="id_prj" value="<%= idProiect %>">
                     <div class="form-group">
                         <label for="nume_echipa">Nume echipă:</label>
@@ -601,7 +602,7 @@
                         <select id="supervizor_echipa" name="supervizor" class="form-control" required>
                             <option value="">-- Selectați --</option>
                             <%
-                            String sqlSupervizori = "SELECT id, nume, prenume FROM useri WHERE tip >= 8 AND activ = 1 ORDER BY nume, prenume";
+                            String sqlSupervizori = "SELECT id, nume, prenume FROM useri WHERE tip >= 8 ORDER BY nume, prenume";
                             try (Statement stmtSupervizori = conn.createStatement();
                                  ResultSet rsSupervizori = stmtSupervizori.executeQuery(sqlSupervizori)) {
                                 
@@ -621,7 +622,7 @@
                         <label>Selectați membrii echipei:</label>
                         <div class="members-list">
                             <%
-                            String sqlAngajati = "SELECT id, nume, prenume FROM useri WHERE activ = 1 AND id_echipa IS NULL ORDER BY nume, prenume";
+                            String sqlAngajati = "SELECT id, nume, prenume FROM useri ORDER BY nume, prenume";
                             try (Statement stmtAngajati = conn.createStatement();
                                  ResultSet rsAngajati = stmtAngajati.executeQuery(sqlAngajati)) {
                                 
@@ -735,11 +736,12 @@
                         <label>Adaugă membri noi:</label>
                         <div class="members-list">
                             <%
+                            // Obține toți angajații care NU sunt deja membri ai acestei echipe
                             String sqlAngajatiNeinclusi = "SELECT u.id, u.nume, u.prenume FROM useri u " +
-                                                        "WHERE u.activ = 1 " +
-                                                        "AND u.id_echipa IS NULL " +
+                                                        "WHERE u.id NOT IN (SELECT me.id_ang FROM membrii_echipe me WHERE me.id_echipa = ?) " +
                                                         "ORDER BY u.nume, u.prenume";
                             try (PreparedStatement pstmtAngajati = conn.prepareStatement(sqlAngajatiNeinclusi)) {
+                                pstmtAngajati.setInt(1, idEchipa);
                                 try (ResultSet rsAngajati = pstmtAngajati.executeQuery()) {
                                     boolean hasCandidates = false;
                                     while (rsAngajati.next()) {
@@ -782,10 +784,11 @@
                     </thead>
                     <tbody>
                         <%
-                        String sqlMembri = "SELECT u.id, u.nume, u.prenume, t.denumire as pozitie " +
-                                        "FROM useri u " +
+                        String sqlMembri = "SELECT u.id, u.nume, u.prenume, t.denumire as pozitie, me.id as id_membru " +
+                                        "FROM membrii_echipe me " +
+                                        "JOIN useri u ON me.id_ang = u.id " +
                                         "JOIN tipuri t ON u.tip = t.tip " +
-                                        "WHERE u.id_echipa = ?";
+                                        "WHERE me.id_echipa = ?";
                         try (PreparedStatement pstmtMembri = conn.prepareStatement(sqlMembri)) {
                             pstmtMembri.setInt(1, idEchipa);
                             try (ResultSet rsMembri = pstmtMembri.executeQuery()) {
@@ -799,7 +802,7 @@
                                 <td><%= rsMembri.getString("pozitie") %></td>
                                 <td>
                                     <button class="table-button btn-delete" 
-                                            onclick="removeMembru(<%= rsMembri.getInt("id") %>, <%= idEchipa %>, <%= idProiect %>)"
+                                            onclick="removeMembru(<%= rsMembri.getInt("id_membru") %>, <%= idEchipa %>, <%= idProiect %>)"
                                             title="Elimină">
                                         <i class="ri-delete-bin-line"></i> Elimină
                                     </button>

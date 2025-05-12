@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -20,17 +21,8 @@ public class DeleteProiectServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-//        HttpSession session = request.getSession();
-//        Integer userTip = (Integer) session.getAttribute("userTip");
-//
-//        // Verificare permisiuni
-//        if (userTip == null || (userTip != 0 && userTip != 3 && userTip != 10)) {
-//            response.setContentType("application/json");
-//            response.setCharacterEncoding("UTF-8");
-//            response.getWriter().write("{\"success\": false, \"message\": \"Nu aveți permisiunile necesare.\"}");
-//            return;
-//        }
-
+        HttpSession session = request.getSession();
+        
         int idProiect = Integer.parseInt(request.getParameter("id"));
         getServletContext().log("Început procesul de ștergere pentru proiectul ID: " + idProiect);
 
@@ -46,15 +38,22 @@ public class DeleteProiectServlet extends HttpServlet {
             conn.setAutoCommit(false);
             getServletContext().log("Conexiune stabilită și autocommit dezactivat");
 
-            // 1. Actualizează membrii echipelor pentru a elimina relația cu echipele din acest proiect
-            String sqlUpdateMembri = 
-                "UPDATE useri SET id_echipa = NULL " +
-                "WHERE id_echipa IN (SELECT id FROM echipe WHERE id_prj = ?)";
-                
-            try (PreparedStatement pstmtUpdateMembri = conn.prepareStatement(sqlUpdateMembri)) {
-                pstmtUpdateMembri.setInt(1, idProiect);
-                int affectedMembers = pstmtUpdateMembri.executeUpdate();
-                getServletContext().log("Membrii echipelor actualizați: " + affectedMembers);
+            // 1. Găsește toate echipele asociate proiectului
+            String sqlFindEchipe = "SELECT id FROM echipe WHERE id_prj = ?";
+            try (PreparedStatement pstmtFindEchipe = conn.prepareStatement(sqlFindEchipe)) {
+                pstmtFindEchipe.setInt(1, idProiect);
+                try (ResultSet rsEchipe = pstmtFindEchipe.executeQuery()) {
+                    // Pentru fiecare echipă, șterge relațiile din membrii_echipe
+                    String sqlDeleteMembri = "DELETE FROM membrii_echipe WHERE id_echipa = ?";
+                    try (PreparedStatement pstmtDeleteMembri = conn.prepareStatement(sqlDeleteMembri)) {
+                        while (rsEchipe.next()) {
+                            int idEchipa = rsEchipe.getInt("id");
+                            pstmtDeleteMembri.setInt(1, idEchipa);
+                            pstmtDeleteMembri.executeUpdate();
+                            getServletContext().log("Șters membrii pentru echipa ID: " + idEchipa);
+                        }
+                    }
+                }
             }
 
             // 2. Șterge echipele asociate proiectului

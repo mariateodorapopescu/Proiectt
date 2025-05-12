@@ -21,15 +21,6 @@ public class RemoveMembruEchipaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        Integer userTip = (Integer) session.getAttribute("userTip");
-
-        // Verificare permisiuni
-        if (userTip == null || (userTip != 0 && userTip != 3 && userTip != 10)) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"success\": false, \"message\": \"Nu aveți permisiunile necesare.\"}");
-            return;
-        }
 
         int idMembru = Integer.parseInt(request.getParameter("id"));
 
@@ -37,10 +28,10 @@ public class RemoveMembruEchipaServlet extends HttpServlet {
             // Load the JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
             
-            // Establish connection and update the user
+            // Establish connection to delete the member from membrii_echipe
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-                // Set id_echipa to NULL for the user
-                String sql = "UPDATE useri SET id_echipa = NULL WHERE id = ?";
+                // Delete the record from membrii_echipe
+                String sql = "DELETE FROM membrii_echipe WHERE id = ?";
                 
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, idMembru);

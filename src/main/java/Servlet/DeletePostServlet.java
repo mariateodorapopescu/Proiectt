@@ -23,18 +23,6 @@ public class DeletePostServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         JSONObject json = new JSONObject();
         
-        HttpSession session = request.getSession();
-        Integer userTip = (Integer) session.getAttribute("userTip");
-        Integer userDep = (Integer) session.getAttribute("userDep");
-        
-        // Verificare permisiuni
-        if (userTip == null || (userTip != 0 && (userTip != 3 && userDep != 1))) {
-            json.put("success", false);
-            json.put("message", "Nu aveți permisiuni pentru această operațiune!");
-            out.print(json.toString());
-            return;
-        }
-        
         int idPost = Integer.parseInt(request.getParameter("id"));
         
         Connection conn = null;
