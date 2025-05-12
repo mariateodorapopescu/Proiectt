@@ -78,32 +78,13 @@ public class AprobSefServlet extends HttpServlet {
             
             final int id2 = id; 
            // notificare asincrona
-            // trimiterea de mailuri se face in mod asincron
-            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            asyncContext.setTimeout(1000);  
-            asyncContext.start(() -> {
+            new Thread(() -> {
                 try {
-                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
                     MailAsincron.send7(id2, idconcediu);
-                    asyncContext.complete();  // Completarea actiunii asincrone
                 } catch (Exception e) {
-                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
-                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
-                    response.setContentType("text/html;charset=UTF-8");
-        	        PrintWriter out = null;
-					try {
-						out = response.getWriter();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-        	        out.println("<script type='text/javascript'>");
-        	        out.println("alert('Eroare din cauze necunoscute!');");
-        	        out.println("window.location.href = 'actiuni.jsp';");
-        	        out.println("</script>");
-        	        out.close();
-        	        return;    
+                    e.printStackTrace();
                 }
-            });
+            }).start();
             
 	    	 // apoi redirectionez la pagina care listeaza concediile
 	            // acest lucru il fac pentru ca utilizatorul sa poata vedea ce concedii sunt la un moment dat in institutie 

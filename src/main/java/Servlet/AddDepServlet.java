@@ -65,32 +65,13 @@ public class AddDepServlet extends HttpServlet {
 		    out.println("</script>");
 		    out.close();
 		    // trimiterea de mailuri se face in mod asincron
-            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            
-            asyncContext.start(() -> {
-                try {
-                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
-                    MailAsincron.send3();
-                    asyncContext.complete();  // Completarea actiunii asincrone
-                } catch (Exception e) {
-                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
-                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
-                    response.setContentType("text/html;charset=UTF-8");
-        	        PrintWriter out2 = null;
-					try {
-						out2 = response.getWriter();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-        	        out2.println("<script type='text/javascript'>");
-        	        out2.println("alert('Eroare din cauze necunoscute!');");
-        	        out2.println("window.location.href = 'actiuni.jsp';");
-        	        out2.println("</script>");
-        	        out2.close();
-        	        return;    
-                }
-            });
+		    new Thread(() -> {
+		        try {
+		            MailAsincron.send3();
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }).start();
         } catch (Exception e) {
         	// in caz de eroare redirectionez la aceeasi pagina, ca sa poata vedea toate departamentele existente, dar cu alerta diefrita
             e.printStackTrace();

@@ -630,14 +630,6 @@
                     </a>
                 </li>
                
-                <li style="--bg: <%out.println(accent); %>">
-                     <a href="concediinoisef.jsp" class="load-content" target="iframe">
-                         <div class="siiconn">
-                            <ion-icon name="alert"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Notificari</div>
-                    </a>
-                </li>
                  <li style="--bg: <%out.println(accent); %>">
                     <a href="actiuni2.jsp" class="load-content" target="iframe">
                         <div class="siiconn">

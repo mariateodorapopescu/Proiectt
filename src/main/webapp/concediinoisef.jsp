@@ -378,7 +378,7 @@ try {
         <line x1="12" y1="16" x2="12.01" y2="16"></line>
     </svg>
     <div>
-        <strong>Atenție!</strong> Există <%= todayLeavesCount %> concedii adăugate astăzi, dar numai <%=todayLeavesWithLocationCount %> are locație asociată.
+        <strong>Atenție!</strong> Există <%= todayLeavesCount - 1%> concedii adăugate astăzi, dar numai <%=todayLeavesWithLocationCount - 1%> are locație asociată.
     </div>
     <button onclick="document.getElementById('noLocationsBanner').style.display='none';" style="
         background: transparent;

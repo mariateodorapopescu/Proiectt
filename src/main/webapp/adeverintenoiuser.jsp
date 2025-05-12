@@ -39,6 +39,7 @@
     String card = "#ECEDFA";
     String hover = "#ECEDFA";
     String functie = "";
+    boolean isSef = false, isDirector = false, isAdmin = false, isUtilizatorNormal = false, isIncepator = false;
 
     Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -58,9 +59,15 @@
                 userdep = rs.getInt("id_dep");
                 functie = rs.getString("functie");
                 ierarhie = rs.getInt("ierarhie");
-                if (functie.compareTo("Administrator") != 0) {  
-                  
-                      
+                
+                // Funcție helper pentru a determina rolul utilizatorului
+                isDirector = (ierarhie < 3) ;
+                isSef = (ierarhie >= 4 && ierarhie <=5);
+                isIncepator = (ierarhie >= 10);
+                isAdmin = (functie.contains("Administrator"));
+                isUtilizatorNormal = !isDirector && !isSef && !isIncepator && !isAdmin; // tipuri 1, 2, 5-9
+              
+                if (!isAdmin) {    
                 String query = "SELECT * FROM teme WHERE id_usr = ?";
                 try (PreparedStatement stmt = connection.prepareStatement(query)) {
                     stmt.setInt(1, id);
@@ -79,17 +86,6 @@
         }
     }
 
-    // Funcție helper pentru a determina rolul utilizatorului
-    boolean isDirector = (ierarhie < 3) ;
-    boolean isAdmin = (userType==4);
-    boolean isSef = (ierarhie > 4 && ierarhie <=5);
-    boolean isUtilizatorNormal = !isDirector && !isSef; // tipuri 1, 2, 5-9
-
-    // Debug userType
-    System.out.println("userType: " + userType);
-    System.out.println("isDirector: " + isDirector);
-    System.out.println("isSef: " + isSef);
-    System.out.println("isUtilizatorNormal: " + isUtilizatorNormal);
 
     // Dacă cererea este pentru JSON, returnăm direct JSON-ul
     if ("true".equals(request.getParameter("json"))) {
@@ -503,7 +499,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             "</td>";
 
                 // Butoane pentru șef
-                if (<%=userType%> === 3 && !<%=request.getParameter("pag") != null%>) {
+                if (<%=isSef%> && !<%=request.getParameter("pag") != null%>) {
                     if (row.Status === "Neaprobat") {
                         cellsHtml += "<td data-label='Status'>" +
                                     "<span class='status-icon status-aprobat-sef'>" +
@@ -535,7 +531,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 // Butoane pentru director
-                if (<%=userType%> === 0 && !<%=request.getParameter("pag") != null%>) {
+                if (<%=isDirector%> && !<%=request.getParameter("pag") != null%>) {
                     if (row.Status === "Aprobat sef") {
                         cellsHtml += "<td data-label='Status'>" +
                                     "<span class='status-icon status-aprobat-director'>" +
@@ -587,7 +583,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     
                     // Butoane de modificare și ștergere - doar pentru adeverințe neaprobate sau aprobate de șef
                     if (row.Status === "Neaprobat" || 
-                        (row.Status === "Aprobat sef" && (<%=userType%> === 3 || <%=userType%> === 0))) {
+                        (row.Status === "Aprobat sef" && (<%=isSef%>  || <%=isDirector%>))) {
                         cellsHtml += "<td data-label='Status'>" +
                                     "<span class='status-icon status-neaprobat'>" +
                                     "<a href='modifadev.jsp?idadev=" + row.id + "'>" +

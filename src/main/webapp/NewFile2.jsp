@@ -277,6 +277,7 @@
     </div>
     
     <button style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="addAddress">Adaugare</button>
+    <button style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"><a style="color: white;" href="concediinoisef.jsp?pag=1">Inapoi</a></button>
     <p style=" color:<%out.println(text);%>" for="" class="login__label" id="addressOutput"></p>
     
   </div>

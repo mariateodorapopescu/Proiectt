@@ -998,123 +998,141 @@ BEGIN
 END$$
 
 -- -----------------------------------------------------
--- Trigger care modifica numarul de zile de concedii dupa ce se sterge un concediu
+-- Trigger care modifica zilele si numarul de concedii dupa ce un concediu e sters
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS after_delete $$
-CREATE
-TRIGGER test.after_delete
-AFTER DELETE ON test.concedii
+CREATE TRIGGER after_delete
+AFTER DELETE ON concedii
 FOR EACH ROW
 BEGIN
     DECLARE userType INT;
-    DECLARE totalDuration INT;
-    -- Selecting user type and current total duration of leaves
-    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
-    -- Update the total duration of leaves
-    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
-    -- Update useri table for leave details
-    UPDATE useri
-    SET zilecons = totalDuration,
-        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
-        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
-        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
+    DECLARE userHierarchy INT;
+    DECLARE totalDurata INT;
+    DECLARE concediiAnCurent INT;
+    
+    -- Obține tipul și ierarhia utilizatorului
+    SELECT tip, (SELECT ierarhie FROM tipuri WHERE tip = useri.tip) 
+    INTO userType, userHierarchy 
+    FROM useri 
     WHERE id = OLD.id_ang;
-    -- Additional check if the leave was approved
-    IF OLD.status = 2 THEN
-        UPDATE useri
-        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
-			conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
-        WHERE id = OLD.id_ang;
-    END IF;
+    
+    -- Calculează durata totală a concediilor pentru anul curent
+    SELECT COALESCE(SUM(durata), 0) INTO totalDurata 
+    FROM concedii 
+    WHERE id_ang = OLD.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(CURDATE());
+    
+    -- Calculează numărul de concedii pentru anul curent
+    SELECT COUNT(*) INTO concediiAnCurent 
+    FROM concedii 
+    WHERE id_ang = OLD.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(CURDATE());
+    
+    -- Actualizează utilizatorul cu valorile calculate
+    UPDATE useri
+    SET zilecons = totalDurata,
+        zileramase = IF(userHierarchy = 10, 30 - totalDurata, 40 - totalDurata),
+        conluate = concediiAnCurent,
+        conramase = 3 - concediiAnCurent
+    WHERE id = OLD.id_ang;
 END$$
 
 -- -----------------------------------------------------
--- Trigger care modifica numarul de zile de concedii dupa ce se adauga un concediu
+-- Trigger care calculează zilele și numărul de concedii după ce un concediu este adăugat
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS after_insert $$
-CREATE
-TRIGGER test.after_insert
-AFTER INSERT ON test.concedii
+CREATE TRIGGER after_insert
+AFTER INSERT ON concedii
 FOR EACH ROW
 BEGIN
-    UPDATE useri u
-    SET u.zilecons = (SELECT SUM(c.durata) FROM concedii c WHERE c.id_ang = NEW.id_ang)
-    WHERE u.id = NEW.id_ang;
+    DECLARE userType INT;
+    DECLARE userHierarchy INT;
+    DECLARE totalDurata INT;
+    DECLARE concediiAnCurent INT;
+    
+    -- Obține tipul și ierarhia utilizatorului
+    SELECT tip, (SELECT ierarhie FROM tipuri WHERE tip = useri.tip) 
+    INTO userType, userHierarchy 
+    FROM useri 
+    WHERE id = NEW.id_ang;
+    
+    -- Calculează durata totală a concediilor pentru anul curent
+    SELECT COALESCE(SUM(durata), 0) INTO totalDurata 
+    FROM concedii 
+    WHERE id_ang = NEW.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(CURDATE());
+    
+    -- Calculează numărul de concedii pentru anul curent
+    SELECT COUNT(*) INTO concediiAnCurent 
+    FROM concedii 
+    WHERE id_ang = NEW.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(CURDATE());
+    
+    -- Actualizează utilizatorul cu valorile calculate
+    UPDATE useri
+    SET zilecons = totalDurata,
+        zileramase = IF(userHierarchy = 10, 30 - totalDurata, 40 - totalDurata),
+        conluate = concediiAnCurent,
+        conramase = 3 - concediiAnCurent
+    WHERE id = NEW.id_ang;
 END$$
 
 -- -----------------------------------------------------
--- Trigger care modifica numarul de concedii dupa ce un concediu este adaugat + se modifica si numarul de zile (chiar daca am deja un trigger ce face asta separat)
+-- Trigger care modifica numarul de concedii dupa ce un concediu este adaugat
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS after_insert2 $$
-CREATE
-TRIGGER test.after_insert2
-AFTER INSERT ON test.concedii
+CREATE TRIGGER after_insert2
+AFTER INSERT ON concedii
 FOR EACH ROW
 BEGIN
-    DECLARE userType INT;
-    SELECT tip INTO userType FROM useri WHERE id = NEW.id_ang;
-    UPDATE useri
-	SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
-        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
-    WHERE id = NEW.id_ang;
-    IF userType = 2 THEN
-        UPDATE useri
-        SET zileramase = 30 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
-        WHERE id = NEW.id_ang;
-    ELSE
-        UPDATE useri
-        SET zileramase = 40 - (SELECT SUM(durata) FROM concedii WHERE id_ang = NEW.id_ang)
-        WHERE id = NEW.id_ang;
-    END IF;
+    -- Acest trigger a fost înlocuit cu funcționalitatea din after_insert
+    -- Păstrat gol pentru compatibilitate, dar funcționalitatea este unificată în after_insert
 END$$
 
 -- -----------------------------------------------------
--- Trigger care modifica numarul de zile de concedii dupa ce se modifica un concediu aka este aprobat sau respins
+-- Trigger care modifica numarul de zile de concedii dupa ce se modifica un concediu
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS after_update $$
-CREATE
-TRIGGER test.after_update
-AFTER UPDATE ON test.concedii
+CREATE TRIGGER after_update
+AFTER UPDATE ON concedii
 FOR EACH ROW
 BEGIN
     DECLARE userType INT;
-    DECLARE totalDuration INT;
-    -- Selecting user type and current total duration of leaves
-    SELECT tip, zilecons INTO userType, totalDuration FROM useri WHERE id = OLD.id_ang;
-    -- Update the total duration of leaves
-    SET totalDuration = (select sum(durata) from concedii where id_ang = old.id_ang);
-    -- Update useri table for leave details
+    DECLARE userHierarchy INT;
+    DECLARE totalDurata INT;
+    DECLARE concediiAnCurent INT;
+    
+    -- Obține tipul și ierarhia utilizatorului
+    SELECT tip, (SELECT ierarhie FROM tipuri WHERE tip = useri.tip) 
+    INTO userType, userHierarchy 
+    FROM useri 
+    WHERE id = NEW.id_ang;
+    
+    -- Calculează durata totală a concediilor pentru anul curent
+    SELECT COALESCE(SUM(durata), 0) INTO totalDurata 
+    FROM concedii 
+    WHERE id_ang = NEW.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(CURDATE());
+    
+    -- Calculează numărul de concedii pentru anul curent
+    SELECT COUNT(*) INTO concediiAnCurent 
+    FROM concedii 
+    WHERE id_ang = NEW.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(CURDATE());
+    
+    -- Actualizează utilizatorul cu valorile calculate
     UPDATE useri
-    SET zilecons = totalDuration,
-        zileramase = IF(userType = 2, 30 - totalDuration, 40 - totalDuration),
-        conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
-        conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
-    WHERE id = OLD.id_ang;
-    -- Additional check if the leave was approved
-    IF OLD.status = 2 THEN
-        UPDATE useri
-        SET conluate = (select count(*) from concedii where status = 2 and id_ang = old.id_ang),
-            conramase = 3 - (select count(*) from concedii where status = 2 and id_ang = old.id_ang)
-        WHERE id = OLD.id_ang;
-    END IF;
-    IF new.status = -1 THEN
-        UPDATE useri
-        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
-			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
-        WHERE id = OLD.id_ang;
-    END IF;
-    IF OLD.status = 1 THEN
-        UPDATE useri
-        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
-			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
-        WHERE id = OLD.id_ang;
-    END IF;
-    IF OLD.status = -2 THEN
-        UPDATE useri
-        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = old.id_ang),
-			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = old.id_ang)
-        WHERE id = OLD.id_ang;
-    END IF;
+    SET zilecons = totalDurata,
+        zileramase = IF(userHierarchy = 10, 30 - totalDurata, 40 - totalDurata),
+        conluate = concediiAnCurent,
+        conramase = 3 - concediiAnCurent
+    WHERE id = NEW.id_ang;
 END$$
 
 -- -----------------------------------------------------
@@ -1130,89 +1148,238 @@ BEGIN
 END$$
 
 -- -----------------------------------------------------
--- Trigger care verifica daca s-a adaugat bine un concediu aka data de inceput < data de final
+-- Trigger care verifică regulile la inserarea unui concediu
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS before_insert_concedii $$
-USE test$$
-CREATE
-TRIGGER test.before_insert_concedii
-BEFORE INSERT ON test.concedii
+CREATE TRIGGER before_insert_concedii
+BEFORE INSERT ON concedii
 FOR EACH ROW
 BEGIN
+    DECLARE userType INT;
+    DECLARE userHierarchy INT;
+    DECLARE concediiAnCurent INT;
+    DECLARE concediiVara INT;
+    DECLARE totalDurata INT;
+    
+    -- Verifică dacă data de final nu este înaintea celei de început
     IF NEW.end_c < NEW.start_c THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data de final nu poate fi inaintea celei de inceput.';
     END IF;
+    
+    -- Calculează durata concediului
     SET NEW.durata = DATEDIFF(NEW.end_c, NEW.start_c) + 1;
+    
+    -- Setează datele
     SET NEW.added = CURDATE();
     SET NEW.modified = CURDATE();
     SET NEW.acc_res = CURDATE();
+    
+    -- Obține tipul și ierarhia utilizatorului
+    SELECT tip, (SELECT ierarhie FROM tipuri WHERE tip = useri.tip) 
+    INTO userType, userHierarchy 
+    FROM useri 
+    WHERE id = NEW.id_ang;
+    
+    -- Verifică numărul de concedii din anul curent
+    SELECT COUNT(*) INTO concediiAnCurent 
+    FROM concedii 
+    WHERE id_ang = NEW.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(NEW.start_c);
+    
+    -- Verifică numărul de concedii din vara curentă
+    SELECT COUNT(*) INTO concediiVara 
+    FROM concedii 
+    WHERE id_ang = NEW.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(NEW.start_c)
+      AND (
+          (start_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                        AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+          OR 
+          (end_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                      AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+          OR 
+          (start_c <= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+           AND end_c >= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+      );
+    
+    -- Verifică dacă noul concediu ar fi în perioada de vară
+    IF (NEW.start_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                        AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+       OR 
+       (NEW.end_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                     AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+       OR 
+       (NEW.start_c <= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+        AND NEW.end_c >= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d')) THEN
+        
+        -- Verifică dacă există deja un concediu de vară
+        IF concediiVara > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nu este permis mai mult de un concediu în perioada de vară (1 iunie - 31 august).';
+        END IF;
+    END IF;
+    
+    -- Verifică regula de maxim 3 concedii pe an
+    IF concediiAnCurent >= 3 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Angajatul a atins deja limita de 3 concedii pentru anul curent.';
+    END IF;
+    
+    -- Calculează durata totală a concediilor din anul curent
+    SELECT COALESCE(SUM(durata), 0) INTO totalDurata 
+    FROM concedii 
+    WHERE id_ang = NEW.id_ang 
+      AND status >= 0
+      AND YEAR(start_c) = YEAR(NEW.start_c);
+    
+    -- Verifică dacă se depășește limita de zile în funcție de ierarhie
+    IF userHierarchy = 10 AND (totalDurata + NEW.durata > 30) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Angajații începători pot avea maxim 30 de zile de concediu pe an.';
+    ELSEIF userHierarchy != 10 AND (totalDurata + NEW.durata > 40) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Angajații pot avea maxim 40 de zile de concediu pe an.';
+    END IF;
 END$$
 
 -- -----------------------------------------------------
--- Trigger care pune data la care a fost aprobat sau respins un concediu
+-- Trigger care verifică regulile la actualizarea unui concediu
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS before_update_concedii $$
-CREATE
-TRIGGER test.before_update_concedii
-BEFORE UPDATE ON test.concedii
+CREATE TRIGGER before_update_concedii
+BEFORE UPDATE ON concedii
 FOR EACH ROW
 BEGIN
+    DECLARE userType INT;
+    DECLARE userHierarchy INT;
+    DECLARE concediiAnCurent INT;
+    DECLARE concediiVara INT;
+    DECLARE totalDurata INT;
+    
+    -- Verifică dacă data de final nu este înaintea celei de început (doar dacă s-au modificat datele)
+    IF NEW.end_c < NEW.start_c AND (OLD.start_c != NEW.start_c OR OLD.end_c != NEW.end_c) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Data de final nu poate fi inaintea celei de inceput.';
+    END IF;
+    
+    -- Dacă s-au modificat datele, recalculează durata
+    IF OLD.start_c != NEW.start_c OR OLD.end_c != NEW.end_c THEN
+        SET NEW.durata = DATEDIFF(NEW.end_c, NEW.start_c) + 1;
+    END IF;
+    
+    -- Dacă statusul este negativ, setează durata la 0
     IF NEW.status < 0 THEN
         SET NEW.durata = 0;
-    END IF; -- mai am asta si in alta parte, dar stiu macar ca merge???
-    IF NEW.status <> 0 THEN
+    END IF;
+    
+    -- Dacă statusul s-a schimbat, setează data modificării
+    IF NEW.status != OLD.status THEN
         SET NEW.modified = CURDATE();
     END IF;
-    -- SET NEW.modified = CURDATE();
+    
+    -- Dacă s-au modificat datele sau statusul și statusul nou este >= 0, verifică regulile
+    IF (OLD.start_c != NEW.start_c OR OLD.end_c != NEW.end_c OR OLD.status != NEW.status) AND NEW.status >= 0 THEN
+        -- Obține tipul și ierarhia utilizatorului
+        SELECT tip, (SELECT ierarhie FROM tipuri WHERE tip = useri.tip) 
+        INTO userType, userHierarchy 
+        FROM useri 
+        WHERE id = NEW.id_ang;
+        
+        -- Verifică numărul de concedii din anul curent (excluzând pe cel curent)
+        SELECT COUNT(*) INTO concediiAnCurent 
+        FROM concedii 
+        WHERE id_ang = NEW.id_ang 
+          AND id != NEW.id
+          AND status >= 0
+          AND YEAR(start_c) = YEAR(NEW.start_c);
+        
+        -- Adaugă 1 pentru concediul curent dacă statusul este >= 0
+        IF NEW.status >= 0 THEN
+            SET concediiAnCurent = concediiAnCurent + 1;
+        END IF;
+        
+        -- Verifică regula de maxim 3 concedii pe an
+        IF concediiAnCurent > 3 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Angajatul a atins deja limita de 3 concedii pentru anul curent.';
+        END IF;
+        
+        -- Verifică numărul de concedii din vara curentă (excluzând pe cel curent)
+        SELECT COUNT(*) INTO concediiVara 
+        FROM concedii 
+        WHERE id_ang = NEW.id_ang 
+          AND id != NEW.id
+          AND status >= 0
+          AND YEAR(start_c) = YEAR(NEW.start_c)
+          AND (
+              (start_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                         AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+              OR 
+              (end_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                         AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+              OR 
+              (start_c <= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+               AND end_c >= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+          );
+        
+        -- Verifică dacă concediul actualizat ar fi în perioada de vară
+        IF (NEW.start_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                         AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+           OR 
+           (NEW.end_c BETWEEN STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+                        AND STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d'))
+           OR 
+           (NEW.start_c <= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-06-01'), '%Y-%m-%d') 
+            AND NEW.end_c >= STR_TO_DATE(CONCAT(YEAR(NEW.start_c), '-08-31'), '%Y-%m-%d')) THEN
+            
+            -- Verifică dacă există deja un concediu de vară (altul decât cel curent)
+            IF concediiVara > 0 THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nu este permis mai mult de un concediu în perioada de vară (1 iunie - 31 august).';
+            END IF;
+        END IF;
+        
+        -- Calculează durata totală a concediilor din anul curent (excluzând pe cel curent)
+        SELECT COALESCE(SUM(durata), 0) INTO totalDurata 
+        FROM concedii 
+        WHERE id_ang = NEW.id_ang 
+          AND id != NEW.id
+          AND status >= 0
+          AND YEAR(start_c) = YEAR(NEW.start_c);
+        
+        -- Adaugă durata concediului curent dacă statusul este >= 0
+        IF NEW.status >= 0 THEN
+            SET totalDurata = totalDurata + NEW.durata;
+        END IF;
+        
+        -- Verifică dacă se depășește limita de zile în funcție de ierarhie
+        IF userHierarchy = 10 AND totalDurata > 30 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Angajații începători pot avea maxim 30 de zile de concediu pe an.';
+        ELSEIF userHierarchy != 10 AND totalDurata > 40 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Angajații pot avea maxim 40 de zile de concediu pe an.';
+        END IF;
+    END IF;
 END$$
 
 -- -----------------------------------------------------
 -- Trigger care calculeaza zilele si numarul de concedii, dupa ce un concediu e respins
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS negativestatus $$
-CREATE
-TRIGGER test.negativestatus
-BEFORE UPDATE ON test.concedii
+CREATE TRIGGER negativestatus
+BEFORE UPDATE ON concedii
 FOR EACH ROW
 BEGIN
-	DECLARE userType INT;
-    DECLARE newZilecons INT;
-    SELECT tip INTO userType FROM useri WHERE id = OLD.id_ang;
-    IF NEW.status < 0 THEN
+    -- Dacă statusul se schimbă la negativ, resetează durata și actualizează contoarele
+    IF NEW.status < 0 AND OLD.status >= 0 THEN
         SET NEW.durata = 0;
-        SELECT SUM(durata) INTO newZilecons FROM concedii WHERE id_ang = NEW.id_ang AND id != NEW.id;
-        UPDATE useri
-        SET zilecons = newZilecons
-        WHERE id = NEW.id_ang;
-        IF userType = 2 THEN
-            UPDATE useri
-            SET zileramase = 30 - newZilecons, 
-				conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
-				conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
-            WHERE id = NEW.id_ang;
-        ELSE
-            UPDATE useri
-            SET zileramase = 40 - newZilecons
-            WHERE id = NEW.id_ang;
-        END IF;
     END IF;
 END$$
 
 -- -----------------------------------------------------
--- Trigger care calculeaza zilele si numarul de concedii, dupa ce un concediu e aprobat final, ca sa zic asa
+-- Trigger care calculeaza zilele si numarul de concedii, dupa ce un concediu e aprobat final
 -- -----------------------------------------------------
 DROP TRIGGER IF EXISTS status2 $$
-CREATE
-TRIGGER test.status2
-BEFORE UPDATE ON test.concedii
+CREATE TRIGGER status2
+BEFORE UPDATE ON concedii
 FOR EACH ROW
 BEGIN
-    IF NEW.status = 2 and new.status != old.status THEN
-        UPDATE useri
-        SET conluate = (select count(*) from concedii where status >= 0 and id_ang = new.id_ang),
-			conramase = 3 - (select count(*) from concedii where status >= 0 and id_ang = new.id_ang)
-        WHERE id = NEW.id_ang;
-    END IF;
+    -- Acest trigger este redundant acum deoarece after_update gestionează deja toate situațiile
+    -- Păstrat gol pentru compatibilitate
 END$$
 
 -- -----------------------------------------------------
@@ -2086,3 +2253,4 @@ SELECT c.id, u.nume, u.prenume, d.nume_dep AS departament, t.denumire AS functie
 -- -----------------------------------------------------
 -- test
 -- -----------------------------------------------------
+select * from useri;
