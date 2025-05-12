@@ -58,33 +58,16 @@ public class DelUsrServlet extends HttpServlet {
         try {
             employeeDao.deleteUser(numeutilizator, id);
             
-            // trimitere asincrona mail-uri
-            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            
-            asyncContext.start(() -> {
-                try {
-                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
-                    MailAsincron.send10(id, numeutilizator);
-                    asyncContext.complete();  // Completarea actiunii asincrone
-                } catch (Exception e) {
-                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
-                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
-                    response.setContentType("text/html;charset=UTF-8");
-        	        PrintWriter out = null;
-					try {
-						out = response.getWriter();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-        	        out.println("<script type='text/javascript'>");
-        	        out.println("alert('eroare din cauze necunoscute!');");
-        	        out.println("window.location.href = 'actiuni.jsp';");
-        	        out.println("</script>");
-        	        out.close();
-        	        return; 
-                    
-                }
-            });
+            // Cea mai simplă alternativă
+		    new Thread(() -> {
+		        try {
+		            // Codul operațiunii asincrone (ex: trimitere email)
+		            MailAsincron.send10(id, numeutilizator);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }).start();
+
             
             response.setContentType("text/html;charset=UTF-8");
             // daca s-a facut stergerea cu succes -> redirectare la pagina in care afiseaza utilizatorii sa vada ca s-a sters

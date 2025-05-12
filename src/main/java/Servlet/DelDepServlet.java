@@ -61,34 +61,7 @@ public class DelDepServlet extends HttpServlet {
             employeeDao.stergere(departament, id);
             // trimit notificare la angajati
 
-            // trimiterea de mailuri se face in mod asincron
-            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-             
-            asyncContext.start(() -> {
-                try {
-                	// am facut o clasa/un obiect separat ce trimite mailuri, separat de un mail sender, ci efectiv ceva ce pregatste un email
-                   MailAsincron.send5(departament);
-                    asyncContext.complete();  // Completarea actiunii asincrone
-                } catch (Exception e) {
-                    e.printStackTrace();  // in caz de eroare, afisez in concola serverului sa vad de ce + redirectare la pagina de adaugare/modificare concediu + alerta
-                    asyncContext.complete();  // Context asincron finalizat indiferent de situatie
-                    response.setContentType("text/html;charset=UTF-8");
-        	        PrintWriter out = null;
-					try {
-						out = response.getWriter();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-					
-        	        out.println("<script type='text/javascript'>");
-        	        out.println("alert('Eroare din cauze necunoscute!');");
-        	        out.println("window.location.href = 'actiuni.jsp';");
-        	        out.println("</script>");
-        	        out.close();
-        	        return; 
-                    
-                }
-            });
+            
             
             // apoi redirectionez la pagina care listeaza si permite modificarea si stergerea departamentelor
             // acest lucru il fac pentru ca utilizatorul sa poata vedea ce departamente sunt la un moment dat in institutie 
@@ -100,6 +73,16 @@ public class DelDepServlet extends HttpServlet {
 		    out.println("window.location.href = 'modifdeldep.jsp';");
 		    out.println("</script>");
 		    out.close();
+		    // Cea mai simplă alternativă
+		    new Thread(() -> {
+		        try {
+		            // Codul operațiunii asincrone (ex: trimitere email)
+		            MailAsincron.send5(departament);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }).start();
+
         } catch (Exception e) {
         	// in caz de eroare redirectionez la aceeasi pagina, ca sa poata vedea toate departamentele existente, dar cu alerta diefrita
         	response.setContentType("text/html;charset=UTF-8");

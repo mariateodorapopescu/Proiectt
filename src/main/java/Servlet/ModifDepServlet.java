@@ -51,16 +51,15 @@ public class ModifDepServlet extends HttpServlet {
 		    out.println("</script>");
 		    out.close();
 
-            jakarta.servlet.AsyncContext asyncContext = request.startAsync();
-            
-            asyncContext.start(() -> {
-                try {
-                    MailAsincron.send4(old, departament);
-                } catch (Exception e) {
-                    asyncContext.getRequest().setAttribute("error", "Eroare la trimiterea email-ului: " + e.getMessage());
-                }
-                asyncContext.complete();
-            });
+		 // Cea mai simplă alternativă
+		    new Thread(() -> {
+		        try {
+		            // Codul operațiunii asincrone (ex: trimitere email)
+		            MailAsincron.send4(old, departament);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }).start();
 
         } catch (Exception e) {
 		    PrintWriter out = response.getWriter();

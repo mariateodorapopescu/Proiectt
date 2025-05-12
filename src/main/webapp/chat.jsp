@@ -247,6 +247,7 @@
             border-top: 1px solid <%=accent%>;
             background-color: <%=accent%>;
             position: relative;
+           
         }
         
         .chat-input textarea {
@@ -261,7 +262,7 @@
             min-height: 24px;
             transition: all 0.3s;
             background-color: <%=clr%>;
-            color: white;
+             color: <%=text%>;
         }
         
         .chat-input textarea:focus, .chat-input textarea:active, .chat-input textarea:hover {
@@ -484,24 +485,25 @@ background-color: red;}
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot-message">
-                <strong>Cum să folosești asistentul:</strong><br>
-                            - Întreabă despre angajați, departamente, concedii<br>
-                            - Solicită informații specifice sau statistici<br>
-                            - Folosește limbaj natural în întrebări<br>
-                            - Spune "Da" pentru a vedea detalii<br>
-                            - Încearcă sugestiile de mai jos
+                <strong>Cum să folositi asistentul:</strong><br>
+                            - Întrebati despre angajați, departamente, concedii<br>
+                            - Solicitati informații specifice sau statistici<br>
+                            - Folositi limbaj natural în întrebări<br>
+                            - Spuneti "Da" pentru continut detaliat<br>
+                            - Încercati sugestiile de mai jos v
                     
                 </div>
                  <div class="message bot-message">
-                <p>Bine ați venit! Sunt asistentul HR virtual. Vă pot oferi informații despre:</p>
-                    <ul>
-                        <li>Angajați și departamente</li>
-                        <li>Concedii și adeverințe</li>
-                        <li>Poziții, roluri și salarii</li>
-                        <li>Proiecte și echipe</li>
-                    </ul>
-                    <p>Cum vă pot ajuta astăzi?</p>
+                <p>Bine ați venit! Sunt asistentul HR virtual. Vă pot oferi informații despre: <br>
+                    
+                        - Angajați și departamente<br>
+                        - Concedii și adeverințe<br>
+                        - Poziții, roluri și salarii<br>
+                        -Proiecte și echipe<br> </p>
                     </div>
+                     <div class="message bot-message">
+                <p>Cu ce va pot ajuta? </p>
+                    </div>               
             </div>
             <div class="suggestions-container" id="suggestionsContainer">
                 <!-- Suggestions will be added here dynamically -->

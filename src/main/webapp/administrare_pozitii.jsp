@@ -36,7 +36,6 @@
         action = "view"; // Acțiunea implicită
     }
 
-
     Class.forName("com.mysql.cj.jdbc.Driver");
 
     try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
@@ -55,9 +54,7 @@
                 userdep = rs.getInt("id_dep");
                 functie = rs.getString("functie");
                 ierarhie = rs.getInt("ierarhie");
-                if (functie.compareTo("Administrator") == 0) {  
-                  
-                      
+                if (functie.compareTo("Administrator") == 0) {       
                 String query = "SELECT * FROM teme WHERE id_usr = ?";
                 try (PreparedStatement stmt = connection.prepareStatement(query)) {
                     stmt.setInt(1, id);
@@ -158,7 +155,7 @@
             padding: 20px;
             background: <%=card%>;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           
         }
         
         .action-buttons {
@@ -255,6 +252,7 @@
         
         .pozitii-table tr:hover {
             background-color: <%=accent%>;
+            color: white;
         }
         
         .btn-small {

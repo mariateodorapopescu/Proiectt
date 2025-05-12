@@ -45,7 +45,7 @@
                     boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
                     boolean isAdmin = (functie.compareTo("Administrator") == 0);
 
-                    if (!isAdmin) {  
+                    if (isAdmin) {  
                     	// aflu data curenta, tot ca o interogare bd =(
                     	String today = "";
                    	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
@@ -277,6 +277,7 @@
     </div>
     
     <button style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="addAddress">Adaugare</button>
+     <button style="margin:0; top:-10px; box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"><a style="color: white;" href="modifdeldep.jsp">Inapoi</a></button>
     <p style=" color:<%out.println(text);%>" for="" class="login__label" id="addressOutput"></p>
     
   </div>
