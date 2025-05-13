@@ -66,7 +66,7 @@ if (sesi != null) {
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raport Departament</title>
+    <title><% if (isSef || isDirector) { %>Raport Departament<% } else { %>Raport Personal<% } %></title>
     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -302,7 +302,11 @@ if (sesi != null) {
 <body>
     <div class="app-container">
         <div class="app-header">
+            <% if (isSef || isDirector) { %>
             <h1>Raport Departament: <%=numeDepartament%></h1>
+            <% } else { %>
+            <h1>Raport Personal: <%=rs.getString("nume") + " " + rs.getString("prenume")%></h1>
+            <% } %>
         </div>
         
         <div class="app-body">
@@ -329,7 +333,11 @@ if (sesi != null) {
                         </select>
                     </div>
                     
+                    <% if (isSef || isDirector) { %>
                     <input type="hidden" name="dep" value="<%=userDep%>">
+                    <% } else { %>
+                    <input type="hidden" name="user_id" value="<%=userId%>">
+                    <% } %>
                     <input type="hidden" name="tip" value="1">
                     
                     <div class="form-group">
@@ -344,8 +352,14 @@ if (sesi != null) {
             
             <!-- Main content -->
             <div class="main-content" id="content">
-                <h3 id="chartHeader" class="header-title">Raport Concedii</h3>
-                <p class="note">*Graficul afiseaza numarul de angajati in fiecare luna</p>
+                <h3 id="chartHeader" class="header-title">
+                    <% if (isSef || isDirector) { %>
+                    Raport Concedii Departament
+                    <% } else { %>
+                    Raport Concedii Personale
+                    <% } %>
+                </h3>
+                <p class="note">*Graficul afiseaza doar lunile cu concedii</p>
                 
                 <div class="chart-container">
                     <div id="myChart"></div>
@@ -360,8 +374,13 @@ if (sesi != null) {
                     </div>
                     
                     <div class="data-row">
+                        <% if (isSef || isDirector) { %>
                         <span class="data-label">Departament:</span>
                         <span class="data-value" id="departmentInfo"><%=numeDepartament%></span>
+                        <% } else { %>
+                        <span class="data-label">Utilizator:</span>
+                        <span class="data-value" id="departmentInfo"><%=rs.getString("nume") + " " + rs.getString("prenume")%></span>
+                        <% } %>
                     </div>
                     
                     <div class="data-row">
@@ -370,7 +389,7 @@ if (sesi != null) {
                     </div>
                     
                     <div class="data-row">
-                        <span class="data-label">Total angajati:</span>
+                        <span class="data-label">Total concedii:</span>
                         <span class="data-value" id="totalInfo">Se incarca...</span>
                     </div>
                 </div>
@@ -459,7 +478,20 @@ $(document).ready(function() {
     }
 
     function updateChart(data) {
-        $('#chartHeader').text(data.h3 || 'Raport Concedii Departament');
+        $('#chartHeader').text(data.h3 || 'Raport Concedii');
+        
+        // Filtrez doar lunile cu concedii (valori > 0)
+        let filteredMonths = [];
+        let filteredCounts = [];
+        
+        if (data.months && data.counts) {
+            for (let i = 0; i < data.months.length; i++) {
+                if (data.counts[i] > 0) {
+                    filteredMonths.push(data.months[i]);
+                    filteredCounts.push(data.counts[i]);
+                }
+            }
+        }
         
         // Responsive font sizes based on screen width
         const isMobile = window.innerWidth < 768;
@@ -472,20 +504,20 @@ $(document).ready(function() {
                 type: 'bar',
                 backgroundColor: 'transparent',
                 title: {
-                    text: 'Numar angajati / luna',
+                    text: 'Numar concedii / luna',
                     fontColor: document.getElementById("color-picker").value,
                     fontSize: titleSize
                 },
                 scaleX: {
-                    values: data.months ? data.months.map(month => month.toString()) : [],
+                    values: filteredMonths.map(month => month.toString()),
                     item: {
                         fontColor: accent,
                         fontSize: fontSize
                     },
                     // Make labels vertical on mobile
-                    labels: data.months ? data.months.map(month => month.toString()) : [],
+                    labels: filteredMonths.map(month => month.toString()),
                     "max-labels": isMobile ? 6 : 12,
-                    "step": isMobile ? Math.ceil(data.months?.length / 6) || 1 : 1
+                    "step": isMobile ? Math.ceil(filteredMonths.length / 6) || 1 : 1
                 },
                 scaleY: {
                     item: {
@@ -494,10 +526,10 @@ $(document).ready(function() {
                     }
                 },
                 series: [{
-                    values: data.counts || [],
+                    values: filteredCounts,
                     backgroundColor: document.getElementById("color-picker").value,
                     tooltip: {
-                        text: '%v angajati',
+                        text: '%v concedii',
                         backgroundColor: document.getElementById("color-picker").value
                     }
                 }],
@@ -527,7 +559,68 @@ $(document).ready(function() {
     document.getElementById('color-picker').addEventListener('change', function(e) {
         if (!chartData) return;
         
-        updateChart(chartData);
+        // Filtrez doar lunile cu concedii (valori > 0)
+        let filteredMonths = [];
+        let filteredCounts = [];
+        
+        if (chartData.months && chartData.counts) {
+            for (let i = 0; i < chartData.months.length; i++) {
+                if (chartData.counts[i] > 0) {
+                    filteredMonths.push(chartData.months[i]);
+                    filteredCounts.push(chartData.counts[i]);
+                }
+            }
+        }
+        
+        var myConfig = {
+            type: 'bar',
+            backgroundColor: 'transparent',
+            title: {
+                text: 'Numar concedii / luna',
+                fontColor: document.getElementById("color-picker").value
+            },
+            scaleX: {
+                values: filteredMonths.map(month => month.toString()),
+                item: {
+                    fontColor: accent
+                }
+            },
+            scaleY: {
+                item: {
+                    fontColor: accent
+                }
+            },
+            series: [{
+                values: filteredCounts,
+                backgroundColor: document.getElementById("color-picker").value,
+                tooltip: {
+                    text: '%v concedii',
+                    backgroundColor: document.getElementById("color-picker").value
+                }
+            }],
+            plot: {
+                valueBox: {
+                    text: '%v',
+                    placement: 'top',
+                    fontColor: '#FFF',
+                    backgroundColor: document.getElementById("color-picker").value,
+                    borderRadius: 3
+                },
+                "animation": {
+                    "effect": "ANIMATION_EXPAND_BOTTOM",
+                    "method": "ANIMATION_STRONG_EASE_OUT",
+                    "sequence": "ANIMATION_BY_PLOT_AND_NODE",
+                    "speed": 275
+                }
+            }
+        };
+
+        zingchart.render({
+            id: 'myChart',
+            data: myConfig,
+            height: '100%',
+            width: '100%'
+        });
     }, false);
     
     // Re-render chart on window resize for responsiveness
@@ -559,7 +652,7 @@ function generatePDF() {
     // Use html2pdf to generate PDF directly
     html2pdf().set({
         margin: [15, 15, 15, 15],
-        filename: 'raport_departament.pdf',
+        filename: <% if (isSef || isDirector) { %>'raport_departament.pdf'<% } else { %>'raport_personal.pdf'<% } %>,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
             scale: 2,

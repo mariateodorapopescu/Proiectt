@@ -35,7 +35,7 @@ if (sesi != null) {
                 String functie = rs.getString("functie");
                 int ierarhie = rs.getInt("ierarhie");
 
-                // Funcție helper pentru a determina rolul utilizatorului
+                // Functie helper pentru a determina rolul utilizatorului
                 boolean isDirector = (ierarhie < 3) ;
                 boolean isSef = (ierarhie >= 4 && ierarhie <=5);
                 boolean isIncepator = (ierarhie >= 10);
@@ -263,7 +263,19 @@ if (sesi != null) {
                         }
                         %>
                     </select>
+                    <%
+                    // Sefii continua sa vada concediile din departamentul lor
+                    if (isSef || isDirector) {
+                    %>
                     <input type="hidden" name="dep" value="<%=userDep%>">
+                    <%
+                    } else {
+                    // Utilizatorii normali vad doar concediile lor
+                    %>
+                    <input type="hidden" name="user_id" value="<%=userId%>">
+                    <%
+                    }
+                    %>
                     <input type="hidden" name="tip" value="2">
                 </form>
             </div>
@@ -283,8 +295,12 @@ if (sesi != null) {
         <!-- Main Content -->
         <div class="main-content">
             <div id="content">
-                <h3 id="chartHeader" class="header-title"></h3>
-                <p class="note">*Nu au fost inlcuse si zilele in care niciun angajat nu este plecat in concediu</p>
+                <% if (isSef || isDirector) { %>
+                <h3 id="chartHeader" class="header-title">Raport concedii departament</h3>
+                <% } else { %>
+                <h3 id="chartHeader" class="header-title">Raport concedii personale</h3>
+                <% } %>
+                <p class="note">*Nu au fost incluse zilele in care nu exista concedii</p>
                 
                 <div class="chart-container">
                     <div id="myChart"></div>
@@ -299,8 +315,13 @@ if (sesi != null) {
                     </div>
                     
                     <div class="data-row">
+                        <% if (isSef || isDirector) { %>
                         <span class="data-label">Departament:</span>
                         <span class="data-value" id="departmentInfo">Se incarca...</span>
+                        <% } else { %>
+                        <span class="data-label">Utilizator:</span>
+                        <span class="data-value" id="departmentInfo"><%=rs.getString("nume") + " " + rs.getString("prenume")%></span>
+                        <% } %>
                     </div>
                     
                     <div class="data-row">
@@ -393,11 +414,13 @@ $(document).ready(function() {
             $('#statusInfo').text(data.status === '3' ? 'Toate statusurile' : 'Status necunoscut');
         }
         
-        // Update department info
-        $('#departmentInfo').text(data.departament || 'Toate departamentele');
+        // Update department info - this is already pre-filled in the HTML for user-specific views
+        if (data.departament && $('#departmentInfo').text() === 'Se incarca...') {
+            $('#departmentInfo').text(data.departament);
+        }
         
         // Update month info
-        $('#monthInfo').text(data.monthName || 'Luna curentă');
+        $('#monthInfo').text(data.monthName || 'Luna curenta');
         
         // Calculate total days with leaves (days with at least 1 leave)
         const daysWithLeaves = data.counts ? data.counts.filter(count => count > 0).length : 0;
@@ -430,7 +453,7 @@ $(document).ready(function() {
                 type: 'bar',
                 backgroundColor: 'transparent',
                 title: {
-                    text: 'Numar angajati / zi',
+                    text: 'Zile cu concedii',
                     fontColor: document.getElementById("color-picker").value
                 },
                 scaleX: {
@@ -445,7 +468,7 @@ $(document).ready(function() {
                 },
                 scaleY: {
                     label: {
-                        text: 'Numar angajati',
+                        text: 'Numar concedii',
                         fontColor: accent
                     },
                     item: {
@@ -456,7 +479,7 @@ $(document).ready(function() {
                     values: filteredCounts,
                     backgroundColor: document.getElementById("color-picker").value,
                     tooltip: {
-                        text: '%v angajati',
+                        text: '%v concedii',
                         backgroundColor: document.getElementById("color-picker").value
                     }
                 }],
@@ -526,7 +549,7 @@ $(document).ready(function() {
                 }
             },
             title: {
-                text: 'Numar angajati / zi',
+                text: 'Zile cu concedii',
                 fontColor: document.getElementById("color-picker").value
             },
             scaleX: {
@@ -541,7 +564,7 @@ $(document).ready(function() {
             },
             scaleY: {
                 label: {
-                    text: 'Numar angajati',
+                    text: 'Numar concedii',
                     fontColor: accent
                 },
                 item: {
@@ -552,7 +575,7 @@ $(document).ready(function() {
                 values: filteredCounts,
                 backgroundColor: document.getElementById("color-picker").value,
                 tooltip: {
-                    text: '%v angajati',
+                    text: '%v concedii',
                     backgroundColor: document.getElementById("color-picker").value
                 }
             }]

@@ -46,12 +46,14 @@ public class JsonServlet extends HttpServlet {
         String tipConcediuParam = request.getParameter("tip_concediu");
         String tipParam = request.getParameter("tip");
         String monthParam = request.getParameter("month");
+        String userIdParam = request.getParameter("user_id");
         
         int status = 3; // Default: Any status
         int department = -1; // Default: Any department
         int tipConcediu = -1; // Default: Any leave type
         int type = 1; // Default report type: Annual
         int month = -1; // Default: No specific month
+        int userId = -1; // Default: No specific user
         
         try {
             if (statusParam != null && !statusParam.isEmpty()) {
@@ -68,6 +70,9 @@ public class JsonServlet extends HttpServlet {
             }
             if (monthParam != null && !monthParam.isEmpty()) {
                 month = Integer.parseInt(monthParam);
+            }
+            if (userIdParam != null && !userIdParam.isEmpty()) {
+                userId = Integer.parseInt(userIdParam);
             }
         } catch (NumberFormatException e) {
             System.out.println("Error parsing parameters: " + e.getMessage());
@@ -104,6 +109,20 @@ public class JsonServlet extends HttpServlet {
                     }
                 }
                 
+                // Fetch user name if userId is provided
+                String userName = null;
+                if (userId != -1) {
+                    try (PreparedStatement userStmt = conn.prepareStatement("SELECT CONCAT(nume, ' ', prenume) as full_name FROM useri WHERE id = ?")) {
+                        userStmt.setInt(1, userId);
+                        try (ResultSet userRs = userStmt.executeQuery()) {
+                            if (userRs.next()) {
+                                userName = userRs.getString("full_name");
+                                departmentName = userName; // Override department name with user name for display
+                            }
+                        }
+                    }
+                }
+                
                 // Fetch tip concediu name
                 String tipConcediuName = "Toate tipurile"; // Default
                 if (tipConcediu != -1) {
@@ -119,10 +138,10 @@ public class JsonServlet extends HttpServlet {
                 
                 if (type == 2 && month != -1) {
                     // Monthly report with daily breakdown
-                    generateMonthlyReport(conn, jsonResponse, status, department, tipConcediu, month, statusName, departmentName, tipConcediuName);
+                    generateMonthlyReport(conn, jsonResponse, status, department, tipConcediu, month, userId, statusName, departmentName, tipConcediuName);
                 } else {
                     // Annual report with monthly breakdown (default)
-                    generateAnnualReport(conn, jsonResponse, status, department, tipConcediu, statusName, departmentName, tipConcediuName);
+                    generateAnnualReport(conn, jsonResponse, status, department, tipConcediu, userId, statusName, departmentName, tipConcediuName);
                 }
                 
                 out.print(jsonResponse.toString());
@@ -137,7 +156,7 @@ public class JsonServlet extends HttpServlet {
     }
     
     private void generateAnnualReport(Connection conn, JSONObject jsonResponse, int status, int department, int tipConcediu, 
-                               String statusName, String departmentName, String tipConcediuName) throws SQLException {
+                               int userId, String statusName, String departmentName, String tipConcediuName) throws SQLException {
         // Build the base query for annual report (by month)
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT MONTH(c.start_c) as month, YEAR(c.start_c) as year, COUNT(*) as count ")
@@ -157,6 +176,13 @@ public class JsonServlet extends HttpServlet {
         if (department != -1) {
             queryBuilder.append(whereAdded ? " AND " : " WHERE ");
             queryBuilder.append("u.id_dep = ?");
+            whereAdded = true;
+        }
+        
+        // Add user_id condition if needed
+        if (userId != -1) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("c.id_ang = ?");
             whereAdded = true;
         }
         
@@ -182,6 +208,10 @@ public class JsonServlet extends HttpServlet {
             
             if (department != -1) {
                 stmt.setInt(paramIndex++, department);
+            }
+            
+            if (userId != -1) {
+                stmt.setInt(paramIndex++, userId);
             }
             
             if (tipConcediu != -1) {
@@ -218,7 +248,9 @@ public class JsonServlet extends HttpServlet {
             if (!statusName.equals("Toate statusurile")) {
                 titleBuilder.append(" - ").append(statusName);
             }
-            if (!departmentName.equals("Toate departamentele")) {
+            if (userId != -1) {
+                titleBuilder.append(" - ").append(departmentName); // departmentName contains user name in this case
+            } else if (!departmentName.equals("Toate departamentele")) {
                 titleBuilder.append(" - ").append(departmentName);
             }
             if (!tipConcediuName.equals("Toate tipurile")) {
@@ -236,7 +268,7 @@ public class JsonServlet extends HttpServlet {
     }
     
     private void generateMonthlyReport(Connection conn, JSONObject jsonResponse, int status, int department, int tipConcediu, 
-                                int month, String statusName, String departmentName, String tipConcediuName) throws SQLException {
+                                int month, int userId, String statusName, String departmentName, String tipConcediuName) throws SQLException {
         // Get current year
         int currentYear = LocalDate.now().getYear();
         
@@ -274,6 +306,12 @@ public class JsonServlet extends HttpServlet {
             whereAdded = true;
         }
         
+        if (userId != -1) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("c.id_ang = ?");
+            whereAdded = true;
+        }
+        
         if (tipConcediu != -1) {
             queryBuilder.append(whereAdded ? " AND " : " WHERE ");
             queryBuilder.append("c.tip = ?");
@@ -296,6 +334,10 @@ public class JsonServlet extends HttpServlet {
             
             if (department != -1) {
                 stmt.setInt(paramIndex++, department);
+            }
+            
+            if (userId != -1) {
+                stmt.setInt(paramIndex++, userId);
             }
             
             if (tipConcediu != -1) {
@@ -322,11 +364,17 @@ public class JsonServlet extends HttpServlet {
             String monthName = monthNames[month-1];
             
             // Build response JSON
-            StringBuilder titleBuilder = new StringBuilder("Raport concedii pentru luna " + monthName);
+            StringBuilder titleBuilder = new StringBuilder();
+            if (userId != -1) {
+                titleBuilder.append("Raport concedii personale pentru luna ").append(monthName);
+            } else {
+                titleBuilder.append("Raport concedii pentru luna ").append(monthName);
+            }
+            
             if (!statusName.equals("Toate statusurile")) {
                 titleBuilder.append(" - ").append(statusName);
             }
-            if (!departmentName.equals("Toate departamentele")) {
+            if (userId == -1 && !departmentName.equals("Toate departamentele")) {
                 titleBuilder.append(" - ").append(departmentName);
             }
             if (!tipConcediuName.equals("Toate tipurile")) {
