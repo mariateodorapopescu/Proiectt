@@ -180,6 +180,44 @@
             margin-top: 10px;
             font-weight: bold;
         }
+        
+        .location-details {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .location-details h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .location-details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .loading-indicator div {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid <%= accent %>;
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -203,6 +241,20 @@
             <p id="locationCoords" style="font-size:12px; margin-top:0;"></p>
         </div>
         
+        <div class="location-details" id="locationDetails" style="background:<%=clr%>; color:<%=text%>; display:none;">
+            <h4 style="margin-top:0; color:<%=accent%>">Detalii adresă:</h4>
+            <p id="addressStreet" style="margin:5px 0;"></p>
+            <p id="addressCity" style="margin:5px 0;"></p>
+            <p id="addressRegion" style="margin:5px 0;"></p>
+            <p id="addressPostal" style="margin:5px 0;"></p>
+            <p id="addressCountry" style="margin:5px 0;"></p>
+        </div>
+        
+        <div id="loadingIndicator" class="loading-indicator">
+            <p style="color: <%=text%>">Se obțin informații despre locație...</p>
+            <div></div>
+        </div>
+        
         <button id="saveBtn" style="margin-top:15px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" disabled>
             Salvează această locație
         </button>
@@ -223,6 +275,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const idConcediu = '<%= idConcediu %>';
             let selectedLocationData = null;
+            let completeAddressData = null;
             
             require([
                 "esri/config",
@@ -299,6 +352,60 @@
                         document.getElementById("statusMessage").className = "error-message";
                     });
                 
+                // Funcție pentru a obține detaliile adresei folosind reverse geocoding
+                async function getAddressDetails(latitude, longitude) {
+                    document.getElementById("loadingIndicator").style.display = "block";
+                    
+                    const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+                    
+                    try {
+                        // Obținem detaliile adresei complete
+                        const response = await locator.locationToAddress(locatorUrl, {
+                            location: {
+                                latitude: latitude,
+                                longitude: longitude
+                            },
+                            outFields: ["*"]
+                        });
+                        
+                        document.getElementById("loadingIndicator").style.display = "none";
+                        
+                        if (response && response.address) {
+                            completeAddressData = {
+                                street: response.address.Address || "Necunoscut",
+                                city: response.address.City || "Necunoscut",
+                                region: response.address.Region || "Necunoscut",
+                                postal: response.address.Postal || "Necunoscut",
+                                country: response.address.CountryCode || "RO"
+                            };
+                            
+                            // Afișăm detaliile adresei
+                            document.getElementById("addressStreet").textContent = "Strada: " + completeAddressData.street;
+                            document.getElementById("addressCity").textContent = "Oraș: " + completeAddressData.city;
+                            document.getElementById("addressRegion").textContent = "Județ: " + completeAddressData.region;
+                            document.getElementById("addressPostal").textContent = "Cod poștal: " + completeAddressData.postal;
+                            document.getElementById("addressCountry").textContent = "Țară: " + (completeAddressData.country == "RO" ? "România" : completeAddressData.country);
+                            
+                            document.getElementById("locationDetails").style.display = "block";
+                            
+                            return completeAddressData;
+                        }
+                    } catch (error) {
+                        console.error("Eroare la obținerea detaliilor adresei:", error);
+                        document.getElementById("loadingIndicator").style.display = "none";
+                        document.getElementById("statusMessage").textContent = "Nu s-a putut obține adresa exactă. Se vor folosi date aproximative.";
+                    }
+                    
+                    // Dacă nu reușim să obținem adresa, returnăm valori implicite
+                    return {
+                        street: "Locație necunoscută",
+                        city: "Necunoscut",
+                        region: "Necunoscut",
+                        postal: "000000",
+                        country: "RO"
+                    };
+                }
+                
                 // Eveniment pentru selectarea unei locații din dropdown
                 document.getElementById("locationSelect").addEventListener("change", function() {
                     const selectedOption = this.options[this.selectedIndex];
@@ -324,8 +431,11 @@
                             
                             // Afișăm informațiile despre locația selectată
                             document.getElementById("locationName").textContent = selectedOption.textContent;
-                            document.getElementById("locationCoords").textContent = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
+                            document.getElementById("locationCoords").textContent = "Lat: " + lat.toFixed(6) + ", Lon: " + lon.toFixed(6);
                             document.getElementById("selectedLocation").style.display = "block";
+                            
+                            // Obținem detaliile adresei
+                            getAddressDetails(lat, lon);
                             
                             // Activăm butonul de salvare
                             document.getElementById("saveBtn").disabled = false;
@@ -371,7 +481,7 @@
                 document.getElementById("locateMeBtn").addEventListener("click", function() {
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(
-                            function(position) {
+                            async function(position) {
                                 const longitude = position.coords.longitude;
                                 const latitude = position.coords.latitude;
                                 
@@ -379,6 +489,25 @@
                                     longitude: longitude,
                                     latitude: latitude
                                 });
+                                
+                                // Salvăm datele locației curente
+                                selectedLocationData = {
+                                    id: "current_location",
+                                    name: "Locația mea",
+                                    latitude: latitude,
+                                    longitude: longitude
+                                };
+                                
+                                // Afișăm informațiile despre locația curentă
+                                document.getElementById("locationName").textContent = "Locația mea";
+                                document.getElementById("locationCoords").textContent = "Lat: " + latitude.toFixed(6) + ", Lon: " + longitude.toFixed(6);
+                                document.getElementById("selectedLocation").style.display = "block";
+                                
+                                // Obținem detaliile adresei
+                                await getAddressDetails(latitude, longitude);
+                                
+                                // Activăm butonul de salvare
+                                document.getElementById("saveBtn").disabled = false;
                                 
                                 const locationGraphic = new Graphic({
                                     geometry: myLocation,
@@ -401,72 +530,15 @@
                                     }
                                 });
                                 
-                                // Eliminăm markerii anteriori dacă e necesar și adăugăm cel nou
-                                if (selectedLocationData) {
-                                    view.graphics.removeAll();
-                                    
-                                    // Readăugăm și markerul pentru locația selectată
-                                    const selectedPoint = new Point({
-                                        longitude: selectedLocationData.longitude,
-                                        latitude: selectedLocationData.latitude
-                                    });
-                                    
-                                    const selectedGraphic = new Graphic({
-                                        geometry: selectedPoint,
-                                        symbol: {
-                                            type: "simple-marker",
-                                            color: "<%= accent %>",
-                                            size: "12px",
-                                            outline: {
-                                                color: [255, 255, 255],
-                                                width: 2
-                                            }
-                                        }
-                                    });
-                                    
-                                    view.graphics.add(selectedGraphic);
-                                    
-                                    // Linie pentru rută între poziția mea și locația selectată
-                                    const routeLine = new Graphic({
-                                        geometry: {
-                                            type: "polyline",
-                                            paths: [
-                                                [longitude, latitude], 
-                                                [selectedLocationData.longitude, selectedLocationData.latitude]
-                                            ]
-                                        },
-                                        symbol: {
-                                            type: "simple-line",
-                                            color: "<%= accent %>",
-                                            width: 3
-                                        }
-                                    });
-                                    
-                                    view.graphics.add(routeLine);
-                                }
-                                
+                                // Eliminăm markerii anteriori și adăugăm cel nou
+                                view.graphics.removeAll();
                                 view.graphics.add(locationGraphic);
                                 
-                                // Zoom și centrare pe regiunea care include ambele puncte
-                                if (selectedLocationData) {
-                                    view.goTo({
-                                        target: [myLocation, new Point({
-                                            longitude: selectedLocationData.longitude,
-                                            latitude: selectedLocationData.latitude
-                                        })],
-                                        padding: {
-                                            top: 100,
-                                            right: 100,
-                                            bottom: 100,
-                                            left: 100
-                                        }
-                                    });
-                                } else {
-                                    view.goTo({
-                                        center: [longitude, latitude],
-                                        zoom: 15
-                                    });
-                                }
+                                // Zoom și centrare pe locația curentă
+                                view.goTo({
+                                    center: [longitude, latitude],
+                                    zoom: 15
+                                });
                             },
                             function(error) {
                                 console.error("Eroare la obținerea locației:", error);
@@ -491,47 +563,25 @@
                     // Pregătim datele pentru a fi trimise la server
                     const requestBody = {
                         id_con: idConcediu,
-                        strada: "Atracție turistică: " + selectedLocationData.name,
-                        cod: "000000", // Cod poștal implicit
-                        judet: "N/A", // Se va determina de către server prin reverse geocoding
-                        oras: "N/A", // Se va determina de către server prin reverse geocoding
-                        tara: "România",
+                        strada: completeAddressData ? completeAddressData.street : "Locație necunoscută",
+                        cod: completeAddressData ? completeAddressData.postal : "000000",
+                        judet: completeAddressData ? completeAddressData.region : "Necunoscut",
+                        oras: completeAddressData ? completeAddressData.city : "Necunoscut",
+                        tara: completeAddressData ? (completeAddressData.country == "RO" ? "România" : completeAddressData.country) : "România",
                         latitudine: selectedLocationData.latitude,
                         longitudine: selectedLocationData.longitude
                     };
                     
-                    // Încercăm să facem reverse geocoding pentru a obține adresa completă
-                    const locatorUrl = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+                    // Verificăm dacă locația este o atracție turistică sau poziția curentă
+                    if (selectedLocationData.id !== "current_location") {
+                        requestBody.strada = "Atracție turistică: " + selectedLocationData.name + 
+                                            (completeAddressData ? " (" + completeAddressData.street + ")" : "");
+                    }
                     
-                    const location = {
-                        longitude: selectedLocationData.longitude,
-                        latitude: selectedLocationData.latitude
-                    };
+                    // Afișăm indicator de încărcare
+                    document.getElementById("loadingIndicator").style.display = "block";
                     
-                    locator.locationToAddress(locatorUrl, {
-                        location: location
-                    })
-                    .then(function(response) {
-                        // Actualizăm requestBody cu datele de adresă obținute
-                        if (response && response.address) {
-                            requestBody.judet = response.address.Region || "N/A";
-                            requestBody.oras = response.address.City || "N/A";
-                            requestBody.strada = "Atracție turistică: " + selectedLocationData.name + 
-                                                " (" + (response.address.Address || "Adresă necunoscută") + ")";
-                        }
-                        
-                        // Trimitem datele către server
-                        sendLocationToServer(requestBody);
-                    })
-                    .catch(function(error) {
-                        console.log("Reverse geocoding eșuat, se folosesc date implicite", error);
-                        // Trimitem datele către server cu datele implicite
-                        sendLocationToServer(requestBody);
-                    });
-                });
-                
-                // Funcție pentru trimiterea datelor de locație către server
-                function sendLocationToServer(requestBody) {
+                    // Trimitem datele către server
                     fetch("/Proiect/AddLeaveLocation", {
                         method: "POST",
                         headers: {
@@ -540,6 +590,8 @@
                         body: JSON.stringify(requestBody)
                     })
                     .then(response => {
+                        document.getElementById("loadingIndicator").style.display = "none";
+                        
                         if (response.ok) {
                             document.getElementById("statusMessage").textContent = "Locația a fost salvată cu succes!";
                             document.getElementById("statusMessage").className = "success-message";
@@ -553,15 +605,65 @@
                         }
                     })
                     .catch(error => {
+                        document.getElementById("loadingIndicator").style.display = "none";
                         console.error("Eroare:", error);
                         document.getElementById("statusMessage").textContent = "Eroare: " + error.message;
                         document.getElementById("statusMessage").className = "error-message";
                     });
-                }
+                });
                 
-                // Eveniment pentru click pe hartă - afișarea detaliilor atracțiilor
-                view.on("click", function(event) {
-                    // Facem un query pe layer-ul de atracții turistice
+                // Eveniment pentru click pe hartă
+                view.on("click", async function(event) {
+                    // Coordonatele locației pe care s-a făcut click
+                    const latitude = event.mapPoint.latitude;
+                    const longitude = event.mapPoint.longitude;
+                    
+                    // Salvăm datele locației selectate
+                    selectedLocationData = {
+                        id: "map_click",
+                        name: "Locație aleasă pe hartă",
+                        latitude: latitude,
+                        longitude: longitude
+                    };
+                    
+                    // Afișăm informațiile despre locația selectată
+                    document.getElementById("locationName").textContent = "Locație aleasă pe hartă";
+                    document.getElementById("locationCoords").textContent = "Lat: " + latitude.toFixed(6) + ", Lon: " + longitude.toFixed(6);
+                    document.getElementById("selectedLocation").style.display = "block";
+                    
+                    // Obținem detaliile adresei
+                    await getAddressDetails(latitude, longitude);
+                    
+                    // Activăm butonul de salvare
+                    document.getElementById("saveBtn").disabled = false;
+                    
+                    // Creare marker pentru locația selectată
+                    const pointGraphic = new Graphic({
+                        geometry: event.mapPoint,
+                        symbol: {
+                            type: "simple-marker",
+                            color: "<%= accent %>",
+                            size: "12px",
+                            outline: {
+                                color: [255, 255, 255],
+                                width: 2
+                            }
+                        },
+                        attributes: {
+                            title: "Locație aleasă pe hartă",
+                            location: completeAddressData ? completeAddressData.street : "Locație necunoscută"
+                        },
+                        popupTemplate: {
+                            title: "{title}",
+                            content: "{location}"
+                        }
+                    });
+                    
+                    // Eliminăm markerii anteriori și adăugăm unul nou
+                    view.graphics.removeAll();
+                    view.graphics.add(pointGraphic);
+                    
+                    // Verificăm dacă facem click pe o atracție turistică
                     const query = attractionsLayer.createQuery();
                     query.geometry = event.mapPoint;
                     query.distance = 100; // Căutare într-o rază de 100 metri
@@ -574,75 +676,40 @@
                             const feature = results.features[0];
                             const attributes = feature.attributes;
                             
+                            // Actualizăm datele locației selectate
+                            selectedLocationData.id = attributes.OBJECTID || "map_attraction";
+                            selectedLocationData.name = attributes.name || "Atracție turistică";
+                            
+                            // Actualizăm informațiile afișate
+                            document.getElementById("locationName").textContent = selectedLocationData.name;
+                            
+                            // Actualizăm descrierea markerului
+                            pointGraphic.attributes.title = selectedLocationData.name;
+                            pointGraphic.attributes.location = "Atracție turistică";
+                            
                             // Afișăm detaliile atracției
                             const detailsPanel = document.getElementById("detailsPanel");
                             const detailsContent = document.getElementById("detailsContent");
                             
-                            let content = `<h4>${attributes.name || 'Atracție turistică'}</h4>`;
-                            content += `<p><strong>Tip:</strong> ${attributes.tourism || 'Nespecificat'}</p>`;
+                            let content = "<h4>" + (attributes.name || 'Atracție turistică') + "</h4>";
+                            content += "<p><strong>Tip:</strong> " + (attributes.tourism || 'Nespecificat') + "</p>";
                             if (attributes.description) {
-                                content += `<p><strong>Descriere:</strong> ${attributes.description}</p>`;
+                                content += "<p><strong>Descriere:</strong> " + attributes.description + "</p>";
                             }
                             
                             // Adăugăm coordonatele
-                            const point = feature.geometry;
-                            content += `<p><strong>Coordonate:</strong> Lat: ${point.latitude.toFixed(6)}, Lon: ${point.longitude.toFixed(6)}</p>`;
+                            content += "<p><strong>Coordonate:</strong> Lat: " + latitude.toFixed(6) + ", Lon: " + longitude.toFixed(6) + "</p>";
                             
-                            // Buton pentru a selecta această atracție
-                            content += `<button id="selectAttraction" style="
-                                width: 100%;
-                                padding: 8px;
-                                background-color: ${accent};
-                                color: white;
-                                border: none;
-                                border-radius: 4px;
-                                cursor: pointer;
-                                margin-top: 10px;
-                            ">Selectează această atracție</button>`;
+                            // Adăugăm informații despre adresă
+                            if (completeAddressData) {
+                                content += "<p><strong>Adresă:</strong> " + completeAddressData.street + "</p>";
+                                content += "<p><strong>Oraș:</strong> " + completeAddressData.city + "</p>";
+                                content += "<p><strong>Județ:</strong> " + completeAddressData.region + "</p>";
+                                content += "<p><strong>Cod poștal:</strong> " + completeAddressData.postal + "</p>";
+                            }
                             
                             detailsContent.innerHTML = content;
                             detailsPanel.style.display = "block";
-                            
-                            // Adăugăm handler pentru butonul de selectare
-                            document.getElementById("selectAttraction").addEventListener("click", function() {
-                                // Salvăm datele despre atracția selectată
-                                selectedLocationData = {
-                                    id: attributes.OBJECTID || 'unknown',
-                                    name: attributes.name || 'Atracție turistică',
-                                    latitude: point.latitude,
-                                    longitude: point.longitude
-                                };
-                                
-                                // Afișăm informațiile în panoul de locație selectată
-                                document.getElementById("locationName").textContent = selectedLocationData.name;
-                                document.getElementById("locationCoords").textContent = 
-                                    `Lat: ${selectedLocationData.latitude.toFixed(6)}, Lon: ${selectedLocationData.longitude.toFixed(6)}`;
-                                document.getElementById("selectedLocation").style.display = "block";
-                                
-                                // Activăm butonul de salvare
-                                document.getElementById("saveBtn").disabled = false;
-                                
-                                // Creare marker pentru locația selectată
-                                const pointGraphic = new Graphic({
-                                    geometry: point,
-                                    symbol: {
-                                        type: "simple-marker",
-                                        color: accent,
-                                        size: "12px",
-                                        outline: {
-                                            color: [255, 255, 255],
-                                            width: 2
-                                        }
-                                    }
-                                });
-                                
-                                // Eliminăm markerii anteriori și adăugăm unul nou
-                                view.graphics.removeAll();
-                                view.graphics.add(pointGraphic);
-                                
-                                // Ascundem panoul de detalii după selectare
-                                detailsPanel.style.display = "none";
-                            });
                         }
                     });
                 });
@@ -659,7 +726,6 @@
                 out.println("alert('" + e.getMessage() + "');");
                 out.println("</script>");
                 e.printStackTrace();
-                ;;
             }
         } else {
             out.println("<script type='text/javascript'>");

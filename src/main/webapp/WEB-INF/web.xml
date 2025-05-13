@@ -1304,4 +1304,24 @@
     <servlet-name>UpdateSediutLocatieServlet</servlet-name>
     <url-pattern>/UpdateSediutLocatieServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetConcediiPersonaleServlet</display-name>
+    <servlet-name>GetConcediiPersonaleServlet</servlet-name>
+    <servlet-class>Servlet.GetConcediiPersonaleServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetConcediiPersonaleServlet</servlet-name>
+    <url-pattern>/GetConcediiPersonaleServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetNextConcediuServlet</display-name>
+    <servlet-name>GetNextConcediuServlet</servlet-name>
+    <servlet-class>Servlet.GetNextConcediuServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetNextConcediuServlet</servlet-name>
+    <url-pattern>/GetNextConcediuServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
