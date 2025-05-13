@@ -300,12 +300,7 @@
                             Sediul departamentului personal
                         </a>
                     </button>
-                    <button class="action-button">
-                        <a href="harta_concedii2.jsp">
-                            <i class="fa-solid fa-umbrella-beach"></i>
-                            Atracții turistice
-                        </a>
-                    </button>
+                    
                     <button class="action-button">
                         <a href="harta_concedii2.jsp">
                             <i class="fa-solid fa-building-circle-check"></i>

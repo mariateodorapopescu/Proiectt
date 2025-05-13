@@ -48,8 +48,8 @@ if (sesi != null) {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
             preparedStatement = connection.prepareStatement(
-            		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie" +
-                            "dp.denumire_completa AS denumire_specifică FROM useri u " +
+            		"SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                            "dp.denumire_completa AS denumire FROM useri u " +
                             "JOIN tipuri t ON u.tip = t.tip " +
                             "JOIN departament d ON u.id_dep = d.id_dep " +
                             "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
@@ -285,7 +285,11 @@ table.picka-table tr {
 			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Telefon</label>");
 			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"text\" name=\"telefon\" placeholder=\"Introduceti telefonul\" value=\""+ rs2.getString("telefon") +"\" required class=\"login__input\">");
 			            	out.println("                </div>");
-			            	
+			            	out.println("                <div>");
+			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">UserName</label>");
+			            	out.println("                    <input style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" type=\"text\" name=\"username\" placeholder=\"Introduceti numele de utilizator\" value=\""+ rs2.getString("username") +"\" required class=\"login__input\">");
+			            	out.println("                </div>");
+
 			            	out.println("                <div>");
 			            	out.println("                    <label style=\"color: " + text + ";\" for=\"\" class=\"login__label\">Departament</label>");
 			            	out.println("                    <select style=\"color: " + text + "; border-color:" + accent +  "; background: " + clr + ";\" name=\"departament\" class=\"login__input\">");
