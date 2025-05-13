@@ -365,7 +365,7 @@
                             <th style="color:white">Status</th>
                             
                             <%
-                            if (request.getParameter("pag")== null && (userType == 3 || userType == 0)) {
+                            if (request.getParameter("pag")== null && (isSef || isDirector)) {
                             %>
                             <th style="color:white">Aprob.</th>
                             <th style="color:white">Resp.</th>

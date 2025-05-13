@@ -30,7 +30,7 @@
     }
 
     String username = currentUser.getUsername();
-    int userdep = 0, id = 0, userType = 0;
+    int userdep = 0, id = 0, userType = 0, ierarhie = 11;
 
     // Setăm culorile implicite
     String accent = "#10439F";
@@ -39,6 +39,8 @@
     String text = "#333";
     String card = "#ECEDFA";
     String hover = "#ECEDFA";
+    String functie = "";
+    boolean isSef = false, isDirector = false, isAdmin = false, isUtilizatorNormal = false, isIncepator = false;
 
     Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -56,15 +58,15 @@
             id = rs.getInt("id");
             userType = rs.getInt("tip");
             userdep = rs.getInt("id_dep");
-            String functie = rs.getString("functie");
-            int ierarhie = rs.getInt("ierarhie");
-
+            functie = rs.getString("functie");
+            ierarhie = rs.getInt("ierarhie");
+            
             // Funcție helper pentru a determina rolul utilizatorului
-            boolean isDirector = (ierarhie < 3) ;
-            boolean isSef = (ierarhie >= 4 && ierarhie <=5);
-            boolean isIncepator = (ierarhie >= 10);
-            boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
-            boolean isAdmin = (functie.compareTo("Administrator") == 0);
+            isDirector = (ierarhie < 3) ;
+            isSef = (ierarhie >= 4 && ierarhie <=5);
+            isIncepator = (ierarhie >= 10);
+            isAdmin = (functie.contains("Administrator"));
+            isUtilizatorNormal = !isDirector && !isSef && !isIncepator && !isAdmin; // tipuri 1, 2, 5-9
             
             if (!isAdmin) {
                 String query = "SELECT * FROM teme WHERE id_usr = ?";
@@ -378,7 +380,7 @@ try {
         <line x1="12" y1="16" x2="12.01" y2="16"></line>
     </svg>
     <div>
-        <strong>Atenție!</strong> Există <%= todayLeavesCount - 1%> concedii adăugate astăzi, dar numai <%=todayLeavesWithLocationCount - 1%> are locație asociată.
+        <strong>Atenție!</strong> Există <%= todayLeavesCount %> concedii adăugate astăzi, dar numai <%=todayLeavesWithLocationCount%> are locație asociată.
     </div>
     <button onclick="document.getElementById('noLocationsBanner').style.display='none';" style="
         background: transparent;
@@ -403,7 +405,7 @@ try {
 
 
                         <%
-                    if (request.getParameter("pag")!=null || (request.getParameter("pag")== null && userType != 3 || userType != 0)) {
+                    if (request.getParameter("pag")!=null || (request.getParameter("pag")== null && !isSef || !isDirector)) {
                     %>
                     <h1>Cereri noi de concedii</h1>
                      <% } else {%>
@@ -437,7 +439,7 @@ try {
                      <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
                     <%
                     
-                    if (request.getParameter("pag")== null && (userType == 3 || userType == 0)) {
+                    if (request.getParameter("pag")== null && (isSef || isDirector)) {
                     %>
                      <th style="color:white">Aprob.</th>
                      <th style="color:white">Resp.</th>
@@ -555,7 +557,7 @@ try {
                                     "</td>";
 
                         // Butoane pentru șef
-                        if (<%=userType%> === 3 && !<%=request.getParameter("pag")%>) {
+                        if (<%=isSef%> && !<%=request.getParameter("pag")%>) {
                             if (row.Status === "Neaprobat") {
                                 cellsHtml += "<td data-label='Status'>" +
                                             "<span class='status-icon status-aprobat-sef'>" +
@@ -575,7 +577,7 @@ try {
                         }
 
                         // Butoane pentru director
-                        if (<%=userType%> === 0 && !<%=request.getParameter("pag")%>) {
+                        if (<%=isDirector%> && !<%=request.getParameter("pag")%>) {
                             if (row.Status === "Aprobat sef") {
                                 cellsHtml += "<td data-label='Status'>" +
                                             "<span class='status-icon status-aprobat-director'>" +
@@ -596,8 +598,8 @@ try {
 
                         // Butoane de modificare/ștergere
                         if (<%=request.getParameter("pag") != null%>) {
-                            if ((row.Status === "Neaprobat" && (<%=userType%> === 1 || <%=userType%> === 2)) || 
-                                (row.Status === "Aprobat sef" && (<%=userType%> === 3 || <%=userType%> === 0))) {
+                            if ((row.Status === "Neaprobat" && (<%=!isSef%> || <%=!isDirector%>)) || 
+                                (row.Status === "Aprobat sef" && (<%=isSef%> || <%=isDirector%> ))) {
                                 cellsHtml += "<td data-label='Status'>" +
                                             "<span class='status-icon status-neaprobat'>" +
                                             "<a href='NewFile2.jsp?idcon=" + row.id + "'>" +
