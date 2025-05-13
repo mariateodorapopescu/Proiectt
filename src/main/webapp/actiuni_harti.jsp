@@ -302,7 +302,7 @@
                     </button>
                     
                     <button class="action-button">
-                        <a href="rutare_urmatorul_concediu.jsp">
+                        <a href="rutare_sediu_apropiat.jsp">
                             <i class="fa-solid fa-building-circle-check"></i>
                             Cel mai apropiat sediu
                         </a>
@@ -321,13 +321,13 @@
                     </button>
                     <% if (isDirector) { %>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="rutare_departament.jsp">
                             <i class="fa-solid fa-sitemap"></i>
                             Sediul unui anumit departament
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="rutare_sediu_select.jsp">
                             <i class="fa-solid fa-building-user"></i>
                             Un anumit sediu
                         </a>

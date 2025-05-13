@@ -591,9 +591,6 @@
     <servlet-name>IncetareContractServlet</servlet-name>
     <url-pattern>/IncetareContractServlet</url-pattern>
   </servlet-mapping>
-  <listener>
-    <listener-class>scheduler.ContractTerminationScheduler</listener-class>
-  </listener>
   <servlet>
     <description></description>
     <display-name>AdaugaSediuServlet</display-name>
@@ -1323,5 +1320,35 @@
   <servlet-mapping>
     <servlet-name>GetNextConcediuServlet</servlet-name>
     <url-pattern>/GetNextConcediuServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetSediiiServlet</display-name>
+    <servlet-name>GetSediiiServlet</servlet-name>
+    <servlet-class>Servlet.GetSediiiServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetSediiiServlet</servlet-name>
+    <url-pattern>/GetSediiiServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetDepartamenteServlet</display-name>
+    <servlet-name>GetDepartamenteServlet</servlet-name>
+    <servlet-class>Servlet.GetDepartamenteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetDepartamenteServlet</servlet-name>
+    <url-pattern>/GetDepartamenteServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetSediiSelectServlet</display-name>
+    <servlet-name>GetSediiSelectServlet</servlet-name>
+    <servlet-class>Servlet.GetSediiSelectServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetSediiSelectServlet</servlet-name>
+    <url-pattern>/GetSediiSelectServlet</url-pattern>
   </servlet-mapping>
 </web-app>
