@@ -34,7 +34,7 @@ if (sesi != null) {
                 String functie = rs.getString("functie");
                 int ierarhie = rs.getInt("ierarhie");
 
-                // Funcție helper pentru a determina rolul utilizatorului
+                // Functie helper pentru a determina rolul utilizatorului
                 boolean isDirector = (ierarhie < 3) ;
                 boolean isSef = (ierarhie >= 4 && ierarhie <=5);
                 boolean isIncepator = (ierarhie >= 10);
@@ -63,73 +63,134 @@ if (sesi != null) {
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Raport</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raport Concedii</title>
     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <style>
+        :root {
+            --accent: <%=accent%>;
+            --clr: <%=clr%>;
+            --sidebar: <%=sidebar%>;
+            --text: <%=text%>;
+            --card: <%=card%>;
+        }
+        
         body {
             margin: 0;
             padding: 0;
-            --bg: <%=accent%>;
-            --clr: <%=clr%>;
-            --sd: <%=sidebar%>;
-            --text: <%=text%>;
-            background: <%=clr%>;
+            background: var(--clr);
             font-family: 'Arial', sans-serif;
+            color: var(--text);
         }
         
+        /* Containers */
         .page-container {
-            display: flex;
-            flex-direction: row;
-            height: 100vh;
             width: 100%;
-        }
-        
-        .sidebar {
-            width: 250px;
-            padding: 20px;
-            background-color: <%=sidebar%>;
-            border-radius: 20px;
-            color: <%=text%>;
-            position: fixed;
-            left: 0;
-            top: 5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
             height: 100%;
-            overflow-y: auto;
         }
         
-        .main-content {
-            margin-left: 290px;
+        .content {
+            background-color: var(--sidebar);
+            border-radius: 15px;
             padding: 20px;
-            width: calc(100% - 330px);
-            top: 5rem;
+            margin-top: 20px;
+            height: 100%;
         }
         
         .chart-container {
-            background-color: <%=sidebar%>;
-            border-radius: 20px;
-            padding: 20px;
+            background-color: var(--sidebar);
+            border-radius: 10px;
+            padding: 15px;
             margin-bottom: 20px;
-            
-        }
-        
-        #myChart {
-            width: 100%;
-            height: 400px;
         }
         
         .chart-info {
-            background-color: <%=sidebar%>;
-            border-radius: 20px;
-            padding: 20px;
+            background-color: var(--sidebar);
+            border-radius: 10px;
+            padding: 15px;
             margin-top: 20px;
-            color: <%=text%>;
-            
         }
         
+        /* Headers */
+        h1, h2, h3, h4 {
+            color: var(--accent);
+            margin-top: 0;
+        }
+        
+        .header-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        /* Filter panel */
+        .filter-toggle {
+            display: block;
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+
+            position: relative;
+        }
+        
+        .filter-toggle::after {
+            content: "⯆";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+        }
+        
+        .filter-toggle.active::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        .filters {
+            display: none;
+            background-color: var(--sidebar);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            right: 1em;
+            top: 1em;
+        }
+        
+        .filters.active {
+            display: block;
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-column {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        /* Form elements */
         .form-group {
             margin-bottom: 15px;
         }
@@ -137,134 +198,248 @@ if (sesi != null) {
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 14px;
         }
         
         select, input {
             width: 100%;
-            padding: 8px;
-            border: 1px solid <%=accent%>;
-            border-radius: 5px;
-            background-color: <%=sidebar%>;
-            color: <%=text%>;
+            padding: 10px;
+            border: var(--sidebar);
+            border-radius: 8px;
+            background-color: var(--sidebar);
+            color: #333;
+            font-size: 14px;
+           
         }
         
         .btn {
             display: block;
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: <%=accent%>;
+            padding: 12px;
+            background-color: var(--accent);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             text-align: center;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
         .btn:hover {
-            background-color: black;
-            color: white;
-            text-decoration: underline;
+            opacity: 0.9;
+            transform: translateY(-2px);
         }
         
-        h3, h4 {
-            color: <%=accent%>;
-            margin-top: 0;
+        /* Data display */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
         
-        .zc-img, .zc-svg, .zc-rel .zc-top{
-            background-color: transparent;
+        .data-label {
+            font-weight: 600;
+            color: var(--accent);
         }
         
-        .header-title {
-            text-align: center;
-            color: <%=accent%>;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+        /* Chart styles */
+        #myChart {
+            width: 100%;
+            height: 300px;
         }
         
         .note {
-            font-size: 0.8rem;
-            color: #777;
+            text-align: center;
             font-style: italic;
+            color: var(--text);
+            margin: 10px 0;
+            font-size: 14px;
         }
         
-        @media print {
-            .sidebar {
+        .explanation {
+            background-color: var(--sidebar);
+            border-left: 3px solid var(--accent);
+            padding: 10px 15px;
+            margin-top: 15px;
+            font-style: italic;
+            font-size: 14px;
+        }
+        
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .page-layout {
+                display: flex;
+            }
+            
+            .page-sidebar {
+                width: 280px;
+                margin-right: 20px;
+            }
+            
+            .page-content {
+                flex: 1;
+            }
+            
+            .filter-toggle {
                 display: none;
             }
             
-            .main-content {
-                margin-left: 0;
-                width: 100%;
+            .filters {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .header-title {
+                font-size: 1.3rem;
+            }
+            
+            .chart-container, .chart-info {
+                padding: 10px;
+            }
+            
+            #myChart {
+                height: 250px;
+            }
+            
+            .data-row {
+                flex-direction: column;
+                padding: 5px 0;
+            }
+            
+            .data-label {
+                margin-bottom: 3px;
+            }
+            
+            .filter-column {
+                min-width: 100%;
+            }
+        }
+        
+        @media print {
+            .filter-toggle, .filters, .btn {
+                display: none;
+            }
+            
+            .page-container, .content, .chart-container, .chart-info {
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            
+            body {
+                background: white;
+                color: black;
             }
         }
     </style>
 </head>
 <body>
-    <div style="padding-top:4rem;" class="page-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h3>Optiuni Raport</h3>
-            
-            <form id="statusForm" method="post" onsubmit="return false;">
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status" style="border-color:<%=accent%>; background:white; color:<%=text%>;">
-                        <option value="3">Oricare</option>
-                        <%
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
-                            try (ResultSet rs1 = stm.executeQuery()) {
-                                while (rs1.next()) {
-                                    int id = rs1.getInt("status");
-                                    String nume = rs1.getString("nume_status");
-                                    out.println("<option value='" + id + "'>" + nume + "</option>");
-                                }
-                            }
-                        }
-                        %>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Departament</label>
-                    <select name="dep" style="border-color:<%=accent%>; background:white; color:<%=text%>;">
-                        <option value="-1">Oricare</option>
-                        <%
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
-                            try (ResultSet rs1 = stm.executeQuery()) {
-                                while (rs1.next()) {
-                                    int id = rs1.getInt("id_dep");
-                                    String nume = rs1.getString("nume_dep");
-                                    out.println("<option value='" + id + "'>" + nume + "</option>");
-                                }
-                            }
-                        }
-                        %>
-                    </select>
-                </div>
-                
-                <input type="hidden" name="tip" value="1">
-            </form>
-            
-            <div class="form-group">
-                <label>Culoare Grafic</label>
-                <input type="color" id="color-picker" value="<%=accent%>" style="width: 100%; height: 30px;">
-            </div>
-            
-            <button class="btn" onclick="generatePDF()">Descarcati PDF</button>
-            
-            
-            <p id="ceva1" style="display:none;"><%=sidebar%></p>
-            <p id="ceva2" style="display:none;"><%=accent%></p>
-        </div>
+    <div class="page-container">
+        <h1 class="header-title">Raport Concedii</h1>
         
-        <!-- Main Content -->
-        <div class="main-content">
-            <div id="content">
-                <h3 id="chartHeader" class="header-title"></h3>
+        <!-- Filter toggle button (mobile only) -->
+        <button class="filter-toggle" onclick="toggleFilters()">Filtre raport</button>
+        
+        <div class="page-layout">
+            <!-- Sidebar for filters (desktop) / Expandable panel (mobile) -->
+            <div class="filters" id="filterPanel">
+                <form id="statusForm" method="post" onsubmit="return false;">
+                    <div class="filter-row">
+                        <div class="filter-column">
+                            <div class="form-group">
+                                <label>Status concedii</label>
+                                <select name="status">
+                                    <option value="3">Oricare</option>
+                                    <%
+                                    try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri ORDER BY status DESC;")) {
+                                        try (ResultSet rs1 = stm.executeQuery()) {
+                                            while (rs1.next()) {
+                                                int id = rs1.getInt("status");
+                                                String nume = rs1.getString("nume_status");
+                                                out.println("<option value='" + id + "'>" + nume + "</option>");
+                                            }
+                                        }
+                                    }
+                                    %>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-column">
+                            <div class="form-group">
+                                <label>Departament</label>
+                                <select name="dep">
+                                    <option value="-1">Oricare</option>
+                                    <%
+                                    try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament ORDER BY nume_dep;")) {
+                                        try (ResultSet rs1 = stm.executeQuery()) {
+                                            while (rs1.next()) {
+                                                int id = rs1.getInt("id_dep");
+                                                String nume = rs1.getString("nume_dep");
+                                                out.println("<option value='" + id + "'>" + nume + "</option>");
+                                            }
+                                        }
+                                    }
+                                    %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-row">
+                        <div class="filter-column">
+                            <div class="form-group">
+                                <label>Tip concediu</label>
+                                <select name="tip_concediu">
+                                    <option value="-1">Oricare</option>
+                                    <%
+                                    try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM tipcon ORDER BY tip;")) {
+                                        try (ResultSet rs1 = stm.executeQuery()) {
+                                            while (rs1.next()) {
+                                                int id = rs1.getInt("tip");
+                                                String motiv = rs1.getString("motiv");
+                                                out.println("<option value='" + id + "'>" + motiv + "</option>");
+                                            }
+                                        }
+                                    }
+                                    %>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-column">
+                            <div class="form-group">
+                                <label>Culoare grafic</label>
+                                <input type="color" id="color-picker" value="<%=accent%>">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="tip" value="1">
+                    
+                    <div class="filter-row">
+                        <div class="filter-column">
+                            <button class="btn" id="applyFilters">Aplica filtre</button>
+                        </div>
+                        <div class="filter-column">
+                            <button class="btn" onclick="generatePDF()" style="background-color: var(--accent);">Descarca PDF</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+            <!-- Main content -->
+            <div class="content" id="content">
+                <h3 id="chartHeader" class="header-title">Raport Concedii</h3>
                 <p class="note">*Graficul afiseaza numarul de concedii in fiecare luna</p>
                 
                 <div class="chart-container">
@@ -273,27 +448,48 @@ if (sesi != null) {
                 
                 <div class="chart-info">
                     <h4>Detalii raport</h4>
-                    <p id="statusInfo"></p>
-                    <p id="departmentInfo"></p>
-                    <p id="dataInfo"></p>
-                    <p id="totalInfo"></p>
-                    <p id="explanationInfo" style="font-style: italic; margin-top: 15px;">
+                    
+                    <div class="data-row">
+                        <span class="data-label">Status concedii:</span>
+                        <span class="data-value" id="statusInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Departament:</span>
+                        <span class="data-value" id="departmentInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Tip concediu:</span>
+                        <span class="data-value" id="tipConcediuInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Perioada analizata:</span>
+                        <span class="data-value" id="dataInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Total concedii:</span>
+                        <span class="data-value" id="totalInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="explanation" id="explanationInfo">
                         Acest raport afiseaza numarul de concedii suprapuse in fiecare luna. 
                         O valoare de 3, de exemplu, inseamna ca in acea luna sunt 3 angajati in concediu simultan.
-                    </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Hidden values for JavaScript -->
+    <p id="ceva1" style="display:none;"><%=sidebar%></p>
+    <p id="ceva2" style="display:none;"><%=accent%></p>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
 var clear = document.getElementById("ceva1").innerText;
 var accent = document.getElementById("ceva2").innerText;
@@ -302,6 +498,16 @@ let colorPicker;
 let chartData; // Variable to store the JSON data
 const defaultColor = accent;
 
+// Toggle filter panel (mobile only)
+function toggleFilters() {
+    const filterPanel = document.getElementById('filterPanel');
+    const filterToggle = document.querySelector('.filter-toggle');
+    
+    filterPanel.classList.toggle('active');
+    filterToggle.classList.toggle('active');
+}
+
+// Set up color picker
 window.addEventListener("load", startup, false);
 
 function startup() {
@@ -319,81 +525,114 @@ function updateFirst(event) {
 $(document).ready(function() {
     fetchChartData();
 
-    $('#statusForm').on('change', 'select', function() {
-        fetchChartData(); // Call this function on change
+    // Apply filters button
+    $('#applyFilters').click(function() {
+        fetchChartData();
     });
 
     function fetchChartData() {
+        // Disable buttons during fetch
+        $('#applyFilters').prop('disabled', true).text('Se proceseaza...');
+        
         $.ajax({
-            url: 'JsonServlet', // Ensure this URL is correct
+            url: 'JsonServlet',
             type: 'POST',
-            data: $('#statusForm').serialize(), // Serialize the form data
-            dataType: 'json', // Expecting JSON response
+            data: $('#statusForm').serialize(),
+            dataType: 'json',
             success: function(response) {
                 chartData = response; 
-                updateChart(response); // Update the chart with the response
+                updateChart(response);
                 updateChartInfo(response);
+                $('#applyFilters').prop('disabled', false).text('Aplica filtre');
             },
             error: function(xhr, status, error) {
-                alert('Error: ' + xhr.statusText);
+                alert('Eroare: ' + (xhr.responseJSON?.error || xhr.statusText || error));
+                $('#applyFilters').prop('disabled', false).text('Aplica filtre');
             }
         });
     }
     
     function updateChartInfo(data) {
-        $('#statusInfo').text('Status: ' + (data.status === '3' ? 'Toate statusurile' : data.status));
-        $('#departmentInfo').text('Departament: ' + data.departament);
-        
-        // Determine the date range if available
-        if (data.months && data.months.length > 0) {
-            $('#dataInfo').text('Luni analizate: ' + data.months[0] + ' - ' + data.months[data.months.length-1]);
+        // Actualizeaza statusul cu nume in loc de id
+        if (data.statusName) {
+            $('#statusInfo').text(data.statusName);
         } else {
-            $('#dataInfo').text('Luni analizate: Nu sunt date disponibile');
+            $('#statusInfo').text(data.status === '3' ? 'Toate statusurile' : 'Status necunoscut');
         }
         
-        // Calculate total from counts and max overlap
-        const total = data.counts.reduce((a, b) => a + b, 0);
+        // Actualizeaza departamentul cu nume in loc de id
+        $('#departmentInfo').text(data.departament || 'Toate departamentele');
         
+        // Actualizeaza tipul de concediu
+        if (data.tipConcediuName) {
+            $('#tipConcediuInfo').text(data.tipConcediuName);
+        } else {
+            $('#tipConcediuInfo').text('Toate tipurile');
+        }
         
-        $('#totalInfo').html('Total concedii: ' + total );
+        // Determina intervalul de date daca este disponibil
+        if (data.months && data.months.length > 0) {
+            $('#dataInfo').text(data.months[0] + ' - ' + data.months[data.months.length-1]);
+        } else {
+            $('#dataInfo').text('Nu sunt date disponibile');
+        }
+        
+        // Calculeaza totalul din counts
+        const total = data.counts ? data.counts.reduce((a, b) => a + b, 0) : 0;
+        $('#totalInfo').text(total);
     }
 
     function updateChart(data) {
-        $('#chartHeader').text(data.h3);
+        $('#chartHeader').text(data.h3 || 'Raport Concedii');
+        
+        // Responsive font sizes based on screen width
+        const isMobile = window.innerWidth < 768;
+        const fontSize = isMobile ? 12 : 16;
+        const titleSize = isMobile ? 14 : 18;
         
         zingchart.render({
             id: 'myChart',
             data: {
                 type: 'bar',
-                backgroundColor: 'transparent', // Sets the background color of the chart area
+                backgroundColor: 'transparent',
                 title: {
-                    text: 'Suprapuneri concedii / luna'
+                    text: 'Suprapuneri concedii / luna',
+                    fontColor: document.getElementById("color-picker").value,
+                    fontSize: titleSize
                 },
                 scaleX: {
-                    values: data.months.map(month => month.toString())
+                    values: data.months ? data.months.map(month => month.toString()) : [],
+                    item: {
+                        fontColor: accent,
+                        fontSize: fontSize
+                    },
+                    // Make labels vertical on mobile
+                    labels: data.months ? data.months.map(month => month.toString()) : [],
+                    "max-labels": isMobile ? 6 : 12,
+                    "step": isMobile ? Math.ceil(data.months?.length / 6) || 1 : 1
+                },
+                scaleY: {
+                    item: {
+                        fontColor: accent,
+                        fontSize: fontSize
+                    }
                 },
                 series: [{
-                    values: data.counts,
-                    backgroundColor: document.getElementById("color-picker").value
+                    values: data.counts || [],
+                    backgroundColor: document.getElementById("color-picker").value,
+                    tooltip: {
+                        text: '%v concedii',
+                        backgroundColor: document.getElementById("color-picker").value
+                    }
                 }],
-                plot: { // Additional styling for plot area
+                plot: {
                     valueBox: {
-                        text: '%v', // Displaying value on the bar
+                        text: '%v',
                         placement: 'top',
                         fontColor: '#FFF',
                         backgroundColor: document.getElementById("color-picker").value,
-                        borderRadius: 3
-                    },
-                    "hover-mode": "node",
-                    "hover-state": {
-                      "background-color": "black"
-                    },
-                    "selection-mode": "plot",
-                    "selected-state": {
-                      "background-color": "black",
-                      "border-width": 5,
-                      "border-color": "white",
-                      "line-style": "dashdot"
+                        borderRadius: 3,
+                        fontSize: fontSize
                     },
                     "animation": {
                         "effect": "ANIMATION_EXPAND_BOTTOM",
@@ -403,65 +642,47 @@ $(document).ready(function() {
                     }
                 }
             },
-            height: 400,
+            height: isMobile ? 250 : 400,
             width: '100%'
         });
     }  
     
+    // Color picker change event
     document.getElementById('color-picker').addEventListener('change', function(e) {
         if (!chartData) return;
         
-        var myConfig2 = {
-            type: 'bar',
-            plot: {
-                "animation": {
-                    "effect": "ANIMATION_EXPAND_BOTTOM",
-                    "method": "ANIMATION_STRONG_EASE_OUT",
-                    "sequence": "ANIMATION_BY_PLOT_AND_NODE",
-                    "speed": 275
-                },
-                valueBox: {
-                    text: '%v',
-                    placement: 'top',
-                    fontColor: '#FFF',
-                    backgroundColor: document.getElementById("color-picker").value,
-                    borderRadius: 3
-                }
-            },
-            title: {
-                text: 'Suprapuneri concedii / luna'
-            },
-            scaleX: {
-                values: chartData.months.map(month => month.toString())
-            },
-            series: [{
-                values: chartData.counts,
-                backgroundColor: document.getElementById("color-picker").value
-            }]
-        };
-
-        zingchart.render({
-            id: 'myChart',
-            data: myConfig2,
-            height: '100%',
-            width: '100%'
-        });
+        updateChart(chartData);
     }, false);
+    
+    // Re-render chart on window resize for responsiveness
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (chartData) updateChart(chartData);
+        }, 250);
+    });
 });
 
 function generatePDF() {
 	// Ensure libraries are loaded
     if (typeof html2canvas === 'undefined' || typeof html2pdf === 'undefined') {
-        alert('PDF generation libraries not loaded. Please refresh the page.');
+        alert('Bibliotecile necesare pentru generarea PDF-ului nu sunt incarcate. Reimprospatati pagina.');
         return;
     }
+
+    // Show loading state
+    const downloadBtn = document.querySelector('.btn[onclick="generatePDF()"]');
+    const originalText = downloadBtn.textContent;
+    downloadBtn.textContent = 'Se genereaza PDF...';
+    downloadBtn.disabled = true;
 
     // Get the content to convert
     const contentElement = document.getElementById('content');
 
     // Use html2pdf to generate PDF directly
     html2pdf().set({
-        margin: [10, 10, 10, 10],
+        margin: [15, 15, 15, 15],
         filename: 'raport_concedii.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
@@ -476,10 +697,14 @@ function generatePDF() {
             orientation: 'portrait'
         }
     }).from(contentElement).save().then(() => {
-        console.log('PDF generated successfully');
+        console.log('PDF generat cu succes');
+        downloadBtn.textContent = originalText;
+        downloadBtn.disabled = false;
     }).catch((error) => {
-        console.error('PDF Generation Error:', error);
-        alert('Failed to generate PDF. Check browser console for details.');
+        console.error('Eroare la generarea PDF:', error);
+        alert('Nu s-a putut genera PDF-ul. Verificati consola browserului pentru detalii.');
+        downloadBtn.textContent = originalText;
+        downloadBtn.disabled = false;
     });
 }
 

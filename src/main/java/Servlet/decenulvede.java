@@ -1,141 +1,238 @@
 package Servlet;
-import bean.*;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import bean.MyUser;
 
-/**
- * Server ce accepta atat get cat si post si creaza un json care pune ce concedii sunt intr-o zi, in fiecare zi a unui an
- */
 public class decenulvede extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        JSONArray events = new JSONArray();
-        try {
-            int departmentId = getUserDepartment(request);
-            if (departmentId != -1) {
-                // Obține parametrul status din cerere, valoarea default este 2 (aprobat director)
-                String statusParam = request.getParameter("status");
-                int status = 2; // valoare default
-                
-                // Dacă statusParam nu este null și este un număr valid
-                if (statusParam != null && !statusParam.isEmpty()) {
-                    try {
-                        status = Integer.parseInt(statusParam);
-                    } catch (NumberFormatException e) {
-                        // Ignoră și folosește valoarea default
-                    }
-                }
-                
-                loadDepartmentLeaves(departmentId, events, status);
-            } 
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Internal Server Error: " + e.getMessage());
-        }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        JSONArray events = new JSONArray();
-        try {
-            int departmentId = getUserDepartment(request);
-            if (departmentId != -1) {
-                // Obține parametrul status din cerere, valoarea default este 2 (aprobat director)
-                String statusParam = request.getParameter("status");
-                int status = 2; // valoare default
-                
-                // Dacă statusParam nu este null și este un număr valid
-                if (statusParam != null && !statusParam.isEmpty()) {
-                    try {
-                        status = Integer.parseInt(statusParam);
-                    } catch (NumberFormatException e) {
-                        // Ignoră și folosește valoarea default
-                    }
-                }
-                
-                loadDepartmentLeaves(departmentId, events, status);
-            }
-            PrintWriter out = response.getWriter();
-            out.print(events.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Internal Server Error: " + e.getMessage());
-        }
-    }
     
-    private int getUserDepartment(HttpServletRequest request) throws ClassNotFoundException, SQLException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        
         HttpSession session = request.getSession(false);
-        if (session != null) {
-            MyUser currentUser = (MyUser) session.getAttribute("currentUser");
-            if (currentUser != null) {
-            	// cum numele de utilizator este unic...
-            	// aceeasi pasi ca mai sus, sunt urmati si aici
-                String username = currentUser.getUsername();
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                     PreparedStatement preparedStatement = connection.prepareStatement("SELECT id_dep FROM useri WHERE username = ?")) {
-                    preparedStatement.setString(1, username);
-                    ResultSet rs = preparedStatement.executeQuery();
-                    if (rs.next()) {
-                        return rs.getInt("id_dep");
+        if (session == null || session.getAttribute("currentUser") == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not logged in");
+            return;
+        }
+        
+        MyUser currentUser = (MyUser) session.getAttribute("currentUser");
+        String username = currentUser.getUsername();
+        
+        // Obținem parametrul de status din request - punem log pentru depanare
+        String statusParam = request.getParameter("status");
+        System.out.println("Status param received: " + statusParam);
+        
+        int status;
+        try {
+            if (statusParam != null && !statusParam.isEmpty()) {
+                status = Integer.parseInt(statusParam);
+            } else {
+                status = 3; // Valoare implicită - "Oricare"
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Error parsing status parameter: " + e.getMessage());
+            status = 3; // În caz de eroare, folosim valoarea implicită
+        }
+        
+        System.out.println("Using status filter: " + status);
+        
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                
+                int userId = 0;
+                int departmentId = 0;
+                int ierarhie = 0;
+                
+                // Obținem informațiile despre utilizator
+                String userQuery = "SELECT u.id, u.id_dep, t.ierarhie " +
+                                   "FROM useri u " +
+                                   "JOIN tipuri t ON u.tip = t.tip " +
+                                   "WHERE u.username = ?";
+                
+                try (PreparedStatement userStmt = conn.prepareStatement(userQuery)) {
+                    userStmt.setString(1, username);
+                    try (ResultSet userRs = userStmt.executeQuery()) {
+                        if (userRs.next()) {
+                            userId = userRs.getInt("id");
+                            departmentId = userRs.getInt("id_dep");
+                            ierarhie = userRs.getInt("ierarhie");
+                            System.out.println("User info - ID: " + userId + ", Dept: " + departmentId + ", Ierarhie: " + ierarhie);
+                        } else {
+                            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
+                            return;
+                        }
                     }
                 }
+                
+                // Determinăm rolul utilizatorului
+                boolean isDirector = (ierarhie < 3);
+                boolean isSef = (ierarhie >= 4 && ierarhie <= 5);
+                System.out.println("User roles - Director: " + isDirector + ", Sef: " + isSef);
+                
+                // Construim partea comună a query-ului
+                StringBuilder queryBuilder = new StringBuilder();
+                queryBuilder.append("SELECT c.id, c.id_ang, u.nume, u.prenume, d.nume_dep, ")
+                           .append("t.denumire AS functie, c.start_c, c.end_c, c.motiv, c.locatie, ")
+                           .append("s.nume_status, u.culoare, tc.motiv AS tip_concediu, c.status ")
+                           .append("FROM concedii c ")
+                           .append("JOIN useri u ON c.id_ang = u.id ")
+                           .append("JOIN departament d ON u.id_dep = d.id_dep ")
+                           .append("JOIN tipuri t ON u.tip = t.tip ")
+                           .append("JOIN statusuri s ON c.status = s.status ")
+                           .append("JOIN tipcon tc ON c.tip = tc.tip ");
+                
+                // Adăugăm condițiile WHERE în funcție de rol și status
+                boolean addedWhereClause = false;
+                PreparedStatement leaveStmt;
+                
+                // 1. Filtrare după rol (director, șef, utilizator normal)
+                if (!isDirector && !isSef) {
+                    // Utilizator normal/începător - vede doar concediile proprii
+                    queryBuilder.append("WHERE c.id_ang = ? ");
+                    addedWhereClause = true;
+                } else if (isSef) {
+                    // Șef - vede concediile din departamentul său
+                    queryBuilder.append("WHERE u.id_dep = ? ");
+                    addedWhereClause = true;
+                }
+                
+                // 2. Filtrare după status (dacă este selectat un status specific)
+                if (status != 3) {
+                    if (addedWhereClause) {
+                        queryBuilder.append("AND c.status = ? ");
+                    } else {
+                        queryBuilder.append("WHERE c.status = ? ");
+                        addedWhereClause = true;
+                    }
+                }
+                
+                // Query-ul final
+                String leaveQuery = queryBuilder.toString();
+                System.out.println("Final query: " + leaveQuery);
+                
+                // Pregătim statement-ul cu parametrii necesari
+                leaveStmt = conn.prepareStatement(leaveQuery);
+                
+                int paramIndex = 1;
+                
+                // Adăugăm parametrii în funcție de condițiile din WHERE
+                if (!isDirector && !isSef) {
+                    leaveStmt.setInt(paramIndex++, userId);
+                } else if (isSef) {
+                    leaveStmt.setInt(paramIndex++, departmentId);
+                }
+                
+                if (status != 3) {
+                    leaveStmt.setInt(paramIndex++, status);
+                }
+                
+                // Executăm query-ul și construim răspunsul JSON
+                JSONArray eventsArray = new JSONArray();
+                try (ResultSet rs = leaveStmt.executeQuery()) {
+                    int count = 0;
+                    while (rs.next()) {
+                        count++;
+                        JSONObject event = new JSONObject();
+                        
+                        String statusName = rs.getString("nume_status");
+                        String title = rs.getString("nume") + " " + rs.getString("prenume") + " - " + rs.getString("tip_concediu");
+                        String department = rs.getString("nume_dep");
+                        String color = rs.getString("culoare");
+                        int eventStatus = rs.getInt("status");
+                        
+                        // Adăugăm detalii suplimentare în titlu în funcție de rol
+                        if ((isDirector || isSef) && rs.getInt("id_ang") != userId) {
+                            title += " (" + department + ")";
+                        }
+                        
+                        event.put("id", rs.getInt("id"));
+                        event.put("title", title);
+                        event.put("start", rs.getDate("start_c").toString());
+                        
+                        // Asigură-te că end_c nu este null
+                        java.sql.Date endDate = rs.getDate("end_c");
+                        if (endDate != null) {
+                            event.put("end", endDate.toString());
+                        } else {
+                            event.put("end", rs.getDate("start_c").toString());
+                        }
+                        
+                        event.put("description", rs.getString("motiv"));
+                        event.put("location", rs.getString("locatie"));
+                        event.put("status", statusName);
+                        event.put("statusCode", eventStatus);
+                        
+                        // Personalizăm culoarea evenimentului în funcție de status
+                        switch (eventStatus) {
+                            case -2: // Dezaprobat director
+                                event.put("textColor", "#FFFFFF");
+                                event.put("backgroundColor", "#DC3545");
+                                event.put("borderColor", "#DC3545");
+                                break;
+                            case -1: // Dezaprobat șef
+                                event.put("textColor", "#FFFFFF");
+                                event.put("backgroundColor", "#FD7E14");
+                                event.put("borderColor", "#FD7E14");
+                                break;
+                            case 0: // Neaprobat
+                                event.put("textColor", "#212529");
+                                event.put("backgroundColor", "#FFC107");
+                                event.put("borderColor", "#FFC107");
+                                event.put("className", "tentative-event");
+                                break;
+                            case 1: // Aprobat șef
+                                event.put("textColor", "#FFFFFF");
+                                event.put("backgroundColor", "#0DCAF0");
+                                event.put("borderColor", "#0DCAF0");
+                                break;
+                            case 2: // Aprobat director
+                                event.put("textColor", "#FFFFFF");
+                                event.put("backgroundColor", "#198754");
+                                event.put("borderColor", "#198754");
+                                break;
+                            default:
+                                // Culoare implicită (culoarea utilizatorului)
+                                event.put("backgroundColor", color);
+                                event.put("borderColor", color);
+                                break;
+                        }
+                        
+                        eventsArray.put(event);
+                    }
+                    System.out.println("Found " + count + " leave records");
+                }
+                
+                out.print(eventsArray.toString());
             }
+        } catch (Exception e) {
+            System.out.println("Error in servlet: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONObject error = new JSONObject();
+            error.put("error", e.getMessage());
+            out.print(error.toString());
         }
-        return -1;
     }
 
-    private void loadDepartmentLeaves(int departmentId, JSONArray events, int status) throws ClassNotFoundException, SQLException {
-    	// initializarea driverului pentru Jdbc
-    	// crearea conexiunii pentru baza de date
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        
-        // Creează interogarea SQL în funcție de status
-        String sql;
-        if (status == 3) {
-            // Încarcă toate concediile, indiferent de status
-            sql = "SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ?";
-        } else {
-            // Încarcă doar concediile cu status-ul specificat
-            sql = "SELECT culoare, accent, nume, prenume, start_c, end_c FROM concedii JOIN useri ON concedii.id_ang = useri.id JOIN teme ON useri.id = teme.id_usr WHERE useri.id_dep = ? AND concedii.status = ?";
-        }
-        
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-            // pregatirea interogarii
-            PreparedStatement statement = connection.prepareStatement(sql)) {
-            
-            // setare variabile in interogare
-        	statement.setInt(1, departmentId);
-            
-            // Adaugă al doilea parametru doar dacă selectăm un status specific
-            if (status != 3) {
-                statement.setInt(2, status);
-            }
-            
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-            	// de fiecare data cand a gasit ceva, il pune in json cu nume, prenume, data inceput/final. locatie, motiv, tip, completand obiectul de tip concediu
-                JSONObject event = new JSONObject();
-                event.put("title", rs.getString("nume") + " " + rs.getString("prenume"));
-                event.put("start", rs.getDate("start_c").toString());
-                event.put("end", rs.getDate("end_c").toString());
-                event.put("color", rs.getString("culoare"));
-                event.put("textColor", "white");
-                events.put(event);
-            }
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
     }
 }

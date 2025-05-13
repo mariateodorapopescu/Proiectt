@@ -23,7 +23,7 @@ if (sesi != null) {
                 int ierarhie = rs.getInt("ierarhie");
 
                 // Funcție helper pentru a determina rolul utilizatorului
-                boolean isDirector = (ierarhie < 3) ;
+                boolean isDirector = (ierarhie < 3);
                 boolean isSef = (ierarhie >= 4 && ierarhie <=5);
                 boolean isIncepator = (ierarhie >= 10);
                 boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
@@ -50,7 +50,7 @@ if (sesi != null) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Calendar View</title>
+    <title>Calendar Concedii</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -62,6 +62,7 @@ if (sesi != null) {
     <link rel="icon" href=" https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
     <style>
+     @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
        .fc-day-number {
           color: <%=accent%> !important;
        }
@@ -70,6 +71,7 @@ if (sesi != null) {
           margin: 0;
           padding: 0;
           background-color: <%=sidebar%>;
+          font-family: 'Poppins', sans-serif;
        }
        
        #calendar {
@@ -167,6 +169,21 @@ if (sesi != null) {
           margin-right: 5px;
           border-radius: 50%;
        }
+       
+       /* Adăugăm stil pentru mesajul de eroare/debugging */
+       #debug-info {
+          position: fixed;
+          bottom: 10px;
+          left: 10px;
+          right: 10px;
+          padding: 10px;
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+          border-radius: 5px;
+          display: none;
+          z-index: 1000;
+       }
     </style>
 </head>
 <body style="background:<%=clr%>">
@@ -175,76 +192,52 @@ if (sesi != null) {
         <h4 style="color: <%=accent%>; margin-top: 0; margin-bottom: 10px;">Filtrare concedii</h4>
         <label for="leaveStatus" style="color: <%=accent%>; margin-bottom: 5px;">Status concedii:</label>
         <select id="leaveStatus" style="width: 100%; margin-bottom: 10px;">
-            <option value="2" selected>Aprobate de director</option>
+            <option value="2">Aprobate de director</option>
             <option value="1">Aprobate de sef</option>
             <option value="0">Neaprobate</option>
             <option value="-1">Respins sef</option>
             <option value="-2">Respins director</option>
-             <option value="3">Oricare</option>
+            <option value="3" selected>Oricare</option>
         </select>
         <button id="applyStatus" style="width: 100%;">Aplica</button>
     </div>
     
+    <!-- Container pentru calendar -->
     <div style="position: fixed; top: 5rem; left:25%;" id='calendar'></div>
+    
+    <!-- Div pentru afișarea informațiilor de debug în caz de eroare -->
+    <div id="debug-info"></div>
+    
     <script>
         $(document).ready(function() {
-            var currentStatus = 2; // Default status (aprobat de director)
+            var currentStatus = 3; // Valoarea implicită - toate statusurile
             
-            // Functie pentru reincarcarea calendarului cu statusul selectat
+            // Funcție pentru reîncărcarea calendarului cu statusul selectat
             function reloadCalendar(status) {
                 $('#calendar').fullCalendar('destroy'); // Distruge vechiul calendar
-                initCalendar(status); // Initializeaza un nou calendar
+                initCalendar(status); // Inițializează un nou calendar
             }
             
-            // Functie pentru initializarea calendarului
+            // Funcție pentru inițializarea calendarului
             function initCalendar(status) {
                 var calendar = $('#calendar').fullCalendar({
-                    headerToolbar: {
+                    header: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                        right: 'month,agendaWeek,agendaDay,listMonth'
                     },
                     locale: 'ro', // Romanian language
                     buttonIcons: true,
                     weekNumbers: false,
                     navLinks: true,
-                    editable: true,
-                    dayMaxEvents: true,
+                    editable: false,
+                    eventLimit: true,
                     defaultView: 'month',
-                    dayRender: function(date, cell) {
-                        var today = $.fullCalendar.moment();
-                        if(date.get('date') == today.get('date')) {
-                           cell.css("textColor", "white");
-                        }
-                    },
-                    selectable: true,
-                    selectHelper: true,
-    
-                    dayClick: function (date, jsEvent, view) {
-                        //var D = moment(date);
-                        t.row.add([
-                            counter,
-                            date.format('dddd,MMMM DD,YYYY'),
-                            'testing'
-                        ]).draw(false);
-    
-                        counter++;
-    
-                        cell.css("background-color", "teal");
-                    },
-                    
-                    dayRender: function(date, cell) { 
-                        var today = $.fullCalendar.moment(); 
-                        var end = $.fullCalendar.moment().add(7, 'days'); 
-                        if (date.get('date') == today.get('date')) { 
-                            $(".fc-"+date.format('ddd').toLowerCase()).css("background", "#f8f9fa"); 
-                            $("th.fc-"+date.format('ddd').toLowerCase()).text("Holiday"); 
-                            $("th.fc-"+date.format('ddd').toLowerCase()).css("background", "red"); 
-                            $("th.fc-"+date.format('ddd').toLowerCase()).css("color", "#fff"); 
-                        } 
-                    },
-                        
                     events: function(start, end, timezone, callback) {
+                        // Afișăm informații în consola de dezvoltator pentru debugging
+                        console.log("Requesting events with status: " + status);
+                        console.log("Date range: " + start.format() + " to " + end.format());
+                        
                         $.ajax({
                             url: 'decenulvede',
                             type: 'POST',
@@ -252,30 +245,69 @@ if (sesi != null) {
                             data: {
                                 start: start.format(),
                                 end: end.format(),
-                                status: status // Adaugam parametrul de status
+                                status: status
                             },
                             success: function(response) {
+                                console.log("Received " + response.length + " events");
+                                // Ascundem mesajul de eroare dacă este vizibil
+                                $('#debug-info').hide();
                                 callback(response);
                             },
-                            error: function() {
-                                alert('There was an error while fetching events!');
+                            error: function(xhr, status, error) {
+                                console.error('Error fetching events:', error);
+                                // Afișăm mesaj de eroare cu detalii pentru debugging
+                                var errorText = "Eroare la încărcarea concediilor! ";
+                                if (xhr.responseText) {
+                                    try {
+                                        var errorObj = JSON.parse(xhr.responseText);
+                                        errorText += errorObj.error || xhr.responseText;
+                                    } catch (e) {
+                                        errorText += xhr.responseText;
+                                    }
+                                } else {
+                                    errorText += error;
+                                }
+                                $('#debug-info').text(errorText).show();
+                                callback([]); // Calendar gol în caz de eroare
                             }
                         });
+                    },
+                    eventRender: function(event, element) {
+                        // Adăugă tooltip cu informații suplimentare
+                        element.attr('title', event.description || 'Fără descriere');
+                        
+                        // Adăugă clasa pentru evenimente tentative (neaprobate)
+                        if (event.status === 'Neaprobat') {
+                            element.addClass('tentative-event');
+                        }
+                    },
+                    eventClick: function(event, jsEvent, view) {
+                        // Afișăm informații despre eveniment la click
+                        alert('Concediu: ' + event.title + '\n' +
+                              'Perioada: ' + moment(event.start).format('DD.MM.YYYY') + ' - ' + 
+                                          moment(event.end || event.start).format('DD.MM.YYYY') + '\n' +
+                              'Motiv: ' + (event.description || 'Nespecificat') + '\n' +
+                              'Locație: ' + (event.location || 'Nespecificată') + '\n' +
+                              'Status: ' + event.status);
                     }
                 });
             }
             
-            // Initializeaza calendarul cu statusul implicit
+            // Inițializează calendarul cu statusul implicit
             initCalendar(currentStatus);
             
             // Handler pentru butonul de aplicare a statusului
             $('#applyStatus').click(function() {
                 var selectedStatus = $('#leaveStatus').val();
+                console.log("Selected status: " + selectedStatus);
                 currentStatus = selectedStatus;
                 reloadCalendar(selectedStatus);
             });
         });
     </script>
+    
+    <!-- Include Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>
 <%

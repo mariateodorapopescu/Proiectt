@@ -34,8 +34,9 @@ if (sesi != null) {
                 int userDep = rs.getInt("id_dep");
                 String functie = rs.getString("functie");
                 int ierarhie = rs.getInt("ierarhie");
+                String numeDepartament = rs.getString("nume_dep");
 
-                // Funcție helper pentru a determina rolul utilizatorului
+                // Functie helper pentru a determina rolul utilizatorului
                 boolean isDirector = (ierarhie < 3) ;
                 boolean isSef = (ierarhie >= 4 && ierarhie <=5);
                 boolean isIncepator = (ierarhie >= 10);
@@ -64,185 +65,326 @@ if (sesi != null) {
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Raport</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raport Departament</title>
     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
     <style>
-        body {
+        :root {
+            --accent: <%=accent%>;
+            --clr: <%=clr%>;
+            --sidebar: <%=sidebar%>;
+            --text: <%=text%>;
+            --card: <%=card%>;
+        }
+        
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            --bg: <%=accent%>;
-            --clr: <%=clr%>;
-            --sd: <%=sidebar%>;
-            --text: <%=text%>;
-            background: <%=clr%>;
-            font-family: 'Arial', sans-serif;
         }
         
-        .page-container {
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background: var(--clr);
+            font-family: 'Arial', sans-serif;
+            color: var(--text);
+        }
+        
+        /* Main layout structure */
+        .app-container {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             height: 100vh;
             width: 100%;
+            overflow: hidden;
+            padding: 10px;
         }
         
-        .sidebar {
-            width: 250px;
+        .app-header {
+            flex: 0 0 auto;
+            padding: 10px 0;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .app-body {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            min-height: 0; /* Important for flex child scrolling */
+            height: calc(100% - 70px); /* Header height + margin */
+        }
+        
+        /* Filter panel */
+        .filter-panel {
+            flex: 0 0 300px;
+            background-color: var(--sidebar);
+            border-radius: 15px;
             padding: 20px;
-            background-color: <%=sidebar%>;
-            border-radius: 20px;
-            color: <%=text%>;
-            position: fixed;
-            left: 0;
-            top: 5rem;
-            height: 100%;
+            margin-top: 50px; /* Push filters down as requested */
+            height: calc(100% - 50px); /* Account for the top margin */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
             overflow-y: auto;
-            
         }
         
+        /* Main content */
         .main-content {
-            margin-left: 290px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--sidebar);
+            border-radius: 15px;
             padding: 20px;
-            width: calc(100% - 330px);
-            top: 5rem;
+            overflow-y: auto;
+            min-width: 0; /* Important for flex child sizing */
         }
         
+        /* Chart container */
         .chart-container {
-            background-color: <%=card%>;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            top: 5rem;
-           
+            flex: 1;
+            background-color: var(--sidebar);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
         }
         
         #myChart {
+            flex: 1;
             width: 100%;
-            height: 400px;
+            min-height: 300px;
         }
         
-        .chart-info {
-            background-color: <%=card%>;
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-            color: <%=text%>;
+        /* Info section */
+        .info-container {
+            flex: 0 0 auto;
+            background-color: var(--sidebar);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
         }
         
-        .form-group {
+        /* Headers */
+        h1, h2, h3, h4 {
+            color: var(--accent);
             margin-bottom: 15px;
+        }
+        
+        .header-title {
+            text-align: center;
+            font-size: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        /* Form elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: var(--sidebar);
+            color: #333;
         }
         
         .btn {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 10px;
-            background-color: <%=accent%>;
+            background-color: var(--accent);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             text-align: center;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
         .btn:hover {
-            background-color: black;
-            color: white;
-            text-decoration: underline;
+            opacity: 0.9;
         }
         
-        h3, h4 {
-            color: <%=accent%>;
-            margin-top: 0;
+        /* Info display */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
         
-        .zc-img, .zc-svg, .zc-rel .zc-top{
-            background-color: transparent;
+        .data-label {
+            font-weight: 600;
+            color: var(--accent);
         }
         
-        @media print {
-            .sidebar {
-                display: none;
+        .note {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin: 5px 0 15px 0;
+        }
+        
+        /* Mobile layout */
+        @media (max-width: 767px) {
+            .app-body {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+            
+            .filter-panel {
+                flex: 0 0 auto;
+                margin-top: 0;
+                height: auto;
+                margin-bottom: 15px;
             }
             
             .main-content {
-                margin-left: 0;
-                width: 100%;
+                flex: 1;
+                min-height: 500px;
+            }
+            
+            #myChart {
+                min-height: 250px;
+            }
+            
+            .app-container {
+                height: auto;
+                overflow-y: auto;
+            }
+            
+            html, body {
+                height: auto;
+                overflow-y: auto;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .filter-panel, .btn {
+                display: none;
+            }
+            
+            .app-container, .app-body, .main-content {
+                display: block;
+                height: auto;
+            }
+            
+            body {
+                background: var(--sidebar);
             }
         }
     </style>
 </head>
 <body>
-    <div style="padding-top:4rem;" class="page-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h3>Optiuni Raport</h3>
-            
-            <div class="form-group">
+    <div class="app-container">
+        <div class="app-header">
+            <h1>Raport Departament: <%=numeDepartament%></h1>
+        </div>
+        
+        <div class="app-body">
+            <!-- Filter panel -->
+            <div class="filter-panel">
+                <h3>Optiuni Raport</h3>
+                
                 <form id="statusForm" method="post" onsubmit="return false;">
-                    <label class="login__label">Status</label>
-                    <select style="border-color:<%=accent%>; background:white; color:<%=text%>;" name="status" class="login__input">
-                        <option value="3">Oricare</option>
-                        <%
-                        try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri;")) {
-                            try (ResultSet rs1 = stm.executeQuery()) {
-                                while (rs1.next()) {
-                                    int id = rs1.getInt("status");
-                                    String nume = rs1.getString("nume_status");
-                                    out.println("<option value='" + id + "'>" + nume + "</option>");
+                    <div class="form-group">
+                        <label>Status concedii</label>
+                        <select name="status">
+                            <option value="3">Oricare</option>
+                            <%
+                            try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM statusuri ORDER BY status DESC;")) {
+                                try (ResultSet rs1 = stm.executeQuery()) {
+                                    while (rs1.next()) {
+                                        int id = rs1.getInt("status");
+                                        String nume = rs1.getString("nume_status");
+                                        out.println("<option value='" + id + "'>" + nume + "</option>");
+                                    }
                                 }
                             }
-                        }
-                        %>
-                    </select>
+                            %>
+                        </select>
+                    </div>
+                    
                     <input type="hidden" name="dep" value="<%=userDep%>">
                     <input type="hidden" name="tip" value="1">
+                    
+                    <div class="form-group">
+                        <label>Culoare grafic</label>
+                        <input type="color" id="color-picker" value="<%=accent%>">
+                    </div>
+                    
+                    <button class="btn" id="applyFilters">Aplica filtre</button>
+                    <button class="btn" onclick="generatePDF()" style="background-color: #4CAF50;">Descarca PDF</button>
                 </form>
             </div>
             
-            <div class="form-group">
-                <label>Culoare Grafic</label>
-                <input type="color" id="color-picker" value="<%=accent%>" style="width: 100%; height: 30px;">
-            </div>
-            
-            <button class="btn" onclick="generatePDF()">Descarcati PDF</button>
-             
-            <p id="ceva1" style="display:none;"><%=sidebar%></p>
-            <p id="ceva2" style="display:none;"><%=accent%></p>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <div id="content">
-                <h3 id="chartHeader" style="text-align: center; margin-bottom: 20px;"></h3>
+            <!-- Main content -->
+            <div class="main-content" id="content">
+                <h3 id="chartHeader" class="header-title">Raport Concedii</h3>
+                <p class="note">*Graficul afiseaza numarul de angajati in fiecare luna</p>
                 
                 <div class="chart-container">
                     <div id="myChart"></div>
                 </div>
                 
-                <div class="chart-info">
+                <div class="info-container">
                     <h4>Detalii raport</h4>
-                    <p id="statusInfo"></p>
-                    <p id="departmentInfo"></p>
-                    <p id="dataInfo"></p>
-                    <p id="totalInfo"></p>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Status concedii:</span>
+                        <span class="data-value" id="statusInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Departament:</span>
+                        <span class="data-value" id="departmentInfo"><%=numeDepartament%></span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Perioada analizata:</span>
+                        <span class="data-value" id="dataInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Total angajati:</span>
+                        <span class="data-value" id="totalInfo">Se incarca...</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+
+    <!-- Hidden values for JavaScript -->
+    <p id="ceva1" style="display:none;"><%=sidebar%></p>
+    <p id="ceva2" style="display:none;"><%=accent%></p>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
 var clear = document.getElementById("ceva1").innerText;
 var accent = document.getElementById("ceva2").innerText;
@@ -251,28 +393,33 @@ let colorPicker;
 let chartData; 
 const defaultColor = accent;
 
+// Set up color picker
 window.addEventListener("load", startup, false);
 
 function startup() {
     colorPicker = document.querySelector("#color-picker");
     colorPicker.value = defaultColor;
-    
+   
     colorPicker.addEventListener("change", updateFirst, false);
     colorPicker.select();
 }
 
 function updateFirst(event) {
-    hbrnm = event.target.value;
+    hbnm = event.target.value;
 }
 
 $(document).ready(function() {
     fetchChartData();
 
-    $('#statusForm').on('change', 'select', function() {
+    // Apply filters button
+    $('#applyFilters').click(function() {
         fetchChartData();
     });
 
     function fetchChartData() {
+        // Disable buttons during fetch
+        $('#applyFilters').prop('disabled', true).text('Se proceseaza...');
+        
         $.ajax({
             url: 'JsonServlet',
             type: 'POST',
@@ -281,24 +428,43 @@ $(document).ready(function() {
             success: function(response) {
                 chartData = response; 
                 updateChart(response);
+                updateChartInfo(response);
+                $('#applyFilters').prop('disabled', false).text('Aplica filtre');
             },
             error: function(xhr, status, error) {
-                alert('Error: ' + xhr.statusText);
+                alert('Eroare: ' + (xhr.responseJSON?.error || xhr.statusText || error));
+                $('#applyFilters').prop('disabled', false).text('Aplica filtre');
             }
         });
     }
 
-    function updateChart(data) {
-        $('#chartHeader').text(data.h3);
+    function updateChartInfo(data) {
+        // Update status info
+        if (data.statusName) {
+            $('#statusInfo').text(data.statusName);
+        } else {
+            $('#statusInfo').text(data.status === '3' ? 'Toate statusurile' : 'Status necunoscut');
+        }
         
-        // Update chart info text
-        $('#statusInfo').text('Status: ' + (data.status === '3' ? 'Toate statusurile' : data.status));
-        $('#departmentInfo').text('Departament: ' + data.departament);
-        $('#dataInfo').text('Perioada analizata: ' + data.months[0] + ' - ' + data.months[data.months.length-1]);
+        // Update date range
+        if (data.months && data.months.length > 0) {
+            $('#dataInfo').text(data.months[0] + ' - ' + data.months[data.months.length-1]);
+        } else {
+            $('#dataInfo').text('Nu sunt date disponibile');
+        }
         
         // Calculate total from counts
-        const total = data.counts.reduce((a, b) => a + b, 0);
-        $('#totalInfo').text('Total angajati: ' + total);
+        const total = data.counts ? data.counts.reduce((a, b) => a + b, 0) : 0;
+        $('#totalInfo').text(total);
+    }
+
+    function updateChart(data) {
+        $('#chartHeader').text(data.h3 || 'Raport Concedii Departament');
+        
+        // Responsive font sizes based on screen width
+        const isMobile = window.innerWidth < 768;
+        const fontSize = isMobile ? 12 : 16;
+        const titleSize = isMobile ? 14 : 18;
         
         zingchart.render({
             id: 'myChart',
@@ -306,14 +472,34 @@ $(document).ready(function() {
                 type: 'bar',
                 backgroundColor: 'transparent',
                 title: {
-                    text: 'Numar angajati / luna'
+                    text: 'Numar angajati / luna',
+                    fontColor: document.getElementById("color-picker").value,
+                    fontSize: titleSize
                 },
                 scaleX: {
-                    values: data.months.map(month => month.toString())
+                    values: data.months ? data.months.map(month => month.toString()) : [],
+                    item: {
+                        fontColor: accent,
+                        fontSize: fontSize
+                    },
+                    // Make labels vertical on mobile
+                    labels: data.months ? data.months.map(month => month.toString()) : [],
+                    "max-labels": isMobile ? 6 : 12,
+                    "step": isMobile ? Math.ceil(data.months?.length / 6) || 1 : 1
+                },
+                scaleY: {
+                    item: {
+                        fontColor: accent,
+                        fontSize: fontSize
+                    }
                 },
                 series: [{
-                    values: data.counts,
-                    backgroundColor: document.getElementById("color-picker").value
+                    values: data.counts || [],
+                    backgroundColor: document.getElementById("color-picker").value,
+                    tooltip: {
+                        text: '%v angajati',
+                        backgroundColor: document.getElementById("color-picker").value
+                    }
                 }],
                 plot: {
                     valueBox: {
@@ -321,18 +507,8 @@ $(document).ready(function() {
                         placement: 'top',
                         fontColor: '#FFF',
                         backgroundColor: document.getElementById("color-picker").value,
-                        borderRadius: 3
-                    },
-                    "hover-mode": "node",
-                    "hover-state": {
-                      "background-color": "black"
-                    },
-                    "selection-mode": "plot",
-                    "selected-state": {
-                      "background-color": "black",
-                      "border-width": 5,
-                      "border-color": "white",
-                      "line-style": "dashdot"
+                        borderRadius: 3,
+                        fontSize: fontSize
                     },
                     "animation": {
                         "effect": "ANIMATION_EXPAND_BOTTOM",
@@ -347,60 +523,43 @@ $(document).ready(function() {
         });
     }  
     
+    // Color picker change event
     document.getElementById('color-picker').addEventListener('change', function(e) {
         if (!chartData) return;
         
-        var myConfig2 = {
-            type: 'bar',
-            plot: {
-                "animation": {
-                    "effect": "ANIMATION_EXPAND_BOTTOM",
-                    "method": "ANIMATION_STRONG_EASE_OUT",
-                    "sequence": "ANIMATION_BY_PLOT_AND_NODE",
-                    "speed": 275
-                },
-                valueBox: {
-                    text: '%v',
-                    placement: 'top',
-                    fontColor: '#FFF',
-                    backgroundColor: document.getElementById("color-picker").value,
-                    borderRadius: 3
-                }
-            },
-            title: {
-                text: 'Numar angajati / luna'
-            },
-            scaleX: {
-                values: chartData.months.map(month => month.toString())
-            },
-            series: [{
-                values: chartData.counts,
-                backgroundColor: document.getElementById("color-picker").value
-            }]
-        };
-
-        zingchart.render({
-            id: 'myChart',
-            data: myConfig2,
-            height: '100%',
-            width: '100%'
-        });
+        updateChart(chartData);
     }, false);
+    
+    // Re-render chart on window resize for responsiveness
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (chartData) updateChart(chartData);
+        }, 250);
+    });
 });
+
 function generatePDF() {
     // Ensure libraries are loaded
     if (typeof html2canvas === 'undefined' || typeof html2pdf === 'undefined') {
-        alert('PDF generation libraries not loaded. Please refresh the page.');
+        alert('Bibliotecile necesare pentru generarea PDF-ului nu sunt incarcate. Reimprospatati pagina.');
         return;
     }
+
+    // Show loading state
+    const downloadBtn = document.querySelector('.btn[onclick="generatePDF()"]');
+    const originalText = downloadBtn.textContent;
+    downloadBtn.textContent = 'Se genereaza PDF...';
+    downloadBtn.disabled = true;
 
     // Get the content to convert
     const contentElement = document.getElementById('content');
 
     // Use html2pdf to generate PDF directly
     html2pdf().set({
-        margin: [10, 10, 10, 10],
-        filename: 'raport_concedii.pdf',
+        margin: [15, 15, 15, 15],
+        filename: 'raport_departament.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
             scale: 2,
@@ -414,14 +573,17 @@ function generatePDF() {
             orientation: 'portrait'
         }
     }).from(contentElement).save().then(() => {
-        console.log('PDF generated successfully');
+        console.log('PDF generat cu succes');
+        downloadBtn.textContent = originalText;
+        downloadBtn.disabled = false;
     }).catch((error) => {
-        console.error('PDF Generation Error:', error);
-        alert('Failed to generate PDF. Check browser console for details.');
+        console.error('Eroare la generarea PDF:', error);
+        alert('Nu s-a putut genera PDF-ul. Verificati consola browserului pentru detalii.');
+        downloadBtn.textContent = originalText;
+        downloadBtn.disabled = false;
     });
 }
 </script>
-
 </body>
 </html>
 <%

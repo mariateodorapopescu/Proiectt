@@ -34,7 +34,7 @@ if (sesi != null) {
                 String functie = rs.getString("functie");
                 int ierarhie = rs.getInt("ierarhie");
 
-                // Funcție helper pentru a determina rolul utilizatorului
+                // Functie helper pentru a determina rolul utilizatorului
                 boolean isDirector = (ierarhie < 3) ;
                 boolean isSef = (ierarhie >= 4 && ierarhie <=5);
                 boolean isIncepator = (ierarhie >= 10);
@@ -191,6 +191,24 @@ if (sesi != null) {
             font-style: italic;
         }
         
+        /* For better data display in info section */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .data-label {
+            font-weight: bold;
+            color: <%=accent%>;
+        }
+        
+        .data-value {
+            text-align: right;
+        }
+        
         @media print {
             .sidebar {
                 display: none;
@@ -274,7 +292,6 @@ if (sesi != null) {
             
             <button class="btn" onclick="generatePDF()">Descarcati PDF</button>
            
-            
             <p id="ceva1" style="display:none;"><%=sidebar%></p>
             <p id="ceva2" style="display:none;"><%=accent%></p>
         </div>
@@ -291,10 +308,32 @@ if (sesi != null) {
                 
                 <div class="chart-info">
                     <h4>Detalii raport</h4>
-                    <p id="statusInfo"></p>
-                    <p id="departmentInfo"></p>
-                    <p id="dataInfo"></p>
-                    <p id="totalInfo"></p>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Status concedii:</span>
+                        <span class="data-value" id="statusInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Departament:</span>
+                        <span class="data-value" id="departmentInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Luna:</span>
+                        <span class="data-value" id="monthInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Total zile cu concedii:</span>
+                        <span class="data-value" id="totalDaysInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Suprapunere maxima:</span>
+                        <span class="data-value" id="maxOverlapInfo">Se incarca...</span>
+                    </div>
+                    
                     <p id="explanationInfo" style="font-style: italic; margin-top: 15px;">
                         Acest raport afiseaza numarul de concedii suprapuse in fiecare zi din luna selectata. 
                         O valoare de 3, de exemplu, inseamna ca in acea zi sunt 3 angajati in concediu simultan.
@@ -351,25 +390,43 @@ $(document).ready(function() {
     }
     
     function updateChartInfo(data) {
-        $('#statusInfo').text('Status: ' + (data.status === '3' ? 'Toate statusurile' : data.status));
-        $('#departmentInfo').text('Departament: ' + data.departament);
-        
-        // Determine the date range if available
-        if (data.months && data.months.length > 0) {
-            $('#dataInfo').text('Zile analizate: ' + data.months[0] + ' - ' + data.months[data.months.length-1]);
+        // Update status info
+        if (data.statusName) {
+            $('#statusInfo').text(data.statusName);
         } else {
-            $('#dataInfo').text('Zile analizate: Nu sunt date disponibile');
+            $('#statusInfo').text(data.status === '3' ? 'Toate statusurile' : 'Status necunoscut');
         }
         
-        // Calculate total from counts and max overlap
-        const total = data.counts.reduce((a, b) => a + b, 0);
-        const maxOverlap = Math.max(...data.counts);
+        // Update department info
+        $('#departmentInfo').text(data.departament || 'Toate departamentele');
         
-        $('#totalInfo').html('Total zile cu concedii: ' + total + '<br>Suprapunere maxima: ' + maxOverlap + ' concedii');
+        // Update month info
+        $('#monthInfo').text(data.monthName || 'Luna necunoscuta');
+        
+        // Calculate total days with leaves (days with at least 1 leave)
+        const daysWithLeaves = data.counts ? data.counts.filter(count => count > 0).length : 0;
+        $('#totalDaysInfo').text(daysWithLeaves);
+        
+        // Calculate maximum overlap
+        const maxOverlap = data.counts ? Math.max(...data.counts) : 0;
+        $('#maxOverlapInfo').text(maxOverlap);
     }
 
     function updateChart(data) {
-        $('#chartHeader').text(data.h3);
+        $('#chartHeader').text(data.h3 || 'Raport Concedii');
+        
+        // Filtrez doar zilele cu concedii (valori > 0)
+        let filteredDays = [];
+        let filteredCounts = [];
+        
+        if (data.months && data.counts) {
+            for (let i = 0; i < data.months.length; i++) {
+                if (data.counts[i] > 0) {
+                    filteredDays.push(data.months[i]);
+                    filteredCounts.push(data.counts[i]);
+                }
+            }
+        }
         
         zingchart.render({
             id: 'myChart',
@@ -377,14 +434,35 @@ $(document).ready(function() {
                 type: 'bar',
                 backgroundColor: 'transparent', // Sets the background color of the chart area
                 title: {
-                    text: 'Suprapuneri concedii / zi'
+                    text: 'Suprapuneri concedii / zi',
+                    fontColor: document.getElementById("color-picker").value
                 },
                 scaleX: {
-                    values: data.months.map(month => month.toString())
+                    values: filteredDays.map(day => day.toString()),
+                    label: {
+                        text: 'Zile',
+                        fontColor: accent
+                    },
+                    item: {
+                        fontColor: accent
+                    }
+                },
+                scaleY: {
+                    label: {
+                        text: 'Numar concedii',
+                        fontColor: accent
+                    },
+                    item: {
+                        fontColor: accent
+                    }
                 },
                 series: [{
-                    values: data.counts,
-                    backgroundColor: document.getElementById("color-picker").value
+                    values: filteredCounts,
+                    backgroundColor: document.getElementById("color-picker").value,
+                    tooltip: {
+                        text: '%v concedii',
+                        backgroundColor: document.getElementById("color-picker").value
+                    }
                 }],
                 plot: { // Additional styling for plot area
                     valueBox: {
@@ -421,6 +499,19 @@ $(document).ready(function() {
     document.getElementById('color-picker').addEventListener('change', function(e) {
         if (!chartData) return;
         
+        // Filtrez doar zilele cu concedii (valori > 0)
+        let filteredDays = [];
+        let filteredCounts = [];
+        
+        if (chartData.months && chartData.counts) {
+            for (let i = 0; i < chartData.months.length; i++) {
+                if (chartData.counts[i] > 0) {
+                    filteredDays.push(chartData.months[i]);
+                    filteredCounts.push(chartData.counts[i]);
+                }
+            }
+        }
+        
         var myConfig2 = {
             type: 'bar',
             plot: {
@@ -439,14 +530,35 @@ $(document).ready(function() {
                 }
             },
             title: {
-                text: 'Suprapuneri concedii / zi'
+                text: 'Suprapuneri concedii / zi',
+                fontColor: document.getElementById("color-picker").value
             },
             scaleX: {
-                values: chartData.months.map(month => month.toString())
+                values: filteredDays.map(day => day.toString()),
+                label: {
+                    text: 'Zile',
+                    fontColor: accent
+                },
+                item: {
+                    fontColor: accent
+                }
+            },
+            scaleY: {
+                label: {
+                    text: 'Numar concedii',
+                    fontColor: accent
+                },
+                item: {
+                    fontColor: accent
+                }
             },
             series: [{
-                values: chartData.counts,
-                backgroundColor: document.getElementById("color-picker").value
+                values: filteredCounts,
+                backgroundColor: document.getElementById("color-picker").value,
+                tooltip: {
+                    text: '%v concedii',
+                    backgroundColor: document.getElementById("color-picker").value
+                }
             }]
         };
 
@@ -475,103 +587,6 @@ function generatePDF() {
             orientation: 'portrait'
         }
     }).from(element).save();
-}
-
-function generateJSON() {
-    if (!chartData) {
-        alert("Nu exista date!");
-        return;
-    }
-    
-    // Calculate maximum overlap
-    const maxOverlap = Math.max(...chartData.counts);
-    
-    // Calculate total days with leaves
-    const totalDaysWithLeaves = chartData.counts.filter(count => count > 0).length;
-    
-    // Transform the JSON structure
-    const transformedData = {
-        luna: chartData.h3.match(/luna (\w+)/)[1], // Extracts the month from the h3 string
-        status: chartData.status,
-        departament: chartData.departament,
-        zile: chartData.months,
-        suprapuneri: chartData.counts,
-        suprapunereMaxima: maxOverlap,
-        zileTotal: totalDaysWithLeaves
-    };
-    
-    // Convert JSON data to a string
-    const jsonString = JSON.stringify(transformedData, null, 2);
-    
-    // Create a Blob with the JSON data
-    const blob = new Blob([jsonString], { type: "application/json" });
-    
-    // Generate a URL for the Blob
-    const url = URL.createObjectURL(blob);
-    
-    // Create a temporary link element
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "suprapuneri_concedii.json";
-    document.body.appendChild(a);
-    
-    // Programmatically trigger the download
-    a.click();
-    
-    // Clean up
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function downloadCsv() {
-    if (!chartData) {
-        alert("Nu exista date!");
-        return;
-    }
-
-    // Prepare CSV header and rows
-    const header = ['Luna', 'Status', 'Departament', 'Zi', 'Suprapuneri'];
-    const rows = [];
-    
-    // Extract month name if possible
-    let lunaName = "";
-    try {
-        lunaName = chartData.h3.match(/luna (\w+)/)[1];
-    } catch (e) {
-        lunaName = "Nedefinit";
-    }
-
-    for (let i = 0; i < chartData.months.length; i++) {
-        rows.push([
-            lunaName,
-            chartData.status,
-            chartData.departament,
-            chartData.months[i],
-            chartData.counts[i]
-        ]);
-    }
-
-    // Convert the header and rows to CSV format
-    const csvContent = [header.join(','), ...rows.map(row => row.join(','))].join('\n');
-
-    // Create a Blob with the CSV data
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-
-    // Generate a URL for the Blob
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary link element
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'suprapuneri_concedii.csv';
-    document.body.appendChild(a);
-
-    // Programmatically trigger the download
-    a.click();
-
-    // Clean up
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
 }
 </script>
 </body>

@@ -1,9 +1,5 @@
 package Servlet;
-// importare biblioteci
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -12,332 +8,344 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.json.JSONObject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.json.JSONArray;
-/**
- * implementare servlet care arunca un json 1
- */
+import org.json.JSONObject;
+import bean.MyUser;
+
 public class JsonServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public JsonServlet() {
-        super(); 
-    }
-    PrintWriter out;
-   
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-			String statusParam = request.getParameter("status");
-            String depParam = request.getParameter("dep");
-            String monthParam = request.getParameter("month");
-            String type = request.getParameter("tip");
-            
-            int status = (statusParam != null) ? Integer.parseInt(statusParam) : 3;
-            int dep = (depParam != null) ? Integer.parseInt(depParam) : -1;
-            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            int month2 = (monthParam != null) ? Integer.parseInt(monthParam) : Calendar.getInstance().get(Calendar.MONTH) + 1;
-            int tip = (type != null) ? Integer.parseInt(type) : -1;
-            System.out.println(status + " " + dep + " " + month2 + " " + currentYear + " " + tip);
-            if (tip == 1) {
-            	 Map<Integer, Integer> leaveCountMap = new HashMap<>();
-                 for (int i = 1; i <= 12; i++) {
-                     leaveCountMap.put(i, 0);
-                 }
+    private static final long serialVersionUID = 1L;
 
-                 String baseQuery = "SELECT MONTH(month_dates) AS month, CEIL(COUNT(*) / 2) AS numar_concedii FROM (";
-
-                 String joinClause = " JOIN useri ON id_ang = useri.id JOIN departament ON useri.id_dep = departament.id_dep";
-                 String whereClause = " WHERE YEAR(start_c) = YEAR(CURRENT_DATE())";
-                 ArrayList<String> conditions = new ArrayList<>();
-
-                 if (status != 3) {
-                     conditions.add(" status = ?");
-                 }
-                 if (dep != -1) {
-                     conditions.add(" departament.id_dep = ?");
-                 }
-                 if (!conditions.isEmpty()) {
-                     whereClause += " AND " + String.join(" AND", conditions);
-                 }
-
-                 // Subqueries
-                 String subQuery1 = "SELECT start_c AS month_dates FROM concedii" + joinClause + whereClause;
-                 String subQuery2 = " UNION ALL SELECT end_c FROM concedii" + joinClause + whereClause;
-                 String subQuery3 = " UNION ALL SELECT DATE_ADD(start_c, INTERVAL 1 MONTH) AS month_dates FROM concedii" + joinClause + whereClause + " AND MONTH(start_c) <> MONTH(end_c)";
-
-                 // Final query
-                 String query = baseQuery + subQuery1 + subQuery2 + subQuery3 + ") AS combined_dates GROUP BY MONTH(month_dates)";
-
-                 try {
-                     Class.forName("com.mysql.cj.jdbc.Driver");
-                 } catch (ClassNotFoundException e) {
-                     e.printStackTrace();
-                 }
-
-                 try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                      PreparedStatement stmt = connection.prepareStatement(query)) {
-                     int paramIndex = 1;
-                     if (status != 3) {
-                         stmt.setInt(paramIndex++, status);
-                         stmt.setInt(paramIndex++, status);
-                         stmt.setInt(paramIndex++, status);
-                     }
-                     if (dep != -1) {
-                         stmt.setInt(paramIndex++, dep);
-                         stmt.setInt(paramIndex++, dep);
-                         stmt.setInt(paramIndex++, dep);
-                     }
-
-                     System.out.println(stmt);
-                     ResultSet rs1 = stmt.executeQuery();
-                     while (rs1.next()) {
-                         int month = rs1.getInt("month");
-                         int count = rs1.getInt("numar_concedii");
-                         leaveCountMap.put(month, count);
-                     }
-
-                     ArrayList<Integer> months = new ArrayList<>();
-                     ArrayList<Integer> counts = new ArrayList<>();
-                     for (int i = 1; i <= 12; i++) {
-                         months.add(i);
-                         counts.add(leaveCountMap.get(i));
-                     }
-                     System.out.println(status + " " + dep);
-                     JSONObject json = new JSONObject();
-                     json.put("months", new JSONArray(months));
-                     json.put("counts", new JSONArray(counts));
-                     json.put("status", status);
-                     json.put("departament", dep);
-                     String statuss = "";
-                     String depp = "";
-                     if (status == -1) {
-                     	statuss = "respinse de sef";
-                     }
-                     if (status == -2) {
-                     	statuss = "respinse de director";
-                     }
-                     if (status == 1) {
-                     	statuss = "aprobate de sef";
-                     }
-                     if (status == 2) {
-                     	statuss = "aprobate de director";
-                     }
-                     if (status == 0) {
-                     	statuss = "in asteptare";
-                     }
-                     if (status == 3) {
-                     	statuss = "de orice fel";
-                     }
-                     if (dep == -1) {
-                     	depp = "toata institutia";
-                     } else {
-                     	  try (PreparedStatement stm = connection.prepareStatement("SELECT * FROM departament;")) {
-                               try (ResultSet rs2 = stm.executeQuery()) {
-                                   while (rs2.next()) {
-                                       int id = rs2.getInt("id_dep");
-                                       String nume = rs2.getString("nume_dep");
-                                       if(dep == id)
-                                       depp = "departamentul " + nume;
-                                   }
-                               }
-                           }
-                     }
-                     String msg = "Vizualizare concedii "+ statuss + " din " + depp;
-                     json.put("h3", msg);
-                     System.out.println(json);
-                     response.setContentType("application/json");
-                     response.setCharacterEncoding("UTF-8");
-                     response.setHeader("Access-Control-Allow-Origin", "*");
-                     response.setHeader("Access-Control-Allow-Methods", "POST");
-                     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-                     PrintWriter out = response.getWriter();
-                     out.print(json.toString());
-                     out.flush();
-                 } catch (SQLException e) {
-     				e.printStackTrace();
-     			}
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("currentUser") == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not logged in");
+            return;
+        }
+        
+        MyUser currentUser = (MyUser) session.getAttribute("currentUser");
+        
+        // Get parameters from the form
+        String statusParam = request.getParameter("status");
+        String departmentParam = request.getParameter("dep");
+        String tipConcediuParam = request.getParameter("tip_concediu");
+        String tipParam = request.getParameter("tip");
+        String monthParam = request.getParameter("month");
+        
+        int status = 3; // Default: Any status
+        int department = -1; // Default: Any department
+        int tipConcediu = -1; // Default: Any leave type
+        int type = 1; // Default report type: Annual
+        int month = -1; // Default: No specific month
+        
+        try {
+            if (statusParam != null && !statusParam.isEmpty()) {
+                status = Integer.parseInt(statusParam);
             }
-            if (tip == 2) {
-					
-					Calendar calendar = Calendar.getInstance();
-					calendar.set(Calendar.YEAR, currentYear);
-					calendar.set(Calendar.MONTH, month2 - 1); // Adjust month index (-1 because Calendar.MONTH is zero-based)
-					int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-					
-					Map<Integer, Integer> leaveCountMap = new HashMap<>();
-					for (int i = 1; i <= daysInMonth; i++) {
-					    leaveCountMap.put(i, 0);
-					}
-					
-					 Map<String, List<String>> leaveDataByDate = new TreeMap<>();
-		              String sql = "";
-		              sql =  "SELECT nume, prenume, start_c, end_c FROM useri JOIN concedii ON useri.id = concedii.id_ang WHERE (MONTH(start_c) = ? OR MONTH(end_c) = ?) AND YEAR(start_c) = ?";
-		              if (status != 3) {
-	                	   sql += " and concedii.status = ?";
-	                   }
-		              if (dep != -1) {
-		            	  sql += " and useri.id_dep = ?";
-		              }
-					 try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-							 PreparedStatement stmt = conn.prepareStatement(sql)) {
-		                   stmt.setInt(1, month2);
-		                   stmt.setInt(2, month2);
-		                   stmt.setInt(3, calendar.get(Calendar.YEAR));
-		                   int param = 4;
-		                   if (status != 3) {
-		                	   stmt.setInt(param++, status);
-		                   }
-		                   if (dep != -1) {
-		                	   stmt.setInt(param++, dep);
-		                   }
-		                   ResultSet rs1 = stmt.executeQuery();
-		                   String nume = "";
-		                   String prenume = "";
-		                   String fullnume = "";
-		                   while (rs1.next()) {
-		                       nume = rs1.getString("nume");
-		                       prenume = rs1.getString("prenume");
-		                       fullnume = nume + " " + prenume;
-
-		                       LocalDate startDate = rs1.getDate("start_c").toLocalDate();
-		                       LocalDate endDate = rs1.getDate("end_c").toLocalDate();
-
-		                       LocalDate currentDate = startDate;
-
-		                       while (!currentDate.isAfter(endDate)) {
-		                           String dateKey = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		                           leaveDataByDate.computeIfAbsent(dateKey, k -> new ArrayList<>()).add(fullnume);
-		                           currentDate = currentDate.plusDays(1);
-		                       }
-		                   }
-		               } catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					System.out.println(leaveDataByDate);
-					 ArrayList<Integer> months = new ArrayList<>();
-				        ArrayList<Integer> counts = new ArrayList<>();
-				        
-				        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("dd");
-				        leaveDataByDate.forEach((dateKey, names) -> {
-				            LocalDate date = LocalDate.parse(dateKey, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-				            months.add(Integer.parseInt(date.format(dayFormatter))); // Add day of month
-				            counts.add(names.size()); // Add count of people
-				        });
-				        System.out.println(months);
-				        System.out.println(counts);
-                    System.out.println(status + " " + dep);
-                    JSONObject json = new JSONObject();
-                    json.put("months", new JSONArray(months));
-                    json.put("counts", new JSONArray(counts));
-                    json.put("status", status);
-                    json.put("departament", dep);
-                    String statuss = "";
-                    String depp = "";
-                    if (status == -1) {
-                    	statuss = "respinse de sef";
+            if (departmentParam != null && !departmentParam.isEmpty()) {
+                department = Integer.parseInt(departmentParam);
+            }
+            if (tipConcediuParam != null && !tipConcediuParam.isEmpty()) {
+                tipConcediu = Integer.parseInt(tipConcediuParam);
+            }
+            if (tipParam != null && !tipParam.isEmpty()) {
+                type = Integer.parseInt(tipParam);
+            }
+            if (monthParam != null && !monthParam.isEmpty()) {
+                month = Integer.parseInt(monthParam);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Error parsing parameters: " + e.getMessage());
+        }
+        
+        JSONObject jsonResponse = new JSONObject();
+        
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                // Fetch status name
+                String statusName = "Toate statusurile"; // Default
+                if (status != 3) {
+                    try (PreparedStatement statusStmt = conn.prepareStatement("SELECT nume_status FROM statusuri WHERE status = ?")) {
+                        statusStmt.setInt(1, status);
+                        try (ResultSet statusRs = statusStmt.executeQuery()) {
+                            if (statusRs.next()) {
+                                statusName = statusRs.getString("nume_status");
+                            }
+                        }
                     }
-                    if (status == -2) {
-                    	statuss = "respinse de director";
+                }
+                
+                // Fetch department name
+                String departmentName = "Toate departamentele"; // Default
+                if (department != -1) {
+                    try (PreparedStatement deptStmt = conn.prepareStatement("SELECT nume_dep FROM departament WHERE id_dep = ?")) {
+                        deptStmt.setInt(1, department);
+                        try (ResultSet deptRs = deptStmt.executeQuery()) {
+                            if (deptRs.next()) {
+                                departmentName = deptRs.getString("nume_dep");
+                            }
+                        }
                     }
-                    if (status == 1) {
-                    	statuss = "aprobate de sef";
+                }
+                
+                // Fetch tip concediu name
+                String tipConcediuName = "Toate tipurile"; // Default
+                if (tipConcediu != -1) {
+                    try (PreparedStatement tipStmt = conn.prepareStatement("SELECT motiv FROM tipcon WHERE tip = ?")) {
+                        tipStmt.setInt(1, tipConcediu);
+                        try (ResultSet tipRs = tipStmt.executeQuery()) {
+                            if (tipRs.next()) {
+                                tipConcediuName = tipRs.getString("motiv");
+                            }
+                        }
                     }
-                    if (status == 2) {
-                    	statuss = "aprobate de director";
-                    }
-                    if (status == 0) {
-                    	statuss = "in asteptare";
-                    }
-                    if (status == 3) {
-                    	statuss = "de orice fel";
-                    }
-                    if (dep == -1) {
-                    	depp = "toata institutia";
-                    } else {
-                    	 try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                    			 PreparedStatement stm = conn.prepareStatement("SELECT * FROM departament;")) {
-                              try (ResultSet rs2 = stm.executeQuery()) {
-                                  while (rs2.next()) {
-                                      int id = rs2.getInt("id_dep");
-                                      String nume = rs2.getString("nume_dep");
-                                      if(dep == id)
-                                      depp = "departamentul " + nume;
-                                  }
-                              }
-                          } catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-                    }
-                    String monthh = "";
-                   
-                    if (month2 == 1) {
-                    	monthh = "Ianuarie";
-                    }
-                    if (month2 == 2) {
-                    	monthh = "Februarie";
-                    }
-                    if (month2 == 3) {
-                    	monthh = "Martie";
-                    }
-                    if (month2 == 4) {
-                    	monthh = "Aprilie";
-                    }
-                    if (month2 == 5) {
-                    	monthh = "Mai";
-                    }
-                    if (month2 == 6) {
-                    	monthh = "Iunie";
-                    }
-                    if (month2 == 7) {
-                    	monthh = "Iulie";
-                    }
-                    if (month2 == 8) {
-                    	monthh = "August";
-                    }
-                    if (month2 == 9) {
-                    	monthh = "Septembrie";
-                    }
-                    if (month2 == 10) {
-                    	monthh = "Octombrie";
-                    }
-                    if (month2 == 11) {
-                    	monthh = "Noiembrie";
-                    }
-                    if (month2 == 12) {
-                    	monthh = "Decembrie";
-                    }
-                    String msg = "Vizualizare concedii "+ statuss + " din " + depp + " din luna " + monthh;
-                    json.put("h3", msg);
-                    System.out.println(json);
-                    response.setContentType("application/json");
-                    response.setCharacterEncoding("UTF-8");
-                    response.setHeader("Access-Control-Allow-Origin", "*"); // for development only, specify domains in production
-                    response.setHeader("Access-Control-Allow-Methods", "POST");
-                    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+                }
+                
+                if (type == 2 && month != -1) {
+                    // Monthly report with daily breakdown
+                    generateMonthlyReport(conn, jsonResponse, status, department, tipConcediu, month, statusName, departmentName, tipConcediuName);
+                } else {
+                    // Annual report with monthly breakdown (default)
+                    generateAnnualReport(conn, jsonResponse, status, department, tipConcediu, statusName, departmentName, tipConcediuName);
+                }
+                
+                out.print(jsonResponse.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONObject error = new JSONObject();
+            error.put("error", e.getMessage());
+            out.print(error.toString());
+        }
+    }
+    
+    private void generateAnnualReport(Connection conn, JSONObject jsonResponse, int status, int department, int tipConcediu, 
+                               String statusName, String departmentName, String tipConcediuName) throws SQLException {
+        // Build the base query for annual report (by month)
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("SELECT MONTH(c.start_c) as month, YEAR(c.start_c) as year, COUNT(*) as count ")
+                   .append("FROM concedii c ")
+                   .append("JOIN useri u ON c.id_ang = u.id where year(c.start_c) = year(current_date())");
+        
+        boolean whereAdded = true;
+        
+        // Add status condition if needed
+        if (status != 3) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("c.status = ?");
+            whereAdded = true;
+        }
+        
+        // Add department condition if needed
+        if (department != -1) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("u.id_dep = ?");
+            whereAdded = true;
+        }
+        
+        // Add tip concediu condition if needed
+        if (tipConcediu != -1) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("c.tip = ?");
+            whereAdded = true;
+        }
+        
+        // Group by month and year
+        queryBuilder.append(" GROUP BY YEAR(c.start_c), MONTH(c.start_c) ORDER BY YEAR(c.start_c), MONTH(c.start_c)");
+        
+        String finalQuery = queryBuilder.toString();
+        
+        // Execute the query with parameters
+        try (PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
+            int paramIndex = 1;
+            
+            if (status != 3) {
+                stmt.setInt(paramIndex++, status);
+            }
+            
+            if (department != -1) {
+                stmt.setInt(paramIndex++, department);
+            }
+            
+            if (tipConcediu != -1) {
+                stmt.setInt(paramIndex++, tipConcediu);
+            }
+            
+            Map<String, Integer> monthCounts = new TreeMap<>(); // TreeMap to keep months in order
+            String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", 
+                                  "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
+            
+            // Execute query and process results
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int month = rs.getInt("month");
+                    int year = rs.getInt("year");
+                    int count = rs.getInt("count");
                     
-                    PrintWriter out = response.getWriter();
-                    out.print(json.toString());
-                    out.flush();
-               
-           }
+                    String monthKey = monthNames[month-1] + " " + year;
+                    monthCounts.put(monthKey, count);
+                }
+            }
+            
+            // Create JSON arrays for chart data
+            JSONArray monthsArray = new JSONArray();
+            JSONArray countsArray = new JSONArray();
+            
+            for (Map.Entry<String, Integer> entry : monthCounts.entrySet()) {
+                monthsArray.put(entry.getKey());
+                countsArray.put(entry.getValue());
+            }
+            
+            // Build response JSON
+            StringBuilder titleBuilder = new StringBuilder("Raport concedii");
+            if (!statusName.equals("Toate statusurile")) {
+                titleBuilder.append(" - ").append(statusName);
+            }
+            if (!departmentName.equals("Toate departamentele")) {
+                titleBuilder.append(" - ").append(departmentName);
+            }
+            if (!tipConcediuName.equals("Toate tipurile")) {
+                titleBuilder.append(" - ").append(tipConcediuName);
+            }
+            
+            jsonResponse.put("h3", titleBuilder.toString());
+            jsonResponse.put("months", monthsArray);
+            jsonResponse.put("counts", countsArray);
+            jsonResponse.put("status", String.valueOf(status));
+            jsonResponse.put("statusName", statusName);
+            jsonResponse.put("departament", departmentName);
+            jsonResponse.put("tipConcediuName", tipConcediuName);
+        }
+    }
+    
+    private void generateMonthlyReport(Connection conn, JSONObject jsonResponse, int status, int department, int tipConcediu, 
+                                int month, String statusName, String departmentName, String tipConcediuName) throws SQLException {
+        // Get current year
+        int currentYear = LocalDate.now().getYear();
+        
+        // Determine the number of days in the specified month
+        YearMonth yearMonthObject = YearMonth.of(currentYear, month);
+        int daysInMonth = yearMonthObject.lengthOfMonth();
+        
+        // Build the query for daily report within the specified month
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("SELECT DAY(date_range.date) as day, COALESCE(COUNT(c.id), 0) as count ")
+                   .append("FROM (");
+        
+        // Generate a range of dates for the month
+        for (int i = 1; i <= daysInMonth; i++) {
+            if (i > 1) queryBuilder.append(" UNION ALL ");
+            queryBuilder.append("SELECT '").append(currentYear).append("-").append(month).append("-").append(i).append("' as date");
+        }
+        
+        queryBuilder.append(") as date_range ")
+                   .append("LEFT JOIN concedii c ON date_range.date BETWEEN c.start_c AND c.end_c ")
+                   .append("LEFT JOIN useri u ON c.id_ang = u.id ");
+        
+        // Add WHERE conditions
+        boolean whereAdded = false;
+        
+        if (status != 3) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("c.status = ?");
+            whereAdded = true;
+        }
+        
+        if (department != -1) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("u.id_dep = ?");
+            whereAdded = true;
+        }
+        
+        if (tipConcediu != -1) {
+            queryBuilder.append(whereAdded ? " AND " : " WHERE ");
+            queryBuilder.append("c.tip = ?");
+            whereAdded = true;
+        }
+        
+        // Group by day and order by day
+        queryBuilder.append(" GROUP BY date_range.date ")
+                   .append("ORDER BY date_range.date");
+        
+        String finalQuery = queryBuilder.toString();
+        
+        // Execute the query with parameters
+        try (PreparedStatement stmt = conn.prepareStatement(finalQuery)) {
+            int paramIndex = 1;
+            
+            if (status != 3) {
+                stmt.setInt(paramIndex++, status);
+            }
+            
+            if (department != -1) {
+                stmt.setInt(paramIndex++, department);
+            }
+            
+            if (tipConcediu != -1) {
+                stmt.setInt(paramIndex++, tipConcediu);
+            }
+            
+            // Execute query and process results
+            JSONArray daysArray = new JSONArray();
+            JSONArray countsArray = new JSONArray();
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int day = rs.getInt("day");
+                    int count = rs.getInt("count");
+                    
+                    daysArray.put(day);
+                    countsArray.put(count);
+                }
+            }
+            
+            // Get the month name
+            String[] monthNames = {"Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", 
+                                  "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"};
+            String monthName = monthNames[month-1];
+            
+            // Build response JSON
+            StringBuilder titleBuilder = new StringBuilder("Raport concedii pentru luna " + monthName);
+            if (!statusName.equals("Toate statusurile")) {
+                titleBuilder.append(" - ").append(statusName);
+            }
+            if (!departmentName.equals("Toate departamentele")) {
+                titleBuilder.append(" - ").append(departmentName);
+            }
+            if (!tipConcediuName.equals("Toate tipurile")) {
+                titleBuilder.append(" - ").append(tipConcediuName);
+            }
+            
+            jsonResponse.put("h3", titleBuilder.toString());
+            jsonResponse.put("months", daysArray); // Reusing "months" key for days for compatibility
+            jsonResponse.put("counts", countsArray);
+            jsonResponse.put("status", String.valueOf(status));
+            jsonResponse.put("statusName", statusName);
+            jsonResponse.put("departament", departmentName);
+            jsonResponse.put("tipConcediuName", tipConcediuName);
+            jsonResponse.put("monthName", monthName);
+        }
+    }
 
-	}
-
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
+    }
 }

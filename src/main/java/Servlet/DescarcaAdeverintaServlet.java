@@ -68,21 +68,16 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             
             // Interogare pentru adeverinta
             String sql = "SELECT a.*, ta.denumire as tip_adeverinta, u.nume, u.prenume, u.cnp, " +
-                        "u.salariu_brut, u.data_ang, d.nume_dep, tp.denumire as pozitie, a.pentru_servi " +
+                        "tp.salariu, u.data_ang, d.nume_dep, tp.denumire as pozitie, a.pentru_servi " +
                         "FROM adeverinte a " +
                         "JOIN tip_adev ta ON a.tip = ta.id " +
                         "JOIN useri u ON a.id_ang = u.id " +
                         "JOIN departament d ON u.id_dep = d.id_dep " +
                         "JOIN tipuri tp ON u.tip = tp.tip " +
-                        "WHERE a.id = ? AND a.status = 2 AND (a.id_ang = ? OR ? IN (0, 3))";
+                        "WHERE a.id = ? AND a.status = 2";
             
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, idAdeverinta);
-            pstmt.setInt(2, currentUser.getId());
-            pstmt.setInt(3, currentUser.getTip());
-            
-            // Log pentru debugging
-            System.out.println("Executand query pentru id=" + idAdeverinta + ", user id=" + currentUser.getId() + ", tip=" + currentUser.getTip());
             
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -93,12 +88,11 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
                 departament = rs.getString("nume_dep");
                 motiv = rs.getString("pentru_servi");
                 tipAdeverinta = rs.getInt("tip");
-                salariu = rs.getInt("salariu_brut");
+                salariu = rs.getInt("salariu");
                 dataAngajarii = rs.getString("data_ang") != null ? rs.getString("data_ang") : "N/A";
                 
-                System.out.println("Date gasite pentru adeverinta " + idAdeverinta + ": " + numePrenume);
             } else {
-                System.out.println("Nu s-au gasit date pentru adeverinta " + idAdeverinta);
+               
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Adeverinta nu a fost gasita sau nu aveti acces la ea");
                 return;
             }
@@ -119,7 +113,7 @@ public class DescarcaAdeverintaServlet extends HttpServlet {
             out.println("<html><head><title>Eroare</title></head><body>");
             out.println("<h1>A aparut o eroare la generarea adeverintei</h1>");
             out.println("<p>Detalii eroare: " + e.getMessage() + "</p>");
-            out.println("<p><a href='adeverinte_mele.jsp'>inapoi la adeverintele mele</a></p>");
+            out.println("<p><a href='adeverintenoiuser.jsp'>inapoi la adeverintele mele</a></p>");
             out.println("</body></html>");
         } finally {
             if (conn != null) {

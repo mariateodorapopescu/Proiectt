@@ -192,6 +192,24 @@ if (sesi != null) {
             font-style: italic;
         }
         
+        /* For better data display in info section */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .data-label {
+            font-weight: bold;
+            color: <%=accent%>;
+        }
+        
+        .data-value {
+            text-align: right;
+        }
+        
         @media print {
             .sidebar {
                 display: none;
@@ -274,10 +292,31 @@ if (sesi != null) {
                 
                 <div class="chart-info">
                     <h4>Detalii raport</h4>
-                    <p id="statusInfo"></p>
-                    <p id="departmentInfo"></p>
-                    <p id="dataInfo"></p>
-                    <p id="totalInfo"></p>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Status concedii:</span>
+                        <span class="data-value" id="statusInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Departament:</span>
+                        <span class="data-value" id="departmentInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Luna:</span>
+                        <span class="data-value" id="monthInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Total zile cu concedii:</span>
+                        <span class="data-value" id="totalDaysInfo">Se incarca...</span>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Suprapunere maxima:</span>
+                        <span class="data-value" id="maxOverlapInfo">Se incarca...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -347,21 +386,43 @@ $(document).ready(function() {
     }
     
     function updateChartInfo(data) {
-        $('#statusInfo').text('Status: ' + (data.status === '3' ? 'Toate statusurile' : data.status));
-        $('#departmentInfo').text('Departament: ' + data.departament);
-        $('#dataInfo').text('Zile analizate: ' + data.months[0] + ' - ' + data.months[data.months.length-1]);
+        // Update status info
+        if (data.statusName) {
+            $('#statusInfo').text(data.statusName);
+        } else {
+            $('#statusInfo').text(data.status === '3' ? 'Toate statusurile' : 'Status necunoscut');
+        }
         
-        // Calculate total from counts
-        const total = data.counts.reduce((a, b) => a + b, 0);
+        // Update department info
+        $('#departmentInfo').text(data.departament || 'Toate departamentele');
         
-        // Find maximum overlap
-        const maxOverlap = Math.max(...data.counts);
+        // Update month info
+        $('#monthInfo').text(data.monthName || 'Luna curentă');
         
-        $('#totalInfo').html('Total zile cu concedii: ' + total + '<br>Suprapunere maxima: ' + maxOverlap + ' concedii');
+        // Calculate total days with leaves (days with at least 1 leave)
+        const daysWithLeaves = data.counts ? data.counts.filter(count => count > 0).length : 0;
+        $('#totalDaysInfo').text(daysWithLeaves);
+        
+        // Calculate maximum overlap
+        const maxOverlap = data.counts ? Math.max(...data.counts) : 0;
+        $('#maxOverlapInfo').text(maxOverlap);
     }
 
     function updateChart(data) {
         $('#chartHeader').text(data.h3);
+        
+        // Filtrez doar zilele cu concedii (valori > 0)
+        let filteredDays = [];
+        let filteredCounts = [];
+        
+        if (data.months && data.counts) {
+            for (let i = 0; i < data.months.length; i++) {
+                if (data.counts[i] > 0) {
+                    filteredDays.push(data.months[i]);
+                    filteredCounts.push(data.counts[i]);
+                }
+            }
+        }
         
         zingchart.render({
             id: 'myChart',
@@ -369,14 +430,35 @@ $(document).ready(function() {
                 type: 'bar',
                 backgroundColor: 'transparent',
                 title: {
-                    text: 'Numar angajati / zi'
+                    text: 'Numar angajati / zi',
+                    fontColor: document.getElementById("color-picker").value
                 },
                 scaleX: {
-                    values: data.months.map(month => month.toString())
+                    values: filteredDays.map(day => day.toString()),
+                    label: {
+                        text: 'Zile',
+                        fontColor: accent
+                    },
+                    item: {
+                        fontColor: accent
+                    }
+                },
+                scaleY: {
+                    label: {
+                        text: 'Numar angajati',
+                        fontColor: accent
+                    },
+                    item: {
+                        fontColor: accent
+                    }
                 },
                 series: [{
-                    values: data.counts,
-                    backgroundColor: document.getElementById("color-picker").value
+                    values: filteredCounts,
+                    backgroundColor: document.getElementById("color-picker").value,
+                    tooltip: {
+                        text: '%v angajati',
+                        backgroundColor: document.getElementById("color-picker").value
+                    }
                 }],
                 plot: {
                     valueBox: {
@@ -413,6 +495,19 @@ $(document).ready(function() {
     document.getElementById('color-picker').addEventListener('change', function(e) {
         if (!chartData) return;
         
+        // Filtrez doar zilele cu concedii (valori > 0)
+        let filteredDays = [];
+        let filteredCounts = [];
+        
+        if (chartData.months && chartData.counts) {
+            for (let i = 0; i < chartData.months.length; i++) {
+                if (chartData.counts[i] > 0) {
+                    filteredDays.push(chartData.months[i]);
+                    filteredCounts.push(chartData.counts[i]);
+                }
+            }
+        }
+        
         var myConfig2 = {
             type: 'bar',
             plot: {
@@ -431,14 +526,35 @@ $(document).ready(function() {
                 }
             },
             title: {
-                text: 'Numar angajati / zi'
+                text: 'Numar angajati / zi',
+                fontColor: document.getElementById("color-picker").value
             },
             scaleX: {
-                values: chartData.months.map(month => month.toString())
+                values: filteredDays.map(day => day.toString()),
+                label: {
+                    text: 'Zile',
+                    fontColor: accent
+                },
+                item: {
+                    fontColor: accent
+                }
+            },
+            scaleY: {
+                label: {
+                    text: 'Numar angajati',
+                    fontColor: accent
+                },
+                item: {
+                    fontColor: accent
+                }
             },
             series: [{
-                values: chartData.counts,
-                backgroundColor: document.getElementById("color-picker").value
+                values: filteredCounts,
+                backgroundColor: document.getElementById("color-picker").value,
+                tooltip: {
+                    text: '%v angajati',
+                    backgroundColor: document.getElementById("color-picker").value
+                }
             }]
         };
 
