@@ -18,26 +18,10 @@ public class AdaugaSediuServlet extends HttpServlet {
         
         String numeSediu = request.getParameter("nume_sediu");
         String tipSediu = request.getParameter("tip_sediu");
-        String strada = request.getParameter("strada");
-        String cod = request.getParameter("cod");
-        String oras = request.getParameter("oras");
-        String judet = request.getParameter("judet");
-        String tara = request.getParameter("tara");
+        
         String telefon = request.getParameter("telefon");
         String email = request.getParameter("email");
         
-        Double latitudine = null;
-        Double longitudine = null;
-        try {
-            if (request.getParameter("latitudine") != null && !request.getParameter("latitudine").isEmpty()) {
-                latitudine = Double.parseDouble(request.getParameter("latitudine"));
-            }
-            if (request.getParameter("longitudine") != null && !request.getParameter("longitudine").isEmpty()) {
-                longitudine = Double.parseDouble(request.getParameter("longitudine"));
-            }
-        } catch (NumberFormatException e) {
-            // Ignore invalid coordinates
-        }
         
         Connection conn = null;
         try {
@@ -45,32 +29,16 @@ public class AdaugaSediuServlet extends HttpServlet {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
             
-            String sql = "INSERT INTO sedii (nume_sediu, tip_sediu, strada, cod, oras, judet, tara, " +
-                        "telefon, email, latitudine, longitudine) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO sedii (nume_sediu, tip_sediu, " +
+                        "telefon, email) " +
+                        "VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, numeSediu);
             pstmt.setString(2, tipSediu);
-            pstmt.setString(3, strada);
-            pstmt.setString(4, cod);
-            pstmt.setString(5, oras);
-            pstmt.setString(6, judet);
-            pstmt.setString(7, tara);
-            pstmt.setString(8, telefon);
-            pstmt.setString(9, email);
-            
-            if (latitudine != null) {
-                pstmt.setDouble(10, latitudine);
-            } else {
-                pstmt.setNull(10, java.sql.Types.DOUBLE);
-            }
-            
-            if (longitudine != null) {
-                pstmt.setDouble(11, longitudine);
-            } else {
-                pstmt.setNull(11, java.sql.Types.DOUBLE);
-            }
-            
+           
+            pstmt.setString(3, telefon);
+            pstmt.setString(4, email);
+          
             pstmt.executeUpdate();
             pstmt.close();
             

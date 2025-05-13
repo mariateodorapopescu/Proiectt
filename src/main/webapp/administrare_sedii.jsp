@@ -604,6 +604,9 @@
                                     <button class="btn btn-outline btn-sm" onclick="editSediu(<%= rs2.getInt("id_sediu") %>)" title="Editează">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button class="btn btn-outline btn-sm" onclick="editLocation(<%= rs2.getInt("id_sediu") %>)" title="Modifică locația">
+                                        <i class="fas fa-map-pin"></i>
+                                    </button>
                                     <% if (rs2.getDouble("latitudine") != 0 && rs2.getDouble("longitudine") != 0) { %>
                                     <button class="btn btn-outline btn-sm" onclick="showMap(<%= rs2.getDouble("latitudine") %>, <%= rs2.getDouble("longitudine") %>)" title="Vezi pe hartă">
                                         <i class="fas fa-map-marker-alt"></i>
@@ -675,48 +678,15 @@
                         
                         <div class="form-group">
                             <label for="telefon" class="form-label">Telefon</label>
-                            <input type="tel" id="telefon" name="telefon" class="form-control">
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label for="strada" class="form-label">Stradă</label>
-                            <input type="text" id="strada" name="strada" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="oras" class="form-label">Oraș</label>
-                            <input type="text" id="oras" name="oras" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="judet" class="form-label">Județ</label>
-                            <input type="text" id="judet" name="judet" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cod" class="form-label">Cod Poștal</label>
-                            <input type="text" id="cod" name="cod" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="tara" class="form-label">Țară</label>
-                            <input type="text" id="tara" name="tara" value="România" class="form-control" required>
+                            <input type="tel" id="telefon" name="telefon" class="form-control" required>
                         </div>
                         
                         <div class="form-group full-width">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" id="email" name="email" class="form-control">
+                            <input type="email" id="email" name="email" class="form-control" required>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="latitudine" class="form-label">Latitudine</label>
-                            <input type="number" step="any" id="latitudine" name="latitudine" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="longitudine" class="form-label">Longitudine</label>
-                            <input type="number" step="any" id="longitudine" name="longitudine" class="form-control">
-                        </div>
+                       
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -758,48 +728,14 @@
                         
                         <div class="form-group">
                             <label for="edit_telefon" class="form-label">Telefon</label>
-                            <input type="tel" id="edit_telefon" name="telefon" class="form-control">
-                        </div>
-                        
-                        <div class="form-group full-width">
-                            <label for="edit_strada" class="form-label">Stradă</label>
-                            <input type="text" id="edit_strada" name="strada" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_oras" class="form-label">Oraș</label>
-                            <input type="text" id="edit_oras" name="oras" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_judet" class="form-label">Județ</label>
-                            <input type="text" id="edit_judet" name="judet" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_cod" class="form-label">Cod Poștal</label>
-                            <input type="text" id="edit_cod" name="cod" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_tara" class="form-label">Țară</label>
-                            <input type="text" id="edit_tara" name="tara" class="form-control" required>
+                            <input type="tel" id="edit_telefon" name="telefon" class="form-control" required>
                         </div>
                         
                         <div class="form-group full-width">
                             <label for="edit_email" class="form-label">Email</label>
-                            <input type="email" id="edit_email" name="email" class="form-control">
+                            <input type="email" id="edit_email" name="email" class="form-control" required>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="edit_latitudine" class="form-label">Latitudine</label>
-                            <input type="number" step="any" id="edit_latitudine" name="latitudine" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="edit_longitudine" class="form-label">Longitudine</label>
-                            <input type="number" step="any" id="edit_longitudine" name="longitudine" class="form-control">
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -918,6 +854,11 @@
                     }
                 });
             }
+        }
+        
+        // Funcție pentru redirecționare către pagina de editare a locației
+        function editLocation(idSediu) {
+            window.location.href = "editareLoc_sediu.jsp?id=" + idSediu;
         }
         
         // Funcție pentru afișare hartă cu ArcGIS

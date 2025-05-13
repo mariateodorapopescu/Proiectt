@@ -1294,4 +1294,14 @@
     <servlet-name>AdaugaEchipaServlet</servlet-name>
     <url-pattern>/AdaugaEchipaServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>UpdateSediutLocatieServlet</display-name>
+    <servlet-name>UpdateSediutLocatieServlet</servlet-name>
+    <servlet-class>Servlet.UpdateSediutLocatieServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UpdateSediutLocatieServlet</servlet-name>
+    <url-pattern>/UpdateSediutLocatieServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
