@@ -600,13 +600,19 @@ try {
                         if (<%=request.getParameter("pag") != null%>) {
                             if ((row.Status === "Neaprobat" && (<%=!isSef%> || <%=!isDirector%>)) || 
                                 (row.Status === "Aprobat sef" && (<%=isSef%> || <%=isDirector%> ))) {
-                                cellsHtml += "<td data-label='Status'>" +
-                                            "<span class='status-icon status-neaprobat'>" +
-                                            "<a href='NewFile2.jsp?idcon=" + row.id + "'>" +
-                                            "<i class='ri-edit-circle-line'></i>" +
-                                            "</a>" +
-                                            "</span>" +
-                                            "</td>";
+                            	cellsHtml += "<td data-label='Status'>" +
+                                "<span class='status-icon status-neaprobat'>" +
+                                "<a href='NewFile2.jsp?idcon=" + row.id + "' title='Adaugă adresă manuală'>" +
+                                "<i class='ri-edit-circle-line'></i>" +
+                                "</a>" +
+                                "</span>" +
+                                " " + // Spațiu între butoane
+                                "<span class='status-icon status-aprobat-sef'>" +
+                                "<a href='harta_concedii2.jsp?idcon=" + row.id + "' title='Selectează atracție turistică'>" +
+                                "<i class='ri-map-pin-line'></i>" +
+                                "</a>" +
+                                "</span>" +
+                                "</td>";
                                 cellsHtml += "<td data-label='Status'>" +
                                             "<span class='status-icon status-neaprobat'>" +
                                             "<a href='modifc2.jsp?idcon=" + row.id + "'>" +
