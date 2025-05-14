@@ -662,7 +662,14 @@
                         <div  class="sitextt">Posturi</div>
                     </a>
                 </li>
-                
+                <li style="--bg: <%out.println(accent); %>">
+                    <a href="administrare_taskuri.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="alert"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Taskuri</div>
+                    </a>
+                </li>
                  <li style="--bg: <%out.println(accent); %>">
                     <a href="viewdep.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
@@ -687,15 +694,6 @@
                             <ion-icon name="moon"></ion-icon>
                         </div>
                         <div  class="sitextt">Concedii</div>
-                    </a>
-                </li>
-                
-                 <li style="--bg: <%out.println(accent); %>">
-                     <a href="vizualizareconcedii.jsp" class="load-content" target="iframe">
-                        <div class="siiconn">
-                            <ion-icon name="stats"></ion-icon>
-                        </div>
-                        <div  class="sitextt">Rapoarte</div>
                     </a>
                 </li>
                 

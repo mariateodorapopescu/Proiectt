@@ -340,25 +340,25 @@
                 <h2><i class="fa-solid fa-house"></i> De acasă</h2>
                 <div class="actions-grid">
                     <button class="action-button">
-                        <a href="harta_concedii1.jsp">
+                        <a href="rutare_acasa_departament.jsp">
                             <i class="fa-solid fa-building"></i>
                             Sediul departamentului personal
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="aaaa.jsp">
                             <i class="fa-solid fa-building-circle-check"></i>
                             Cel mai apropiat sediu
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="rutare_acasa_concediu.jsp">
                             <i class="fa-solid fa-calendar-check"></i>
                             Un anumit concediu
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="acasa_next_concediu.jsp">
                             <i class="fa-solid fa-person-walking-luggage"></i>
                             Cel mai apropiat concediu
                         </a>

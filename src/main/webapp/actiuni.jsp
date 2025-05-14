@@ -116,6 +116,7 @@
 		<% if (isDirector || isSef) { %>
 		<button ><a href = "concediinoisef.jsp?" style="text-decoration:none;">Vizualizare concedii noi</a></button>
 		<% } %>
+		<button ><a href = "vizualizareconcedii.jsp" style="text-decoration:none;">Rapoarte concedii</a></button>
       </div>
    </div>
    

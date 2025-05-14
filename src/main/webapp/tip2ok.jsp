@@ -649,12 +649,12 @@
                     </a>
                 </li>
                 
-                 <li style="--bg: <%out.println(accent); %>">
-                     <a href="viewang2.jsp" class="load-content" target="iframe">
+                <li style="--bg: <%out.println(accent); %>">
+                    <a href="administrare_taskuri.jsp" class="load-content" target="iframe">
                         <div class="siiconn">
-                            <ion-icon name="stats"></ion-icon>
+                            <ion-icon name="alert"></ion-icon>
                         </div>
-                        <div  class="sitextt">Rapoarte</div>
+                        <div  class="sitextt">Taskuri</div>
                     </a>
                 </li>
                 

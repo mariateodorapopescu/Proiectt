@@ -51,6 +51,32 @@ if (sesi != null) {
                     if (action == null) {
                         action = "view";  // Default action
                     }
+                 // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                    String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                    String clr = "#d8d9e1";
+                    String sidebar = "#ECEDFA";
+                    String text = "#333";
+                    String card = "#ECEDFA";
+                    String hover = "#ECEDFA";
+                    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                        String query = "SELECT * from teme where id_usr = ?";
+                        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                            stmt.setInt(1, userId);
+                            try (ResultSet rs2 = stmt.executeQuery()) {
+                                if (rs2.next()) {
+                                  accent = rs2.getString("accent");
+                                  clr = rs2.getString("clr");
+                                  sidebar = rs2.getString("sidebar");
+                                  text = rs2.getString("text");
+                                  card = rs2.getString("card");
+                                  hover = rs2.getString("hover");
+                                }
+                            }
+                        }
+                   } catch (SQLException e) {
+                        out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                        e.printStackTrace();
+                    }
 %>
 
 <!DOCTYPE html>
@@ -60,15 +86,22 @@ if (sesi != null) {
     <title>Administrare Taskuri</title>
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <link rel="stylesheet" href="css/core2.css">
-    <script src="js/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Asigură-te că jQuery este încărcat din CDN pentru fiabilitate -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+       @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+		
+		* {
+		    
+		    font-family: 'Poppins', sans-serif;
+		}
         .main-container {
             max-width: 800px;
             margin: 40px auto;
             padding: 20px;
-            background: white;
+            background: <%=sidebar%>;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           
         }
         .action-buttons {
             display: flex;
@@ -84,20 +117,23 @@ if (sesi != null) {
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+            
+    		display: inline-block; 
         }
         .action-button.active {
-            background-color: #6c5ce7;
+            background-color: <%=accent%>;
             color: white;
         }
         .action-button:not(.active) {
-            background-color: #f0f0f0;
+            background-color: black;
             color: #333;
         }
         .action-button:hover {
-            opacity: 0.9;
+            transform: translateY(-5px);
+        	background-color: black;
         }
         .form-container {
-            background: #f5f5f5;
+            background: <%=sidebar%>;
             padding: 30px;
             border-radius: 20px;
             margin-top: 20px;
@@ -105,7 +141,7 @@ if (sesi != null) {
         }
         .form-container h2 {
             margin-bottom: 20px;
-            color: #333;
+            color: <%=text%>;
         }
         .form-group {
             margin-bottom: 15px;
@@ -118,7 +154,7 @@ if (sesi != null) {
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=sidebar%>;
             border-radius: 5px;
             font-size: 16px;
         }
@@ -127,7 +163,7 @@ if (sesi != null) {
             resize: vertical;
         }
         .submit-button {
-            background-color: #6c5ce7;
+            background-color: <%=accent%>;
             color: white;
             padding: 12px 24px;
             border: none;
@@ -137,7 +173,7 @@ if (sesi != null) {
             margin-top: 20px;
         }
         .submit-button:hover {
-            background-color: #5a4bd1;
+            background-color: black;
         }
         .taskuri-table {
             width: 100%;
@@ -146,11 +182,11 @@ if (sesi != null) {
         }
         .taskuri-table th, .taskuri-table td {
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=sidebar%>;
             text-align: center;
         }
         .taskuri-table th {
-            background-color: #6c5ce7;
+            background-color: <%=accent%>;
             color: white;
         }
         .table-button {
@@ -162,12 +198,16 @@ if (sesi != null) {
             font-size: 14px;
         }
         .modify-button {
-            background-color: #4CAF50;
+            background-color: <%=accent%>;
             color: white;
+             transition: all 0.3s ease;
+    		display: inline-block; 
         }
         .delete-button {
-            background-color: #f44336;
+            background-color: #e63946;
             color: white;
+             transition: all 0.3s ease;
+    		display: inline-block; 
         }
         .back-button {
             display: inline-block;
@@ -177,18 +217,54 @@ if (sesi != null) {
             color: white;
             text-decoration: none;
             border-radius: 5px;
+             transition: all 0.3s ease;
+    		display: inline-block; 
+        }
+        .modify-button:hover, .delete-button:hover, .back-button:hover {
+         transform: translateY(-5px);
+        	background-color: black;
         }
         .status-badge {
             padding: 3px 8px;
             border-radius: 12px;
             font-size: 0.9em;
             color: white;
+            transition: all 0.3s ease;
+    		display: inline-block; 
+        }
+        .status-badge:hover {
+         transform: translateY(-5px);
         }
         .status-0 { background-color: #6c757d; }
         .status-1 { background-color: #17a2b8; }
         .status-2 { background-color: #ffc107; color: black; }
         .status-3 { background-color: #fd7e14; }
         .status-4 { background-color: #28a745; }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,.3);
+            border-radius: 50%;
+            border-top-color: <%=accent%>;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
+            white-space: pre-wrap;
+            display: none;
+        }
     </style>
 </head>
 
@@ -209,7 +285,7 @@ if (sesi != null) {
         <% } else if ("add".equals(action)) { %>
             <div class="form-container">
                 <h2>Adaugă task</h2>
-                <form method="POST" action="AdaugaTaskServlet">
+                <form method="POST" action="AdaugaTaskServlet" id="addTaskForm">
                     <div class="form-group">
                         <label for="nume">Nume task:</label>
                         <input type="text" id="nume" name="nume" required>
@@ -222,7 +298,7 @@ if (sesi != null) {
                     
                     <div class="form-group">
                         <label for="id_prj">Proiect:</label>
-                        <select id="id_prj" name="id_prj" required>
+                        <select id="id_prj" name="id_prj" required onchange="loadTeamMembers(this.value)">
                             <option value="">-- Selectați --</option>
                             <%
                             try {
@@ -247,29 +323,9 @@ if (sesi != null) {
                     </div>
                     
                     <div class="form-group">
-                        <label for="id_ang">Asignat către:</label>
+                        <label for="id_ang">Asignat către: <span id="loading_members" class="loading" style="display: none;"></span></label>
                         <select id="id_ang" name="id_ang" required>
-                            <option value="">-- Selectați --</option>
-                            <%
-                            try {
-                                String sql = "SELECT id, nume, prenume FROM useri WHERE activ = 1 AND id_dep = ? ORDER BY nume, prenume";
-                                PreparedStatement pstmt = connection.prepareStatement(sql);
-                                pstmt.setInt(1, userDep);
-                                ResultSet rsAngajati = pstmt.executeQuery();
-                                
-                                while (rsAngajati.next()) {
-                            %>
-                                <option value="<%= rsAngajati.getInt("id") %>">
-                                    <%= rsAngajati.getString("nume") %> <%= rsAngajati.getString("prenume") %>
-                                </option>
-                            <%
-                                }
-                                rsAngajati.close();
-                                pstmt.close();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                            %>
+                            <option value="">-- Selectați mai întâi un proiect --</option>
                         </select>
                     </div>
                     
@@ -279,7 +335,7 @@ if (sesi != null) {
                             <option value="<%= userId %>" selected>Eu</option>
                             <%
                             try {
-                                String sql = "SELECT id, nume, prenume FROM useri WHERE activ = 1 AND tip >= 8 AND id != ? ORDER BY nume, prenume";
+                                String sql = "SELECT id, nume, prenume FROM useri WHERE id != ? ORDER BY nume, prenume";
                                 PreparedStatement pstmt = connection.prepareStatement(sql);
                                 pstmt.setInt(1, userId);
                                 ResultSet rsSurvizori = pstmt.executeQuery();
@@ -324,6 +380,9 @@ if (sesi != null) {
                     <button type="submit" class="submit-button">Adaugă Task</button>
                 </form>
                 <a href="administrare_taskuri.jsp" class="back-button">Înapoi</a>
+                
+                <!-- Container pentru informații de debugging -->
+                <div id="debug-info" class="debug-info"></div>
             </div>
             
         <% } else if ("list".equals(action)) { %>
@@ -407,7 +466,7 @@ if (sesi != null) {
         %>
             <div class="form-container">
                 <h2>Modificare task</h2>
-                <form method="POST" action="EditTaskServlet">
+                <form method="POST" action="EditTaskServlet" id="editTaskForm">
                     <input type="hidden" name="id" value="<%= idTask %>">
                     
                     <div class="form-group">
@@ -415,14 +474,10 @@ if (sesi != null) {
                         <input type="text" id="nume" name="nume" value="<%= rsTask.getString("nume") %>" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="descriere">Descriere:</label>
-                        <textarea id="descriere" name="descriere"><%= rsTask.getString("descriere") %></textarea>
-                    </div>
-                    
+                  
                     <div class="form-group">
                         <label for="id_prj">Proiect:</label>
-                        <select id="id_prj" name="id_prj" required>
+                        <select id="id_prj" name="id_prj" required onchange="loadTeamMembersEdit(this.value)">
                             <%
                             String sql2 = "SELECT id, nume FROM proiecte ORDER BY nume";
                             Statement stmt2 = connection.createStatement();
@@ -443,24 +498,10 @@ if (sesi != null) {
                     </div>
                     
                     <div class="form-group">
-                        <label for="id_ang">Asignat către:</label>
+                        <label for="id_ang">Asignat către: <span id="loading_members_edit" class="loading" style="display: none;"></span></label>
                         <select id="id_ang" name="id_ang" required>
-                            <%
-                            String sql3 = "SELECT id, nume, prenume FROM useri WHERE activ = 1 ORDER BY nume, prenume";
-                            Statement stmt3 = connection.createStatement();
-                            ResultSet rs3 = stmt3.executeQuery(sql3);
-                            
-                            while (rs3.next()) {
-                                boolean selected = rsTask.getInt("id_ang") == rs3.getInt("id");
-                            %>
-                                <option value="<%= rs3.getInt("id") %>" <%= selected ? "selected" : "" %>>
-                                    <%= rs3.getString("nume") %> <%= rs3.getString("prenume") %>
-                                </option>
-                            <%
-                            }
-                            rs3.close();
-                            stmt3.close();
-                            %>
+                            <!-- Acest select va fi populat prin JavaScript când se încarcă pagina -->
+                            <option value="<%= rsTask.getInt("id_ang") %>">Încărcare membri echipă...</option>
                         </select>
                     </div>
                     
@@ -468,7 +509,7 @@ if (sesi != null) {
                         <label for="supervizor">Supervizor:</label>
                         <select id="supervizor" name="supervizor" required>
                             <%
-                            String sql4 = "SELECT id, nume, prenume FROM useri WHERE activ = 1 AND tip >= 8 ORDER BY nume, prenume";
+                            String sql4 = "SELECT id, nume, prenume FROM useri ORDER BY nume, prenume";
                             Statement stmt4 = connection.createStatement();
                             ResultSet rs4 = stmt4.executeQuery(sql4);
                             
@@ -521,6 +562,9 @@ if (sesi != null) {
                     <button type="submit" class="submit-button">Salvează Modificările</button>
                 </form>
                 <a href="administrare_taskuri.jsp?action=list" class="back-button">Înapoi</a>
+                
+                <!-- Container pentru informații de debugging -->
+                <div id="debug-info-edit" class="debug-info"></div>
             </div>
         <%
                 }
@@ -547,26 +591,155 @@ if (sesi != null) {
     %>
 
     <script>
+        // Funcție pentru a adăuga mesaje în containerul de debugging
+        function addDebugMessage(message, containerId = 'debug-info') {
+            const debugContainer = document.getElementById(containerId);
+            if (debugContainer) {
+                const timestamp = new Date().toLocaleTimeString();
+                const formattedMessage = `[${timestamp}] ${message}`;
+                debugContainer.innerHTML += formattedMessage + '\n';
+                
+                // Facem containerul vizibil și derulăm la ultimul mesaj
+                debugContainer.style.display = 'block';
+                debugContainer.scrollTop = debugContainer.scrollHeight;
+                
+                // Log în consola browserului pentru debugging ușor
+                console.log(message);
+            }
+        }
+
+        // Funcție pentru încărcarea membrilor echipei pe pagina de adăugare
+        function loadTeamMembers(projectId) {
+            if (!projectId) {
+                document.getElementById('id_ang').innerHTML = '<option value="">-- Selectați mai întâi un proiect --</option>';
+                return;
+            }
+            
+            addDebugMessage(`Încărcare membri pentru proiectul ID: ${projectId}`);
+            
+            // Arată indicatorul de încărcare
+            document.getElementById('loading_members').style.display = 'inline-block';
+            document.getElementById('id_ang').disabled = true;
+            
+            // Apelează servlet-ul via AJAX
+            fetch('GetTeamMembersServlet?projectId=' + projectId)
+                .then(response => {
+                    addDebugMessage(`Răspuns primit cu status: ${response.status}`);
+                    return response.text();
+                })
+                .then(data => {
+                    // Actualizează dropdown-ul cu membri
+                    document.getElementById('id_ang').innerHTML = data;
+                    document.getElementById('id_ang').disabled = false;
+                    document.getElementById('loading_members').style.display = 'none';
+                    
+                    addDebugMessage(`Membri încărcați cu succes, ${document.getElementById('id_ang').options.length} opțiuni disponibile`);
+                })
+                .catch(error => {
+                    addDebugMessage(`Eroare la încărcarea membrilor: ${error}`);
+                    document.getElementById('id_ang').innerHTML = '<option value="">Eroare la încărcarea membrilor</option>';
+                    document.getElementById('id_ang').disabled = false;
+                    document.getElementById('loading_members').style.display = 'none';
+                    alert('Eroare la încărcarea membrilor echipei: ' + error);
+                });
+        }
+        
+        // Funcție pentru încărcarea membrilor echipei pe pagina de editare
+        function loadTeamMembersEdit(projectId) {
+            if (!projectId) {
+                document.getElementById('id_ang').innerHTML = '<option value="">-- Selectați mai întâi un proiect --</option>';
+                return;
+            }
+            
+            addDebugMessage(`Încărcare membri pentru proiectul ID: ${projectId}`, 'debug-info-edit');
+            
+            // Arată indicatorul de încărcare
+            document.getElementById('loading_members_edit').style.display = 'inline-block';
+            document.getElementById('id_ang').disabled = true;
+            
+            // Salvează ID-ul angajatului selectat curent (dacă există)
+            const currentAngId = document.getElementById('id_ang').value;
+            
+            // Apelează servlet-ul via AJAX
+            fetch('GetTeamMembersServlet?projectId=' + projectId)
+                .then(response => {
+                    addDebugMessage(`Răspuns primit cu status: ${response.status}`, 'debug-info-edit');
+                    return response.text();
+                })
+                .then(data => {
+                    // Actualizează dropdown-ul cu membri
+                    document.getElementById('id_ang').innerHTML = data;
+                    document.getElementById('id_ang').disabled = false;
+                    document.getElementById('loading_members_edit').style.display = 'none';
+                    
+                    // Încearcă să selecteze angajatul anterior dacă există în lista nouă
+                    if (currentAngId) {
+                        const options = document.getElementById('id_ang').options;
+                        for (let i = 0; i < options.length; i++) {
+                            if (options[i].value === currentAngId) {
+                                options[i].selected = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    addDebugMessage(`Membri încărcați cu succes, ${document.getElementById('id_ang').options.length} opțiuni disponibile`, 'debug-info-edit');
+                })
+                .catch(error => {
+                    addDebugMessage(`Eroare la încărcarea membrilor: ${error}`, 'debug-info-edit');
+                    document.getElementById('id_ang').innerHTML = '<option value="">Eroare la încărcarea membrilor</option>';
+                    document.getElementById('id_ang').disabled = false;
+                    document.getElementById('loading_members_edit').style.display = 'none';
+                    alert('Eroare la încărcarea membrilor echipei: ' + error);
+                });
+        }
+
+        // Funcție pentru ștergerea unui task
         function deleteTask(idTask) {
             if (confirm('Sigur doriți să ștergeți acest task?')) {
-                $.ajax({
-                    url: 'DeleteTaskServlet',
-                    type: 'POST',
-                    data: { id: idTask },
-                    success: function(response) {
-                        if (response.success) {
-                            location.reload();
-                        } else {
-                            alert(response.message || 'Eroare la ștergerea taskului!');
-                        }
+                fetch('DeleteTaskServlet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    error: function() {
-                        alert('Eroare la conectarea cu serverul!');
+                    body: 'id=' + idTask
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Eroare la ștergerea taskului!');
                     }
+                })
+                .catch(error => {
+                    console.error('Delete error:', error);
+                    alert('Eroare la conectarea cu serverul!');
                 });
             }
         }
+
+        // Se execută când documentul se încarcă
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifică dacă suntem pe pagina de editare
+            const editForm = document.getElementById('editTaskForm');
+            if (editForm) {
+                // Încarcă membrii echipei când se încarcă pagina de editare
+                const projectId = document.getElementById('id_prj').value;
+                if (projectId) {
+                    addDebugMessage(`Pagina de editare încărcată, încărcare automată membri pentru proiectul ID: ${projectId}`, 'debug-info-edit');
+                    loadTeamMembersEdit(projectId);
+                }
+            }
+            
+            // Afișează informații despre încărcarea paginii
+            const addForm = document.getElementById('addTaskForm');
+            if (addForm) {
+                addDebugMessage('Pagina de adăugare task încărcată');
+            }
+        });
     </script>
+    
     <script src="js/core2.js"></script>
 </body>
 </html>

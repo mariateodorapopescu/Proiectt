@@ -1,73 +1,94 @@
 package Servlet;
-
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.sql.Date;
 
 public class EditTaskServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
     
-    // Database connection parameters
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/test?useSSL=false";
-    private static final String JDBC_USER = "root";
-    private static final String JDBC_PASSWORD = "student";
-    
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        int idTask = Integer.parseInt(request.getParameter("id"));
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String id = request.getParameter("id");
         String nume = request.getParameter("nume");
-        String descriere = request.getParameter("descriere");
-        int idProiect = Integer.parseInt(request.getParameter("id_prj"));
-        int idAngajat = Integer.parseInt(request.getParameter("id_ang"));
-        int supervizor = Integer.parseInt(request.getParameter("supervizor"));
-        Date dataStart = Date.valueOf(request.getParameter("start"));
-        Date dataEnd = Date.valueOf(request.getParameter("end"));
-        int status = Integer.parseInt(request.getParameter("status"));
+        String idPrj = request.getParameter("id_prj");
+        String idAng = request.getParameter("id_ang");
+        String supervizor = request.getParameter("supervizor");
+        String start = request.getParameter("start");
+        String end = request.getParameter("end");
+        String status = request.getParameter("status");
         
-        Connection conn = null;
         try {
-            // Load the JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
-            
-            // Establish connection using DriverManager
-            conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
-            
-            String sql = "UPDATE tasks SET nume = ?, descriere = ?, id_prj = ?, id_ang = ?, " +
-                        "supervizor = ?, start = ?, end = ?, status = ? WHERE id = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, nume);
-            pstmt.setString(2, descriere);
-            pstmt.setInt(3, idProiect);
-            pstmt.setInt(4, idAngajat);
-            pstmt.setInt(5, supervizor);
-            pstmt.setDate(6, dataStart);
-            pstmt.setDate(7, dataEnd);
-            pstmt.setInt(8, status);
-            pstmt.setInt(9, idTask);
-            
-            pstmt.executeUpdate();
-            pstmt.close();
-            
-            response.sendRedirect("administrare_taskuri_simple.jsp?action=list&success=true");
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-            response.sendRedirect("administrare_taskuri_simple.jsp?action=edit&id=" + idTask + "&error=true");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            response.sendRedirect("administrare_taskuri_simple.jsp?action=edit&id=" + idTask + "&error=true");
-        } finally {
-            if (conn != null) {
-                try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                // Verificarea statusului anterior
+                String oldStatus = "";
+                String sqlGetOldStatus = "SELECT status, id_ang FROM tasks WHERE id = ?";
+                try (PreparedStatement stmt = connection.prepareStatement(sqlGetOldStatus)) {
+                    stmt.setString(1, id);
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        oldStatus = rs.getString("status");
+                    }
+                }
+                
+                // Actualizarea task-ului
+                String sql = "UPDATE tasks SET nume = ?, id_prj = ?, id_ang = ?, supervizor = ?, start = ?, end = ?, status = ? WHERE id = ?";
+                try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                    pstmt.setString(1, nume);
+                    pstmt.setString(2, idPrj);
+                    pstmt.setString(3, idAng);
+                    pstmt.setString(4, supervizor);
+                    pstmt.setString(5, start);
+                    pstmt.setString(6, end);
+                    pstmt.setString(7, status);
+                    pstmt.setString(8, id);
+                    
+                    int rowsAffected = pstmt.executeUpdate();
+                    
+                    if (rowsAffected > 0) {
+                        // Notificare pentru modificarea statusului
+                        if (!oldStatus.equals(status)) {
+                            String sqlNotification = "INSERT INTO notificari_task (id_task, id_ang, tip_notificare, mesaj) VALUES (?, ?, ?, ?)";
+                            try (PreparedStatement pstmtNotif = connection.prepareStatement(sqlNotification)) {
+                                pstmtNotif.setString(1, id);
+                                pstmtNotif.setString(2, supervizor); // Notifică supervizorul
+                                pstmtNotif.setString(3, "STATUS_SCHIMBAT");
+                                pstmtNotif.setString(4, "Statusul task-ului \"" + nume + "\" a fost modificat în " + getStatusText(Integer.parseInt(status)));
+                                pstmtNotif.executeUpdate();
+                            } catch (SQLException e) {
+                                // Ignoră eroarea de notificare - continua fluxul
+                                e.printStackTrace();
+                            }
+                        }
+                        
+                        response.sendRedirect("administrare_taskuri.jsp?action=list&success=true");
+                    } else {
+                        response.sendRedirect("administrare_taskuri.jsp?action=edit&id=" + id + "&error=true");
+                    }
+                }
             }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            response.sendRedirect("administrare_taskuri.jsp?action=edit&id=" + id + "&error=" + e.getMessage());
+        }
+    }
+    
+    private String getStatusText(int status) {
+        switch (status) {
+            case 0: return "0% - Neînceput";
+            case 1: return "25% - În lucru";
+            case 2: return "50% - La jumătate";
+            case 3: return "75% - Aproape gata";
+            case 4: return "100% - Finalizat";
+            default: return "Necunoscut";
         }
     }
 }
