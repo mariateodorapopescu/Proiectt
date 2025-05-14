@@ -365,7 +365,7 @@
                     </button>
                     <% if (isDirector) { %>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="acasa-departament_selectat.jsp">
                             <i class="fa-solid fa-sitemap"></i>
                             Sediul unui anumit departament
                         </a>

@@ -22,7 +22,17 @@ public class GetTeamMembersServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         String projectId = request.getParameter("projectId");
-        System.out.println(projectId);
+        String userIerarhieStr = request.getParameter("userIerarhie");
+        int userIerarhie = 0; // Default ierarhie
+        
+        if (userIerarhieStr != null && !userIerarhieStr.isEmpty()) {
+            try {
+                userIerarhie = Integer.parseInt(userIerarhieStr);
+            } catch (NumberFormatException e) {
+                // Ignorăm eroarea de parsare și folosim valoarea default
+            }
+        }
+        
         if (projectId == null || projectId.isEmpty()) {
             out.println("<option value=''>-- Selectați mai întâi un proiect --</option>");
             return;
@@ -36,94 +46,58 @@ public class GetTeamMembersServlet extends HttpServlet {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
             
-            // Mai întâi, verificăm dacă proiectul există
-            String sqlCheckProject = "SELECT id, nume FROM proiecte WHERE id = ?";
-            PreparedStatement checkStmt = connection.prepareStatement(sqlCheckProject);
-            checkStmt.setInt(1, Integer.parseInt(projectId));
-            ResultSet checkRs = checkStmt.executeQuery();
-           
-            
-            if (!checkRs.next()) {
-                out.println("<option value=''>-- Proiectul selectat nu există în baza de date --</option>");
-                return;
-            }
-            System.out.println(checkRs.getInt("id"));
-            
-            String projectName = checkRs.getString("nume");
-            
-            
-            // Verificăm dacă există echipe asociate proiectului
-            String sqlCheckTeams = "SELECT id, nume FROM echipe WHERE id_prj = ?";
-            checkStmt = connection.prepareStatement(sqlCheckTeams);
-            checkStmt.setInt(1, Integer.parseInt(projectId));
-            checkRs = checkStmt.executeQuery();
-            
-            if (!checkRs.next()) {
-                out.println("<option value=''>-- Nu există echipe asociate proiectului '" + projectName + "' --</option>");
-                // Încarcă toți utilizatorii ca alternativă
-                String sqlAllUsers = "SELECT id, nume, prenume FROM useri ORDER BY nume, prenume";
-                Statement allUsersStmt = connection.createStatement();
-                ResultSet allUsersRs = allUsersStmt.executeQuery(sqlAllUsers);
-                
-                while (allUsersRs.next()) {
-                    out.println("<option value='" + allUsersRs.getInt("id") + "'>" + 
-                                allUsersRs.getString("nume") + " " + 
-                                allUsersRs.getString("prenume") + "</option>");
-                }
-                
-                allUsersRs.close();
-                allUsersStmt.close();
-                return;
-            }
-            
-            // Colectăm ID-urile echipelor pentru a le folosi într-o singură interogare
-            StringBuilder teamIds = new StringBuilder();
-            do {
-                if (teamIds.length() > 0) teamIds.append(",");
-                teamIds.append(checkRs.getInt("id"));
-            } while (checkRs.next());
-            
-            checkRs.close();
-            checkStmt.close();
-            
-            // Verificăm membrii echipelor
-            // Folosim o interogare directă care să listeze toți membrii din toate echipele asociate proiectului
-            String sqlMembers = 
+            // Prima încercăm să obținem membrii echipei bazat pe relația din baza de date și ierarhie
+            String sql = 
                 "SELECT DISTINCT u.id, u.nume, u.prenume " +
                 "FROM useri u " +
                 "JOIN membrii_echipe me ON u.id = me.id_ang " +
-                "WHERE me.id_echipa IN (" + teamIds.toString() + ") " +
+                "JOIN echipe e ON me.id_echipa = e.id " +
+                "JOIN tipuri t ON u.tip = t.tip " +
+                "WHERE e.id_prj = ? AND t.ierarhie > ? " + // Doar utilizatori cu ierarhie mai mică
                 "ORDER BY u.nume, u.prenume";
             
-            stmt = connection.prepareStatement(sqlMembers);
+            stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, Integer.parseInt(projectId));
+            stmt.setInt(2, userIerarhie);
             rs = stmt.executeQuery();
             
-            if (!rs.isBeforeFirst()) {  // Verificăm dacă rezultatul e gol
-                out.println("<option value=''>-- Nu există membri în echipele proiectului '" + projectName + "' --</option>");
-                
-                // Încarcă toți utilizatorii ca alternativă
-                String sqlAllUsers = "SELECT id, nume, prenume FROM useri ORDER BY nume, prenume";
-                Statement allUsersStmt = connection.createStatement();
-                ResultSet allUsersRs = allUsersStmt.executeQuery(sqlAllUsers);
-                
-                while (allUsersRs.next()) {
-                    out.println("<option value='" + allUsersRs.getInt("id") + "'>" + 
-                                allUsersRs.getString("nume") + " " + 
-                                allUsersRs.getString("prenume") + "</option>");
-                }
-                
-                allUsersRs.close();
-                allUsersStmt.close();
+            boolean foundMembers = false;
+            StringBuilder results = new StringBuilder();
+            
+            while (rs.next()) {
+                foundMembers = true;
+                results.append("<option value='")
+                       .append(rs.getInt("id"))
+                       .append("'>")
+                       .append(rs.getString("nume"))
+                       .append(" ")
+                       .append(rs.getString("prenume"))
+                       .append("</option>");
+            }
+            
+            if (foundMembers) {
+                // Adaugă o opțiune implicită la început
+                out.println("<option value=''>-- Selectați un membru --</option>");
+                out.println(results.toString());
             } else {
-                // Avem membri în echipe
-                while (rs.next()) {
-                    out.println("<option value='" + rs.getInt("id") + "'>" + 
-                                rs.getString("nume") + " " + 
-                                rs.getString("prenume") + "</option>");
+                // Dacă nu s-au găsit membri pentru proiect, returnam toți utilizatorii cu ierarhie mai mică
+                out.println("<option value=''>-- Nu există membri în echipă - Selectați orice utilizator --</option>");
+                
+                String sqlAllUsers = "SELECT id, nume, prenume FROM useri JOIN tipuri t ON useri.tip = t.tip " +
+                                    "WHERE t.ierarhie > ? ORDER BY nume, prenume";
+                try (PreparedStatement stmtAll = connection.prepareStatement(sqlAllUsers)) {
+                    stmtAll.setInt(1, userIerarhie);
+                    try (ResultSet rsAll = stmtAll.executeQuery()) {
+                        while (rsAll.next()) {
+                            out.println("<option value='" + rsAll.getInt("id") + "'>" +
+                                    rsAll.getString("nume") + " " + 
+                                    rsAll.getString("prenume") + "</option>");
+                        }
+                    }
                 }
             }
             
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (Exception e) {
             out.println("<option value=''>Eroare: " + e.getMessage() + "</option>");
             e.printStackTrace();
         } finally {

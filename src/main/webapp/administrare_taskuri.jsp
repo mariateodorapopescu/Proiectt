@@ -126,7 +126,7 @@ if (sesi != null) {
         }
         .action-button:not(.active) {
             background-color: black;
-            color: #333;
+            color: white;
         }
         .action-button:hover {
             transform: translateY(-5px);
@@ -138,6 +138,7 @@ if (sesi != null) {
             border-radius: 20px;
             margin-top: 20px;
             text-align: center;
+            color: <%=text%>;
         }
         .form-container h2 {
             margin-bottom: 20px;
@@ -145,6 +146,7 @@ if (sesi != null) {
         }
         .form-group {
             margin-bottom: 15px;
+            color: <%=text%>;
         }
         .form-group label {
             display: block;
@@ -157,10 +159,12 @@ if (sesi != null) {
             border: 1px solid <%=sidebar%>;
             border-radius: 5px;
             font-size: 16px;
+            color: <%=text%>;
         }
         .form-group textarea {
             min-height: 100px;
             resize: vertical;
+            color: <%=text%>;
         }
         .submit-button {
             background-color: <%=accent%>;
@@ -179,12 +183,19 @@ if (sesi != null) {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            color: <%=text%>;
         }
         .taskuri-table th, .taskuri-table td {
             padding: 10px;
             border: 1px solid <%=sidebar%>;
             text-align: center;
+            color: <%=text%>;
         }
+        .taskuri-table tr:hover {
+		    background-color: <%=accent%>;
+		    color: white; 
+		    transition: background-color 0.3s ease, color 0.3s ease;
+		}
         .taskuri-table th {
             background-color: <%=accent%>;
             color: white;
@@ -198,7 +209,7 @@ if (sesi != null) {
             font-size: 14px;
         }
         .modify-button {
-            background-color: <%=accent%>;
+            background-color: black;
             color: white;
              transition: all 0.3s ease;
     		display: inline-block; 
@@ -208,6 +219,12 @@ if (sesi != null) {
             color: white;
              transition: all 0.3s ease;
     		display: inline-block; 
+        }
+        .status-button {
+            background-color: #ffc107;
+            color: black;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
         .back-button {
             display: inline-block;
@@ -220,9 +237,15 @@ if (sesi != null) {
              transition: all 0.3s ease;
     		display: inline-block; 
         }
-        .modify-button:hover, .delete-button:hover, .back-button:hover {
+        .modify-button:hover {
+       		background-color: white;
+       		color: black;
+        	transform: translateY(-5px);
+        }
+        .delete-button:hover, .back-button:hover, .status-button:hover {
          transform: translateY(-5px);
         	background-color: black;
+            color: white;
         }
         .status-badge {
             padding: 3px 8px;
@@ -244,7 +267,7 @@ if (sesi != null) {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(0,0,0,.3);
+            
             border-radius: 50%;
             border-top-color: <%=accent%>;
             animation: spin 1s ease-in-out infinite;
@@ -253,17 +276,13 @@ if (sesi != null) {
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        .debug-info {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            color: #333;
-            white-space: pre-wrap;
-            display: none;
+      
+        .disabled-field {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .main-container {
+        color: <%=accent%>;
         }
     </style>
 </head>
@@ -335,9 +354,14 @@ if (sesi != null) {
                             <option value="<%= userId %>" selected>Eu</option>
                             <%
                             try {
-                                String sql = "SELECT id, nume, prenume FROM useri WHERE id != ? ORDER BY nume, prenume";
+                                // Selectează doar utilizatori cu ierarhie mai mare sau egală cu a utilizatorului curent
+                                String sql = "SELECT u.id, u.nume, u.prenume FROM useri u " +
+                                            "JOIN tipuri t ON u.tip = t.tip " +
+                                            "WHERE u.id != ? AND u.tip <> 34 AND t.ierarhie <= ? " +
+                                            "ORDER BY u.nume, u.prenume";
                                 PreparedStatement pstmt = connection.prepareStatement(sql);
                                 pstmt.setInt(1, userId);
+                                pstmt.setInt(2, ierarhie);
                                 ResultSet rsSurvizori = pstmt.executeQuery();
                                 
                                 while (rsSurvizori.next()) {
@@ -395,8 +419,7 @@ if (sesi != null) {
                         <th>Proiect</th>
                         <th>Asignat</th>
                         <th>Status</th>
-                        <th>Modificare</th>
-                        <th>Ștergere</th>
+                        <th>Acțiuni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -418,6 +441,15 @@ if (sesi != null) {
                         while (rsTasks.next()) {
                             int status = rsTasks.getInt("status");
                             int procent = rsTasks.getInt("procent");
+                            int taskId = rsTasks.getInt("id");
+                            int supervisorId = rsTasks.getInt("supervizor");
+                            int assignedId = rsTasks.getInt("id_ang");
+                            
+                            // Determină drepturile utilizatorului pentru acest task
+                            boolean isAssignee = (userId == assignedId);
+                            boolean isSupervisor = (userId == supervisorId);
+                            boolean canModify = isSupervisor || (isDirector && !isSupervisor);
+                            boolean canDelete = canModify;
                     %>
                         <tr>
                             <td><%= counter++ %></td>
@@ -430,16 +462,26 @@ if (sesi != null) {
                                 </span>
                             </td>
                             <td>
-                                <button class="table-button modify-button" 
-                                        onclick="window.location.href='administrare_taskuri.jsp?action=edit&id=<%= rsTasks.getInt("id") %>'">
-                                    ✏
-                                </button>
-                            </td>
-                            <td>
-                                <button class="table-button delete-button" 
-                                        onclick="deleteTask(<%= rsTasks.getInt("id") %>)">
-                                    X
-                                </button>
+                                <% if (canModify) { %>
+                                    <button class="table-button modify-button" 
+                                            onclick="window.location.href='administrare_taskuri.jsp?action=edit&id=<%= taskId %>'">
+                                        ✏ Modifică
+                                    </button>
+                                <% } %>
+                                
+                                <% if (isAssignee && !canModify) { %>
+                                    <button class="table-button status-button" 
+                                            onclick="window.location.href='administrare_taskuri.jsp?action=status&id=<%= taskId %>'">
+                                        📊 Status
+                                    </button>
+                                <% } %>
+                                
+                                <% if (canDelete) { %>
+                                    <button class="table-button delete-button" 
+                                            onclick="deleteTask(<%= taskId %>)">
+                                        ❌ Șterge
+                                    </button>
+                                <% } %>
                             </td>
                         </tr>
                     <%
@@ -457,12 +499,23 @@ if (sesi != null) {
         <% } else if ("edit".equals(action)) { 
             int idTask = Integer.parseInt(request.getParameter("id"));
             try {
-                String sql = "SELECT * FROM tasks WHERE id = ?";
+                String sql = "SELECT t.*, p.nume as proiect_nume FROM tasks t " +
+                           "LEFT JOIN proiecte p ON t.id_prj = p.id " + 
+                           "WHERE t.id = ?";
                 PreparedStatement pstmt = connection.prepareStatement(sql);
                 pstmt.setInt(1, idTask);
                 ResultSet rsTask = pstmt.executeQuery();
                 
                 if (rsTask.next()) {
+                    // Verifică dacă utilizatorul are drepturi de modificare completă a task-ului
+                    int supervisorId = rsTask.getInt("supervizor");
+                    boolean canModify = (userId == supervisorId) || (isDirector && userId != supervisorId);
+                    
+                    if (!canModify) {
+                        // Redirectează către pagina de modificare status dacă nu are drepturi
+                        response.sendRedirect("administrare_taskuri.jsp?action=status&id=" + idTask);
+                        return;
+                    }
         %>
             <div class="form-container">
                 <h2>Modificare task</h2>
@@ -509,9 +562,14 @@ if (sesi != null) {
                         <label for="supervizor">Supervizor:</label>
                         <select id="supervizor" name="supervizor" required>
                             <%
-                            String sql4 = "SELECT id, nume, prenume FROM useri ORDER BY nume, prenume";
-                            Statement stmt4 = connection.createStatement();
-                            ResultSet rs4 = stmt4.executeQuery(sql4);
+                            // Selectează doar utilizatori cu ierarhie mai mare sau egală cu a utilizatorului curent
+                            String sql4 = "SELECT u.id, u.nume, u.prenume FROM useri u " +
+                                        "JOIN tipuri t ON u.tip = t.tip " +
+                                        "WHERE u.tip <> 34 AND t.ierarhie <= ? " +
+                                        "ORDER BY u.nume, u.prenume";
+                            PreparedStatement pstmt4 = connection.prepareStatement(sql4);
+                            pstmt4.setInt(1, ierarhie);
+                            ResultSet rs4 = pstmt4.executeQuery();
                             
                             while (rs4.next()) {
                                 boolean selected = rsTask.getInt("supervizor") == rs4.getInt("id");
@@ -522,7 +580,7 @@ if (sesi != null) {
                             <%
                             }
                             rs4.close();
-                            stmt4.close();
+                            pstmt4.close();
                             %>
                         </select>
                     </div>
@@ -565,6 +623,91 @@ if (sesi != null) {
                 
                 <!-- Container pentru informații de debugging -->
                 <div id="debug-info-edit" class="debug-info"></div>
+            </div>
+        <%
+                }
+                rsTask.close();
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else if ("status".equals(action)) { 
+            int idTask = Integer.parseInt(request.getParameter("id"));
+            try {
+                String sql = "SELECT t.*, p.nume as proiect_nume, u.nume as asignat_nume, u.prenume as asignat_prenume " +
+                           "FROM tasks t " +
+                           "LEFT JOIN proiecte p ON t.id_prj = p.id " + 
+                           "LEFT JOIN useri u ON t.id_ang = u.id " +
+                           "WHERE t.id = ?";
+                PreparedStatement pstmt = connection.prepareStatement(sql);
+                pstmt.setInt(1, idTask);
+                ResultSet rsTask = pstmt.executeQuery();
+                
+                if (rsTask.next()) {
+                    // Verifică dacă utilizatorul este asignat la acest task
+                    int assignedId = rsTask.getInt("id_ang");
+                    boolean isAssignee = (userId == assignedId);
+                    
+                    if (!isAssignee && !isDirector && userId != rsTask.getInt("supervizor")) {
+                        // Redirectează către pagina de listare dacă nu este asignat
+                        response.sendRedirect("administrare_taskuri.jsp?action=list");
+                        return;
+                    }
+        %>
+            <div class="form-container">
+                <h2>Actualizare status task</h2>
+                <form method="POST" action="UpdateTaskStatusServlet" id="statusForm">
+                    <input type="hidden" name="id" value="<%= idTask %>">
+                    
+                    <div class="form-group">
+                        <label for="nume">Nume task:</label>
+                        <input type="text" id="nume" name="nume" value="<%= rsTask.getString("nume") %>" class="disabled-field" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="proiect">Proiect:</label>
+                        <input type="text" id="proiect" name="proiect" value="<%= rsTask.getString("proiect_nume") %>" class="disabled-field" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="asignat">Asignat către:</label>
+                        <input type="text" id="asignat" name="asignat" 
+                               value="<%= rsTask.getString("asignat_nume") %> <%= rsTask.getString("asignat_prenume") %>" 
+                               class="disabled-field" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="perioada">Perioada:</label>
+                        <input type="text" id="perioada" name="perioada" 
+                               value="<%= rsTask.getDate("start") %> - <%= rsTask.getDate("end") %>" 
+                               class="disabled-field" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status" name="status" required>
+                            <%
+                            String sql5 = "SELECT id, procent FROM statusuri2 ORDER BY id";
+                            Statement stmt5 = connection.createStatement();
+                            ResultSet rs5 = stmt5.executeQuery(sql5);
+                            
+                            while (rs5.next()) {
+                                boolean selected = rsTask.getInt("status") == rs5.getInt("id");
+                            %>
+                                <option value="<%= rs5.getInt("id") %>" <%= selected ? "selected" : "" %>>
+                                    <%= rs5.getInt("procent") %>% - <%= getStatusText(rs5.getInt("id")) %>
+                                </option>
+                            <%
+                            }
+                            rs5.close();
+                            stmt5.close();
+                            %>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="submit-button">Actualizează Status</button>
+                </form>
+                <a href="administrare_taskuri.jsp?action=list" class="back-button">Înapoi</a>
             </div>
         <%
                 }
@@ -621,8 +764,11 @@ if (sesi != null) {
             document.getElementById('loading_members').style.display = 'inline-block';
             document.getElementById('id_ang').disabled = true;
             
-            // Apelează servlet-ul via AJAX
-            fetch('GetTeamMembersServlet?projectId=' + projectId)
+            // Obține ierarhia utilizatorului curent pentru a încărca doar utilizatori cu ierarhie mai mare
+            const userIerarhie = <%= ierarhie %>;
+            
+            // Apelează servlet-ul via AJAX cu parametri suplimentari
+            fetch('GetTeamMembersServlet?projectId=' + projectId + '&userIerarhie=' + userIerarhie)
                 .then(response => {
                     addDebugMessage(`Răspuns primit cu status: ${response.status}`);
                     return response.text();
@@ -660,8 +806,11 @@ if (sesi != null) {
             // Salvează ID-ul angajatului selectat curent (dacă există)
             const currentAngId = document.getElementById('id_ang').value;
             
-            // Apelează servlet-ul via AJAX
-            fetch('GetTeamMembersServlet?projectId=' + projectId)
+            // Obține ierarhia utilizatorului curent pentru a încărca doar utilizatori cu ierarhie mai mare
+            const userIerarhie = <%= ierarhie %>;
+            
+            // Apelează servlet-ul via AJAX cu parametri suplimentari
+            fetch('GetTeamMembersServlet?projectId=' + projectId + '&userIerarhie=' + userIerarhie)
                 .then(response => {
                     addDebugMessage(`Răspuns primit cu status: ${response.status}`, 'debug-info-edit');
                     return response.text();

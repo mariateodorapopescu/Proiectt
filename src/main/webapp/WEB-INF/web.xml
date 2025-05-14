@@ -1411,4 +1411,14 @@
     <servlet-name>GetTeamMembersServlet</servlet-name>
     <url-pattern>/GetTeamMembersServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetUserToDepartmentAnyServlet</display-name>
+    <servlet-name>GetUserToDepartmentAnyServlet</servlet-name>
+    <servlet-class>Servlet.GetUserToDepartmentAnyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetUserToDepartmentAnyServlet</servlet-name>
+    <url-pattern>/GetUserToDepartmentAnyServlet</url-pattern>
+  </servlet-mapping>
 </web-app>
