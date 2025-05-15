@@ -131,30 +131,22 @@
             max-height: 90vh;
             overflow-y: auto;
             position: fixed;
-            top: 10px;
-            left: 10px;
+            top: 20px;
+            left: 20px;
             z-index: 100;
-            padding: 12px;
+            padding: 15px;
             background: <%=sidebar%>;
             color: <%=text%>;
             border-color: <%=clr%>;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 320px;
-            font-size: 14px;
-        }
-        
-        .form-container h3 {
-            margin-top: 0;
-            margin-bottom: 8px;
-            font-size: 16px;
+            width: 300px;
         }
         
         .form-container button {
             display: block;
-            margin-top: 10px;
-            margin-bottom: 8px;
+            margin-top: 15px;
+            margin-bottom: 10px;
             padding: 10px;
             width: 100%;
             border: none;
@@ -163,7 +155,7 @@
             background-color: <%=accent%>;
             color: white;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 24px <%=accent%>;
         }
         
         .form-container button:hover {
@@ -179,34 +171,31 @@
         .details-panel {
             background-color: <%=card%>;
             color: <%=text%>;
-            padding: 8px 10px;
+            padding: 10px 15px;
             border-radius: 8px;
-            margin-top: 8px;
-            font-size: 13px;
+            margin-top: 10px;
+            font-size: 14px;
         }
         
         .details-panel h4 {
             margin-top: 0;
-            margin-bottom: 5px;
             color: <%=accent%>;
             border-bottom: 1px solid <%=clr%>;
-            padding-bottom: 3px;
-            font-size: 14px;
+            padding-bottom: 5px;
         }
         
         .location-info, .sediu-info {
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
         
         .badge {
             display: inline-block;
-            padding: 2px 6px;
+            padding: 3px 8px;
             border-radius: 12px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             color: white;
-            margin-right: 4px;
-            margin-bottom: 4px;
+            margin-right: 5px;
         }
         
         .badge-distance {
@@ -229,145 +218,43 @@
             transform: translate(-50%, -50%);
             z-index: 200;
             background-color: rgba(255, 255, 255, 0.8);
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
         
         #loadingSpinner p {
             margin-bottom: 10px;
             font-weight: bold;
-            font-size: 14px;
         }
         
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 8px;
+            padding: 10px;
             border-radius: 5px;
-            margin-top: 8px;
+            margin-top: 10px;
             display: none;
-            font-size: 12px;
         }
 
         .success-message {
             background-color: #d4edda;
             color: #155724;
-            padding: 8px;
+            padding: 10px;
             border-radius: 5px;
-            margin-top: 8px;
-            display: none;
-            font-size: 12px;
-        }
-        
-        .zoom-controls {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .zoom-controls button {
-            flex: 1;
-            padding: 8px;
-            margin-top: 0;
-            font-size: 12px;
-        }
-        
-        .directions-panel {
-            margin: 10px;
-            padding: 12px;
-            background-color: <%=sidebar%>;
-            color: <%=text%>;
-            border-radius: 8px;
-            max-height: 400px;
-            width: 90%;
-            max-width: 320px;
-            overflow-y: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            font-size: 13px;
-            z-index: 100;
-        }
-        
-        .directions-panel h3 {
-            color: <%=accent%>;
-            margin-top: 0;
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-        
-        .directions-panel ol {
-            padding-left: 20px;
-            margin: 8px 0;
-        }
-        
-        .directions-panel li {
-            margin-bottom: 6px;
-            font-size: 12px;
-        }
-        
-        .directions-summary {
             margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid <%=clr%>;
-            font-size: 12px;
+            display: none;
         }
         
-        .close-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: transparent;
-            border: none;
+        .section-title {
             color: <%=accent%>;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-        }
-        
-        /* Media queries pentru dispozitive mobile */
-        @media (max-width: 480px) {
-            .form-container {
-                width: calc(100% - 20px);
-                max-width: none;
-                font-size: 13px;
-            }
-            
-            .form-container h3 {
-                font-size: 15px;
-            }
-            
-            .details-panel {
-                padding: 6px 8px;
-                font-size: 12px;
-            }
-            
-            .details-panel h4 {
-                font-size: 13px;
-            }
-            
-            .badge {
-                font-size: 10px;
-                padding: 2px 5px;
-            }
-            
-            .directions-panel {
-                width: calc(100% - 20px);
-                max-width: none;
-                font-size: 12px;
-            }
-            
-            .directions-panel h3 {
-                font-size: 14px;
-            }
-            
-            .directions-panel li,
-            .directions-summary p {
-                font-size: 11px;
-            }
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid <%=clr%>;
         }
         
         ::-webkit-scrollbar {
@@ -378,11 +265,11 @@
 <body>
     <div id="viewDiv"></div>
     <div class="form-container">
-        <h3 style="color: <%=accent%>;">Rutare către cel mai apropiat sediu</h3>
+        <h3 style="color: <%=accent%>; margin-top: 0;">Rutare către cel mai apropiat sediu</h3>
         
         <div class="details-panel">
             <h4>Despre această funcționalitate</h4>
-            <p style="margin-top: 0; font-size: 12px;">
+            <p style="margin-top: 0; font-size: 13px;">
                 Acest instrument îți permite să identifici și să generezi ruta către cel mai apropiat sediu în funcție de locația ta actuală.
             </p>
         </div>
@@ -396,15 +283,15 @@
         
         <div class="details-panel">
             <h4>Control Zoom</h4>
-            <div class="zoom-controls">
-                <button id="zoomInBtn">
+            <div style="display: flex; gap: 10px;">
+                <button id="zoomInBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 0;">
                     <i class="ri-zoom-in-line"></i> Zoom In
                 </button>
-                <button id="zoomOutBtn">
+                <button id="zoomOutBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 0;">
                     <i class="ri-zoom-out-line"></i> Zoom Out
                 </button>
             </div>
-            <p style="font-size: 11px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
+            <p style="font-size: 12px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
         </div>
         
         <button id="locateMeBtn" class="login__button">
@@ -429,7 +316,7 @@
             </a>
         </button>
         
-        <p id="statusMessage" style="color:<%=text%>; margin-top: 10px; font-size: 12px;"></p>
+        <p id="statusMessage" style="color:<%=text%>; margin-top: 10px; font-size: 14px;"></p>
         <div id="errorMsg" class="error-message"></div>
         <div id="successMsg" class="success-message"></div>
     </div>
@@ -856,32 +743,54 @@
                                 
                                 // Creăm un container pentru indicații
                                 const directions = document.createElement("div");
-                                directions.className = "directions-panel";
+                                directions.className = "esri-widget esri-widget--panel esri-directions__scroller";
+                                directions.style.margin = "10px";
+                                directions.style.padding = "15px";
+                                directions.style.backgroundColor = "<%=sidebar%>";
+                                directions.style.color = "<%=text%>";
+                                directions.style.borderRadius = "8px";
+                                directions.style.maxHeight = "400px";
+                                directions.style.width = "300px";
+                                directions.style.overflowY = "auto";
+                                directions.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+                                directions.style.position = "fixed";
+                                directions.style.top = "20px";
+                                directions.style.right = "20px";
+                                
+                                // Adăugăm titlul
+                                const title = document.createElement("h3");
+                                title.style.color = "<%=accent%>";
+                                title.style.marginTop = "0";
+                                title.style.fontSize = "16px";
+                                title.textContent = "Indicații de direcții";
+                                directions.appendChild(title);
                                 
                                 // Buton de închidere pentru indicații
                                 const closeBtn = document.createElement("button");
                                 closeBtn.innerHTML = "✖";
-                                closeBtn.className = "close-btn";
+                                closeBtn.style.position = "absolute";
+                                closeBtn.style.top = "10px";
+                                closeBtn.style.right = "10px";
+                                closeBtn.style.background = "transparent";
+                                closeBtn.style.border = "none";
+                                closeBtn.style.color = "<%=accent%>";
+                                closeBtn.style.fontSize = "16px";
+                                closeBtn.style.cursor = "pointer";
                                 closeBtn.addEventListener("click", function() {
                                     directions.remove();
                                 });
                                 directions.appendChild(closeBtn);
                                 
-                                // Adăugăm titlul
-                                const title = document.createElement("h3");
-                                title.textContent = "Indicații de direcții";
-                                directions.appendChild(title);
-                                
                                 // Adăugăm lista de indicații
                                 const list = document.createElement("ol");
-                                list.style.paddingLeft = "20px";
-                                list.style.margin = "8px 0";
+                                list.style.paddingLeft = "25px";
+                                list.style.margin = "10px 0";
                                 
                                 // Procesăm fiecare indicație
                                 routeResult.routeResults[0].directions.features.forEach(feature => {
                                     const item = document.createElement("li");
-                                    item.style.marginBottom = "6px";
-                                    item.style.fontSize = "12px";
+                                    item.style.marginBottom = "8px";
+                                    item.style.fontSize = "14px";
                                     
                                     // Formatare conținut
                                     const kmText = (feature.attributes.length.toFixed(2) + " km");
@@ -895,7 +804,10 @@
                                 
                                 // Adăugăm informații despre distanță totală și timp
                                 const summary = document.createElement("div");
-                                summary.className = "directions-summary";
+                                summary.style.marginTop = "15px";
+                                summary.style.paddingTop = "10px";
+                                summary.style.borderTop = "1px solid " + "<%=clr%>";
+                                summary.style.fontSize = "14px";
                                 
                                 // Calculăm distanța și timpul total
                                 const totalLength = routeResult.routeResults[0].directions.totalLength;
