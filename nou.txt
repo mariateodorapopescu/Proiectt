@@ -1578,9 +1578,9 @@ INSERT INTO tipcon (motiv, nr_zile) VALUES
 ('Concediu pentru carantina', 14);
 
 -- Date inițiale pentru sediul principal
-INSERT INTO sedii (nume_sediu, tip_sediu, strada, cod, oras, judet, tara, telefon, email) VALUES
-('Sediu Central', 'principal', 'Strada Principală nr. 1', '010101', 'București', 'București', 'România', '021-123-4567', 'contact@companie.ro'),
-('Sediu Secundar', 'secundar', 'Strada Secundară nr. 5', '020202', 'Cluj-Napoca', 'Cluj', 'România', '0264-123-456', 'cluj@companie.ro');
+INSERT INTO sedii (nume_sediu, tip_sediu, strada, cod, oras, judet, tara, latitudine, longitudine, telefon, email) VALUES
+('Sediu Central', 'principal', 'Soseaua Giurgiului nr. 269', '040666', 'București', '4', 'România', 44.3749622, 26.0883728, '021-123-4567', 'contact@companie.ro'),
+('Sediu Secundar', 'secundar', 'Strada Locotent Stancu Ion nr. 35', '130105', 'Targoviste', 'Dambovita', 'România', 44.9202398, 25.4640106, '0264-123-456', 'cluj@companie.ro');
 
 -- Dezactivează constrângerile FOREIGN KEY pentru a evita problemele la inserare
 SET FOREIGN_KEY_CHECKS = 0;
@@ -2253,4 +2253,7 @@ SELECT c.id, u.nume, u.prenume, d.nume_dep AS departament, t.denumire AS functie
 -- -----------------------------------------------------
 -- test
 -- -----------------------------------------------------
-select * from tipuri;
+select * from sedii;
+SELECT id, nume FROM echipe WHERE id_prj = 1;
+SELECT DISTINCT u.id, u.nume, u.prenume FROM useri u JOIN membrii_echipe me ON u.id = me.id_ang WHERE me.id_echipa IN (" 1 ") ORDER BY u.nume, u.prenume;
+update useri set id_sediu = 1 where id = 1;

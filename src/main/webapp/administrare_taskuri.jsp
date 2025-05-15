@@ -159,7 +159,7 @@ if (sesi != null) {
             border: 1px solid <%=sidebar%>;
             border-radius: 5px;
             font-size: 16px;
-            color: <%=text%>;
+            color: black;
         }
         .form-group textarea {
             min-height: 100px;
@@ -409,92 +409,136 @@ if (sesi != null) {
                 <div id="debug-info" class="debug-info"></div>
             </div>
             
-        <% } else if ("list".equals(action)) { %>
-            <h2>Vizualizare și modificare taskuri</h2>
-            <table class="taskuri-table">
-                <thead>
-                    <tr>
-                        <th>Nr. crt</th>
-                        <th>Nume task</th>
-                        <th>Proiect</th>
-                        <th>Asignat</th>
-                        <th>Status</th>
-                        <th>Acțiuni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%
-                    try {
-                        String sql = "SELECT t.*, p.nume as proiect_nume, u.nume as asignat_nume, u.prenume as asignat_prenume, s.procent " +
-                                   "FROM tasks t " +
-                                   "LEFT JOIN proiecte p ON t.id_prj = p.id " +
-                                   "LEFT JOIN useri u ON t.id_ang = u.id " +
-                                   "LEFT JOIN statusuri2 s ON t.status = s.id " +
-                                   "WHERE t.supervizor = ? OR t.id_ang = ? " +
-                                   "ORDER BY t.start DESC";
-                        PreparedStatement pstmt = connection.prepareStatement(sql);
-                        pstmt.setInt(1, userId);
-                        pstmt.setInt(2, userId);
-                        ResultSet rsTasks = pstmt.executeQuery();
-                        int counter = 1;
+       <% } else if ("list".equals(action)) { %>
+    <h2>Vizualizare și modificare taskuri</h2>
+    <table class="taskuri-table">
+        <thead>
+            <tr>
+                <th>Nr. crt</th>
+                <th>Nume task</th>
+                <th>Proiect</th>
+                <th>Asignat</th>
+                <th>Status</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%
+            try {
+                String sql;
+                PreparedStatement pstmt;
+                
+                // Construiește interogarea în funcție de rolul utilizatorului
+                if (isDirector) {
+                    // Directorii pot vedea toate task-urile
+                    sql = "SELECT t.*, p.nume as proiect_nume, u.nume as asignat_nume, u.prenume as asignat_prenume, " +
+                          "s.procent, u.id_dep as asignat_dep, usup.id as supervizor_id, usup.nume as supervizor_nume, " +
+                          "usup.prenume as supervizor_prenume, tu.ierarhie as asignat_ierarhie " +
+                          "FROM tasks t " +
+                          "LEFT JOIN proiecte p ON t.id_prj = p.id " +
+                          "LEFT JOIN useri u ON t.id_ang = u.id " +
+                          "LEFT JOIN useri usup ON t.supervizor = usup.id " +
+                          "LEFT JOIN tipuri tu ON u.tip = tu.tip " +
+                          "LEFT JOIN statusuri2 s ON t.status = s.id " +
+                          "ORDER BY t.start DESC";
+                    pstmt = connection.prepareStatement(sql);
+                } else if (isSef) {
+                    // Șefii pot vedea propriile task-uri și task-urile celor din departamentul lor cu ierarhie mai mică
+                    sql = "SELECT t.*, p.nume as proiect_nume, u.nume as asignat_nume, u.prenume as asignat_prenume, " +
+                          "s.procent, u.id_dep as asignat_dep, usup.id as supervizor_id, usup.nume as supervizor_nume, " +
+                          "usup.prenume as supervizor_prenume, tu.ierarhie as asignat_ierarhie " +
+                          "FROM tasks t " +
+                          "LEFT JOIN proiecte p ON t.id_prj = p.id " +
+                          "LEFT JOIN useri u ON t.id_ang = u.id " +
+                          "LEFT JOIN useri usup ON t.supervizor = usup.id " +
+                          "LEFT JOIN tipuri tu ON u.tip = tu.tip " +
+                          "LEFT JOIN statusuri2 s ON t.status = s.id " +
+                          "WHERE t.supervizor = ? OR t.id_ang = ? OR " +
+                          "(u.id_dep = ? AND tu.ierarhie < ?) " +
+                          "ORDER BY t.start DESC";
+                    pstmt = connection.prepareStatement(sql);
+                    pstmt.setInt(1, userId);
+                    pstmt.setInt(2, userId);
+                    pstmt.setInt(3, userDep);
+                    pstmt.setInt(4, ierarhie);
+                } else {
+                    // Utilizatorii normali/începători pot vedea doar task-urile unde sunt supervizori sau asignați
+                    sql = "SELECT t.*, p.nume as proiect_nume, u.nume as asignat_nume, u.prenume as asignat_prenume, " +
+                          "s.procent, u.id_dep as asignat_dep, usup.id as supervizor_id, usup.nume as supervizor_nume, " +
+                          "usup.prenume as supervizor_prenume, tu.ierarhie as asignat_ierarhie " +
+                          "FROM tasks t " +
+                          "LEFT JOIN proiecte p ON t.id_prj = p.id " +
+                          "LEFT JOIN useri u ON t.id_ang = u.id " +
+                          "LEFT JOIN useri usup ON t.supervizor = usup.id " +
+                          "LEFT JOIN tipuri tu ON u.tip = tu.tip " +
+                          "LEFT JOIN statusuri2 s ON t.status = s.id " +
+                          "WHERE t.supervizor = ? OR t.id_ang = ? " +
+                          "ORDER BY t.start DESC";
+                    pstmt = connection.prepareStatement(sql);
+                    pstmt.setInt(1, userId);
+                    pstmt.setInt(2, userId);
+                }
+                
+                ResultSet rsTasks = pstmt.executeQuery();
+                int counter = 1;
+                
+                while (rsTasks.next()) {
+                    int status = rsTasks.getInt("status");
+                    int procent = rsTasks.getInt("procent");
+                    int taskId = rsTasks.getInt("id");
+                    int supervisorId = rsTasks.getInt("supervizor_id");
+                    int assignedId = rsTasks.getInt("id_ang");
+                    
+                    // Determină drepturile utilizatorului pentru acest task
+                    boolean isAssignee = (userId == assignedId);
+                    boolean isSupervisor = (userId == supervisorId);
+                    boolean canModify = isSupervisor || (isDirector && !isSupervisor);
+                    boolean canDelete = canModify;
+            %>
+                <tr>
+                    <td><%= counter++ %></td>
+                    <td><%= rsTasks.getString("nume") %></td>
+                    <td><%= rsTasks.getString("proiect_nume") %></td>
+                    <td><%= rsTasks.getString("asignat_nume") %> <%= rsTasks.getString("asignat_prenume") %></td>
+                    <td>
+                        <span class="status-badge status-<%= status %>">
+                            <%= procent %>%
+                        </span>
+                    </td>
+                    <td>
+                        <% if (canModify) { %>
+                            <button class="table-button modify-button" 
+                                    onclick="window.location.href='administrare_taskuri.jsp?action=edit&id=<%= taskId %>'">
+                                ✏ Modifică
+                            </button>
+                        <% } %>
                         
-                        while (rsTasks.next()) {
-                            int status = rsTasks.getInt("status");
-                            int procent = rsTasks.getInt("procent");
-                            int taskId = rsTasks.getInt("id");
-                            int supervisorId = rsTasks.getInt("supervizor");
-                            int assignedId = rsTasks.getInt("id_ang");
-                            
-                            // Determină drepturile utilizatorului pentru acest task
-                            boolean isAssignee = (userId == assignedId);
-                            boolean isSupervisor = (userId == supervisorId);
-                            boolean canModify = isSupervisor || (isDirector && !isSupervisor);
-                            boolean canDelete = canModify;
-                    %>
-                        <tr>
-                            <td><%= counter++ %></td>
-                            <td><%= rsTasks.getString("nume") %></td>
-                            <td><%= rsTasks.getString("proiect_nume") %></td>
-                            <td><%= rsTasks.getString("asignat_nume") %> <%= rsTasks.getString("asignat_prenume") %></td>
-                            <td>
-                                <span class="status-badge status-<%= status %>">
-                                    <%= procent %>%
-                                </span>
-                            </td>
-                            <td>
-                                <% if (canModify) { %>
-                                    <button class="table-button modify-button" 
-                                            onclick="window.location.href='administrare_taskuri.jsp?action=edit&id=<%= taskId %>'">
-                                        ✏ Modifică
-                                    </button>
-                                <% } %>
-                                
-                                <% if (isAssignee && !canModify) { %>
-                                    <button class="table-button status-button" 
-                                            onclick="window.location.href='administrare_taskuri.jsp?action=status&id=<%= taskId %>'">
-                                        📊 Status
-                                    </button>
-                                <% } %>
-                                
-                                <% if (canDelete) { %>
-                                    <button class="table-button delete-button" 
-                                            onclick="deleteTask(<%= taskId %>)">
-                                        ❌ Șterge
-                                    </button>
-                                <% } %>
-                            </td>
-                        </tr>
-                    <%
-                        }
-                        rsTasks.close();
-                        pstmt.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    %>
-                </tbody>
-            </table>
-            <a href="administrare_taskuri.jsp" class="back-button">Înapoi</a>
+                        <% if (isAssignee && !canModify) { %>
+                            <button class="table-button status-button" 
+                                    onclick="window.location.href='administrare_taskuri.jsp?action=status&id=<%= taskId %>'">
+                                📊 Status
+                            </button>
+                        <% } %>
+                        
+                        <% if (canDelete) { %>
+                            <button class="table-button delete-button" 
+                                    onclick="deleteTask(<%= taskId %>)">
+                                ❌ Șterge
+                            </button>
+                        <% } %>
+                    </td>
+                </tr>
+            <%
+                }
+                rsTasks.close();
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            %>
+        </tbody>
+    </table>
+    <a href="administrare_taskuri.jsp" class="back-button">Înapoi</a>
             
         <% } else if ("edit".equals(action)) { 
             int idTask = Integer.parseInt(request.getParameter("id"));

@@ -215,7 +215,7 @@
         .action-button:hover {
             transform: translateY(-3px);
             
-            background-color: #0e3b8e;
+            background-color: black;
         }
         
         .action-button i {
@@ -371,7 +371,8 @@
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                       
+                        <a href="rutare-acasa-sediu-selectat.jsp">
                             <i class="fa-solid fa-building-user"></i>
                             Un anumit sediu
                         </a>
@@ -384,32 +385,38 @@
                 <h2><i class="fa-solid fa-building"></i> De la sediul meu</h2>
                 <div class="actions-grid">
                     <button class="action-button">
-                        <a href="harta_concedii1.jsp">
+                        <a href="ruta_sediu_dep.jsp">
                             <i class="fa-solid fa-building"></i>
                             Sediul departamentului personal
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="rutare_sediu_concediu.jsp">
                             <i class="fa-solid fa-calendar-check"></i>
                             Un anumit concediu
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="ruta_sediu_next_concediu.jsp">
                             <i class="fa-solid fa-person-walking-luggage"></i>
                             Cel mai apropiat concediu
                         </a>
                     </button>
+                    <button class="action-button">
+                        <a href="sediu_acasa.jsp">
+                            <i class="fa-solid fa-house"></i>
+                           Acasa
+                        </a>
+                    </button>
                     <% if (isDirector) { %>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                        <a href="rutare_sediu_dep.jsp">
                             <i class="fa-solid fa-sitemap"></i>
                             Sediul unui anumit departament
                         </a>
                     </button>
                     <button class="action-button">
-                        <a href="harta_concedii2.jsp">
+                         <a href="sediu_sediu.jsp">
                             <i class="fa-solid fa-building-user"></i>
                             Un anumit sediu
                         </a>

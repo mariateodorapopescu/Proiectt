@@ -6,6 +6,7 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%@ page import="java.text.DecimalFormat" %>
 <%
 
     HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
@@ -34,6 +35,7 @@
                         int ierarhie = rs.getInt("ierarhie");
                         String functie = rs.getString("functie");
                         String nume_dep = rs.getString("nume_dep");
+                        int userSediuId = rs.getInt("id_sediu");
                         
                         // Funcție helper pentru a determina rolul utilizatorului
                         boolean isDirector = (ierarhie < 3);
@@ -85,6 +87,95 @@
                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
                              e.printStackTrace();
                          }
+                         
+                         // Obținem informații despre sediul utilizatorului
+                         String userSediuNume = "";
+                         String userSediuTip = "";
+                         String userSediuAdresa = "";
+                         double userSediuLat = 0;
+                         double userSediuLong = 0;
+                         
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT s.id_sediu, s.nume_sediu, s.tip_sediu, s.strada, s.oras, s.judet, s.tara, s.latitudine, s.longitudine " +
+                                          "FROM sedii s " +
+                                          "JOIN useri u ON s.id_sediu = u.id_sediu " +
+                                          "WHERE u.id = ?";
+                             try (PreparedStatement stmt = con.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                         userSediuNume = rs2.getString("nume_sediu");
+                                         userSediuTip = rs2.getString("tip_sediu");
+                                         userSediuAdresa = rs2.getString("strada") + ", " + 
+                                                         rs2.getString("oras") + ", " + 
+                                                         rs2.getString("judet") + ", " + 
+                                                         rs2.getString("tara");
+                                         userSediuLat = rs2.getDouble("latitudine");
+                                         userSediuLong = rs2.getDouble("longitudine");
+                                     }
+                                 }
+                             }
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                         
+                         // Obținem informații despre sediul departamentului
+                         String depSediuNume = "";
+                         String depDepartament = "";
+                         String depSediuAdresa = "";
+                         double depSediuLat = 0;
+                         double depSediuLong = 0;
+                         double distantaKm = 0;
+                         
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT ld.id_dep, ld.strada, ld.oras, ld.judet, ld.tara, ld.latitudine, ld.longitudine, " +
+                                          "d.nume_dep " +
+                                          "FROM locatii_departamente ld " +
+                                          "JOIN departament d ON ld.id_dep = d.id_dep " +
+                                          "WHERE ld.id_dep = ?";
+                             try (PreparedStatement stmt = con.prepareStatement(query)) {
+                                 stmt.setInt(1, userDep);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                         depDepartament = rs2.getString("nume_dep");
+                                         depSediuNume = "Sediul " + depDepartament;
+                                         depSediuAdresa = rs2.getString("strada") + ", " + 
+                                                         rs2.getString("oras") + ", " + 
+                                                         rs2.getString("judet") + ", " + 
+                                                         rs2.getString("tara");
+                                         depSediuLat = rs2.getDouble("latitudine");
+                                         depSediuLong = rs2.getDouble("longitudine");
+                                         
+                                         // Calculăm distanța dintre cele două locații
+                                         if (userSediuLat != 0 && userSediuLong != 0 && depSediuLat != 0 && depSediuLong != 0) {
+                                             // Convertim din grade în radiani
+                                             double lat1 = Math.toRadians(userSediuLat);
+                                             double lon1 = Math.toRadians(userSediuLong);
+                                             double lat2 = Math.toRadians(depSediuLat);
+                                             double lon2 = Math.toRadians(depSediuLong);
+                                             
+                                             // Formula Haversine
+                                             double dlon = lon2 - lon1;
+                                             double dlat = lat2 - lat1;
+                                             double a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
+                                             double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                             
+                                             // Raza Pământului în kilometri
+                                             double R = 6371.0;
+                                             distantaKm = Math.round((R * c) * 100.0) / 100.0;
+                                         }
+                                     }
+                                 }
+                             }
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                         
+                         // Formatăm distanța pentru afișare 
+                         DecimalFormat df = new DecimalFormat("0.00");
+                         String distantaFormatata = df.format(distantaKm);
 %>
          
 <!DOCTYPE html>
@@ -106,7 +197,7 @@
     <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
     
     <!--=============== titlu ===============-->
-    <title>Rutare: Acasă → Departament Selectat</title>
+    <title>Rutare: Sediul Meu → Sediul Departamentului</title>
     
     <style>
         html, body, #viewDiv {
@@ -150,7 +241,7 @@
             z-index: 100;
             padding: 15px;
             background: <%=sidebar%>;
-            color: <%=clr%>;
+            color: <%=text%>;
             border-color: <%=clr%>;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
@@ -201,7 +292,17 @@
             font-weight: bold;
         }
         
-        .details-panel {
+        .section-title {
+            color: <%=accent%>;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid <%=clr%>;
+        }
+        
+        .info-container {
             background-color: <%=sidebar%>;
             color: <%=text%>;
             padding: 10px 15px;
@@ -210,31 +311,31 @@
             font-size: 14px;
         }
         
-        .details-panel h4 {
-            margin-top: 0;
-            color: <%=accent%>;
-            border-bottom: 1px solid <%=clr%>;
-            padding-bottom: 5px;
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
         }
         
-        .location-info {
-            margin-bottom: 5px;
+        .info-label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        .info-value {
+            flex: 1;
         }
         
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: white;
-            margin-right: 5px;
-        }
-        
-        .badge-distance {
+            margin-bottom: 10px;
             background-color: <%=accent%>;
         }
-
+        
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
@@ -253,103 +354,113 @@
             display: none;
         }
         
-        .select-container {
-            margin-bottom: 15px;
-        }
-        
-        .select-container label {
-            display: block;
-            margin-bottom: 5px;
-            color: <%=text%>;
-            font-weight: bold;
-        }
-        
-        .select-container select {
-            width: 100%;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid <%=clr%>;
-            background-color: white;
-            color: <%=text%>;
-            font-size: 14px;
-        }
-        
         ::-webkit-scrollbar {
             display: none;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .zoom-button {
+            flex: 1;
+            padding: 10px;
+            background-color: <%=accent%>;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .zoom-button i {
+            margin-right: 5px;
+        }
+        
+        .zoom-note {
+            font-size: 12px;
+            color: <%=text%>;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div id="viewDiv"></div>
     <div class="form-container">
-        <h3 style="color: <%=accent%>; margin-top: 0;">Rutare: Acasă → Departament Selectat</h3>
+        <h3 style="color: <%=accent%>; margin-top: 0; font-size: 20px;">Rutare: Sediul Meu → Sediul Departamentului</h3>
         
-        <div class="select-container">
-            <label for="departamentSelect">Selectează departamentul:</label>
-            <select id="departamentSelect">
-                <option value="">-- Selectează --</option>
-                <%
-                    // Obținem lista de departamente
-                    try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                        String depQuery = "SELECT id_dep, nume_dep FROM departament ORDER BY nume_dep";
-                        try (PreparedStatement stmt = con.prepareStatement(depQuery)) {
-                            try (ResultSet rs2 = stmt.executeQuery()) {
-                                while (rs2.next()) {
-                                    int depId = rs2.getInt("id_dep");
-                                    String numeDepartament = rs2.getString("nume_dep");
-                                    
-                                    // Marchează departamentul utilizatorului ca selectat implicit
-                                    String selected = (depId == userDep) ? "selected" : "";
-                                    
-                                    out.println("<option value=\"" + depId + "\" " + selected + ">" + numeDepartament + "</option>");
-                                }
-                            }
-                        }
-                    } catch (SQLException e) {
-                        out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                        e.printStackTrace();
-                    }
-                %>
-            </select>
-        </div>
+        <div class="section-title">Despre această funcționalitate</div>
+        <p style="color: <%=text%>; font-size: 14px; margin-top: 0;">
+            Acest instrument îți permite să vizualizezi ruta de la sediul tău de lucru către sediul departamentului 
+            din care faci parte (<strong><%=nume_dep%></strong>).
+        </p>
         
-        <div id="userDetails" class="details-panel" style="display: none;">
-            <h4>Locația ta de acasă</h4>
-            <div id="userInfo"></div>
-        </div>
-        
-        <div id="departmentDetails" class="details-panel" style="display: none;">
-            <h4>Locația departamentului</h4>
-            <div id="distanceBadge" class="badge badge-distance" style="display: none;"></div>
-            <div id="departmentInfo"></div>
-        </div>
-        
-        <div class="details-panel">
-            <h4>Control Zoom</h4>
-            <div style="display: flex; gap: 10px;">
-                <button id="zoomInBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    <i class="ri-zoom-in-line"></i> Zoom In
-                </button>
-                <button id="zoomOutBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    <i class="ri-zoom-out-line"></i> Zoom Out
-                </button>
+        <div class="section-title">Sediul meu de lucru</div>
+        <div class="info-container">
+            <div class="info-row">
+                <div class="info-label">Nume:</div>
+                <div class="info-value"><%=userSediuNume%></div>
             </div>
-            <p style="font-size: 12px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
+            <div class="info-row">
+                <div class="info-label">Tip:</div>
+                <div class="info-value"><%=userSediuTip%></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Adresa:</div>
+                <div class="info-value"><%=userSediuAdresa%></div>
+            </div>
         </div>
         
-        <button id="loadLocationsBtn" class="login__button">
-            <i class="ri-map-pin-2-line"></i> Încarcă locațiile
-        </button>
+        <div class="section-title">Sediul departamentului</div>
+        <div class="info-container">
+            <% if (distantaKm > 0) { %>
+                <div class="badge"><%=distantaFormatata%> km</div>
+            <% } %>
+            <div class="info-row">
+                <div class="info-label">Departament:</div>
+                <div class="info-value"><%=depDepartament%></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Denumire:</div>
+                <div class="info-value"><%=depSediuNume%></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Adresa:</div>
+                <div class="info-value"><%=depSediuAdresa%></div>
+            </div>
+        </div>
         
-        <button id="generateRouteBtn" class="login__button" disabled>
+        <div class="section-title">Control Zoom</div>
+        <div class="zoom-controls">
+            <button id="zoomInBtn" class="zoom-button">
+                <i class="ri-zoom-in-line"></i> Zoom In
+            </button>
+            <button id="zoomOutBtn" class="zoom-button">
+                <i class="ri-zoom-out-line"></i> Zoom Out
+            </button>
+        </div>
+        <p class="zoom-note">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
+        
+        <button id="generateRouteBtn" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button">
             <i class="ri-route-line"></i> Generează rută
         </button>
         
-        <button id="resetBtn" class="login__button">
+        <button id="resetBtn" class="login__button" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
             <i class="ri-refresh-line"></i> Resetează harta
         </button>
         
-        <button class="login__button">
+        <button class="login__button" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
             <a style="color: white !important; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">
                 <i class="ri-arrow-left-line"></i> Înapoi
             </a>
@@ -404,28 +515,19 @@
             // Culoarea accentului utilizatorului
             const accentColor = "<%=accent%>";
             
-            // ID-ul utilizatorului curent
-            const userId = <%=id%>;
+            // Coordonatele locațiilor
+            const userSediuLat = <%=userSediuLat%>;
+            const userSediuLong = <%=userSediuLong%>;
+            const depSediuLat = <%=depSediuLat%>;
+            const depSediuLong = <%=depSediuLong%>;
             
             // Referințe la elementele DOM
-            const departamentSelect = document.getElementById("departamentSelect");
-            const userDetails = document.getElementById("userDetails");
-            const userInfo = document.getElementById("userInfo");
-            const departmentDetails = document.getElementById("departmentDetails");
-            const departmentInfo = document.getElementById("departmentInfo");
-            const distanceBadge = document.getElementById("distanceBadge");
-            const loadLocationsBtn = document.getElementById("loadLocationsBtn");
             const generateRouteBtn = document.getElementById("generateRouteBtn");
             const resetBtn = document.getElementById("resetBtn");
             const loadingSpinner = document.getElementById("loadingSpinner");
             const statusMessage = document.getElementById("statusMessage");
             const errorMsg = document.getElementById("errorMsg");
             const successMsg = document.getElementById("successMsg");
-            
-            // Variabile pentru stocarea datelor
-            let userLocation = null;
-            let departmentLocation = null;
-            let selectedDepartmentId = departamentSelect.value; // Valoarea inițială
             
             // Funcție pentru afișarea mesajelor
             function afișareMesaj(tip, mesaj, durată = 5000) {
@@ -441,19 +543,6 @@
                     statusMessage.textContent = mesaj;
                 }
             }
-            
-            // Handler pentru selecția departamentului
-            departamentSelect.addEventListener("change", function() {
-                selectedDepartmentId = this.value;
-                generateRouteBtn.disabled = true;
-                
-                if (!selectedDepartmentId) {
-                    afișareMesaj('normal', "Te rugăm să selectezi un departament.");
-                    departmentDetails.style.display = "none";
-                } else {
-                    afișareMesaj('normal', "Departament selectat. Acum poți încărca locațiile.");
-                }
-            });
             
             // Inițializare hartă ArcGIS
             require([
@@ -514,113 +603,29 @@
                 // URL pentru serviciul de rutare
                 const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
                 
-                // Handler pentru butonul "Încarcă locațiile"
-                loadLocationsBtn.addEventListener("click", function() {
-                    if (!selectedDepartmentId) {
-                        afișareMesaj('eroare', "Te rugăm să selectezi un departament mai întâi.");
-                        return;
-                    }
-                    
-                    // Afișăm indicatorul de încărcare
-                    loadingSpinner.style.display = "block";
-                    afișareMesaj('normal', "Se încarcă locațiile...");
-                    
-                    // Facem cerere către servlet pentru a obține locațiile
-                    fetch("GetUserToDepartmentAnyServlet?userId=" + userId + "&departmentId=" + selectedDepartmentId)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Eroare la încărcarea locațiilor: " + response.statusText);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            // Ascundem indicatorul de încărcare
-                            loadingSpinner.style.display = "none";
-                            
-                            // Verificăm dacă avem datele necesare
-                            if (!data.user_location || !data.department_location) {
-                                throw new Error("Nu s-au găsit coordonatele necesare pentru locațiile tale.");
-                            }
-                            
-                            // Salvăm datele locațiilor
-                            userLocation = data.user_location;
-                            departmentLocation = data.department_location;
-                            
-                            // Afișăm detaliile
-                            displayLocationDetails(data);
-                            
-                            // Afișăm locațiile pe hartă
-                            displayLocationsOnMap();
-                            
-                            // Activăm butonul de generare rută
-                            generateRouteBtn.disabled = false;
-                            
-                            afișareMesaj('succes', "Locațiile au fost încărcate. Poți genera ruta acum.");
-                        })
-                        .catch(error => {
-                            // Ascundem indicatorul de încărcare
-                            loadingSpinner.style.display = "none";
-                            afișareMesaj('eroare', error.message);
-                            console.error("Eroare detaliată:", error);
-                            
-                            // Adăugăm un mesaj mai specific pentru fiecare tip de eroare posibilă
-                            if (error.message.includes("locația")) {
-                                afișareMesaj('eroare', "Nu s-au găsit coordonatele locației. Verifică dacă locația are coordonate configurate.");
-                            } else if (error.message.includes("utilizator")) {
-                                afișareMesaj('eroare', "Informațiile utilizatorului nu au putut fi găsite. Contactează administratorul.");
-                            } else if (error.message.includes("departament")) {
-                                afișareMesaj('eroare', "Informațiile departamentului selectat nu au putut fi găsite. Selectează alt departament.");
-                            } else {
-                                afișareMesaj('eroare', "Eroare la încărcarea locațiilor: " + error.message);
-                            }
-                        });
-                });
-                
-                // Funcție pentru afișarea detaliilor locațiilor
-                function displayLocationDetails(data) {
-                    // Afișăm detaliile utilizatorului
-                    userDetails.style.display = "block";
-                    userInfo.innerHTML = 
-                        `<div class="location-info"><strong>Nume:</strong> ${data.user_info.nume} ${data.user_info.prenume}</div>` +
-                        `<div class="location-info"><strong>Adresa:</strong> ${userLocation.adresa_completa}</div>`;
-                    
-                    // Afișăm detaliile departamentului
-                    departmentDetails.style.display = "block";
-                    
-                    // Afișăm badge-ul cu distanța
-                    if (departmentLocation.distanta_km) {
-                        distanceBadge.style.display = "inline-block";
-                        distanceBadge.textContent = departmentLocation.distanta_km + " km";
-                    }
-                    
-                    departmentInfo.innerHTML = 
-                        `<div class="location-info"><strong>Departament:</strong> ${data.department_info.nume_dep}</div>` +
-                        `<div class="location-info"><strong>Adresa:</strong> ${departmentLocation.adresa_completa}</div>`;
-                    
-                    // Debug - afișăm datele în consolă pentru verificare
-                    console.log("User info:", data.user_info);
-                    console.log("User location:", userLocation);
-                    console.log("Department info:", data.department_info);
-                    console.log("Department location:", departmentLocation);
-                }
-                
                 // Funcție pentru afișarea locațiilor pe hartă
                 function displayLocationsOnMap() {
                     // Curățăm graficele existente
                     graphicsLayer.removeAll();
                     
-                    // Creăm punctul pentru locația utilizatorului
-                    const userPoint = new Point({
-                        longitude: userLocation.longitudine,
-                        latitude: userLocation.latitudine
+                    // Verificăm dacă avem coordonate pentru ambele locații
+                    if (userSediuLat === 0 || userSediuLong === 0 || depSediuLat === 0 || depSediuLong === 0) {
+                        afișareMesaj('eroare', "Nu există coordonate geografice pentru unul dintre sedii. Contactați administratorul.");
+                        return false;
+                    }
+                    
+                    // Creăm punctul pentru locația sediului utilizatorului
+                    const userSediuPoint = new Point({
+                        longitude: userSediuLong,
+                        latitude: userSediuLat
                     });
                     
-                    // Creăm marker pentru locația utilizatorului
-                    const userGraphic = new Graphic({
-                        geometry: userPoint,
+                    // Creăm marker pentru locația sediului utilizatorului
+                    const userSediuGraphic = new Graphic({
+                        geometry: userSediuPoint,
                         symbol: {
                             type: "simple-marker",
-                            color: "blue", // Albastru pentru locația utilizatorului
+                            color: accentColor, // Culoarea accentului pentru sediul utilizatorului
                             size: "12px",
                             outline: {
                                 color: [255, 255, 255],
@@ -628,8 +633,8 @@
                             }
                         },
                         attributes: {
-                            title: "Locația ta de acasă",
-                            description: userLocation.adresa_completa
+                            title: "Sediul meu de lucru",
+                            description: "<%=userSediuAdresa%>"
                         },
                         popupTemplate: {
                             title: "{title}",
@@ -637,21 +642,21 @@
                         }
                     });
                     
-                    // Adăugăm marker-ul pentru utilizator
-                    graphicsLayer.add(userGraphic);
+                    // Adăugăm marker-ul pentru sediul utilizatorului
+                    graphicsLayer.add(userSediuGraphic);
                     
-                    // Creăm punctul pentru locația departamentului
-                    const departmentPoint = new Point({
-                        longitude: departmentLocation.longitudine,
-                        latitude: departmentLocation.latitudine
+                    // Creăm punctul pentru locația sediului departamentului
+                    const depSediuPoint = new Point({
+                        longitude: depSediuLong,
+                        latitude: depSediuLat
                     });
                     
-                    // Creăm marker pentru locația departamentului
-                    const departmentGraphic = new Graphic({
-                        geometry: departmentPoint,
+                    // Creăm marker pentru locația sediului departamentului
+                    const depSediuGraphic = new Graphic({
+                        geometry: depSediuPoint,
                         symbol: {
                             type: "simple-marker",
-                            color: accentColor, // Culoarea accentului pentru departament
+                            color: "#6f42c1", // Mov pentru sediul departamentului
                             size: "12px",
                             outline: {
                                 color: [255, 255, 255],
@@ -659,8 +664,8 @@
                             }
                         },
                         attributes: {
-                            title: "Departamentul " + departamentSelect.options[departamentSelect.selectedIndex].text,
-                            description: departmentLocation.adresa_completa
+                            title: "Sediul departamentului <%=nume_dep%>",
+                            description: "<%=depSediuAdresa%>"
                         },
                         popupTemplate: {
                             title: "{title}",
@@ -668,12 +673,12 @@
                         }
                     });
                     
-                    // Adăugăm marker-ul pentru departament
-                    graphicsLayer.add(departmentGraphic);
+                    // Adăugăm marker-ul pentru sediul departamentului
+                    graphicsLayer.add(depSediuGraphic);
                     
                     // Ajustăm vizualizarea pentru a include ambele locații
                     view.goTo({
-                        target: [userPoint, departmentPoint],
+                        target: [userSediuPoint, depSediuPoint],
                         padding: {
                             top: 100,
                             bottom: 100,
@@ -681,12 +686,20 @@
                             right: 100
                         }
                     });
+                    
+                    return true;
                 }
+                
+                // Afișăm locațiile pe hartă la încărcarea paginii
+                setTimeout(function() {
+                    displayLocationsOnMap();
+                }, 1000);
                 
                 // Handler pentru butonul "Generează rută"
                 generateRouteBtn.addEventListener("click", async function() {
-                    if (!userLocation || !departmentLocation) {
-                        afișareMesaj('eroare', "Locațiile nu sunt disponibile. Te rog să le încarci mai întâi.");
+                    // Verificăm dacă avem coordonate pentru ambele locații
+                    if (userSediuLat === 0 || userSediuLong === 0 || depSediuLat === 0 || depSediuLong === 0) {
+                        afișareMesaj('eroare', "Nu există coordonate geografice pentru unul dintre sedii. Contactați administratorul.");
                         return;
                     }
                     
@@ -695,23 +708,23 @@
                     afișareMesaj('normal', "Se calculează ruta...");
                     
                     try {
-                        // Creăm punctele pentru locațiile utilizatorului și departamentului
-                        const userPoint = new Point({
-                            longitude: userLocation.longitudine,
-                            latitude: userLocation.latitudine
+                        // Creăm punctele pentru locațiile sediului utilizatorului și sediului departamentului
+                        const userSediuPoint = new Point({
+                            longitude: userSediuLong,
+                            latitude: userSediuLat
                         });
                         
-                        const departmentPoint = new Point({
-                            longitude: departmentLocation.longitudine,
-                            latitude: departmentLocation.latitudine
+                        const depSediuPoint = new Point({
+                            longitude: depSediuLong,
+                            latitude: depSediuLat
                         });
                         
                         // Parametri pentru calculul rutei
                         const routeParams = new RouteParameters({
                             stops: new FeatureSet({
                                 features: [
-                                    new Graphic({ geometry: userPoint }),  // Locația de acasă a utilizatorului
-                                    new Graphic({ geometry: departmentPoint }) // Locația departamentului
+                                    new Graphic({ geometry: userSediuPoint }),  // Locația sediului utilizatorului
+                                    new Graphic({ geometry: depSediuPoint }) // Locația sediului departamentului
                                 ]
                             }),
                             directionsLanguage: "ro", // Indicații în limba română
@@ -775,7 +788,7 @@
                                 title.style.color = "<%=accent%>";
                                 title.style.marginTop = "0";
                                 title.style.fontSize = "16px";
-                                title.textContent = "Indicații de direcții către departamentul " + departamentSelect.options[departamentSelect.selectedIndex].text;
+                                title.textContent = "Indicații de direcții către sediul departamentului";
                                 directions.appendChild(title);
                                 
                                 // Adăugăm lista de indicații
@@ -829,6 +842,22 @@
                                     "<p><strong>Distanță totală:</strong> " + totalLength.toFixed(2) + " km</p>" +
                                     "<p><strong>Timp estimat:</strong> " + timeText + "</p>";
                                 directions.appendChild(summary);
+                                
+                                // Adăugăm link pentru Google Maps
+                                const googleMapsLink = document.createElement("a");
+                                googleMapsLink.href = `https://www.google.com/maps/dir/${userSediuLat},${userSediuLong}/${depSediuLat},${depSediuLong}`;
+                                googleMapsLink.target = "_blank";
+                                googleMapsLink.style.display = "inline-block";
+                                googleMapsLink.style.marginTop = "15px";
+                                googleMapsLink.style.padding = "8px 15px";
+                                googleMapsLink.style.backgroundColor = accentColor;
+                                googleMapsLink.style.color = "white";
+                                googleMapsLink.style.textDecoration = "none";
+                                googleMapsLink.style.borderRadius = "4px";
+                                googleMapsLink.style.fontSize = "14px";
+                                googleMapsLink.innerHTML = "<i class=\"ri-directions-line\"></i> Deschide în Google Maps";
+                                
+                                directions.appendChild(googleMapsLink);
                                 
                                 // Adăugăm containerul de indicații în interfața utilizator
                                 view.ui.empty("top-right");
@@ -886,10 +915,8 @@
                         zoom: 6
                     });
                     
-                    if (userLocation && departmentLocation) {
-                        // Afișăm din nou locațiile
-                        displayLocationsOnMap();
-                    }
+                    // Afișăm din nou locațiile
+                    displayLocationsOnMap();
                     
                     // Resetăm mesajul de status
                     afișareMesaj('normal', "Hartă resetată. Poți genera ruta din nou.");
