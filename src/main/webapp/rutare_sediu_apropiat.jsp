@@ -113,34 +113,112 @@
             margin: 0;
             height: 100%;
             width: 100%;
+            /* Previne comportamentul de zoom la scroll */
+            touch-action: none;
         }
         
-        .sidebar {
-            position: absolute;
-            top: 80px;
-            left: 20px;
+        /* Folosim CSS pentru a opri scroll wheel zoom */
+        #viewDiv {
+            -ms-touch-action: none;
+            touch-action: none;
+        }
+        
+        .esri-view {
+            touch-action: none !important;
+        }
+        
+        .form-container {
+            max-height: 90vh;
+            overflow-y: auto;
+            position: fixed;
+            top: 10px;
+            left: 10px;
             z-index: 100;
-            background-color: <%=sidebar%>;
-            padding: 15px;
+            padding: 12px;
+            background: <%=sidebar%>;
+            color: <%=text%>;
+            border-color: <%=clr%>;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            color: <%=text%>;
-            font-family: Arial, sans-serif;
+            width: 90%;
+            max-width: 320px;
+            font-size: 14px;
         }
         
-        .sidebar select,
-        .sidebar button {
+        .form-container h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .form-container button {
             display: block;
-            margin-bottom: 10px;
+            margin-top: 10px;
+            margin-bottom: 8px;
             padding: 10px;
             width: 100%;
             border: none;
             border-radius: 5px;
             font-size: 14px;
+            background-color: <%=accent%>;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         
-        .sidebar button:hover {
+        .form-container button:hover {
             opacity: 0.9;
+        }
+        
+        .form-container button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .details-panel {
+            background-color: <%=card%>;
+            color: <%=text%>;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        
+        .details-panel h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: <%=accent%>;
+            border-bottom: 1px solid <%=clr%>;
+            padding-bottom: 3px;
+            font-size: 14px;
+        }
+        
+        .location-info, .sediu-info {
+            margin-bottom: 4px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .badge-distance {
+            background-color: <%=accent%>;
+        }
+
+        .badge-current {
+            background-color: #4CAF50;
+        }
+
+        .badge-sediu {
+            background-color: #E91E63;
         }
         
         #loadingSpinner {
@@ -151,72 +229,145 @@
             transform: translate(-50%, -50%);
             z-index: 200;
             background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
         
         #loadingSpinner p {
             margin-bottom: 10px;
             font-weight: bold;
-        }
-        
-        .form-container {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .details-panel {
-            background-color: <%=sidebar%>;
-            color: <%=text%>;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-top: 10px;
             font-size: 14px;
         }
         
-        .details-panel h4 {
-            margin-top: 0;
-            color: <%=accent%>;
-            border-bottom: 1px solid <%=clr%>;
-            padding-bottom: 5px;
-        }
-        
-        .sediu-info {
-            margin-bottom: 5px;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            margin-right: 5px;
-        }
-        
-        .badge-distance {
-            background-color: <%=accent%>;
-        }
-
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
-            margin-top: 10px;
+            margin-top: 8px;
             display: none;
+            font-size: 12px;
         }
 
         .success-message {
             background-color: #d4edda;
             color: #155724;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
-            margin-top: 10px;
+            margin-top: 8px;
             display: none;
+            font-size: 12px;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .zoom-controls button {
+            flex: 1;
+            padding: 8px;
+            margin-top: 0;
+            font-size: 12px;
+        }
+        
+        .directions-panel {
+            margin: 10px;
+            padding: 12px;
+            background-color: <%=sidebar%>;
+            color: <%=text%>;
+            border-radius: 8px;
+            max-height: 400px;
+            width: 90%;
+            max-width: 320px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 13px;
+            z-index: 100;
+        }
+        
+        .directions-panel h3 {
+            color: <%=accent%>;
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        
+        .directions-panel ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        
+        .directions-panel li {
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        
+        .directions-summary {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid <%=clr%>;
+            font-size: 12px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: <%=accent%>;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        /* Media queries pentru dispozitive mobile */
+        @media (max-width: 480px) {
+            .form-container {
+                width: calc(100% - 20px);
+                max-width: none;
+                font-size: 13px;
+            }
+            
+            .form-container h3 {
+                font-size: 15px;
+            }
+            
+            .details-panel {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+            
+            .details-panel h4 {
+                font-size: 13px;
+            }
+            
+            .badge {
+                font-size: 10px;
+                padding: 2px 5px;
+            }
+            
+            .directions-panel {
+                width: calc(100% - 20px);
+                max-width: none;
+                font-size: 12px;
+            }
+            
+            .directions-panel h3 {
+                font-size: 14px;
+            }
+            
+            .directions-panel li,
+            .directions-summary p {
+                font-size: 11px;
+            }
         }
         
         ::-webkit-scrollbar {
@@ -226,38 +377,59 @@
 </head>
 <body>
     <div id="viewDiv"></div>
-    <div class="form-container" style="position: fixed; top: 20px; left: 20px; z-index: 100; padding: 15px; background:<%=sidebar%>; color:<%=clr%>; border-color: <%=clr%>">
-        <h3 style="color: <%=accent%>; margin-top: 0;">Rutare către cel mai apropiat sediu</h3>
+    <div class="form-container">
+        <h3 style="color: <%=accent%>;">Rutare către cel mai apropiat sediu</h3>
+        
+        <div class="details-panel">
+            <h4>Despre această funcționalitate</h4>
+            <p style="margin-top: 0; font-size: 12px;">
+                Acest instrument îți permite să identifici și să generezi ruta către cel mai apropiat sediu în funcție de locația ta actuală.
+            </p>
+        </div>
         
         <div id="nearestSediuDetails" class="details-panel" style="display: none;">
             <h4>Cel mai apropiat sediu</h4>
+            <div class="badge badge-sediu">Sediu</div>
             <div id="distanceBadge" class="badge badge-distance" style="display: none;"></div>
             <div id="sediuInfo"></div>
         </div>
         
-        <button style="display: block; margin-top: 15px; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="locateMeBtn">
+        <div class="details-panel">
+            <h4>Control Zoom</h4>
+            <div class="zoom-controls">
+                <button id="zoomInBtn">
+                    <i class="ri-zoom-in-line"></i> Zoom In
+                </button>
+                <button id="zoomOutBtn">
+                    <i class="ri-zoom-out-line"></i> Zoom Out
+                </button>
+            </div>
+            <p style="font-size: 11px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
+        </div>
+        
+        <button id="locateMeBtn" class="login__button">
             <i class="ri-map-pin-user-line"></i> Localizează-mă
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="findNearestSediuBtn">
+        <button id="findNearestSediuBtn" class="login__button">
             <i class="ri-building-2-line"></i> Găsește cel mai apropiat sediu
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="generateRouteBtn" disabled>
+        <button id="generateRouteBtn" class="login__button" disabled>
             <i class="ri-route-line"></i> Generează rută
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="resetBtn">
+        <button id="resetBtn" class="login__button">
             <i class="ri-refresh-line"></i> Resetează harta
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button">
+        <button class="login__button">
             <a style="color: white !important; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">
                 <i class="ri-arrow-left-line"></i> Înapoi
             </a>
         </button>
         
-        <p id="statusMessage" style="color:<%=text%>; margin-top: 10px; font-size: 14px;"></p>
+        <p id="statusMessage" style="color:<%=text%>; margin-top: 10px; font-size: 12px;"></p>
         <div id="errorMsg" class="error-message"></div>
         <div id="successMsg" class="success-message"></div>
     </div>
@@ -268,6 +440,30 @@
     </div>
 
     <script>
+        // Prevenim efectul de zoom la scroll direct în browser
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevenim scroll-ul pe div-ul hărții
+            const mapDiv = document.getElementById('viewDiv');
+            
+            mapDiv.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                return false;
+            }, { passive: false });
+            
+            // Adăugăm un event listener pentru a asigura că toate elementele ArcGIS sunt încărcate
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const esriElements = document.querySelectorAll('.esri-view-surface');
+                    esriElements.forEach(function(element) {
+                        element.addEventListener('wheel', function(e) {
+                            e.preventDefault();
+                            return false;
+                        }, { passive: false });
+                    });
+                }, 1000); // Așteptăm 1 secundă pentru încărcarea elementelor ArcGIS
+            });
+        });
+        
         // Animație pentru loading spinner
         document.head.insertAdjacentHTML('beforeend', `
             <style>
@@ -293,6 +489,8 @@
             const findNearestSediuBtn = document.getElementById("findNearestSediuBtn");
             const generateRouteBtn = document.getElementById("generateRouteBtn");
             const resetBtn = document.getElementById("resetBtn");
+            const zoomInBtn = document.getElementById("zoomInBtn");
+            const zoomOutBtn = document.getElementById("zoomOutBtn");
             const loadingSpinner = document.getElementById("loadingSpinner");
             const statusMessage = document.getElementById("statusMessage");
             const errorMsg = document.getElementById("errorMsg");
@@ -360,7 +558,18 @@
                     zoom: 6,
                     ui: {
                         components: ["zoom"] // Afișăm doar controlul de zoom
+                    },
+                    // Dezactivăm zoom-ul la scroll
+                    navigation: {
+                        mouseWheelZoomEnabled: false,
+                        browserTouchPanEnabled: true
                     }
+                });
+                
+                // Adăugăm un eveniment pentru a gestiona scrollul pe pagină
+                view.on("mouse-wheel", function(event) {
+                    // Prevenim comportamentul implicit al scroll-ului
+                    event.stopPropagation();
                 });
                 
                 // URL pentru serviciul de rutare
@@ -372,10 +581,12 @@
                 // Handler pentru butonul "Localizează-mă"
                 locateMeBtn.addEventListener("click", function() {
                     if (navigator.geolocation) {
+                        loadingSpinner.style.display = "block";
                         afișareMesaj('normal', "Se obține locația...");
                         
                         navigator.geolocation.getCurrentPosition(
                             function(position) {
+                                loadingSpinner.style.display = "none";
                                 const longitude = position.coords.longitude;
                                 const latitude = position.coords.latitude;
                                 
@@ -385,12 +596,21 @@
                                     latitude: latitude
                                 });
                                 
+                                // Ștergem orice marker anterior
+                                graphicsLayer.graphics.some((graphic, idx) => {
+                                    if (graphic.attributes && graphic.attributes.isCurrentLocation) {
+                                        graphicsLayer.remove(graphic);
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                
                                 // Creăm un marker pentru locația curentă
                                 const pointGraphic = new Graphic({
                                     geometry: currentLocation,
                                     symbol: {
                                         type: "simple-marker",
-                                        color: "blue", // Folosim albastru pentru locația curentă
+                                        color: "#4CAF50", // Verde pentru locația curentă
                                         size: "12px",
                                         outline: {
                                             color: [255, 255, 255],
@@ -399,7 +619,8 @@
                                     },
                                     attributes: {
                                         title: "Locația mea",
-                                        description: "Poziția mea curentă"
+                                        description: "Poziția mea curentă",
+                                        isCurrentLocation: true
                                     },
                                     popupTemplate: {
                                         title: "{title}",
@@ -407,14 +628,16 @@
                                     }
                                 });
                                 
-                                // Curățăm graficele existente și adăugăm markerul pentru locația curentă
-                                graphicsLayer.removeAll();
+                                // Adăugăm markerul pentru locația curentă
                                 graphicsLayer.add(pointGraphic);
                                 
                                 // Zoom și centrare pe locația curentă
                                 view.goTo({
                                     target: currentLocation,
                                     zoom: 15
+                                }, {
+                                    duration: 1000,
+                                    easing: "ease-in-out"
                                 });
                                 
                                 // Activăm butonul pentru căutarea celui mai apropiat sediu
@@ -422,7 +645,25 @@
                                 afișareMesaj('succes', "Localizare reușită. Acum poți căuta cel mai apropiat sediu.");
                             },
                             function(error) {
-                                afișareMesaj('eroare', "Eroare la obținerea poziției: " + error.message);
+                                loadingSpinner.style.display = "none";
+                                let errorMessage = "Eroare la obținerea poziției.";
+                                
+                                switch(error.code) {
+                                    case error.PERMISSION_DENIED:
+                                        errorMessage = "Accesul la geolocalizare a fost refuzat. Verifică permisiunile browser-ului.";
+                                        break;
+                                    case error.POSITION_UNAVAILABLE:
+                                        errorMessage = "Informațiile de localizare nu sunt disponibile.";
+                                        break;
+                                    case error.TIMEOUT:
+                                        errorMessage = "Cererea de localizare a expirat.";
+                                        break;
+                                    case error.UNKNOWN_ERROR:
+                                        errorMessage = "A apărut o eroare necunoscută la determinarea locației.";
+                                        break;
+                                }
+                                
+                                afișareMesaj('eroare', errorMessage);
                                 console.error("Eroare la geolocație:", error);
                             },
                             {
@@ -469,6 +710,15 @@
                             // Afișăm detaliile sediului
                             displayNearestSediu();
                             
+                            // Ștergem orice marker anterior pentru sediu
+                            graphicsLayer.graphics.some((graphic, idx) => {
+                                if (graphic.attributes && graphic.attributes.isNearestSediu) {
+                                    graphicsLayer.remove(graphic);
+                                    return true;
+                                }
+                                return false;
+                            });
+                            
                             // Adăugăm un marker pentru cel mai apropiat sediu
                             const sediuPoint = new Point({
                                 longitude: nearestSediu.longitudine,
@@ -479,7 +729,7 @@
                                 geometry: sediuPoint,
                                 symbol: {
                                     type: "simple-marker",
-                                    color: accentColor, // Folosim culoarea accentului
+                                    color: "#E91E63", // Roz pentru sediu
                                     size: "12px",
                                     outline: {
                                         color: [255, 255, 255],
@@ -488,7 +738,8 @@
                                 },
                                 attributes: {
                                     title: nearestSediu.nume_sediu,
-                                    description: "Tip: " + nearestSediu.tip_sediu + "<br>Adresa: " + nearestSediu.strada + ", " + nearestSediu.oras
+                                    description: "Tip: " + nearestSediu.tip_sediu + "<br>Adresa: " + nearestSediu.strada + ", " + nearestSediu.oras,
+                                    isNearestSediu: true
                                 },
                                 popupTemplate: {
                                     title: "{title}",
@@ -505,9 +756,12 @@
                                 padding: {
                                     top: 50,
                                     bottom: 50,
-                                    left: 50,
+                                    left: 350,
                                     right: 50
                                 }
+                            }, {
+                                duration: 1000,
+                                easing: "ease-in-out"
                             });
                             
                             // Activăm butonul de generare rută
@@ -597,36 +851,37 @@
                             if (routeResult.routeResults[0].directions &&
                                 routeResult.routeResults[0].directions.features) {
                                 
+                                // Curățăm indicațiile anterioare
+                                document.querySelectorAll('.esri-directions__scroller').forEach(el => el.remove());
+                                
                                 // Creăm un container pentru indicații
                                 const directions = document.createElement("div");
-                                directions.className = "esri-widget esri-widget--panel esri-directions__scroller";
-                                directions.style.margin = "10px";
-                                directions.style.padding = "15px";
-                                directions.style.backgroundColor = "<%=sidebar%>";
-                                directions.style.color = "<%=text%>";
-                                directions.style.borderRadius = "8px";
-                                directions.style.maxHeight = "300px";
-                                directions.style.overflowY = "auto";
-                                directions.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+                                directions.className = "directions-panel";
+                                
+                                // Buton de închidere pentru indicații
+                                const closeBtn = document.createElement("button");
+                                closeBtn.innerHTML = "✖";
+                                closeBtn.className = "close-btn";
+                                closeBtn.addEventListener("click", function() {
+                                    directions.remove();
+                                });
+                                directions.appendChild(closeBtn);
                                 
                                 // Adăugăm titlul
                                 const title = document.createElement("h3");
-                                title.style.color = "<%=accent%>";
-                                title.style.marginTop = "0";
-                                title.style.fontSize = "16px";
                                 title.textContent = "Indicații de direcții";
                                 directions.appendChild(title);
                                 
                                 // Adăugăm lista de indicații
                                 const list = document.createElement("ol");
-                                list.style.paddingLeft = "25px";
-                                list.style.margin = "10px 0";
+                                list.style.paddingLeft = "20px";
+                                list.style.margin = "8px 0";
                                 
                                 // Procesăm fiecare indicație
                                 routeResult.routeResults[0].directions.features.forEach(feature => {
                                     const item = document.createElement("li");
-                                    item.style.marginBottom = "8px";
-                                    item.style.fontSize = "14px";
+                                    item.style.marginBottom = "6px";
+                                    item.style.fontSize = "12px";
                                     
                                     // Formatare conținut
                                     const kmText = (feature.attributes.length.toFixed(2) + " km");
@@ -640,10 +895,7 @@
                                 
                                 // Adăugăm informații despre distanță totală și timp
                                 const summary = document.createElement("div");
-                                summary.style.marginTop = "15px";
-                                summary.style.paddingTop = "10px";
-                                summary.style.borderTop = "1px solid " + "<%=clr%>";
-                                summary.style.fontSize = "14px";
+                                summary.className = "directions-summary";
                                 
                                 // Calculăm distanța și timpul total
                                 const totalLength = routeResult.routeResults[0].directions.totalLength;
@@ -669,19 +921,21 @@
                                     "<p><strong>Timp estimat:</strong> " + timeText + "</p>";
                                 directions.appendChild(summary);
                                 
-                                // Adăugăm containerul de indicații în interfața utilizator
-                                view.ui.empty("top-right");
-                                view.ui.add(directions, "top-right");
+                                // Adăugăm containerul de indicații în pagină
+                                document.body.appendChild(directions);
                                 
                                 // Zoom la extinderea rutei cu padding
                                 view.goTo({
                                     target: routeResult.routeResults[0].route.geometry.extent,
                                     padding: {
-                                        top: 100,
-                                        bottom: 100,
-                                        left: 100,
-                                        right: 350 // Pad mai mare în dreapta pentru indicații
+                                        top: 50,
+                                        bottom: 50,
+                                        left: 350,
+                                        right: 50
                                     }
+                                }, {
+                                    duration: 1000,
+                                    easing: "ease-in-out"
                                 });
                                 
                                 afișareMesaj('succes', "Ruta a fost generată cu succes!");
@@ -703,13 +957,16 @@
                     // Curățăm toate graficele
                     graphicsLayer.removeAll();
                     
-                    // Resetăm interfața utilizator
-                    view.ui.empty("top-right");
+                    // Curățăm orice instrucțiuni de direcție afișate
+                    document.querySelectorAll('.esri-directions__scroller').forEach(el => el.remove());
                     
                     // Resetăm vizualizarea hărții
                     view.goTo({
                         center: [25, 45],
                         zoom: 6
+                    }, {
+                        duration: 1000,
+                        easing: "ease-in-out"
                     });
                     
                     // Resetăm variabilele
@@ -728,6 +985,29 @@
                     
                     // Afișăm toate sediile pe hartă
                     displayAllSedii();
+                });
+                
+                // Handler-i pentru butoanele de zoom
+                zoomInBtn.addEventListener('click', function() {
+                    // Păstrăm centrul actual și doar mărim nivelul de zoom
+                    const currentCenter = view.center;
+                    view.goTo({
+                        target: currentCenter,
+                        zoom: view.zoom + 1
+                    }, {
+                        duration: 500
+                    });
+                });
+                
+                zoomOutBtn.addEventListener('click', function() {
+                    // Păstrăm centrul actual și doar micșorăm nivelul de zoom
+                    const currentCenter = view.center;
+                    view.goTo({
+                        target: currentCenter,
+                        zoom: view.zoom - 1
+                    }, {
+                        duration: 500
+                    });
                 });
                 
                 // Funcție pentru afișarea tuturor sediilor pe hartă
@@ -752,7 +1032,7 @@
                                 symbol: {
                                     type: "simple-marker",
                                     color: accentColor,
-                                    size: "10px",
+                                    size: "8px",
                                     outline: {
                                         color: [255, 255, 255],
                                         width: 1
@@ -860,5 +1140,3 @@
         response.sendRedirect("login.jsp");
     }
 %>
-</body>
-</html>
