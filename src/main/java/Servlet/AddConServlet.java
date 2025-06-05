@@ -670,7 +670,7 @@ public class AddConServlet extends HttpServlet {
 			int nr = 0;
 			int id = Integer.valueOf(request.getParameter("userId"));
 			
-		    String sql = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and concedii.status >= 0;";
+		    String sql = "SELECT count(*) as total FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE id_ang = ? AND MONTH(start_c) >=6 AND MONTH(start_c) <= 8 and YEAR(start_c) = YEAR(CURRENT_DATE()) and concedii.status >= 0;";
 		    
 		    Class.forName("com.mysql.cj.jdbc.Driver");
 		    try (Connection conexiune = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");

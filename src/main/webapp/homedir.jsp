@@ -98,6 +98,10 @@
     <link rel="stylesheet" href="./responsive-login-form-main/assets/css/calendar.css">
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
     <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    <link href="https://cdn.jsdelivr.net/npm/remixicons@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
     <style>
         body {
             background-color: var(--clr);
@@ -152,217 +156,832 @@
             background-color: black;
            
         }
+
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--hover-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--accent-color), var(--info-color));
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .header-content {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-info h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .user-role {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .current-date {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quick-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--info-color));
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+        }
+
+        .trend-up { color: var(--success-color); }
+        .trend-down { color: var(--danger-color); }
+        .trend-neutral { color: #666; }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .chart-filter {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background: var(--bg-color);
+        }
+
+        .canvas-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .activity-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .activity-card {
+            background: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 15px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            background: var(--hover-color);
+        }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .timeline-content h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content p {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .timeline-date {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .notification-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .alert-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .alert-item:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .pdf-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pdf-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .activity-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .user-info h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animații pentru încărcare */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
     </style>
 </head>
-<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; background:<%out.println(clr);%>">
+<body>
+    <div class="dashboard-container">
+        <!-- Header Section -->
+        <div class="header-section fade-in">
+            <div class="header-content">
+                <div class="user-info">
+                    <h1 id="userName">Vasile Fabian</h1>
+                    <span class="user-role" id="userRole">Director HR</span>
+                    <div class="current-date" id="currentDate">Vineri, 06 Iunie 2025</div>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-btn" title="Notificări">
+                        <i class="ri-notification-line"></i>
+                    </button>
+                    <button class="quick-btn" title="Setări">
+                        <i class="ri-settings-line"></i>
+                    </button>
+                    <button class="quick-btn" title="Profil">
+                        <i class="ri-user-line"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-<%
-// Verifică dacă există concedii în ziua curentă care să aibă locații
-boolean hasLocationsForTodayLeaves = false;
-int todayLeavesCount = 0;
-int todayLeavesWithLocationCount = 0;
+        <!-- Stats Grid -->
+        <div class="stats-grid fade-in">
+            <!-- Statistici Concedii -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Concedii Luate</div>
+                        <div class="stat-value" id="concediiLuate">2</div>
+                        <div class="stat-trend trend-up">
+                            <i class="ri-arrow-up-line"></i>
+                            <span>din 3 disponibile</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--info-color);">
+                        <i class="ri-calendar-check-line"></i>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 67%;"></div>
+                </div>
+            </div>
 
-try {
-    // Interogare pentru a verifica concediile din ziua curentă folosind direct CURDATE()
-    String checkQuery = "SELECT c.id FROM concedii c WHERE c.added = CURDATE() and c.id_ang =" + id;
+            <!-- Zile Concediu -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Zile Concediu</div>
+                        <div class="stat-value" id="zileUsed">16</div>
+                        <div class="stat-trend trend-neutral">
+                            <i class="ri-calendar-line"></i>
+                            <span>din 40 disponibile</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--success-color);">
+                        <i class="ri-time-line"></i>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 40%;"></div>
+                </div>
+            </div>
 
-    try (Connection connection2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-         PreparedStatement checkStmt = connection2.prepareStatement(checkQuery)) {
-        
-        try (ResultSet checkRs = checkStmt.executeQuery()) {
-            // Numără concediile din ziua curentă
-            while (checkRs.next()) {
-                todayLeavesCount++;
+            <!-- Proiecte Active -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Proiecte Active</div>
+                        <div class="stat-value" id="proiecteActive">2</div>
+                        <div class="stat-trend trend-up">
+                            <i class="ri-arrow-up-line"></i>
+                            <span>+1 față de luna trecută</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--warning-color);">
+                        <i class="ri-briefcase-line"></i>
+                    </div>
+                </div>
+            </div>
 
-                // Pentru fiecare concediu, verifică dacă are o locație
-                int concediuId = checkRs.getInt("id");
-                String locatieQuery = "SELECT COUNT(*) AS count FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on concedii.id_Ang = useri.id WHERE id_concediu = ? and useri.id = " + id;
+            <!-- Salariu Curent -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-label">Salariu Net</div>
+                        <div class="stat-value" style="font-size: 1.8rem;" id="salariuNet">7,605 RON</div>
+                        <div class="stat-trend trend-up">
+                            <i class="ri-arrow-up-line"></i>
+                            <span>Cu sporuri incluse</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon" style="background: var(--success-color);">
+                        <i class="ri-money-dollar-circle-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                try (PreparedStatement locatieStmt = connection2.prepareStatement(locatieQuery)) {
-                    locatieStmt.setInt(1, concediuId);
-                    try (ResultSet locatieRs = locatieStmt.executeQuery()) {
-                        if (locatieRs.next() && locatieRs.getInt("count") > 0) {
-                            todayLeavesWithLocationCount++;
+        <!-- Charts Section -->
+        <div class="charts-section slide-in">
+            <!-- Grafic Concedii -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Evoluția Concediilor</h3>
+                    <select class="chart-filter">
+                        <option>Ultimele 6 luni</option>
+                        <option>Ultimul an</option>
+                        <option>Tot timpul</option>
+                    </select>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="concediiChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Grafic Status Concedii -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Status Concedii</h3>
+                    <select class="chart-filter">
+                        <option>Anul curent</option>
+                        <option>Anul trecut</option>
+                        <option>Totale</option>
+                    </select>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Section -->
+        <div class="activity-section slide-in">
+            <!-- Activitate Recentă -->
+            <div class="activity-card">
+                <div class="activity-header">
+                    <h3>Activitate Recentă</h3>
+                    <button class="quick-btn" style="position: relative; background: var(--accent-color);">
+                        <i class="ri-refresh-line"></i>
+                    </button>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon" style="background: var(--success-color);">
+                        <i class="ri-check-line"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>Concediu aprobat</h4>
+                        <p>Cererea ta de concediu pentru perioada 01-10 Iulie a fost aprobată de directorul de departament.</p>
+                        <div class="timeline-date">Acum 2 ore</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon" style="background: var(--info-color);">
+                        <i class="ri-file-text-line"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>Task nou asignat</h4>
+                        <p>Ai fost asignat la task-ul "Implementare modul HR" în proiectul ERP Implementation.</p>
+                        <div class="timeline-date">Ieri, 14:30</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon" style="background: var(--warning-color);">
+                        <i class="ri-star-line"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>Evaluare performanță</h4>
+                        <p>A fost programată evaluarea ta de performanță pentru săptămâna viitoare.</p>
+                        <div class="timeline-date">25 Mai, 09:15</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon" style="background: var(--accent-color);">
+                        <i class="ri-team-line"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>Adăugat în echipă</h4>
+                        <p>Ai fost adăugat în echipa "HR Management System" pentru proiectul de digitalizare.</p>
+                        <div class="timeline-date">20 Mai, 16:45</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notificări și Alerte -->
+            <div>
+                <div class="notification-card">
+                    <div class="notification-header">
+                        <h3>Notificări</h3>
+                        <span style="background: rgba(255,255,255,0.3); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">3 noi</span>
+                    </div>
+                    
+                    <div class="alert-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Ședință echipă</strong>
+                                <p style="margin: 5px 0; font-size: 0.85rem;">Mâine la ora 10:00</p>
+                            </div>
+                            <i class="ri-calendar-event-line"></i>
+                        </div>
+                    </div>
+
+                    <div class="alert-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Deadline proiect</strong>
+                                <p style="margin: 5px 0; font-size: 0.85rem;">în 3 zile</p>
+                            </div>
+                            <i class="ri-alarm-warning-line"></i>
+                        </div>
+                    </div>
+
+                    <div class="alert-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Adeverință gata</strong>
+                                <p style="margin: 5px 0; font-size: 0.85rem;">Poate fi ridicată</p>
+                            </div>
+                            <i class="ri-file-download-line"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Card pentru Proiecte -->
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <h3>Proiectele Tale</h3>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-weight: 600;">ERP Implementation</span>
+                            <span style="color: var(--success-color); font-weight: 600;">75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Deadline: 31 Dec 2025</p>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-weight: 600;">HR Management System</span>
+                            <span style="color: var(--warning-color); font-weight: 600;">45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%; background: linear-gradient(90deg, var(--warning-color), var(--accent-color));"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Deadline: 31 Jul 2025</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Download Button -->
+    <button class="pdf-btn" id="generatePDF">
+        <i class="ri-download-line"></i>
+        Descarcă PDF
+    </button>
+
+    <script>
+        // Inițializare Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulare date dinamice (în producție acestea vor veni din JSP/servletul Java)
+            const userData = {
+                nume: 'Vasile',
+                prenume: 'Fabian',
+                functie: 'Director HR',
+                ierarhie: 2,
+                concediiLuate: 2,
+                concediiRamase: 1,
+                zileLuate: 16,
+                zileRamase: 24,
+                salariuBrut: 13000,
+                salariuNet: 7605,
+                proiecteActive: 2
+            };
+
+            // Update informații user
+            updateUserInfo(userData);
+            
+            // Inițializare grafice
+            initializeCharts();
+            
+            // Setare dată curentă
+            updateCurrentDate();
+            
+            // Event listeners
+            setupEventListeners();
+        });
+
+        function updateUserInfo(data) {
+            document.getElementById('userName').textContent = `${data.nume} ${data.prenume}`;
+            document.getElementById('userRole').textContent = determineRole(data.ierarhie, data.functie);
+            document.getElementById('concediiLuate').textContent = data.concediiLuate;
+            document.getElementById('zileUsed').textContent = data.zileLuate;
+            document.getElementById('proiecteActive').textContent = data.proiecteActive;
+            document.getElementById('salariuNet').textContent = `${data.salariuNet.toLocaleString()} RON`;
+        }
+
+        function determineRole(ierarhie, functie) {
+            if (ierarhie < 3) return `Director ${functie}`;
+            if (ierarhie >= 4 && ierarhie <= 5) return `Șef ${functie}`;
+            if (ierarhie >= 10) return `Stagiar ${functie}`;
+            return functie;
+        }
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('ro-RO', options);
+        }
+
+        function initializeCharts() {
+            // Grafic evoluție concedii
+            const concediiCtx = document.getElementById('concediiChart').getContext('2d');
+            new Chart(concediiCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun'],
+                    datasets: [{
+                        label: 'Zile Concediu',
+                        data: [0, 5, 8, 12, 16, 16],
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-color'),
+                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-color') + '20',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 40,
+                            grid: {
+                                color: '#f0f0f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
                         }
                     }
                 }
-            }
-        }
-    }
+            });
 
-    // Există locații pentru concediile din ziua curentă dacă cel puțin un concediu are locație
-    hasLocationsForTodayLeaves = (todayLeavesWithLocationCount > 0);
-
-} catch (Exception e) {
-    e.printStackTrace();
-    out.println("<script type='text/javascript'>");
-    out.println("console.error('Eroare la verificarea concediilor: " + e.getMessage() + "');");
-    out.println("</script>");
-}
-%>
-
-<!-- Alertă pentru concedii fără locații -->
-<% if (todayLeavesCount > todayLeavesWithLocationCount) { %>
-<div id="noLocationsBanner" style="
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    background-color: <%= accent %>;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 80%;
-    max-width: 600px;
-">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="min-width: 24px;">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-    </svg>
-    <div>
-        <strong>Atenție!</strong> Există <%= todayLeavesCount %> concedii adăugate astăzi, dar numai <%=todayLeavesWithLocationCount %> are locație asociată.
-    </div>
-    <button onclick="document.getElementById('noLocationsBanner').style.display='none';" style="
-        background: transparent;
-        border: none;
-        color: white;
-        cursor: pointer;
-        font-size: 20px;
-        margin-left: 10px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    ">&times;</button>
-</div>
-<% } %>
-
-<div class="main-content">
-    
-    <div class="card">
-        <h3>Statistici personale la data de <% 
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today")) {
-                ResultSet rs2 = preparedStatement2.executeQuery();
-                if (rs2.next()) {
-                    out.println(rs2.getString("today"));
-                }
-            } catch (SQLException e) {
-                out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                e.printStackTrace();
-            }
-        %></h3>
-        <div class="info">
-            <%
-                String email = "";
-                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                     PreparedStatement stmt = connection.prepareStatement("SELECT nume, prenume, data_nasterii, adresa, email, telefon, username, denumire, nume_dep, zilecons, zileramase, conluate, conramase FROM useri NATURAL JOIN tipuri NATURAL JOIN departament WHERE username = ?")) {
-                    stmt.setString(1, username);
-                    ResultSet rs1 = stmt.executeQuery();
-                    if (rs1.next()) {
-                        email = rs1.getString("email");
-                        out.println("<div><span>Concedii luate:</span> " + rs1.getString("conluate") + "</div>");
-                        out.println("<div><span>Concedii ramase:</span> " + rs1.getString("conramase") + "</div>");
-                        out.println("<div><span>Zile luate:</span> " + rs1.getString("zilecons") + "</div>");
-                        out.println("<div><span>Zile ramase:</span> " + rs1.getString("zileramase") + "</div>");
-                    } else {
-                        out.println("<div>Nu exista date.</div>");
-                    }
-                } catch (SQLException e) {
-                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                    e.printStackTrace();
-                }
-            %>
-        </div>
-        <%
-        int cate = -1;
-   	 try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-            // Check for upcoming leaves in 3 days
-            String query = "SELECT COUNT(*) AS count FROM concedii WHERE start_c + 3 >= date(NOW()) AND id_ang = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, id);
-                try (ResultSet rs2 = stmt.executeQuery()) {
-                    if (rs2.next() && rs2.getInt("count") > 0) {
-                       cate =  rs2.getInt("count");
-                    }
-                }
-            }
-           // System.out.println(cate);
-            // Display the user dashboard or related information
-            //out.println("<div>Welcome, " + currentUser.getPrenume() + "</div>");
-            // Add additional user-specific content here
-        } catch (SQLException e) {
-            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-            e.printStackTrace();
-        }
-   	 
-        int cate2 = -1;
-     	if (cate >= 1) {
-     		 String query2 = "SELECT CASE WHEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) between 0 and 4 THEN DATEDIFF(start_c, (SELECT date_checked FROM date_logs ORDER BY date_checked DESC LIMIT 1)) ELSE -1 END AS dif FROM concedii WHERE id_ang = ? order by dif desc limit 1";
-             try (PreparedStatement stmt = connection.prepareStatement(query2)) {
-                 stmt.setInt(1, id);
-                 try (ResultSet rs2 = stmt.executeQuery()) {
-                     if (rs2.next() && rs2.getInt("dif") > 0) {
-                        cate2 =  rs2.getInt("dif");
-                        
-                     }
-                 }
-             }
-             // System.out.println(cate2);
-             if (cate2 > 0)
-	     		{
-            	 //out.println ("Aveti un concediu in mai putin de " + cate2 + " zile!");
-            	 // isi ia deconectare dupa si nu inteleg de ce + nu merge redirectarea ok + cum automatizez?
-            		System.out.println("ok");
-	     		}
-     	}
-        %>
-    </div>
-    <div class="card">
-        <h3>Statistici concedii la data de <% 
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today")) {
-                ResultSet rs2 = preparedStatement2.executeQuery();
-                if (rs2.next()) {
-                    out.println(rs2.getString("today"));
-                }
-            } catch (SQLException e) {
-                out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                e.printStackTrace();
-            }
-        %></h3>
-        <div class="info">
-            <%
-                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                    PreparedStatement stmt = connection.prepareStatement("SELECT count(*) as total FROM concedii WHERE status = ?");
-                    int[] statuses = {-2, -1, 2, 1, 0};
-                    String[] labels = {"Respinse director", "Respinse sef", "Aprobate director", "Aprobate sef", "In asteptare"};
-                    for (int i = 0; i < statuses.length; i++) {
-                        stmt.setInt(1, statuses[i]);
-                        ResultSet rs2 = stmt.executeQuery();
-                        if (rs2.next()) {
-                            out.println("<div><span>" + labels[i] + ":</span> " + rs2.getString("total") + "</div>");
+            // Grafic status concedii - Donut Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aprobate Director', 'Aprobate Șef', 'În Așteptare', 'Respinse'],
+                    datasets: [{
+                        data: [2, 4, 1, 0],
+                        backgroundColor: [
+                            '#28a745',
+                            '#17a2b8', 
+                            '#ffc107',
+                            '#dc3545'
+                        ],
+                        borderWidth: 0,
+                        cutout: '60%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
                         }
                     }
-                } catch (SQLException e) {
-                    out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                    e.printStackTrace();
                 }
-            %>
-        </div>
-    </div>
-    
-</div>
+            });
+        }
 
-        <button style="box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="generate" class="btn btn-primary" onclick="generate()">Descarcati PDF</button>
+        function setupEventListeners() {
+            // PDF generation
+            document.getElementById('generatePDF').addEventListener('click', function() {
+                // Simulare generare PDF
+                this.innerHTML = '<i class="ri-loader-line"></i> Generez...';
+                this.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="ri-check-line"></i> Gata!';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="ri-download-line"></i> Descarcă PDF';
+                        this.style.pointerEvents = 'auto';
+                    }, 2000);
+                }, 3000);
+            });
 
+            // Refresh button pentru activitate
+            document.querySelector('.activity-header button').addEventListener('click', function() {
+                this.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                    this.style.transform = 'rotate(0deg)';
+                }, 500);
+            });
+        }
+
+        // Simulare actualizări în timp real
+        setInterval(() => {
+            // Update random pentru demonstrație
+            const stats = document.querySelectorAll('.stat-value');
+            stats.forEach(stat => {
+                stat.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    stat.style.transform = 'scale(1)';
+                }, 200);
+            });
+        }, 30000);
+    </script>
+</body>
+</html>
  <%
                     }
                 }
@@ -387,25 +1006,3 @@ try {
         response.sendRedirect("logout");
     }
 %>
-<script>
-function generate() {
-    const element = document.querySelector('.main-content');
-    html2pdf().set({
-        pagebreak: { mode: ['css', 'legacy'] },
-        html2canvas: {
-            scale: 1,
-            logging: true,
-            dpi: 192,
-            letterRendering: true,
-            useCORS: true
-        },
-        jsPDF: {
-            unit: 'in',
-            format: 'a4',
-            orientation: 'portrait'
-        }
-    }).from(element).save();
-}
-</script>
-</body>
-</html>

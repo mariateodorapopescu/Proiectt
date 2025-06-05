@@ -715,6 +715,15 @@
                     </a>
                 </li>
                 
+                 <li style="--bg: <%out.println(accent); %>">
+                    <a href="faq.jsp" class="load-content" target="iframe">
+                        <div class="siiconn">
+                            <ion-icon name="information-circle"></ion-icon>
+                        </div>
+                        <div  class="sitextt">Cum fac sa...?</div>
+                    </a>
+                </li>
+                
                 <li style="--bg: <%out.println(accent); %>;">
                      <a href="setari.jsp" class="load-content" target="iframe">
                         <div class="siiconn">

@@ -1,4 +1,3 @@
-```jsp
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
       
@@ -114,34 +113,124 @@
             margin: 0;
             height: 100%;
             width: 100%;
+            /* Previne comportamentul de zoom la scroll */
+            touch-action: none;
         }
         
-        .sidebar {
-            position: absolute;
-            top: 80px;
-            left: 20px;
+        /* Folosim CSS pentru a opri scroll wheel zoom */
+        #viewDiv {
+            -ms-touch-action: none;
+            touch-action: none;
+        }
+        
+        .esri-view {
+            touch-action: none !important;
+        }
+        
+        .form-container {
+            max-height: 90vh;
+            overflow-y: auto;
+            position: fixed;
+            top: 10px;
+            left: 10px;
             z-index: 100;
-            background-color: <%=sidebar%>;
-            padding: 15px;
+            padding: 12px;
+            background: <%=sidebar%>;
+            color: <%=text%>;
+            border-color: <%=clr%>;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            color: <%=text%>;
-            font-family: Arial, sans-serif;
+            width: 90%;
+            max-width: 320px;
+            font-size: 14px;
         }
         
-        .sidebar select,
-        .sidebar button {
+        .form-container h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .form-container select {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             padding: 10px;
             width: 100%;
             border: none;
             border-radius: 5px;
             font-size: 14px;
+            background-color: <%=clr%>;
+            color: <%=text%>;
         }
         
-        .sidebar button:hover {
+        .form-container button {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 8px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: <%=accent%>;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-container button:hover {
             opacity: 0.9;
+        }
+        
+        .form-container button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .details-panel {
+            background-color: <%=card%>;
+            color: <%=text%>;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        
+        .details-panel h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: <%=accent%>;
+            border-bottom: 1px solid <%=clr%>;
+            padding-bottom: 3px;
+            font-size: 14px;
+        }
+        
+        .concediu-info {
+            margin-bottom: 4px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .badge-distance {
+            background-color: <%=accent%>;
+        }
+
+        .badge-current {
+            background-color: #4CAF50;
+        }
+
+        .badge-concediu {
+            background-color: #E91E63;
         }
         
         #loadingSpinner {
@@ -152,40 +241,145 @@
             transform: translate(-50%, -50%);
             z-index: 200;
             background-color: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
         
         #loadingSpinner p {
             margin-bottom: 10px;
             font-weight: bold;
-        }
-        
-        .form-container {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .details-panel {
-            background-color: <%=sidebar%>;
-            color: <%=text%>;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-top: 10px;
             font-size: 14px;
         }
         
-        .details-panel h4 {
-            margin-top: 0;
-            color: <%=accent%>;
-            border-bottom: 1px solid <%=clr%>;
-            padding-bottom: 5px;
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 8px;
+            display: none;
+            font-size: 12px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 8px;
+            display: none;
+            font-size: 12px;
         }
         
-        .concediu-info {
-            margin-bottom: 5px;
+        .zoom-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .zoom-controls button {
+            flex: 1;
+            padding: 8px;
+            margin-top: 0;
+            font-size: 12px;
+        }
+        
+        .directions-panel {
+            margin: 10px;
+            padding: 12px;
+            background-color: <%=sidebar%>;
+            color: <%=text%>;
+            border-radius: 8px;
+            max-height: 400px;
+            width: 90%;
+            max-width: 320px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 13px;
+            z-index: 100;
+        }
+        
+        .directions-panel h3 {
+            color: <%=accent%>;
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        
+        .directions-panel ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        
+        .directions-panel li {
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        
+        .directions-summary {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid <%=clr%>;
+            font-size: 12px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: <%=accent%>;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        /* Media queries pentru dispozitive mobile */
+        @media (max-width: 480px) {
+            .form-container {
+                width: calc(100% - 20px);
+                max-width: none;
+                font-size: 13px;
+            }
+            
+            .form-container h3 {
+                font-size: 15px;
+            }
+            
+            .details-panel {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+            
+            .details-panel h4 {
+                font-size: 13px;
+            }
+            
+            .badge {
+                font-size: 10px;
+                padding: 2px 5px;
+            }
+            
+            .directions-panel {
+                width: calc(100% - 20px);
+                max-width: none;
+                font-size: 12px;
+            }
+            
+            .directions-panel h3 {
+                font-size: 14px;
+            }
+            
+            .directions-panel li,
+            .directions-summary p {
+                font-size: 11px;
+            }
         }
         
         ::-webkit-scrollbar {
@@ -195,46 +389,96 @@
 </head>
 <body>
     <div id="viewDiv"></div>
-    <div class="form-container" style="position: fixed; top: 20px; left: 20px; z-index: 100; padding: 15px; background:<%=sidebar%>; color:<%=clr%>; border-color: <%=clr%>">
-        <h3 style="color: <%=accent%>; margin-top: 0;">Rutare către concediile mele</h3>
+    <div class="form-container">
+        <h3 style="color: <%=accent%>;">Rutare către concediile mele</h3>
         
-        <label style="color:<%=text%>" class="login__label" for="concediuSelect">Selectează concediul</label>
-        <select style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; border-color:<%=accent%>; background:<%=clr%>; color:<%=text%>" class="login__input" id="concediuSelect">
-            <option value="" disabled selected>Alege un concediu...</option>
-        </select>
+        <div class="details-panel">
+            <h4>Despre această funcționalitate</h4>
+            <p style="margin-top: 0; font-size: 12px;">
+                Acest instrument îți permite să vizualizezi și să generezi ruta către locațiile concediilor tale personale.
+            </p>
+        </div>
+        
+        <div class="details-panel">
+            <h4>Selectează un concediu</h4>
+            <select id="concediuSelect" class="login__input">
+                <option value="" disabled selected>Alege un concediu...</option>
+                <!-- Opțiunile vor fi încărcate dinamic -->
+            </select>
+        </div>
         
         <div id="concediuDetails" class="details-panel" style="display: none;">
             <h4>Detalii concediu</h4>
+            <div class="badge badge-concediu">Concediu</div>
             <div id="concediuInfo"></div>
         </div>
         
-        <button style="display: block; margin-top: 15px; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="locateMeBtn">
+        <div class="details-panel">
+            <h4>Control Zoom</h4>
+            <div class="zoom-controls">
+                <button id="zoomInBtn">
+                    <i class="ri-zoom-in-line"></i> Zoom In
+                </button>
+                <button id="zoomOutBtn">
+                    <i class="ri-zoom-out-line"></i> Zoom Out
+                </button>
+            </div>
+            <p style="font-size: 11px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
+        </div>
+        
+        <button id="locateMeBtn" class="login__button">
             <i class="ri-map-pin-user-line"></i> Localizează-mă
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="generateRouteBtn" disabled>
+        <button id="generateRouteBtn" class="login__button" disabled>
             <i class="ri-route-line"></i> Generează rută
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="resetBtn">
+        <button id="resetBtn" class="login__button">
             <i class="ri-refresh-line"></i> Resetează harta
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button">
+        <button class="login__button">
             <a style="color: white !important; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">
                 <i class="ri-arrow-left-line"></i> Înapoi
             </a>
         </button>
         
-        <p id="statusMessage" style="color:<%=text%>; margin-top: 10px; font-size: 14px;"></p>
+        <p id="statusMessage" style="color:<%=text%>; margin-top: 10px; font-size: 12px;"></p>
+        <div id="errorMsg" class="error-message"></div>
+        <div id="successMsg" class="success-message"></div>
     </div>
 
     <div id="loadingSpinner">
-        <p>Se încarcă ruta...</p>
+        <p>Se încarcă...</p>
         <div style="width: 50px; height: 50px; border: 5px solid <%=clr%>; border-top: 5px solid <%=accent%>; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
     </div>
 
     <script>
+        // Prevenim efectul de zoom la scroll direct în browser
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevenim scroll-ul pe div-ul hărții
+            const mapDiv = document.getElementById('viewDiv');
+            
+            mapDiv.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                return false;
+            }, { passive: false });
+            
+            // Adăugăm un event listener pentru a asigura că toate elementele ArcGIS sunt încărcate
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const esriElements = document.querySelectorAll('.esri-view-surface');
+                    esriElements.forEach(function(element) {
+                        element.addEventListener('wheel', function(e) {
+                            e.preventDefault();
+                            return false;
+                        }, { passive: false });
+                    });
+                }, 1000); // Așteptăm 1 secundă pentru încărcarea elementelor ArcGIS
+            });
+        });
+        
         // Animație pentru loading spinner
         document.head.insertAdjacentHTML('beforeend', `
             <style>
@@ -251,7 +495,6 @@
             
             // ID-ul utilizatorului curent
             const userId = <%=id%>;
-            console.log(userId);
             
             // Referințe la elementele DOM
             const concediuSelect = document.getElementById("concediuSelect");
@@ -260,12 +503,31 @@
             const locateMeBtn = document.getElementById("locateMeBtn");
             const generateRouteBtn = document.getElementById("generateRouteBtn");
             const resetBtn = document.getElementById("resetBtn");
+            const zoomInBtn = document.getElementById("zoomInBtn");
+            const zoomOutBtn = document.getElementById("zoomOutBtn");
             const loadingSpinner = document.getElementById("loadingSpinner");
             const statusMessage = document.getElementById("statusMessage");
+            const errorMsg = document.getElementById("errorMsg");
+            const successMsg = document.getElementById("successMsg");
             
             // Variabile pentru stocarea datelor
             let currentLocation = null;
             let selectedConcediuLocation = null;
+            
+            // Funcție pentru afișarea mesajelor
+            function afișareMesaj(tip, mesaj, durată = 5000) {
+                if (tip === 'succes') {
+                    successMsg.textContent = mesaj;
+                    successMsg.style.display = 'block';
+                    setTimeout(() => { successMsg.style.display = 'none'; }, durată);
+                } else if (tip === 'eroare') {
+                    errorMsg.textContent = mesaj;
+                    errorMsg.style.display = 'block';
+                    setTimeout(() => { errorMsg.style.display = 'none'; }, durată);
+                } else {
+                    statusMessage.textContent = mesaj;
+                }
+            }
             
             // Încarcă concediile utilizatorului
             loadConcediiPersonale();
@@ -278,6 +540,7 @@
                 "esri/Graphic",
                 "esri/layers/GraphicsLayer",
                 "esri/geometry/Point",
+                "esri/geometry/Polyline",
                 "esri/rest/route",
                 "esri/rest/support/RouteParameters",
                 "esri/rest/support/FeatureSet"
@@ -288,6 +551,7 @@
                 Graphic,
                 GraphicsLayer,
                 Point,
+                Polyline,
                 route,
                 RouteParameters,
                 FeatureSet
@@ -312,6 +576,11 @@
                     zoom: 6,
                     ui: {
                         components: ["zoom"] // Afișăm doar controlul de zoom
+                    },
+                    // Dezactivăm zoom-ul la scroll
+                    navigation: {
+                        mouseWheelZoomEnabled: false,
+                        browserTouchPanEnabled: true
                     }
                 });
                 
@@ -346,15 +615,21 @@
                                 <div class="concediu-info"><strong>Locație:</strong> ${locatie}</div>
                                 <div class="concediu-info"><strong>Perioada:</strong> ${perioada}</div>
                                 <div class="concediu-info"><strong>Tip:</strong> ${tip}</div>
-                                <div class="concediu-info"><strong>Coordonate:</strong> Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}</div>
                             `;
+                            
+                            // Ștergem markerii anteriori pentru concedii
+                            graphicsLayer.graphics.forEach(function(graphic) {
+                                if (graphic.attributes && graphic.attributes.title === "Locație concediu") {
+                                    graphicsLayer.remove(graphic);
+                                }
+                            });
                             
                             // Creăm un marker pentru locația concediului
                             const pointGraphic = new Graphic({
                                 geometry: selectedConcediuLocation,
                                 symbol: {
                                     type: "simple-marker",
-                                    color: accentColor,
+                                    color: "#E91E63", // Roz pentru locația concediului
                                     size: "12px",
                                     outline: {
                                         color: [255, 255, 255],
@@ -371,23 +646,27 @@
                                 }
                             });
                             
-                            // Curăță layer-ul de grafice și adaugă noul marker
-                            graphicsLayer.removeAll();
+                            // Adăugăm markerul pe hartă
                             graphicsLayer.add(pointGraphic);
                             
                             // Zoom și centrare pe locația concediului
                             view.goTo({
-                                target: selectedConcediuLocation,
+                                center: [lon, lat],
                                 zoom: 12
+                            }, {
+                                duration: 1000,
+                                easing: "ease-in-out"
                             });
                             
                             // Activăm butonul de generare rută dacă avem și locația curentă
                             if (currentLocation) {
                                 generateRouteBtn.disabled = false;
                             }
+                            
+                            afișareMesaj('succes', "Concediu selectat cu succes!");
                         } else {
                             // Nu avem coordonate valide
-                            statusMessage.textContent = "Acest concediu nu are coordonate geografice definite.";
+                            afișareMesaj('eroare', "Acest concediu nu are coordonate geografice definite.");
                             selectedConcediuLocation = null;
                             generateRouteBtn.disabled = true;
                         }
@@ -402,8 +681,12 @@
                 // Handler pentru butonul "Localizează-mă"
                 locateMeBtn.addEventListener("click", function() {
                     if (navigator.geolocation) {
+                        loadingSpinner.style.display = "block";
+                        afișareMesaj('normal', "Se obține locația...");
+                        
                         navigator.geolocation.getCurrentPosition(
                             function(position) {
+                                loadingSpinner.style.display = "none";
                                 const longitude = position.coords.longitude;
                                 const latitude = position.coords.latitude;
                                 
@@ -413,12 +696,19 @@
                                     latitude: latitude
                                 });
                                 
+                                // Ștergem markerul anterior pentru locația curentă
+                                graphicsLayer.graphics.forEach(function(graphic) {
+                                    if (graphic.attributes && graphic.attributes.title === "Locația mea") {
+                                        graphicsLayer.remove(graphic);
+                                    }
+                                });
+                                
                                 // Creăm un marker pentru locația curentă
                                 const pointGraphic = new Graphic({
                                     geometry: currentLocation,
                                     symbol: {
                                         type: "simple-marker",
-                                        color: "blue", // Folosim albastru pentru locația curentă
+                                        color: "#4CAF50", // Verde pentru locația curentă
                                         size: "12px",
                                         outline: {
                                             color: [255, 255, 255],
@@ -435,234 +725,365 @@
                                     }
                                 });
                                 
-                                // Adăugăm markeri pe hartă
-                                // Dacă avem și o locație de concediu selectată, o păstrăm pe hartă
+                                // Adăugăm markerul pe hartă
+                                graphicsLayer.add(pointGraphic);
+                                
+                                // Dacă avem și o locație de concediu selectată, ajustăm vizualizarea
                                 if (selectedConcediuLocation) {
-                                    // Găsim markerul existent pentru concediu și îl păstrăm
-                                    const graphics = graphicsLayer.graphics.toArray();
-                                    graphicsLayer.removeAll();
+                                    // Calculăm centrul dintre cele două puncte
+                                    const centerLat = (latitude + selectedConcediuLocation.latitude) / 2;
+                                    const centerLon = (longitude + selectedConcediuLocation.longitude) / 2;
                                     
-                                    // Adăugăm înapoi doar markerul pentru concediu
-                                    for (const graphic of graphics) {
-                                        if (graphic.geometry.type === "point" && 
-                                            graphic.attributes && 
-                                            graphic.attributes.title === "Locație concediu") {
-                                            graphicsLayer.add(graphic);
-                                        }
+                                    // Calculăm distanța aproximativă (în grade)
+                                    const distanceLat = Math.abs(latitude - selectedConcediuLocation.latitude);
+                                    const distanceLon = Math.abs(longitude - selectedConcediuLocation.longitude);
+                                    
+                                    // Determinăm un nivel de zoom adecvat bazat pe distanță
+                                    let zoomLevel;
+                                    const maxDistance = Math.max(distanceLat, distanceLon) * 111; // Aproximativ km
+                                    
+                                    if (maxDistance > 100) {
+                                        zoomLevel = 8;
+                                    } else if (maxDistance > 50) {
+                                        zoomLevel = 9;
+                                    } else if (maxDistance > 20) {
+                                        zoomLevel = 10;
+                                    } else if (maxDistance > 10) {
+                                        zoomLevel = 11;
+                                    } else if (maxDistance > 5) {
+                                        zoomLevel = 12;
+                                    } else if (maxDistance > 2) {
+                                        zoomLevel = 13;
+                                    } else if (maxDistance > 1) {
+                                        zoomLevel = 14;
+                                    } else {
+                                        zoomLevel = 15;
                                     }
                                     
-                                    // Acum adăugăm și locația curentă
-                                    graphicsLayer.add(pointGraphic);
-                                    
-                                    // Ajustăm vizualizarea pentru a include ambele locații
+                                    // Aplicăm zoom-ul pentru a include ambele locații
                                     view.goTo({
-                                        target: [currentLocation, selectedConcediuLocation],
-                                        padding: {
-                                            top: 50,
-                                            bottom: 50,
-                                            left: 50,
-                                            right: 50
-                                        }
+                                        center: [centerLon, centerLat],
+                                        zoom: zoomLevel
+                                    }, {
+                                        duration: 1000,
+                                        easing: "ease-in-out"
                                     });
                                     
                                     // Activăm butonul de generare rută
                                     generateRouteBtn.disabled = false;
                                 } else {
                                     // Doar locația curentă
-                                    graphicsLayer.removeAll();
-                                    graphicsLayer.add(pointGraphic);
-                                    
-                                    // Zoom și centrare pe locația curentă
                                     view.goTo({
-                                        target: currentLocation,
+                                        center: [longitude, latitude],
                                         zoom: 15
+                                    }, {
+                                        duration: 1000,
+                                        easing: "ease-in-out"
                                     });
                                 }
                                 
-                                statusMessage.textContent = "Localizat cu succes!";
+                                afișareMesaj('succes', "Localizat cu succes!");
                             },
                             function(error) {
-                                statusMessage.textContent = "Eroare la obținerea poziției: " + error.message;
+                                loadingSpinner.style.display = "none";
+                                let errorMessage = "Eroare la obținerea poziției.";
+                                
+                                switch(error.code) {
+                                    case error.PERMISSION_DENIED:
+                                        errorMessage = "Accesul la geolocalizare a fost refuzat. Verifică permisiunile browser-ului.";
+                                        break;
+                                    case error.POSITION_UNAVAILABLE:
+                                        errorMessage = "Informațiile de localizare nu sunt disponibile.";
+                                        break;
+                                    case error.TIMEOUT:
+                                        errorMessage = "Cererea de localizare a expirat.";
+                                        break;
+                                    case error.UNKNOWN_ERROR:
+                                        errorMessage = "A apărut o eroare necunoscută la determinarea locației.";
+                                        break;
+                                }
+                                
+                                afișareMesaj('eroare', errorMessage);
                                 console.error("Eroare la geolocație:", error);
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 10000,
+                                maximumAge: 0
                             }
                         );
                     } else {
-                        statusMessage.textContent = "Geolocația nu este suportată de acest browser.";
+                        afișareMesaj('eroare', "Geolocația nu este suportată de acest browser.");
                     }
                 });
                 
                 // Handler pentru butonul "Generează rută"
-                generateRouteBtn.addEventListener("click", async function() {
+                generateRouteBtn.addEventListener("click", function() {
                     if (!currentLocation) {
-                        statusMessage.textContent = "Te rog să te localizezi mai întâi.";
+                        afișareMesaj('eroare', "Te rog să te localizezi mai întâi.");
                         return;
                     }
                     
                     if (!selectedConcediuLocation) {
-                        statusMessage.textContent = "Te rog să selectezi un concediu cu locație definită.";
+                        afișareMesaj('eroare', "Te rog să selectezi un concediu cu locație definită.");
                         return;
                     }
                     
                     // Afișăm indicatorul de încărcare
                     loadingSpinner.style.display = "block";
+                    afișareMesaj('normal', "Se calculează ruta...");
                     
-                    try {
-                        // Parametri pentru calculul rutei
-                        const routeParams = new RouteParameters({
-                            stops: new FeatureSet({
-                                features: [
-                                    new Graphic({ geometry: currentLocation }),  // Locația de start
-                                    new Graphic({ geometry: selectedConcediuLocation }) // Destinația
-                                ]
-                            }),
-                            directionsLanguage: "ro", // Indicații în limba română
-                            returnDirections: true,   // Returnează indicațiile de direcții
-                            outSpatialReference: {    // Folosim același sistem de referință ca view-ul
-                                wkid: view.spatialReference.wkid
-                            }
-                        });
-                        
-                        // Calculăm ruta
-                        const routeResult = await route.solve(routeUrl, routeParams);
-                        
-                        // Procesăm rezultatele
-                        if (routeResult && routeResult.routeResults && routeResult.routeResults.length > 0) {
-                            // Curățăm graficele existente, dar păstrăm markerii
-                            const points = [];
-                            graphicsLayer.graphics.forEach(graphic => {
-                                if (graphic.geometry.type === "point") {
-                                    points.push(graphic);
-                                }
-                            });
-                            
-                            graphicsLayer.removeAll();
-                            
-                            // Adăugăm înapoi markerii
-                            points.forEach(point => {
-                                graphicsLayer.add(point);
-                            });
-                            
-                            // Adăugăm graficul rutei
-                            routeResult.routeResults.forEach(result => {
-                                // Setăm simbolul pentru rută
-                                result.route.symbol = {
-                                    type: "simple-line",
-                                    color: accentColor,
-                                    width: 4
-                                };
+                    // Obținem coordonatele punctelor de start și destinație
+                    const startPoint = currentLocation;
+                    const endPoint = selectedConcediuLocation;
+                    
+                    // Creăm o linie simplă între cele două puncte (ca rezervă)
+                    const straightLine = new Polyline({
+                        paths: [
+                            [startPoint.longitude, startPoint.latitude],
+                            [endPoint.longitude, endPoint.latitude]
+                        ],
+                        spatialReference: view.spatialReference
+                    });
+                    
+                    // Parametri pentru calculul rutei
+                    const routeParams = new RouteParameters({
+                        stops: new FeatureSet({
+                            features: [
+                                new Graphic({ geometry: startPoint }),
+                                new Graphic({ geometry: endPoint })
+                            ]
+                        }),
+                        directionsLanguage: "ro",
+                        returnDirections: true
+                    });
+                    
+                    // Încercăm să obținem ruta
+                    route.solve(routeUrl, routeParams)
+                        .then(function(result) {
+                            // Procesăm rezultatele
+                            if (result && result.routeResults && result.routeResults.length > 0) {
+                                const routeResult = result.routeResults[0];
                                 
-                                // Adăugăm ruta pe hartă
-                                graphicsLayer.add(result.route);
-                            });
-                            
-                            // Afișăm indicațiile de direcții
-                            if (routeResult.routeResults[0].directions &&
-                                routeResult.routeResults[0].directions.features) {
-                                
-                                // Creăm un container pentru indicații
-                                const directions = document.createElement("div");
-                                directions.className = "esri-widget esri-widget--panel esri-directions__scroller";
-                                directions.style.margin = "10px";
-                                directions.style.padding = "15px";
-                                directions.style.backgroundColor = "<%=sidebar%>";
-                                directions.style.color = "<%=text%>";
-                                directions.style.borderRadius = "8px";
-                                directions.style.maxHeight = "300px";
-                                directions.style.overflowY = "auto";
-                                directions.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
-                                
-                                // Adăugăm titlul
-                                const title = document.createElement("h3");
-                                title.style.color = "<%=accent%>";
-                                title.style.marginTop = "0";
-                                title.style.fontSize = "16px";
-                                title.textContent = "Indicații de direcții";
-                                directions.appendChild(title);
-                                
-                                // Adăugăm lista de indicații
-                                const list = document.createElement("ol");
-                                list.style.paddingLeft = "25px";
-                                list.style.margin = "10px 0";
-                                
-                                // Procesăm fiecare indicație
-                                routeResult.routeResults[0].directions.features.forEach(feature => {
-                                    const item = document.createElement("li");
-                                    item.style.marginBottom = "8px";
-                                    item.style.fontSize = "14px";
-                                    item.innerHTML = feature.attributes.text +
-                                        ` <span style="color:<%=accent%>; font-weight:bold;">(${feature.attributes.length.toFixed(2)} km)</span>`;
-                                    list.appendChild(item);
-                                });
-                                
-                                directions.appendChild(list);
-                                
-                                // Adăugăm informații despre distanță totală și timp
-                                const summary = document.createElement("div");
-                                summary.style.marginTop = "15px";
-                                summary.style.paddingTop = "10px";
-                                summary.style.borderTop = "1px solid <%=clr%>";
-                                summary.style.fontSize = "14px";
-                                
-                                // Calculăm distanța și timpul total
-                                const totalLength = routeResult.routeResults[0].directions.totalLength;
-                                const totalTime = routeResult.routeResults[0].directions.totalTime;
-                                
-                                // Convertim timpul din minute în ore și minute
-                                const hours = Math.floor(totalTime / 60);
-                                const minutes = Math.round(totalTime % 60);
-                                
-                                // AICI ESTE CORECȚIA - Schimbat "===" cu "=="
-                                const timeText = hours > 0 
-                                    ? `${hours} ${hours == 1 ? 'oră' : 'ore'} și ${minutes} ${minutes == 1 ? 'minut' : 'minute'}`
-                                    : `${minutes} ${minutes == 1 ? 'minut' : 'minute'}`;
-                                
-                                summary.innerHTML = `
-                                    <p><strong>Distanță totală:</strong> ${totalLength.toFixed(2)} km</p>
-                                    <p><strong>Timp estimat:</strong> ${timeText}</p>
-                                `;
-                                directions.appendChild(summary);
-                                
-                                // Adăugăm containerul de indicații în interfața utilizator
-                                view.ui.empty("top-right");
-                                view.ui.add(directions, "top-right");
-                                
-                                // Zoom la extinderea rutei cu padding
-                                view.goTo({
-                                    target: routeResult.routeResults[0].route.geometry.extent,
-                                    padding: {
-                                        top: 100,
-                                        bottom: 100,
-                                        left: 100,
-                                        right: 350 // Pad mai mare în dreapta pentru indicații
+                                // Curățăm graficele vechi (linii - rute)
+                                graphicsLayer.graphics.forEach(function(graphic) {
+                                    if (graphic.geometry && 
+                                        (graphic.geometry.type === "polyline" || 
+                                         graphic.geometry instanceof Polyline)) {
+                                        graphicsLayer.remove(graphic);
                                     }
                                 });
                                 
-                                statusMessage.textContent = "Ruta a fost generată cu succes!";
+                                // Adăugăm ruta pe hartă
+                                const routeGraphic = new Graphic({
+                                    geometry: routeResult.route.geometry,
+                                    symbol: {
+                                        type: "simple-line",
+                                        color: accentColor,
+                                        width: 4
+                                    }
+                                });
+                                
+                                graphicsLayer.add(routeGraphic);
+                                
+                                // Afișăm indicațiile
+                                showDirections(result.routeResults[0].directions);
+                                
+                                // Calculăm centrul și zoom-ul pentru extinderea rutei
+                                const extent = routeResult.route.geometry.extent;
+                                const centerX = (extent.xmin + extent.xmax) / 2;
+                                const centerY = (extent.ymin + extent.ymax) / 2;
+                                
+                                // Determinăm un nivel de zoom adecvat
+                                const width = extent.xmax - extent.xmin;
+                                const height = extent.ymax - extent.ymin;
+                                const maxDimension = Math.max(width, height) * 111; // Aproximativ km
+                                
+                                let zoomLevel = 12; // Valoare implicită
+                                
+                                if (maxDimension > 100) {
+                                    zoomLevel = 8;
+                                } else if (maxDimension > 50) {
+                                    zoomLevel = 9;
+                                } else if (maxDimension > 20) {
+                                    zoomLevel = 10;
+                                } else if (maxDimension > 10) {
+                                    zoomLevel = 11;
+                                } else if (maxDimension > 5) {
+                                    zoomLevel = 12;
+                                } else if (maxDimension > 2) {
+                                    zoomLevel = 13;
+                                } else if (maxDimension > 1) {
+                                    zoomLevel = 14;
+                                } else {
+                                    zoomLevel = 15;
+                                }
+                                
+                                // Aplicăm zoom pentru a include întreaga rută
+                                view.goTo({
+                                    center: [centerX, centerY],
+                                    zoom: zoomLevel
+                                }, {
+                                    duration: 1000,
+                                    easing: "ease-in-out"
+                                });
+                                
+                                afișareMesaj('succes', "Ruta a fost generată cu succes!");
+                            } else {
+                                // Dacă nu avem rută, afișăm linia directă
+                                const directLineGraphic = new Graphic({
+                                    geometry: straightLine,
+                                    symbol: {
+                                        type: "simple-line",
+                                        color: accentColor,
+                                        width: 4,
+                                        style: "dash"
+                                    }
+                                });
+                                
+                                graphicsLayer.add(directLineGraphic);
+                                
+                                // Centrăm între puncte
+                                const centerX = (startPoint.longitude + endPoint.longitude) / 2;
+                                const centerY = (startPoint.latitude + endPoint.latitude) / 2;
+                                
+                                view.goTo({
+                                    center: [centerX, centerY],
+                                    zoom: 12
+                                }, {
+                                    duration: 1000,
+                                    easing: "ease-in-out"
+                                });
+                                
+                                afișareMesaj('eroare', "Nu s-a putut genera ruta. Se afișează linia directă.");
                             }
-                        } else {
-                            statusMessage.textContent = "Nu s-a putut genera ruta între locațiile specificate.";
-                        }
-                    } catch (error) {
-                        console.error("Eroare la generarea rutei:", error);
-                        statusMessage.textContent = "Eroare la generarea rutei: " + error.message;
-                    } finally {
-                        // Ascundem indicatorul de încărcare
-                        loadingSpinner.style.display = "none";
-                    }
+                            
+                            loadingSpinner.style.display = "none";
+                        })
+                        .catch(function(error) {
+                            console.error("Eroare la calcularea rutei:", error);
+                            
+                            // În caz de eroare, afișăm linia directă
+                            const directLineGraphic = new Graphic({
+                                geometry: straightLine,
+                                symbol: {
+                                    type: "simple-line",
+                                    color: accentColor,
+                                    width: 4,
+                                    style: "dash"
+                                }
+                            });
+                            
+                            graphicsLayer.add(directLineGraphic);
+                            
+                            // Centrăm între puncte
+                            const centerX = (startPoint.longitude + endPoint.longitude) / 2;
+                            const centerY = (startPoint.latitude + endPoint.latitude) / 2;
+                            
+                            view.goTo({
+                                center: [centerX, centerY],
+                                zoom: 12
+                            }, {
+                                duration: 1000,
+                                easing: "ease-in-out"
+                            });
+                            
+                            loadingSpinner.style.display = "none";
+                            afișareMesaj('eroare', "Eroare la generarea rutei: " + error.message);
+                        });
                 });
+                
+                // Funcție pentru afișarea indicațiilor
+                function showDirections(directions) {
+                    if (!directions || !directions.features || directions.features.length === 0) {
+                        return;
+                    }
+                    
+                    // Curățăm indicațiile anterioare
+                    document.querySelectorAll('.directions-panel').forEach(el => el.remove());
+                    
+                    // Creăm un container pentru indicații
+                    const directionsPanel = document.createElement("div");
+                    directionsPanel.className = "directions-panel";
+                    
+                    // Titlu
+                    const title = document.createElement("h3");
+                    title.textContent = "Indicații de direcții";
+                    directionsPanel.appendChild(title);
+                    
+                    // Buton de închidere
+                    const closeButton = document.createElement("button");
+                    closeButton.className = "close-btn";
+                    closeButton.innerHTML = "✖";
+                    closeButton.addEventListener("click", function() {
+                        directionsPanel.remove();
+                    });
+                    directionsPanel.appendChild(closeButton);
+                    
+                    // Lista de indicații
+                    const list = document.createElement("ol");
+                    list.style.paddingLeft = "20px";
+                    
+                    directions.features.forEach(function(feature) {
+                        const item = document.createElement("li");
+                        const text = feature.attributes.text;
+                        const distance = feature.attributes.length;
+                        
+                        item.innerHTML = text + 
+                            " <span style='color:" + accentColor + ";font-weight:bold;'>(" + 
+                            distance.toFixed(2) + " km)</span>";
+                            
+                        list.appendChild(item);
+                    });
+                    
+                    directionsPanel.appendChild(list);
+                    
+                    // Rezumat
+                    const summary = document.createElement("div");
+                    summary.className = "directions-summary";
+                    
+                    const totalDistance = directions.totalLength;
+                    const totalMinutes = directions.totalTime;
+                    
+                    // Convertim timpul în ore și minute
+                    const hours = Math.floor(totalMinutes / 60);
+                    const minutes = Math.round(totalMinutes % 60);
+                    
+                    let timeText = "";
+                    if (hours > 0) {
+                        timeText = hours + " " + (hours === 1 ? "oră" : "ore");
+                        if (minutes > 0) {
+                            timeText += " și " + minutes + " " + (minutes === 1 ? "minut" : "minute");
+                        }
+                    } else {
+                        timeText = minutes + " " + (minutes === 1 ? "minut" : "minute");
+                    }
+                    
+                    summary.innerHTML = 
+                        "<p><strong>Distanță totală:</strong> " + totalDistance.toFixed(2) + " km</p>" +
+                        "<p><strong>Timp estimat:</strong> " + timeText + "</p>";
+                        
+                    directionsPanel.appendChild(summary);
+                    
+                    // Adăugăm la pagină
+                    document.body.appendChild(directionsPanel);
+                }
                 
                 // Handler pentru butonul "Resetează harta"
                 resetBtn.addEventListener("click", function() {
                     // Curățăm toate graficele
                     graphicsLayer.removeAll();
                     
-                    // Resetăm interfața utilizator
-                    view.ui.empty("top-right");
+                    // Curățăm indicațiile
+                    document.querySelectorAll('.directions-panel').forEach(el => el.remove());
                     
                     // Resetăm vizualizarea hărții
                     view.goTo({
                         center: [25, 45],
                         zoom: 6
+                    }, {
+                        duration: 1000,
+                        easing: "ease-in-out"
                     });
                     
                     // Resetăm variabilele
@@ -672,13 +1093,36 @@
                     generateRouteBtn.disabled = true;
                     
                     // Resetăm mesajul de status
-                    statusMessage.textContent = "Hartă resetată.";
+                    afișareMesaj('normal', "Hartă resetată.");
                     
                     // Păstrăm selecția concediului dacă există
                     if (concediuSelect.selectedIndex > 0) {
                         const event = new Event('change');
                         concediuSelect.dispatchEvent(event);
                     }
+                });
+                
+                // Handler-i pentru butoanele de zoom
+                zoomInBtn.addEventListener('click', function() {
+                    // Păstrăm centrul actual și doar mărim nivelul de zoom
+                    const currentCenter = view.center;
+                    view.goTo({
+                        target: currentCenter,
+                        zoom: view.zoom + 1
+                    }, {
+                        duration: 500
+                    });
+                });
+                
+                zoomOutBtn.addEventListener('click', function() {
+                    // Păstrăm centrul actual și doar micșorăm nivelul de zoom
+                    const currentCenter = view.center;
+                    view.goTo({
+                        target: currentCenter,
+                        zoom: view.zoom - 1
+                    }, {
+                        duration: 500
+                    });
                 });
             });
             
@@ -694,7 +1138,7 @@
                     .then(data => {
                         // Verificăm dacă avem date
                         if (!data || data.length === 0) {
-                            statusMessage.textContent = "Nu există concedii cu locații definite.";
+                            afișareMesaj('eroare', "Nu există concedii cu locații definite.");
                             return;
                         }
                         
@@ -723,14 +1167,14 @@
                         
                         // Verificăm dacă am adăugat vreun concediu în dropdown
                         if (concediuSelect.options.length <= 1) {
-                            statusMessage.textContent = "Nu există concedii cu locații definite.";
+                            afișareMesaj('eroare', "Nu există concedii cu locații definite.");
                         } else {
-                            statusMessage.textContent = `${concediuSelect.options.length - 1} concedii disponibile.`;
+                            afișareMesaj('succes', `${concediuSelect.options.length - 1} concedii disponibile.`);
                         }
                     })
                     .catch(error => {
                         console.error("Eroare la încărcarea concediilor:", error);
-                        statusMessage.textContent = "Eroare la încărcarea concediilor: " + error.message;
+                        afișareMesaj('eroare', "Eroare la încărcarea concediilor: " + error.message);
                     });
             }
         });
@@ -744,18 +1188,7 @@
                 out.println("alert('Eroare la baza de date!');");
                 out.println("alert('" + e.getMessage() + "');");
                 out.println("</script>");
-                if (currentUser.getTip() == 1) {
-                    response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
-                    response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
-                    response.sendRedirect("sefok.jsp");
-                }
-                if (currentUser.getTip() == 0) {
-                    response.sendRedirect("dashboard.jsp");
-                }
+                
                 e.printStackTrace();
             }
         } else {
@@ -771,6 +1204,3 @@
         response.sendRedirect("login.jsp");
     }
 %>
-</body>
-</html>
-```
