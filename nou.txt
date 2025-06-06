@@ -2253,7 +2253,10 @@ SELECT c.id, u.nume, u.prenume, d.nume_dep AS departament, t.denumire AS functie
 -- -----------------------------------------------------
 -- test
 -- -----------------------------------------------------
-select * from sedii;
+select * from useri;
 SELECT id, nume FROM echipe WHERE id_prj = 1;
+SELECT status, COUNT(*) as count FROM concedii join useri on concedii.id_ang = useri.id GROUP by status;
+SELECT SUM(CASE WHEN MONTH(start_c) = 1 THEN durata ELSE 0 END) as ian, SUM(CASE WHEN MONTH(start_c) = 2 THEN durata ELSE 0 END) as feb, SUM(CASE WHEN MONTH(start_c) = 3 THEN durata ELSE 0 END) as mar, SUM(CASE WHEN MONTH(start_c) = 4 THEN durata ELSE 0 END) as apr, SUM(CASE WHEN MONTH(start_c) = 5 THEN durata ELSE 0 END) as mai, SUM(CASE WHEN MONTH(start_c) = 6 THEN durata ELSE 0 END) as iun, SUM(CASE WHEN MONTH(start_c) = 7 THEN durata ELSE 0 END) as iul, SUM(CASE WHEN MONTH(start_c) = 8 THEN durata ELSE 0 END) as aug, SUM(CASE WHEN MONTH(start_c) = 9 THEN durata ELSE 0 END) as sept, SUM(CASE WHEN MONTH(start_c) = 10 THEN durata ELSE 0 END) as oct, SUM(CASE WHEN MONTH(start_c) = 11 THEN durata ELSE 0 END) as nov, SUM(CASE WHEN MONTH(start_c) = 12 THEN durata ELSE 0 END) as decm FROM concedii join useri on concedii.id_ang = useri.id WHERE YEAR(start_c) = YEAR(CURDATE()) AND status >= 0 GROUP BY status;
 SELECT DISTINCT u.id, u.nume, u.prenume FROM useri u JOIN membrii_echipe me ON u.id = me.id_ang WHERE me.id_echipa IN (" 1 ") ORDER BY u.nume, u.prenume;
 update useri set id_sediu = 1 where id = 1;
+select * from penalizari;

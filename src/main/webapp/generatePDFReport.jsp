@@ -27,23 +27,18 @@
                 // Seteaza header-ul pentru descarcare PDF
                 String fileName = "Raport_" + reportType + "_" + new SimpleDateFormat("yyyy_MM_dd").format(new java.util.Date()) + ".pdf";
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-                response.setContentType("application/pdf");
                 
-                // Initializeaza documentul PDF cu margini de 2cm (56.69 points = 2cm)
-                float margin = 56.69f; // 2cm in points
-                Document document = new Document(PageSize.A4, margin, margin, margin, margin);
+                // Initializeaza documentul PDF
+                Document document = new Document(PageSize.A4, 50, 50, 50, 50);
                 PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
                 
                 document.open();
                 
-                // Fonturi Times New Roman 12pt cu line height 1.5
-                Font titleFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 16, Font.BOLD, BaseColor.BLACK);
-                Font headerFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 14, Font.BOLD, BaseColor.BLACK);
-                Font normalFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.BLACK);
-                Font smallFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 10, Font.NORMAL, BaseColor.GRAY);
-                
-                // Set line spacing pentru paragrafe (1.5)
-                float lineSpacing = 1.5f;
+                // Fonturi
+                Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.DARK_GRAY);
+                Font headerFont = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+                Font normalFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+                Font smallFont = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL, BaseColor.GRAY);
                 
                 try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
                     
