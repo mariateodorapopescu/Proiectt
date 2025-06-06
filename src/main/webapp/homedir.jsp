@@ -85,6 +85,65 @@
                         }
                         
                         %>
+                        <%
+// Verifică și creează tema pentru director dacă nu există
+if (accent == null || sidebar == null || text == null) {
+    System.out.println("Tema lipsește pentru directorul: " + id);
+    
+    try (Connection themeConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+        // Verifică dacă există tema
+        String checkThemeQuery = "SELECT COUNT(*) as count FROM teme WHERE id_usr = ?";
+        try (PreparedStatement checkStmt = themeConn.prepareStatement(checkThemeQuery)) {
+            checkStmt.setInt(1, id);
+            try (ResultSet checkRs = checkStmt.executeQuery()) {
+                if (checkRs.next() && checkRs.getInt("count") == 0) {
+                    // Creează tema implicit
+                    String insertThemeQuery = "INSERT INTO teme (id_usr, accent, clr, sidebar, card, text, hover) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    try (PreparedStatement insertStmt = themeConn.prepareStatement(insertThemeQuery)) {
+                        insertStmt.setInt(1, id);
+                        insertStmt.setString(2, "#10439F");  // accent
+                        insertStmt.setString(3, "#d8d9e1");  // clr
+                        insertStmt.setString(4, "#ECEDFA");  // sidebar
+                        insertStmt.setString(5, "#ECEDFA");  // card
+                        insertStmt.setString(6, "#333");     // text
+                        insertStmt.setString(7, "#ECEDFA");  // hover
+                        insertStmt.executeUpdate();
+                        
+                        System.out.println("Tema creată pentru directorul: " + id);
+                        
+                        // Setează variabilele
+                        accent = "#10439F";
+                        clr = "#d8d9e1";
+                        sidebar = "#ECEDFA";
+                        text = "#333";
+                        card = "#ECEDFA";
+                        hover = "#ECEDFA";
+                    }
+                }
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Eroare la crearea temei: " + e.getMessage());
+        // Setează valori default
+        accent = "#10439F";
+        clr = "#d8d9e1";
+        sidebar = "#ECEDFA";
+        text = "#333";
+        card = "#ECEDFA";
+        hover = "#ECEDFA";
+    }
+}
+
+// Verifică din nou și setează valori default dacă încă sunt null
+if (accent == null) accent = "#10439F";
+if (clr == null) clr = "#d8d9e1";
+if (sidebar == null) sidebar = "#ECEDFA";
+if (text == null) text = "#333";
+if (card == null) card = "#ECEDFA";
+if (hover == null) hover = "#ECEDFA";
+
+System.out.println("Tema finală pentru user " + id + ": accent=" + accent + ", sidebar=" + sidebar + ", text=" + text);
+%>
 <html>
 <head>
     <title>Profil utilizator</title>
@@ -107,6 +166,15 @@
             background-color: var(--clr);
            
         }
+        :root {
+    --bg: <%=accent != null ? accent : "#10439F"%>;
+    --clr: <%=clr != null ? clr : "#d8d9e1"%>;
+    --sd: <%=sidebar != null ? sidebar : "#ECEDFA"%>;
+    --text: <%=text != null ? text : "#333"%>;
+    --succes-color: #28a745;
+    --danger-color: #dc3545;
+    --waining-color: #ffc107;
+}
        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
 * {
     margin: 0;
@@ -565,6 +633,9 @@
             from { opacity: 0; transform: translateX(-30px); }
             to { opacity: 1; transform: translateX(0); }
         }
+        
+      
+        
     </style>
 </head>
 <body style="--bg:<%=accent%>; --clr:<%=clr%>; --sd:<%=sidebar%>; --text:<%=text%>; background:<%=clr%>">
@@ -665,15 +736,9 @@
                     <h1 id="userName"><%=rs.getString("nume")%> <%=rs.getString("prenume")%></h1>
                     <span class="user-role" id="userRole">
                         <%
-                        if (isDirector) {
-                            out.println("Director " + functie);
-                        } else if (isSef) {
-                            out.println("Șef " + functie);
-                        } else if (isIncepator) {
-                            out.println("Stagiar " + functie);
-                        } else {
+                      
                             out.println(functie);
-                        }
+                       
                         %>
                     </span>
                     <div class="current-date" id="currentDate">
@@ -1251,31 +1316,717 @@
             </div>
         </div>
     </div>
+ 
+<%
+// Date pentru ultimele 6 luni - FĂRĂ GROUP BY status
+String[] luni6 = {"Ian", "Feb", "Mar", "Apr", "Mai", "Iun"};
+int[] data6Luni = new int[6];
 
+String query6Luni = "SELECT " +
+        "SUM(CASE WHEN MONTH(start_c) = 1 THEN durata ELSE 0 END) as ian, " +
+        "SUM(CASE WHEN MONTH(start_c) = 2 THEN durata ELSE 0 END) as feb, " +
+        "SUM(CASE WHEN MONTH(start_c) = 3 THEN durata ELSE 0 END) as mar, " +
+        "SUM(CASE WHEN MONTH(start_c) = 4 THEN durata ELSE 0 END) as apr, " +
+        "SUM(CASE WHEN MONTH(start_c) = 5 THEN durata ELSE 0 END) as mai, " +
+        "SUM(CASE WHEN MONTH(start_c) = 6 THEN durata ELSE 0 END) as iun " +
+        "FROM concedii JOIN useri ON concedii.id_ang = useri.id " +
+        "WHERE YEAR(start_c) = YEAR(CURDATE()) AND status >= 0";
+
+if (isDirector) {
+    // Director vede concediile din departamentul său
+    query6Luni += " AND useri.id_dep = " + rs.getInt("id_dep");
+} else if (isSef) {
+    query6Luni += " AND useri.id_dep = " + rs.getInt("id_dep");
+} else {
+    query6Luni += " AND useri.id = " + id;
+}
+
+try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+     PreparedStatement stmt = connection.prepareStatement(query6Luni)) {
+    ResultSet rs_6luni = stmt.executeQuery();
+    if (rs_6luni.next()) {
+        data6Luni[0] = rs_6luni.getInt("ian");
+        data6Luni[1] = rs_6luni.getInt("feb");
+        data6Luni[2] = rs_6luni.getInt("mar");
+        data6Luni[3] = rs_6luni.getInt("apr");
+        data6Luni[4] = rs_6luni.getInt("mai");
+        data6Luni[5] = rs_6luni.getInt("iun");
+    }
+} catch (SQLException e) {
+    System.out.println("Eroare query 6 luni: " + e.getMessage());
+}
+
+// Date pentru ultimul an (pe trimestre)
+int[] dataAn = new int[4];
+String queryAn = "SELECT " +
+        "SUM(CASE WHEN QUARTER(start_c) = 1 THEN durata ELSE 0 END) as q1, " +
+        "SUM(CASE WHEN QUARTER(start_c) = 2 THEN durata ELSE 0 END) as q2, " +
+        "SUM(CASE WHEN QUARTER(start_c) = 3 THEN durata ELSE 0 END) as q3, " +
+        "SUM(CASE WHEN QUARTER(start_c) = 4 THEN durata ELSE 0 END) as q4 " +
+        "FROM concedii JOIN useri ON concedii.id_ang = useri.id " +
+        "WHERE YEAR(start_c) = YEAR(CURDATE()) AND status >= 0";
+
+if (isDirector) {
+    queryAn += " AND useri.id_dep = " + rs.getInt("id_dep");
+} else if (isSef) {
+    queryAn += " AND useri.id_dep = " + rs.getInt("id_dep");
+} else {
+    queryAn += " AND useri.id = " + id;
+}
+
+try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+     PreparedStatement stmt = connection.prepareStatement(queryAn)) {
+    ResultSet rs_an = stmt.executeQuery();
+    if (rs_an.next()) {
+        dataAn[0] = rs_an.getInt("q1");
+        dataAn[1] = rs_an.getInt("q2");
+        dataAn[2] = rs_an.getInt("q3");
+        dataAn[3] = rs_an.getInt("q4");
+    }
+} catch (SQLException e) {
+    System.out.println("Eroare query an: " + e.getMessage());
+}
+
+System.out.println("Date grafice: 6luni=" + java.util.Arrays.toString(data6Luni) + ", an=" + java.util.Arrays.toString(dataAn));
+%>
     <script>
-        // Funcție globală pentru generarea PDF (backup)
-        function generatePDFReport() {
-            console.log('Global PDF function called!');
+ // ============= VERIFICĂRI ȘI DEBUGGING =============
+    console.log('=== CHART SCRIPT START ===');
+
+    // Verifică dacă Chart.js este încărcat
+    function checkChartJS() {
+        if (typeof Chart === 'undefined') {
+            console.error('❌ Chart.js is NOT loaded!');
+            return false;
+        } else {
+            console.log('✅ Chart.js is loaded, version:', Chart.version || 'unknown');
+            return true;
+        }
+    }
+
+    // ============= VARIABILE GLOBALE =============
+    window.concediiChart = null;
+    window.statusChart = null;
+    window.cssVars = null;
+
+    // ============= FUNCȚIE PENTRU CSS VARIABLES =============
+    function getCSSVariables() {
+        try {
+            const root = document.documentElement;
+            const styles = getComputedStyle(root);
             
-            const reportType = document.getElementById('reportType').value || 'lunar';
-            const btn = document.getElementById('generatePDF');
+            const cssVars = {
+                accent: styles.getPropertyValue('--bg').trim() || styles.getPropertyValue('--theme-accent').trim() || '#10439F',
+                clr: styles.getPropertyValue('--clr').trim() || styles.getPropertyValue('--theme-clr').trim() || '#d8d9e1',
+                sidebar: styles.getPropertyValue('--sd').trim() || styles.getPropertyValue('--theme-sidebar').trim() || '#ECEDFA',
+                text: styles.getPropertyValue('--text').trim() || styles.getPropertyValue('--theme-text').trim() || '#333'
+            };
             
-            console.log('Report type:', reportType);
-            console.log('User ID: <%=id%>');
+            // Verifică dacă valorile sunt valide
+            Object.keys(cssVars).forEach(key => {
+                if (!cssVars[key] || cssVars[key] === '' || cssVars[key] === 'undefined') {
+                    console.warn(`CSS Variable ${key} is invalid, using fallback`);
+                    switch(key) {
+                        case 'accent': cssVars[key] = '#10439F'; break;
+                        case 'clr': cssVars[key] = '#d8d9e1'; break;
+                        case 'sidebar': cssVars[key] = '#ECEDFA'; break;
+                        case 'text': cssVars[key] = '#333'; break;
+                    }
+                }
+                
+                // Asigură-te că culoarea începe cu #
+                if (!cssVars[key].startsWith('#')) {
+                    cssVars[key] = '#' + cssVars[key];
+                }
+            });
             
-            if (btn) {
-                btn.innerHTML = '<i class="ri-loader-line"></i> Generez...';
-                btn.style.pointerEvents = 'none';
+            console.log('✅ CSS Variables extracted:', cssVars);
+            return cssVars;
+            
+        } catch (error) {
+            console.error('❌ Error getting CSS variables:', error);
+            return {
+                accent: '#10439F',
+                clr: '#d8d9e1',
+                sidebar: '#ECEDFA',
+                text: '#333'
+            };
+        }
+    }
+
+    // ============= FUNCȚII GRAFICE CORECTATE =============
+
+    function updateConcediiChart(period = '6luni') {
+        console.log('=== updateConcediiChart START ===', period);
+        
+        // Verificări preliminare
+        if (!checkChartJS()) {
+            console.error('Chart.js not available, aborting');
+            return false;
+        }
+        
+        const canvas = document.getElementById('concediiChart');
+        if (!canvas) {
+            console.error('❌ Canvas concediiChart not found!');
+            return false;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('❌ Could not get 2D context!');
+            return false;
+        }
+        
+        // Obține CSS variables (CORECTAREA PROBLEMEI 1: ccsVars -> cssVars)
+        window.cssVars = getCSSVariables();
+        
+        // Distruge graficul existent
+        if (window.concediiChart && typeof window.concediiChart.destroy === 'function') {
+            console.log('Destroying existing chart...');
+            window.concediiChart.destroy();
+            window.concediiChart = null;
+        }
+        
+        // Configurare date
+        let labels, data, maxValue;
+        
+        switch(period) {
+            case '6luni':
+            case 'Ultimele 6 luni':
+                labels = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun'];
+                data = [<%=data6Luni[0]%>, <%=data6Luni[1]%>, <%=data6Luni[2]%>, <%=data6Luni[3]%>, <%=data6Luni[4]%>, <%=data6Luni[5]%>];
+                maxValue = 40;
+                break;
+            case '1an':
+            case 'Ultimul an':
+                labels = ['T1', 'T2', 'T3', 'T4'];
+                data = [<%=dataAn[0]%>, <%=dataAn[1]%>, <%=dataAn[2]%>, <%=dataAn[3]%>];
+                maxValue = 40;
+                break;
+            case 'total':
+            case 'Tot timpul':
+                labels = ['2023', '2024', '2025'];
+                data = [10, 15, 8]; // Date exemple
+                maxValue = 50;
+                break;
+            default:
+                labels = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun'];
+                data = [<%=data6Luni[0]%>, <%=data6Luni[1]%>, <%=data6Luni[2]%>, <%=data6Luni[3]%>, <%=data6Luni[4]%>, <%=data6Luni[5]%>];
+                maxValue = 40;
+        }
+        
+        console.log('Chart data:', { labels, data, maxValue, cssVars: window.cssVars });
+        
+        // Verifică dacă avem date valide
+        if (!data || data.length === 0) {
+            console.error('❌ No valid data for chart');
+            return false;
+        }
+        
+        try {
+            // Creează gradient cu culorile CSS (CORECTAREA PROBLEMEI 2)
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, window.cssVars.accent + '40'); // Hex transparency
+            gradient.addColorStop(1, window.cssVars.accent + '10');
+            
+            // Creează graficul
+            window.concediiChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Zile Concediu',
+                        data: data,
+                        borderColor: window.cssVars.accent,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: window.cssVars.accent,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: window.cssVars.text,
+                        pointHoverBorderColor: window.cssVars.accent,
+                        pointHoverBorderWidth: 3,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: window.cssVars.sidebar,
+                            titleColor: window.cssVars.text,
+                            bodyColor: window.cssVars.text,
+                            borderColor: window.cssVars.accent,
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: maxValue,
+                            grid: {
+                                color: window.cssVars.text + '20',
+                                borderDash: [5, 5]
+                            },
+                            ticks: {
+                                color: window.cssVars.text,
+                                font: {
+                                    family: 'Poppins',
+                                    size: 12
+                                },
+                                stepSize: 5
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: window.cssVars.text,
+                                font: {
+                                    family: 'Poppins',
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+            
+            console.log('✅ Concedii chart created successfully!');
+            return true;
+            
+        } catch (error) {
+            console.error('❌ Error creating concedii chart:', error);
+            
+            // Afișează eroare pe canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '16px Poppins';
+            ctx.fillStyle = window.cssVars.text;
+            ctx.textAlign = 'center';
+            ctx.fillText('Eroare la încărcarea graficului', canvas.width / 2, canvas.height / 2);
+            ctx.fillText(error.message, canvas.width / 2, canvas.height / 2 + 20);
+            
+            return false;
+        }
+    }
+
+    function updateStatusChart(period = 'curent') {
+        console.log('=== updateStatusChart START ===', period);
+        
+        // Verificări preliminare
+        if (!checkChartJS()) {
+            console.error('Chart.js not available, aborting');
+            return false;
+        }
+        
+        const canvas = document.getElementById('statusChart');
+        if (!canvas) {
+            console.error('❌ Canvas statusChart not found!');
+            return false;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('❌ Could not get 2D context!');
+            return false;
+        }
+        
+        // Obține CSS variables dacă nu există
+        if (!window.cssVars) {
+            window.cssVars = getCSSVariables();
+        }
+        
+        // Distruge graficul existent
+        if (window.statusChart && typeof window.statusChart.destroy === 'function') {
+            console.log('Destroying existing status chart...');
+            window.statusChart.destroy();
+            window.statusChart = null;
+        }
+        
+        // Date pentru diferite perioade (CORECTAREA PROBLEMEI 3: JSP code în funcție JS)
+        let data;
+
+        <%
+                  // Date pentru anul curent
+                  int[] statusCurent = {0, 0, 0, 0}; // [aprobate_director, aprobate_sef, in_asteptare, respinse]
+                  String queryStatusCurent = "SELECT status, COUNT(*) as count FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE YEAR(start_c) = YEAR(CURDATE())";
+                  
+                  if (isDirector) {
+                      queryStatusCurent += "";
+                  } else if (isSef) {
+                      queryStatusCurent += " AND useri.id_dep = " + rs.getInt("id_dep");
+                  } else {
+                      queryStatusCurent += " AND useri.id = " + id;
+                  }
+                  queryStatusCurent += " GROUP BY status";
+                  
+                  try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                       PreparedStatement stmt = connection.prepareStatement(queryStatusCurent)) {
+                      ResultSet rs_status = stmt.executeQuery();
+                      while (rs_status.next()) {
+                          int status = rs_status.getInt("status");
+                          int count = rs_status.getInt("count");
+                          if (status == 2) statusCurent[0] = count;
+                          else if (status == 1) statusCurent[1] = count;
+                          else if (status == 0) statusCurent[2] = count;
+                          else if (status < 0) statusCurent[3] += count;
+                      }
+                  } catch (SQLException e) {
+                      System.out.println("Eroare query status curent: " + e.getMessage());
+                  }
+                  
+                  // Date pentru anul trecut
+                  int[] statusTrecut = {0, 0, 0, 0};
+                  String queryStatusTrecut = "SELECT status, COUNT(*) as count FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE YEAR(start_c) = YEAR(CURDATE()) - 1";
+                  
+                  if (isDirector) {
+                      queryStatusTrecut += "";
+                  } else if (isSef) {
+                      queryStatusTrecut += " AND useri.id_dep = " + rs.getInt("id_dep");
+                  } else {
+                      queryStatusTrecut += " AND useri.id = " + id;
+                  }
+                  queryStatusTrecut += " GROUP BY status";
+                  
+                  try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                       PreparedStatement stmt = connection.prepareStatement(queryStatusTrecut)) {
+                      ResultSet rs_status = stmt.executeQuery();
+                      while (rs_status.next()) {
+                          int status = rs_status.getInt("status");
+                          int count = rs_status.getInt("count");
+                          if (status == 2) statusTrecut[0] = count;
+                          else if (status == 1) statusTrecut[1] = count;
+                          else if (status == 0) statusTrecut[2] = count;
+                          else if (status < 0) statusTrecut[3] += count;
+                      }
+                  } catch (SQLException e) {
+                      System.out.println("Eroare query status trecut: " + e.getMessage());
+                  }
+                  
+                  // Date pentru total
+                  int[] statusTotal = {0, 0, 0, 0};
+                  String queryStatusTotal = "SELECT status, COUNT(*) as count FROM concedii JOIN useri ON concedii.id_ang = useri.id";
+                  
+                  if (isDirector) {
+                      queryStatusTotal += "";
+                  } else if (isSef) {
+                      queryStatusTotal += " WHERE useri.id_dep = " + rs.getInt("id_dep");
+                  } else {
+                      queryStatusTotal += " WHERE useri.id = " + id;
+                  }
+                  queryStatusTotal += " GROUP BY status";
+                  
+                  try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                       PreparedStatement stmt = connection.prepareStatement(queryStatusTotal)) {
+                      ResultSet rs_status = stmt.executeQuery();
+                      while (rs_status.next()) {
+                          int status = rs_status.getInt("status");
+                          int count = rs_status.getInt("count");
+                          if (status == 2) statusTotal[0] = count;
+                          else if (status == 1) statusTotal[1] = count;
+                          else if (status == 0) statusTotal[2] = count;
+                          else if (status < 0) statusTotal[3] += count;
+                      }
+                  } catch (SQLException e) {
+                      System.out.println("Eroare query status total: " + e.getMessage());
+                  }
+                  %>
+
+        // IMPORTANT: Aceste date trebuie să fie calculate în JSP, nu în funcția JS
+        // Voi folosi date statice pentru demonstrație
+        const statusData = {
+            curent: [<%=statusCurent[0]%>, <%=statusCurent[1]%>, <%=statusCurent[2]%>, <%=statusCurent[3]%>],
+            trecut: [<%=statusTrecut[0]%>, <%=statusTrecut[1]%>, <%=statusTrecut[2]%>, <%=statusTrecut[3]%>],
+            total: [<%=statusTotal[0]%>, <%=statusTotal[1]%>, <%=statusTotal[2]%>, <%=statusTotal[3]%>]
+        };
+        
+        switch(period) {
+            case 'curent':
+            case 'Anul curent':
+                data = statusData.curent;
+                break;
+            case 'trecut':
+            case 'Anul trecut':
+                data = statusData.trecut;
+                break;
+            case 'total':
+            case 'Totale':
+                data = statusData.total;
+                break;
+            default:
+                data = statusData.curent;
+        }
+        
+        console.log('Status chart data:', { period, data, cssVars: window.cssVars });
+        
+        // Verifică dacă există date
+        const total = data.reduce((a, b) => a + b, 0);
+        if (total === 0) {
+            console.log('⚠️ No status data available');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '16px Poppins';
+            ctx.fillStyle = window.cssVars.text;
+            ctx.textAlign = 'center';
+            ctx.fillText('Nu există date pentru', canvas.width / 2, canvas.height / 2 - 10);
+            ctx.fillText('perioada selectată', canvas.width / 2, canvas.height / 2 + 10);
+            return false;
+        }
+        
+        try {
+            // Creează paletă de culori bazată pe tema curentă
+            const colors = [
+                window.cssVars.accent,                    // Aprobate Director
+                lightenColor(window.cssVars.accent, 20), // Aprobate Șef
+                lightenColor(window.cssVars.accent, 40), // În Așteptare
+                darkenColor(window.cssVars.accent, 30)   // Respinse
+            ];
+            
+            // Creează graficul
+            window.statusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aprobate Director', 'Aprobate Șef', 'În Așteptare', 'Respinse'],
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        cutout: '60%',
+                        hoverOffset: 8,
+                        hoverBorderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: window.cssVars.text,
+                                font: {
+                                    family: 'Poppins',
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: window.cssVars.sidebar,
+                            titleColor: window.cssVars.text,
+                            bodyColor: window.cssVars.text,
+                            borderColor: window.cssVars.accent,
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const value = context.parsed;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+            
+            console.log('✅ Status chart created successfully!');
+            return true;
+            
+        } catch (error) {
+            console.error('❌ Error creating status chart:', error);
+            
+            // Afișează eroare pe canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '16px Poppins';
+            ctx.fillStyle = window.cssVars.text;
+            ctx.textAlign = 'center';
+            ctx.fillText('Eroare la încărcarea graficului', canvas.width / 2, canvas.height / 2);
+            
+            return false;
+        }
+    }
+
+    // ============= HELPER FUNCTIONS =============
+
+    function lightenColor(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.min(255, (num >> 16) + amt);
+        const G = Math.min(255, (num >> 8 & 0x00FF) + amt);
+        const B = Math.min(255, (num & 0x0000FF) + amt);
+        return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+    }
+
+    function darkenColor(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.max(0, (num >> 16) - amt);
+        const G = Math.max(0, (num >> 8 & 0x00FF) - amt);
+        const B = Math.max(0, (num & 0x0000FF) - amt);
+        return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+    }
+
+    // ============= INIȚIALIZARE ȘI EVENT LISTENERS =============
+
+    function initializeCharts() {
+        console.log('=== INITIALIZING CHARTS ===');
+        
+        // Verificări preliminare
+        if (!checkChartJS()) {
+            console.error('Chart.js not available, cannot initialize charts');
+            return false;
+        }
+        
+        // Verifică canvas-urile
+        const concediiCanvas = document.getElementById('concediiChart');
+        const statusCanvas = document.getElementById('statusChart');
+        
+        console.log('Canvas elements:', {
+            concediiChart: !!concediiCanvas,
+            statusChart: !!statusCanvas
+        });
+        
+        if (!concediiCanvas && !statusCanvas) {
+            console.error('❌ No canvas elements found!');
+            return false;
+        }
+        
+        // Obține CSS variables
+        window.cssVars = getCSSVariables();
+        
+        // Inițializează graficele cu o mică întârziere
+        setTimeout(() => {
+            let success = true;
+            
+            if (concediiCanvas) {
+                const result1 = updateConcediiChart('6luni');
+                success = success && result1;
             }
             
+            if (statusCanvas) {
+                const result2 = updateStatusChart('curent');
+                success = success && result2;
+            }
+            
+            console.log('Charts initialization result:', success ? '✅ SUCCESS' : '❌ FAILED');
+            
+            // Retry dacă a eșuat
+            if (!success) {
+                console.log('Retrying chart initialization in 2 seconds...');
+                setTimeout(() => {
+                    if (concediiCanvas && !window.concediiChart) {
+                        updateConcediiChart('6luni');
+                    }
+                    if (statusCanvas && !window.statusChart) {
+                        updateStatusChart('curent');
+                    }
+                }, 2000);
+            }
+        }, 200);
+        
+        return true;
+    }
+
+    function setupEventListeners() {
+        console.log('=== SETUP EVENT LISTENERS ===');
+        
+        // Event listeners pentru filtre grafice
+        const allFilters = document.querySelectorAll('.chart-filter');
+        console.log('Found chart filters:', allFilters.length);
+        
+        allFilters.forEach((filter, index) => {
+            const chartCard = filter.closest('.chart-card');
+            if (!chartCard) return;
+            
+            const isConcediiChart = chartCard.querySelector('#concediiChart');
+            const isStatusChart = chartCard.querySelector('#statusChart');
+            
+            console.log(`Filter ${index}:`, {
+                isConcediiChart: !!isConcediiChart,
+                isStatusChart: !!isStatusChart
+            });
+            
+            filter.addEventListener('change', function(e) {
+                console.log('Filter changed:', e.target.value);
+                
+                if (isConcediiChart) {
+                    updateConcediiChart(e.target.value);
+                } else if (isStatusChart) {
+                    updateStatusChart(e.target.value);
+                }
+            });
+        });
+        
+        // Event listener pentru PDF (CORECTAREA PROBLEMEI 4: verifică dacă butonul există)
+        const pdfBtn = document.getElementById('generatePDF');
+        if (pdfBtn) {
+            pdfBtn.addEventListener('click', generatePDFReport);
+            console.log('✅ PDF button event listener attached');
+        } else {
+            console.warn('⚠️ PDF button not found, will try again later');
+        }
+        
+        // Refresh button pentru activitate
+        const refreshBtn = document.querySelector('.activity-header button');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function() {
+                this.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                    this.style.transform = 'rotate(0deg)';
+                    location.reload();
+                }, 500);
+            });
+            console.log('✅ Refresh button event listener attached');
+        }
+    }
+
+    // ============= FUNCȚIA PDF (CORECTATĂ) =============
+
+    function generatePDFReport() {
+        console.log('=== PDF Report Generation ===');
+        
+        const reportType = document.getElementById('reportType')?.value || 'lunar';
+        const btn = document.getElementById('generatePDF');
+        
+        console.log('Report type:', reportType);
+        console.log('User ID: <%=id%>');
+        
+        if (btn) {
+            btn.innerHTML = '<i class="ri-loader-line"></i> Generez...';
+            btn.style.pointerEvents = 'none';
+        }
+        
+        try {
             // Creează form pentru a trimite cererea către server
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = 'generatePDFReport.jsp';
             form.target = '_blank';
             form.style.display = 'none';
-            
-            console.log('Form action:', form.action);
             
             // Adaugă parametrii
             const reportTypeInput = document.createElement('input');
@@ -1290,21 +2041,8 @@
             userIdInput.value = '<%=id%>';
             form.appendChild(userIdInput);
             
-            console.log('Form data:', {
-                reportType: reportTypeInput.value,
-                userId: userIdInput.value
-            });
-            
-            // Adaugă form la document și submit
             document.body.appendChild(form);
-            
-            try {
-                console.log('Attempting form submit...');
-                form.submit();
-                console.log('Form submitted successfully!');
-            } catch (error) {
-                console.error('Form submit error:', error);
-            }
+            form.submit();
             
             // Cleanup
             setTimeout(() => {
@@ -1313,489 +2051,162 @@
                 }
             }, 2000);
             
-            // Reset button
-            setTimeout(() => {
-                if (btn) {
-                    btn.innerHTML = '<i class="ri-download-line"></i> Generează PDF';
-                    btn.style.pointerEvents = 'auto';
-                }
-            }, 4000);
-        }
-
-        // Inițializare Dashboard cu date din JSP
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard loaded!');
+            console.log('✅ PDF form submitted successfully');
             
-            // Date preluate din JSP
-            const userData = {
-                nume: '<%=rs.getString("nume")%>',
-                prenume: '<%=rs.getString("prenume")%>',
-                functie: '<%=functie%>',
-                ierarhie: <%=ierarhie%>,
-                id: <%=id%>
-            };
+        } catch (error) {
+            console.error('❌ PDF generation error:', error);
+        }
+        
+        // Reset button
+        setTimeout(() => {
+            if (btn) {
+                btn.innerHTML = '<i class="ri-download-line"></i> Generează PDF';
+                btn.style.pointerEvents = 'auto';
+            }
+        }, 4000);
+    }
 
-            console.log('User data:', userData);
+    // ============= EVENT LISTENERS PENTRU ÎNCĂRCARE =============
 
-            // Inițializare grafice cu date reale
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== DOM CONTENT LOADED ===');
+        
+        // Verifică Chart.js
+        if (!checkChartJS()) {
+            console.log('Chart.js not ready, will retry...');
+            setTimeout(() => {
+                if (checkChartJS()) {
+                    initializeCharts();
+                    setupEventListeners();
+                } else {
+                    console.error('Chart.js failed to load after retry');
+                }
+            }, 1000);
+        } else {
+            // Inițializează imediat
             initializeCharts();
-            
-            // Event listeners
             setupEventListeners();
+        }
+        
+        // Date utilizator pentru debugging
+        const userData = {
+            nume: '<%=rs.getString("nume")%>',
+            prenume: '<%=rs.getString("prenume")%>',
+            functie: '<%=functie%>',
+            ierarhie: <%=ierarhie%>,
+            id: <%=id%>
+        };
+        console.log('User data:', userData);
+    });
+
+    window.addEventListener('load', function() {
+        console.log('=== WINDOW FULLY LOADED ===');
+        
+        // Verificare finală după 3 secunde
+        setTimeout(() => {
+            console.log('=== FINAL VERIFICATION ===');
             
-            // Test pentru butonul PDF
+            const concediiExists = !!window.concediiChart;
+            const statusExists = !!window.statusChart;
+            const chartJsLoaded = typeof Chart !== 'undefined';
+            
+            console.log('Final status:', {
+                chartJsLoaded,
+                concediiChart: concediiExists,
+                statusChart: statusExists,
+                cssVars: !!window.cssVars
+            });
+            
+            // Re-inițializează graficele lipsă
+            if (chartJsLoaded && (!concediiExists || !statusExists)) {
+                console.log('Re-initializing missing charts...');
+                if (!concediiExists) updateConcediiChart('6luni');
+                if (!statusExists) updateStatusChart('curent');
+            }
+            
+            // Verifică din nou PDF button
             const pdfBtn = document.getElementById('generatePDF');
-            console.log('PDF Button found:', pdfBtn);
-            
-            if (pdfBtn) {
-                console.log('PDF Button exists in DOM');
-            } else {
-                console.error('PDF Button NOT FOUND in DOM!');
+            if (pdfBtn && !pdfBtn.onclick) {
+                pdfBtn.addEventListener('click', generatePDFReport);
+                console.log('✅ Late PDF button attachment successful');
             }
-        });
+            
+            if (concediiExists && statusExists) {
+                console.log('🎉 ALL CHARTS ARE WORKING CORRECTLY!');
+            }
+        }, 3000);
+    });
 
-        function initializeCharts() {
-            // Variabile globale pentru grafice
-            window.concediiChart = null;
-            window.statusChart = null;
-            
-            // Inițializare grafice cu date implicite
-            updateConcediiChart('6luni');
-            updateStatusChart('curent');
-        }
+    // ============= EXPORT PENTRU DEBUGGING =============
 
-        // Funcție pentru actualizarea graficului de evoluție concedii
-        function updateConcediiChart(period) {
-            const ctx = document.getElementById('concediiChart').getContext('2d');
-            
-            // Distruge graficul existent dacă există
-            if (window.concediiChart) {
-                window.concediiChart.destroy();
-            }
-            
-            // Creează gradient-ul corect
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, '<%=accent%>40');       // Start cu transparență
-            gradient.addColorStop(1, '<%=accent%>10');       // End mai transparent
-            
-            // Date pentru diferite perioade
-            let labels, data, maxValue;
-            
-            <%
-            // Date pentru ultimele 6 luni - FĂRĂ GROUP BY status
-            String[] luni6 = {"Ian", "Feb", "Mar", "Apr", "Mai", "Iun"};
-            int[] data6Luni = new int[6];
-            
-            String query6Luni = "SELECT " +
-                    "SUM(CASE WHEN MONTH(start_c) = 1 THEN durata ELSE 0 END) as ian, " +
-                    "SUM(CASE WHEN MONTH(start_c) = 2 THEN durata ELSE 0 END) as feb, " +
-                    "SUM(CASE WHEN MONTH(start_c) = 3 THEN durata ELSE 0 END) as mar, " +
-                    "SUM(CASE WHEN MONTH(start_c) = 4 THEN durata ELSE 0 END) as apr, " +
-                    "SUM(CASE WHEN MONTH(start_c) = 5 THEN durata ELSE 0 END) as mai, " +
-                    "SUM(CASE WHEN MONTH(start_c) = 6 THEN durata ELSE 0 END) as iun " +
-                    "FROM concedii JOIN useri ON concedii.id_ang = useri.id " +
-                    "WHERE YEAR(start_c) = YEAR(CURDATE()) AND status >= 0";
-            
-            if (isDirector) {
-                // Director vede toate concediile
-                query6Luni += "";
-            } else if (isSef) {
-                query6Luni += " AND useri.id_dep = " + rs.getInt("id_dep");
-            } else {
-                query6Luni += " AND useri.id = " + id;
-            }
-            
-            System.out.println("Query 6 luni: " + query6Luni);
-            
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement stmt = connection.prepareStatement(query6Luni)) {
-                ResultSet rs_6luni = stmt.executeQuery();
-                if (rs_6luni.next()) {
-                    data6Luni[0] = rs_6luni.getInt("ian");
-                    data6Luni[1] = rs_6luni.getInt("feb");
-                    data6Luni[2] = rs_6luni.getInt("mar");
-                    data6Luni[3] = rs_6luni.getInt("apr");
-                    data6Luni[4] = rs_6luni.getInt("mai");
-                    data6Luni[5] = rs_6luni.getInt("iun");
-                    System.out.println("Date 6 luni: " + data6Luni[0] + " " + data6Luni[1] + " " + data6Luni[2] + " " + data6Luni[3] + " " + data6Luni[4] + " " + data6Luni[5]);
-                }
-            } catch (SQLException e) {
-                System.out.println("Eroare query 6 luni: " + e.getMessage());
-            }
-            
-            // Date pentru ultimul an (pe trimestre)
-            int[] dataAn = new int[4];
-            String queryAn = "SELECT " +
-                    "SUM(CASE WHEN QUARTER(start_c) = 1 THEN durata ELSE 0 END) as q1, " +
-                    "SUM(CASE WHEN QUARTER(start_c) = 2 THEN durata ELSE 0 END) as q2, " +
-                    "SUM(CASE WHEN QUARTER(start_c) = 3 THEN durata ELSE 0 END) as q3, " +
-                    "SUM(CASE WHEN QUARTER(start_c) = 4 THEN durata ELSE 0 END) as q4 " +
-                    "FROM concedii JOIN useri ON concedii.id_ang = useri.id " +
-                    "WHERE YEAR(start_c) = YEAR(CURDATE()) AND status >= 0";
-            
-            if (isDirector) {
-                queryAn += "";
-            } else if (isSef) {
-                queryAn += " AND useri.id_dep = " + rs.getInt("id_dep");
-            } else {
-                queryAn += " AND useri.id = " + id;
-            }
-            
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement stmt = connection.prepareStatement(queryAn)) {
-                ResultSet rs_an = stmt.executeQuery();
-                if (rs_an.next()) {
-                    dataAn[0] = rs_an.getInt("q1");
-                    dataAn[1] = rs_an.getInt("q2");
-                    dataAn[2] = rs_an.getInt("q3");
-                    dataAn[3] = rs_an.getInt("q4");
-                }
-            } catch (SQLException e) {
-                System.out.println("Eroare query an: " + e.getMessage());
-            }
-            
-            // Date pentru tot timpul (pe ani)
-            java.util.List<String> aniLabels = new java.util.ArrayList<>();
-            java.util.List<Integer> aniData = new java.util.ArrayList<>();
-            String queryTotal = "SELECT YEAR(start_c) as an, SUM(durata) as total " +
-                    "FROM concedii JOIN useri ON concedii.id_ang = useri.id " +
-                    "WHERE status >= 0";
-            
-            if (isDirector) {
-                queryTotal += "";
-            } else if (isSef) {
-                queryTotal += " AND useri.id_dep = " + rs.getInt("id_dep");
-            } else {
-                queryTotal += " AND useri.id = " + id;
-            }
-            
-            queryTotal += " GROUP BY YEAR(start_c) ORDER BY YEAR(start_c) DESC LIMIT 5";
-            
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement stmt = connection.prepareStatement(queryTotal)) {
-                ResultSet rs_total = stmt.executeQuery();
-                while (rs_total.next()) {
-                    aniLabels.add(0, String.valueOf(rs_total.getInt("an")));
-                    aniData.add(0, rs_total.getInt("total"));
-                }
-            } catch (SQLException e) {
-                System.out.println("Eroare query total: " + e.getMessage());
-            }
-            %>
-            
-            switch(period) {
-                case '6luni':
-                    labels = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun'];
-                    data = [<%=data6Luni[0]%>, <%=data6Luni[1]%>, <%=data6Luni[2]%>, <%=data6Luni[3]%>, <%=data6Luni[4]%>, <%=data6Luni[5]%>];
-                    maxValue = 40;
-                    break;
-                case '1an':
-                    labels = ['T1', 'T2', 'T3', 'T4'];
-                    data = [<%=dataAn[0]%>, <%=dataAn[1]%>, <%=dataAn[2]%>, <%=dataAn[3]%>];
-                    maxValue = 40;
-                    break;
-                case 'total':
-                    labels = [<%if(aniLabels.size() > 0) { for(int i = 0; i < aniLabels.size(); i++) { out.print("'" + aniLabels.get(i) + "'"); if(i < aniLabels.size()-1) out.print(","); }} else { out.print("'2025'"); }%>];
-                    data = [<%if(aniData.size() > 0) { for(int i = 0; i < aniData.size(); i++) { out.print(aniData.get(i)); if(i < aniData.size()-1) out.print(","); }} else { out.print("0"); }%>];
-                    maxValue = Math.max(...data, 40) + 10;
-                    break;
-                default:
-                    labels = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun'];
-                    data = [<%=data6Luni[0]%>, <%=data6Luni[1]%>, <%=data6Luni[2]%>, <%=data6Luni[3]%>, <%=data6Luni[4]%>, <%=data6Luni[5]%>];
-                    maxValue = 40;
-            }
-            
-            console.log('Period:', period, 'Labels:', labels, 'Data:', data);
-            
-            window.concediiChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Zile Concediu',
-                        data: data,
-                        borderColor: '<%=accent%>',
-                        backgroundColor: gradient,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointBackgroundColor: '<%=accent%>',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: maxValue,
-                            grid: {
-                                color: '#f0f0f0'
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
-                        }
-                    },
-                    elements: {
-                        point: {
-                            hoverBackgroundColor: '<%=accent%>'
-                        }
-                    }
-                }
-            });
-        }
+    window.chartDebug = {
+        checkChartJS,
+        getCSSVariables,
+        updateConcediiChart,
+        updateStatusChart,
+        initializeCharts,
+        setupEventListeners,
+        generatePDFReport,
+        cssVars: () => window.cssVars,
+        charts: () => ({
+            concedii: window.concediiChart,
+            status: window.statusChart
+        })
+    };
 
-        // Funcție pentru actualizarea graficului de status
-        function updateStatusChart(period) {
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            
-            // Distruge graficul existent dacă există
-            if (window.statusChart) {
-                window.statusChart.destroy();
-            }
-            
-            let data;
-            
-            <%
-            // Date pentru anul curent
-            int[] statusCurent = {0, 0, 0, 0}; // [aprobate_director, aprobate_sef, in_asteptare, respinse]
-            String queryStatusCurent = "SELECT status, COUNT(*) as count FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE YEAR(start_c) = YEAR(CURDATE())";
-            
-            if (isDirector) {
-                queryStatusCurent += "";
-            } else if (isSef) {
-                queryStatusCurent += " AND useri.id_dep = " + rs.getInt("id_dep");
-            } else {
-                queryStatusCurent += " AND useri.id = " + id;
-            }
-            queryStatusCurent += " GROUP BY status";
-            
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement stmt = connection.prepareStatement(queryStatusCurent)) {
-                ResultSet rs_status = stmt.executeQuery();
-                while (rs_status.next()) {
-                    int status = rs_status.getInt("status");
-                    int count = rs_status.getInt("count");
-                    if (status == 2) statusCurent[0] = count;
-                    else if (status == 1) statusCurent[1] = count;
-                    else if (status == 0) statusCurent[2] = count;
-                    else if (status < 0) statusCurent[3] += count;
-                }
-            } catch (SQLException e) {
-                System.out.println("Eroare query status curent: " + e.getMessage());
-            }
-            
-            // Date pentru anul trecut
-            int[] statusTrecut = {0, 0, 0, 0};
-            String queryStatusTrecut = "SELECT status, COUNT(*) as count FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE YEAR(start_c) = YEAR(CURDATE()) - 1";
-            
-            if (isDirector) {
-                queryStatusTrecut += "";
-            } else if (isSef) {
-                queryStatusTrecut += " AND useri.id_dep = " + rs.getInt("id_dep");
-            } else {
-                queryStatusTrecut += " AND useri.id = " + id;
-            }
-            queryStatusTrecut += " GROUP BY status";
-            
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement stmt = connection.prepareStatement(queryStatusTrecut)) {
-                ResultSet rs_status = stmt.executeQuery();
-                while (rs_status.next()) {
-                    int status = rs_status.getInt("status");
-                    int count = rs_status.getInt("count");
-                    if (status == 2) statusTrecut[0] = count;
-                    else if (status == 1) statusTrecut[1] = count;
-                    else if (status == 0) statusTrecut[2] = count;
-                    else if (status < 0) statusTrecut[3] += count;
-                }
-            } catch (SQLException e) {
-                System.out.println("Eroare query status trecut: " + e.getMessage());
-            }
-            
-            // Date pentru total
-            int[] statusTotal = {0, 0, 0, 0};
-            String queryStatusTotal = "SELECT status, COUNT(*) as count FROM concedii JOIN useri ON concedii.id_ang = useri.id";
-            
-            if (isDirector) {
-                queryStatusTotal += "";
-            } else if (isSef) {
-                queryStatusTotal += " WHERE useri.id_dep = " + rs.getInt("id_dep");
-            } else {
-                queryStatusTotal += " WHERE useri.id = " + id;
-            }
-            queryStatusTotal += " GROUP BY status";
-            
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                 PreparedStatement stmt = connection.prepareStatement(queryStatusTotal)) {
-                ResultSet rs_status = stmt.executeQuery();
-                while (rs_status.next()) {
-                    int status = rs_status.getInt("status");
-                    int count = rs_status.getInt("count");
-                    if (status == 2) statusTotal[0] = count;
-                    else if (status == 1) statusTotal[1] = count;
-                    else if (status == 0) statusTotal[2] = count;
-                    else if (status < 0) statusTotal[3] += count;
-                }
-            } catch (SQLException e) {
-                System.out.println("Eroare query status total: " + e.getMessage());
-            }
-            %>
-            
-            switch(period) {
-                case 'curent':
-                    data = [<%=statusCurent[0]%>, <%=statusCurent[1]%>, <%=statusCurent[2]%>, <%=statusCurent[3]%>];
-                    break;
-                case 'trecut':
-                    data = [<%=statusTrecut[0]%>, <%=statusTrecut[1]%>, <%=statusTrecut[2]%>, <%=statusTrecut[3]%>];
-                    break;
-                case 'total':
-                    data = [<%=statusTotal[0]%>, <%=statusTotal[1]%>, <%=statusTotal[2]%>, <%=statusTotal[3]%>];
-                    break;
-                default:
-                    data = [<%=statusCurent[0]%>, <%=statusCurent[1]%>, <%=statusCurent[2]%>, <%=statusCurent[3]%>];
-            }
-            
-            console.log('Status period:', period, 'Data:', data);
-            
-            window.statusChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Aprobate Director', 'Aprobate Șef', 'În Așteptare', 'Respinse'],
-                    datasets: [{
-                        data: data,
-                        backgroundColor: [
-                            '#28a745',
-                            '#17a2b8', 
-                            '#ffc107',
-                            '#dc3545'
-                        ],
-                        borderWidth: 0,
-                        cutout: '60%',
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                color: '#666'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const value = context.parsed;
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                    return context.label + ': ' + value + ' (' + percentage + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+    console.log('=== CHART SCRIPT LOADED COMPLETELY ===');
+    console.log('Use window.chartDebug for manual testing');
 
-        function setupEventListeners() {
-            // Event listeners pentru filtre grafice
-            document.getElementById('concediiFilter').addEventListener('change', function(e) {
-                updateConcediiChart(e.target.value);
-            });
-            
-            document.getElementById('statusFilter').addEventListener('change', function(e) {
-                updateStatusChart(e.target.value);
-            });
-
-            // PDF generation cu iText (server-side)
-            document.getElementById('generatePDF').addEventListener('click', function() {
-                const reportType = document.getElementById('reportType').value;
-                const btn = this;
-                
-                btn.innerHTML = '<i class="ri-loader-line"></i> Generez...';
-                btn.style.pointerEvents = 'none';
-                
-                // Creează form pentru a trimite cererea către server
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'generatePDFReport.jsp'; // Noul JSP pentru generarea PDF
-                form.style.display = 'none';
-                
-                // Adaugă parametrii
-                const reportTypeInput = document.createElement('input');
-                reportTypeInput.type = 'hidden';
-                reportTypeInput.name = 'reportType';
-                reportTypeInput.value = reportType;
-                form.appendChild(reportTypeInput);
-                
-                const userIdInput = document.createElement('input');
-                userIdInput.type = 'hidden';
-                userIdInput.name = 'userId';
-                userIdInput.value = '<%=id%>';
-                form.appendChild(userIdInput);
-                
-                document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
-                
-                // Reset button after delay
+    // Animații pentru stats la încărcare (păstrat din codul original)
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            const stats = document.querySelectorAll('.stat-value');
+            stats.forEach((stat, index) => {
                 setTimeout(() => {
-                    btn.innerHTML = '<i class="ri-download-line"></i> Generează PDF';
-                    btn.style.pointerEvents = 'auto';
-                }, 2000);
+                    stat.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        stat.style.transform = 'scale(1)';
+                    }, 300);
+                }, index * 100);
             });
-
-            // Refresh button pentru activitate
-            const refreshBtn = document.querySelector('.activity-header button');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', function() {
-                    this.style.transform = 'rotate(360deg)';
-                    setTimeout(() => {
-                        this.style.transform = 'rotate(0deg)';
-                        // Refresh pagina pentru date noi
-                        location.reload();
-                    }, 500);
-                });
-            }
-        }
-
-        // Animații pentru stats la încărcare
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                const stats = document.querySelectorAll('.stat-value');
-                stats.forEach((stat, index) => {
-                    setTimeout(() => {
-                        stat.style.transform = 'scale(1.1)';
-                        setTimeout(() => {
-                            stat.style.transform = 'scale(1)';
-                        }, 300);
-                    }, index * 100);
-                });
-            }, 500);
-        });
+        }, 500);
+    });
     </script>
+    <script>
+console.log('=== DEBUG GRAFICE DIRECTOR ===');
+console.log('Data pentru grafice:');
+console.log('6 luni:', [<%=data6Luni[0]%>, <%=data6Luni[1]%>, <%=data6Luni[2]%>, <%=data6Luni[3]%>, <%=data6Luni[4]%>, <%=data6Luni[5]%>]);
+console.log('An:', [<%=dataAn[0]%>, <%=dataAn[1]%>, <%=dataAn[2]%>, <%=dataAn[3]%>]);
+console.log('Status curent:', [<%=statusCurent[0]%>, <%=statusCurent[1]%>, <%=statusCurent[2]%>, <%=statusCurent[3]%>]);
+console.log('CSS Variables:');
+console.log('--bg:', '<%=accent%>');
+console.log('--clr:', '<%=clr%>');
+console.log('--sd:', '<%=sidebar%>');
+console.log('--text:', '<%=text%>');
+</script>
+    <script>
+// Test de verificare finală
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        console.log('=== VERIFICARE FINALĂ ===');
+        console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+        console.log('Grafic concedii exists:', !!window.concediiChart);
+        console.log('Grafic status exists:', !!window.statusChart);
+        
+        // Verifică dacă canvas-urile sunt vizibile
+        const canvases = document.querySelectorAll('canvas');
+        canvases.forEach((canvas, index) => {
+            const rect = canvas.getBoundingClientRect();
+            console.log(`Canvas ${index} vizibil:`, {
+                width: rect.width,
+                height: rect.height,
+                visible: rect.width > 0 && rect.height > 0
+            });
+        });
+    }, 5000);
+});
+</script>
+
 </body>
 </html>
  <%
