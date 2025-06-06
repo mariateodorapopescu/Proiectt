@@ -250,6 +250,7 @@
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
+           
             font-size: 1.2rem;
         }
 
@@ -654,14 +655,14 @@
                     </div>
                 </div>
                 <div class="quick-actions">
-                    <button class="quick-btn" title="Notificări">
-                        <i class="ri-notification-line"></i>
+                    <button class="quick-btn" title="Info">
+                        <a style="text-decoration:none; color: white;" href="faq.jsp"><i class="ri-question-mark"></i></a>
                     </button>
                     <button class="quick-btn" title="Setări">
-                        <i class="ri-settings-line"></i>
+                       <a style="text-decoration:none; color: white;" href="setari.jsp"> <i class="ri-settings-line"></i></a>
                     </button>
                     <button class="quick-btn" title="Profil">
-                       <a style="text-decoration:none;" href="despr.jsp"> <i class="ri-user-line"></i> </a>
+                       <a style="text-decoration:none; color: white;" href="despr.jsp"> <i class="ri-user-line"></i> </a>
                        
                     </button>
                 </div>
@@ -1170,6 +1171,34 @@
     <script>
         // Inițializare Dashboard cu date din JSP
         document.addEventListener('DOMContentLoaded', function() {
+        	
+        	function hexToRgba(hex, alpha) {
+        	    hex = hex.replace('#', '');
+        	    if (hex.length === 3) {
+        	        hex = hex.split('').map(c => c + c).join('');
+        	    }
+        	    const r = parseInt(hex.substring(0, 2), 16);
+        	    const g = parseInt(hex.substring(2, 4), 16);
+        	    const b = parseInt(hex.substring(4, 6), 16);
+        	    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        	}
+
+        	document.addEventListener('DOMContentLoaded', () => {
+        	    const btn = document.querySelector('.quick-btn');
+        	    const computedColor = getComputedStyle(btn).backgroundColor;
+
+        	    // Convert doar dacă e hex — aici presupunem că inițial e hex (de ex: #007bff injectat ca stil inline/server)
+        	    // Alternativ, folosește deja valoarea RGB obținută
+        	    if (computedColor.startsWith('rgb') && !computedColor.startsWith('rgba')) {
+        	        const rgba = computedColor.replace('rgb', 'rgba').replace(')', ', 0.25)');
+        	        btn.style.backgroundColor = rgba;
+        	    }
+
+        	    // Dacă știi sigur că e hex:
+        	    // const rgba = hexToRgba('<%=accent%>', 0.25);
+        	    // btn.style.backgroundColor = rgba;
+        	});
+        	
             // Date preluate din JSP
             const userData = {
                 nume: '<%=rs.getString("nume")%>',
