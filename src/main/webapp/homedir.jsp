@@ -117,39 +117,39 @@
         .main-content {
             
             padding: 20px;
-            color: var(--text);
+            color: <%=text%>;
         }
         .header {
-            background-color: var(--sd);
+            background-color: <%=sidebar%>;
             padding: 20px;
             border-radius: 10px;
-            color: var(--text);
+            color: <%=text%>;
             margin-bottom: 20px;
         }
         .card {
             
             padding: 20px;
             border-radius: 10px;
-             background-color: var(--sd);
+             background-color: <%=sidebar%>;
             margin-bottom: 20px;
-            color: var(--text);
+            color: <%=text%>;
         }
         .card h3 {
             margin-bottom: 20px;
-            color: var(--text);
+            color: <%=text%>;
         }
         .card .info div {
             margin-bottom: 10px;
             font-size: 16px;
-            color: #555;
+            color: <%=text%>;
             
         }
         .card .info div span {
             font-weight: bold;
-            color: var(--text);
+            color: <%=text%>;
         }
         .btn-primary {
-            background-color: var(--bg);
+            background-color: <%=clr%>;
             
         }
         .btn-primary:hover {
@@ -166,8 +166,8 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--bg-color) 0%, var(--hover-color) 100%);
-            color: var(--text-color);
+            background: linear-gradient(135deg, <%=clr%>; 0%, <%=accent%> 100%);
+            color: <%=text%>;
             min-height: 100vh;
             line-height: 1.6;
         }
@@ -179,12 +179,12 @@
         }
 
         .header-section {
-            background: linear-gradient(135deg, var(--accent-color), var(--info-color));
-            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, <%=accent%>, <%=clr%>);
+            border-radius: 2rem;
             padding: 30px;
             margin-bottom: 30px;
             color: white;
-            box-shadow: var(--shadow);
+           
             position: relative;
             overflow: hidden;
         }
@@ -196,7 +196,8 @@
             right: -20px;
             width: 200px;
             height: 200px;
-            background: rgba(255,255,255,0.1);
+            background: <%=clr%>;
+            opacity: 50%;
             border-radius: 50%;
             animation: float 6s ease-in-out infinite;
         }
@@ -222,7 +223,7 @@
         }
 
         .user-role {
-            background: rgba(255,255,255,0.2);
+            background: <%=accent%>;
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.9rem;
@@ -242,7 +243,7 @@
         }
 
         .quick-btn {
-            background: rgba(255,255,255,0.2);
+            background: <%=accent%>;
             border: none;
             padding: 12px;
             border-radius: 50%;
@@ -253,7 +254,7 @@
         }
 
         .quick-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: black;
             transform: translateY(-2px);
         }
 
@@ -265,10 +266,10 @@
         }
 
         .stat-card {
-            background: var(--card-color);
-            border-radius: var(--border-radius);
+            background: <%=sidebar%>;
+            border-radius: 2rem;
             padding: 25px;
-            box-shadow: var(--shadow);
+           
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -276,7 +277,7 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            
         }
 
         .stat-card::before {
@@ -286,7 +287,7 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-color), var(--info-color));
+            background: linear-gradient(90deg, <%=accent%>, <%=sidebar%>);
         }
 
         .stat-header {
@@ -310,13 +311,13 @@
         .stat-value {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--accent-color);
+            color: <%=accent%>;
             margin: 10px 0;
         }
 
         .stat-label {
             font-size: 0.9rem;
-            color: #666;
+            color: <%=text%>;
             margin-bottom: 8px;
         }
 
@@ -325,11 +326,12 @@
             align-items: center;
             gap: 5px;
             font-size: 0.8rem;
+            color: <%=text%>;
         }
 
-        .trend-up { color: var(--success-color); }
-        .trend-down { color: var(--danger-color); }
-        .trend-neutral { color: #666; }
+        .trend-up { color: <%=text%>; }
+        .trend-down { color: <%=text%>; }
+        .trend-neutral { color: <%=text%>; }
 
         .charts-section {
             display: grid;
@@ -339,10 +341,10 @@
         }
 
         .chart-card {
-            background: var(--card-color);
-            border-radius: var(--border-radius);
+            background: <%=sidebar%>;
+            border-radius: 2rem;
             padding: 25px;
-            box-shadow: var(--shadow);
+           
         }
 
         .chart-header {
@@ -355,15 +357,16 @@
         .chart-title {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--text-color);
+            color: <%=text%>;
         }
 
         .chart-filter {
             padding: 5px 10px;
-            border: 1px solid #ddd;
+            border: 1px solid <%=accent%>;
             border-radius: 6px;
             font-size: 0.8rem;
-            background: var(--bg-color);
+            background: <%=accent%>;
+            color: white;
         }
 
         .canvas-container {
@@ -378,10 +381,10 @@
         }
 
         .activity-card {
-            background: var(--card-color);
-            border-radius: var(--border-radius);
+            background: <%=sidebar%>;
+            border-radius: 2rem;
             padding: 25px;
-            box-shadow: var(--shadow);
+           
         }
 
         .activity-header {
@@ -389,7 +392,7 @@
             justify-content: between;
             align-items: center;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--bg-color);
+            border-bottom: 2px solid <%=sidebar%>;
             padding-bottom: 15px;
         }
 
@@ -403,7 +406,7 @@
         }
 
         .timeline-item:hover {
-            background: var(--hover-color);
+            background: <%=hover%>;
         }
 
         .timeline-icon {
@@ -436,20 +439,7 @@
             margin-top: 5px;
         }
 
-        .notification-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .notification-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+       
 
         .alert-item {
             background: rgba(255,255,255,0.1);
@@ -467,14 +457,14 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: var(--accent-color);
+            background: <%=accent%>;
             color: white;
             border: none;
             padding: 15px 20px;
             border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: var(--shadow);
+           
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -483,13 +473,13 @@
 
         .pdf-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            
         }
 
         .progress-bar {
             width: 100%;
             height: 8px;
-            background: var(--bg-color);
+            background: <%=accent%>;
             border-radius: 4px;
             overflow: hidden;
             margin: 10px 0;
@@ -497,7 +487,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+            background: linear-gradient(90deg, <%=sidebar%>, <%=accent%>);
             transition: width 0.5s ease;
         }
 
@@ -540,15 +530,128 @@
         }
     </style>
 </head>
-<body>
+<body style="--bg:<%=accent%>; --clr:<%=clr%>; --sd:<%=sidebar%>; --text:<%=text%>; background:<%=clr%>">
+
+    <%
+    // Verifică dacă există concedii în ziua curentă care să aibă locații
+    boolean hasLocationsForTodayLeaves = false;
+    int todayLeavesCount = 0;
+    int todayLeavesWithLocationCount = 0;
+
+    try {
+        // Interogare pentru a verifica concediile din ziua curentă folosind direct CURDATE()
+        String checkQuery = "SELECT c.id FROM concedii c WHERE c.added = CURDATE() and c.id_ang =" + id;
+
+        try (Connection connection2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+             PreparedStatement checkStmt = connection2.prepareStatement(checkQuery)) {
+            
+            try (ResultSet checkRs = checkStmt.executeQuery()) {
+                // Numără concediile din ziua curentă
+                while (checkRs.next()) {
+                    todayLeavesCount++;
+
+                    // Pentru fiecare concediu, verifică dacă are o locație
+                    int concediuId = checkRs.getInt("id");
+                    String locatieQuery = "SELECT COUNT(*) AS count FROM locatii_concedii join concedii on locatii_concedii.id_concediu = concedii.id join useri on concedii.id_Ang = useri.id WHERE id_concediu = ? and useri.id = " + id;
+
+                    try (PreparedStatement locatieStmt = connection2.prepareStatement(locatieQuery)) {
+                        locatieStmt.setInt(1, concediuId);
+                        try (ResultSet locatieRs = locatieStmt.executeQuery()) {
+                            if (locatieRs.next() && locatieRs.getInt("count") > 0) {
+                                todayLeavesWithLocationCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Există locații pentru concediile din ziua curentă dacă cel puțin un concediu are locație
+        hasLocationsForTodayLeaves = (todayLeavesWithLocationCount > 0);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        out.println("<script type='text/javascript'>");
+        out.println("console.error('Eroare la verificarea concediilor: " + e.getMessage() + "');");
+        out.println("</script>");
+    }
+    %>
+
+    <!-- Alertă pentru concedii fără locații -->
+    <% if (todayLeavesCount > todayLeavesWithLocationCount) { %>
+    <div id="noLocationsBanner" style="
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        background-color: <%= accent %>;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 80%;
+        max-width: 600px;
+    ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="min-width: 24px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>
+            <strong>Atenție!</strong> Există <%= todayLeavesCount %> concedii adăugate astăzi, dar numai <%=todayLeavesWithLocationCount %> are locație asociată.
+        </div>
+        <button onclick="document.getElementById('noLocationsBanner').style.display='none';" style="
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: 10px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        ">&times;</button>
+    </div>
+    <% } %>
+
     <div class="dashboard-container">
         <!-- Header Section -->
         <div class="header-section fade-in">
             <div class="header-content">
                 <div class="user-info">
-                    <h1 id="userName">Vasile Fabian</h1>
-                    <span class="user-role" id="userRole">Director HR</span>
-                    <div class="current-date" id="currentDate">Vineri, 06 Iunie 2025</div>
+                    <h1 id="userName"><%=rs.getString("nume")%> <%=rs.getString("prenume")%></h1>
+                    <span class="user-role" id="userRole">
+                        <%
+                        if (isDirector) {
+                            out.println("Director " + functie);
+                        } else if (isSef) {
+                            out.println("Șef " + functie);
+                        } else if (isIncepator) {
+                            out.println("Stagiar " + functie);
+                        } else {
+                            out.println(functie);
+                        }
+                        %>
+                    </span>
+                    <div class="current-date" id="currentDate">
+                        <%
+                        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                             PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT DATE_FORMAT(NOW(), '%W, %d %M %Y') as today")) {
+                            ResultSet rs2 = preparedStatement2.executeQuery();
+                            if (rs2.next()) {
+                                out.println(rs2.getString("today"));
+                            }
+                        } catch (SQLException e) {
+                            out.println("Data curentă");
+                        }
+                        %>
+                    </div>
                 </div>
                 <div class="quick-actions">
                     <button class="quick-btn" title="Notificări">
@@ -558,7 +661,8 @@
                         <i class="ri-settings-line"></i>
                     </button>
                     <button class="quick-btn" title="Profil">
-                        <i class="ri-user-line"></i>
+                       <a style="text-decoration:none;" href="despr.jsp"> <i class="ri-user-line"></i> </a>
+                       
                     </button>
                 </div>
             </div>
@@ -571,7 +675,22 @@
                 <div class="stat-header">
                     <div>
                         <div class="stat-label">Concedii Luate</div>
-                        <div class="stat-value" id="concediiLuate">2</div>
+                        <div class="stat-value" id="concediiLuate">
+                            <%
+                            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                 PreparedStatement stmt = connection.prepareStatement("SELECT conluate FROM useri WHERE id = ?")) {
+                                stmt.setInt(1, id);
+                                ResultSet rs1 = stmt.executeQuery();
+                                if (rs1.next()) {
+                                    out.println(rs1.getString("conluate"));
+                                } else {
+                                    out.println("0");
+                                }
+                            } catch (SQLException e) {
+                                out.println("0");
+                            }
+                            %>
+                        </div>
                         <div class="stat-trend trend-up">
                             <i class="ri-arrow-up-line"></i>
                             <span>din 3 disponibile</span>
@@ -582,7 +701,21 @@
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 67%;"></div>
+                    <%
+                    int conluate = 0;
+                    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                         PreparedStatement stmt = connection.prepareStatement("SELECT conluate FROM useri WHERE id = ?")) {
+                        stmt.setInt(1, id);
+                        ResultSet rs1 = stmt.executeQuery();
+                        if (rs1.next()) {
+                            conluate = rs1.getInt("conluate");
+                        }
+                    } catch (SQLException e) {
+                        // Handle error
+                    }
+                    double progressPercent = (conluate / 3.0) * 100;
+                    %>
+                    <div class="progress-fill" style="width: <%=progressPercent%>%;"></div>
                 </div>
             </div>
 
@@ -591,10 +724,41 @@
                 <div class="stat-header">
                     <div>
                         <div class="stat-label">Zile Concediu</div>
-                        <div class="stat-value" id="zileUsed">16</div>
+                        <div class="stat-value" id="zileUsed">
+                            <%
+                            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                 PreparedStatement stmt = connection.prepareStatement("SELECT zilecons, zileramase FROM useri WHERE id = ?")) {
+                                stmt.setInt(1, id);
+                                ResultSet rs1 = stmt.executeQuery();
+                                if (rs1.next()) {
+                                    out.println(rs1.getString("zilecons"));
+                                } else {
+                                    out.println("0");
+                                }
+                            } catch (SQLException e) {
+                                out.println("0");
+                            }
+                            %>
+                        </div>
                         <div class="stat-trend trend-neutral">
                             <i class="ri-calendar-line"></i>
-                            <span>din 40 disponibile</span>
+                            <span>din 
+                            <%
+                            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                 PreparedStatement stmt = connection.prepareStatement("SELECT zilecons, zileramase FROM useri WHERE id = ?")) {
+                                stmt.setInt(1, id);
+                                ResultSet rs1 = stmt.executeQuery();
+                                if (rs1.next()) {
+                                    int zilecons = rs1.getInt("zilecons");
+                                    int zileramase = rs1.getInt("zileramase");
+                                    out.println(zilecons + zileramase);
+                                } else {
+                                    out.println("40");
+                                }
+                            } catch (SQLException e) {
+                                out.println("40");
+                            }
+                            %> disponibile</span>
                         </div>
                     </div>
                     <div class="stat-icon" style="background: var(--success-color);">
@@ -602,7 +766,24 @@
                     </div>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 40%;"></div>
+                    <%
+                    int zilecons = 0;
+                    int totalZile = 40;
+                    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                         PreparedStatement stmt = connection.prepareStatement("SELECT zilecons, zileramase FROM useri WHERE id = ?")) {
+                        stmt.setInt(1, id);
+                        ResultSet rs1 = stmt.executeQuery();
+                        if (rs1.next()) {
+                            zilecons = rs1.getInt("zilecons");
+                            int zileramase = rs1.getInt("zileramase");
+                            totalZile = zilecons + zileramase;
+                        }
+                    } catch (SQLException e) {
+                        // Handle error
+                    }
+                    double zileProgressPercent = totalZile > 0 ? (zilecons / (double)totalZile) * 100 : 0;
+                    %>
+                    <div class="progress-fill" style="width: <%=zileProgressPercent%>%;"></div>
                 </div>
             </div>
 
@@ -611,10 +792,25 @@
                 <div class="stat-header">
                     <div>
                         <div class="stat-label">Proiecte Active</div>
-                        <div class="stat-value" id="proiecteActive">2</div>
+                        <div class="stat-value" id="proiecteActive">
+                            <%
+                            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                 PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(DISTINCT p.id) as total FROM proiecte p JOIN echipe e ON p.id = e.id_prj JOIN membrii_echipe me ON e.id = me.id_echipa WHERE me.id_ang = ? AND p.start <= CURDATE() AND p.end >= CURDATE()")) {
+                                stmt.setInt(1, id);
+                                ResultSet rs1 = stmt.executeQuery();
+                                if (rs1.next()) {
+                                    out.println(rs1.getString("total"));
+                                } else {
+                                    out.println("0");
+                                }
+                            } catch (SQLException e) {
+                                out.println("0");
+                            }
+                            %>
+                        </div>
                         <div class="stat-trend trend-up">
                             <i class="ri-arrow-up-line"></i>
-                            <span>+1 față de luna trecută</span>
+                           
                         </div>
                     </div>
                     <div class="stat-icon" style="background: var(--warning-color);">
@@ -628,10 +824,51 @@
                 <div class="stat-header">
                     <div>
                         <div class="stat-label">Salariu Net</div>
-                        <div class="stat-value" style="font-size: 1.8rem;" id="salariuNet">7,605 RON</div>
+                        <div class="stat-value" style="font-size: 1.8rem;" id="salariuNet">
+                            <%
+                            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                 PreparedStatement stmt = connection.prepareStatement("SELECT salariu_net FROM istoric_fluture WHERE id_ang = ? ORDER BY an DESC, luna DESC LIMIT 1")) {
+                                stmt.setInt(1, id);
+                                ResultSet rs1 = stmt.executeQuery();
+                                if (rs1.next()) {
+                                    out.println(String.format("%,.0f RON", rs1.getDouble("salariu_net")));
+                                } else {
+                                    // Fallback la salariul din tipuri
+                                    try (PreparedStatement stmt2 = connection.prepareStatement("SELECT t.salariu FROM useri u JOIN tipuri t ON u.tip = t.tip WHERE u.id = ?")) {
+                                        stmt2.setInt(1, id);
+                                        ResultSet rs2 = stmt2.executeQuery();
+                                        if (rs2.next()) {
+                                            double salariuBrut = rs2.getDouble("salariu");
+                                            double salariuNet = salariuBrut * 0.585; // Aprox calculation
+                                            out.println(String.format("%,.0f RON", salariuNet));
+                                        } else {
+                                            out.println("N/A");
+                                        }
+                                    }
+                                }
+                            } catch (SQLException e) {
+                                out.println("N/A");
+                            }
+                            %>
+                        </div>
                         <div class="stat-trend trend-up">
                             <i class="ri-arrow-up-line"></i>
-                            <span>Cu sporuri incluse</span>
+                            <span>
+                            <%
+                            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                                 PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) as sporuri FROM istoric_sporuri WHERE id_ang = ? AND data_start <= CURDATE() AND data_final >= CURDATE()")) {
+                                stmt.setInt(1, id);
+                                ResultSet rs1 = stmt.executeQuery();
+                                if (rs1.next() && rs1.getInt("sporuri") > 0) {
+                                    out.println("Cu " + rs1.getInt("sporuri") + " spor(uri)");
+                                } else {
+                                    out.println("Salariu de bază");
+                                }
+                            } catch (SQLException e) {
+                                out.println("Salariu curent");
+                            }
+                            %>
+                            </span>
                         </div>
                     </div>
                     <div class="stat-icon" style="background: var(--success-color);">
@@ -680,94 +917,173 @@
             <div class="activity-card">
                 <div class="activity-header">
                     <h3>Activitate Recentă</h3>
-                    <button class="quick-btn" style="position: relative; background: var(--accent-color);">
+                    <button class="quick-btn" style="position: relative; background: <%=accent%>;;">
                         <i class="ri-refresh-line"></i>
                     </button>
                 </div>
                 
+                <%
+                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                     PreparedStatement stmt = connection.prepareStatement("SELECT c.id, c.start_c, c.end_c, c.motiv, s.nume_status, c.added, c.modified FROM concedii c JOIN statusuri s ON c.status = s.status WHERE c.id_ang = ? ORDER BY c.modified DESC, c.added DESC LIMIT 3")) {
+                    stmt.setInt(1, id);
+                    ResultSet rs3 = stmt.executeQuery();
+                    while (rs3.next()) {
+                        String status = rs3.getString("nume_status");
+                        String iconClass = "";
+                        String bgColor = "";
+                        
+                        if (status.contains("Aprobat")) {
+                            iconClass = "ri-check-line";
+                            bgColor = "var(--success-color)";
+                        } else if (status.contains("Respins")) {
+                            iconClass = "ri-close-line";
+                            bgColor = "var(--danger-color)";
+                        } else {
+                            iconClass = "ri-time-line";
+                            bgColor = "var(--warning-color)";
+                        }
+                %>
+                
                 <div class="timeline-item">
-                    <div class="timeline-icon" style="background: var(--success-color);">
-                        <i class="ri-check-line"></i>
+                    <div class="timeline-icon" style="background: <%=bgColor%>;">
+                        <i class="<%=iconClass%>"></i>
                     </div>
                     <div class="timeline-content">
-                        <h4>Concediu aprobat</h4>
-                        <p>Cererea ta de concediu pentru perioada 01-10 Iulie a fost aprobată de directorul de departament.</p>
-                        <div class="timeline-date">Acum 2 ore</div>
+                        <h4>Concediu <%=status.toLowerCase()%></h4>
+                        <p><%=rs3.getString("motiv")%> pentru perioada <%=rs3.getDate("start_c")%> - <%=rs3.getDate("end_c")%></p>
+                        <div class="timeline-date"><%=rs3.getTimestamp("modified") != null ? rs3.getTimestamp("modified") : rs3.getTimestamp("added")%></div>
                     </div>
                 </div>
-
+                
+                <%
+                    }
+                } catch (SQLException e) {
+                    // Fallback content
+                %>
                 <div class="timeline-item">
                     <div class="timeline-icon" style="background: var(--info-color);">
-                        <i class="ri-file-text-line"></i>
+                        <i class="ri-information-line"></i>
                     </div>
                     <div class="timeline-content">
-                        <h4>Task nou asignat</h4>
-                        <p>Ai fost asignat la task-ul "Implementare modul HR" în proiectul ERP Implementation.</p>
-                        <div class="timeline-date">Ieri, 14:30</div>
+                        <h4>Bun venit!</h4>
+                        <p>Explorează dashboard-ul pentru a vedea statistici și activități recente.</p>
+                        <div class="timeline-date">Acum</div>
                     </div>
                 </div>
+                <%
+                }
+                %>
 
+                <%
+                // Task-uri recente
+                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                     PreparedStatement stmt = connection.prepareStatement("SELECT t.nume, t.start, t.end, s.procent FROM tasks t LEFT JOIN statusuri2 s ON t.status = s.id WHERE t.id_ang = ? ORDER BY t.start DESC LIMIT 2")) {
+                    stmt.setInt(1, id);
+                    ResultSet rs4 = stmt.executeQuery();
+                    while (rs4.next()) {
+                %>
+                
                 <div class="timeline-item">
-                    <div class="timeline-icon" style="background: var(--warning-color);">
-                        <i class="ri-star-line"></i>
+                    <div class="timeline-icon" style="background: <%=accent%>;;">
+                        <i class="ri-task-line"></i>
                     </div>
                     <div class="timeline-content">
-                        <h4>Evaluare performanță</h4>
-                        <p>A fost programată evaluarea ta de performanță pentru săptămâna viitoare.</p>
-                        <div class="timeline-date">25 Mai, 09:15</div>
+                        <h4>Task: <%=rs4.getString("nume")%></h4>
+                        <p>Progres: <%=rs4.getInt("procent")%>% - Deadline: <%=rs4.getDate("end")%></p>
+                        <div class="timeline-date"><%=rs4.getDate("start")%></div>
                     </div>
                 </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-icon" style="background: var(--accent-color);">
-                        <i class="ri-team-line"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Adăugat în echipă</h4>
-                        <p>Ai fost adăugat în echipa "HR Management System" pentru proiectul de digitalizare.</p>
-                        <div class="timeline-date">20 Mai, 16:45</div>
-                    </div>
-                </div>
+                
+                <%
+                    }
+                } catch (SQLException e) {
+                    // Handle error silently
+                }
+                %>
             </div>
 
             <!-- Notificări și Alerte -->
+            <!-- 
             <div>
                 <div class="notification-card">
                     <div class="notification-header">
                         <h3>Notificări</h3>
-                        <span style="background: rgba(255,255,255,0.3); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">3 noi</span>
+                        <%
+                        int notificariCount = 0;
+                        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                             PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) as count FROM notificari_general WHERE id_destinatar = ? AND citit = FALSE")) {
+                            stmt.setInt(1, id);
+                            ResultSet rs5 = stmt.executeQuery();
+                            if (rs5.next()) {
+                                notificariCount = rs5.getInt("count");
+                            }
+                        } catch (SQLException e) {
+                            // Handle error
+                        }
+                        %>
+                        <span style="background: rgba(255,255,255,0.3); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;"><%=notificariCount%> noi</span>
                     </div>
+                   
+                    <%
+                    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                         PreparedStatement stmt = connection.prepareStatement("SELECT tip, mesaj, data_creare FROM notificari_general WHERE id_destinatar = ? ORDER BY data_creare DESC LIMIT 3")) {
+                        stmt.setInt(1, id);
+                        ResultSet rs6 = stmt.executeQuery();
+                        while (rs6.next()) {
+                            String tip = rs6.getString("tip");
+                            String icon = "";
+                            
+                            if (tip.contains("SEDINTA") || tip.contains("MEETING")) {
+                                icon = "ri-calendar-event-line";
+                            } else if (tip.contains("DEADLINE") || tip.contains("URGENT")) {
+                                icon = "ri-alarm-warning-line";
+                            } else {
+                                icon = "ri-information-line";
+                            }
+                    %>
                     
                     <div class="alert-item">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <strong>Ședință echipă</strong>
-                                <p style="margin: 5px 0; font-size: 0.85rem;">Mâine la ora 10:00</p>
+                                <strong><%=tip%></strong>
+                                <p style="margin: 5px 0; font-size: 0.85rem;"><%=rs6.getString("mesaj")%></p>
                             </div>
-                            <i class="ri-calendar-event-line"></i>
+                            <i class="<%=icon%>"></i>
                         </div>
                     </div>
-
+                    
+                    <%
+                        }
+                        if (notificariCount == 0) {
+                    %>
                     <div class="alert-item">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <strong>Deadline proiect</strong>
-                                <p style="margin: 5px 0; font-size: 0.85rem;">în 3 zile</p>
+                                <strong>Nicio notificare</strong>
+                                <p style="margin: 5px 0; font-size: 0.85rem;">Toate notificările sunt la zi</p>
                             </div>
-                            <i class="ri-alarm-warning-line"></i>
+                            <i class="ri-check-line"></i>
                         </div>
                     </div>
-
+                    <%
+                        }
+                    } catch (SQLException e) {
+                        // Fallback content
+                    %>
                     <div class="alert-item">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <strong>Adeverință gata</strong>
-                                <p style="margin: 5px 0; font-size: 0.85rem;">Poate fi ridicată</p>
+                                <strong>Sistem activ</strong>
+                                <p style="margin: 5px 0; font-size: 0.85rem;">Dashboard funcționează normal</p>
                             </div>
-                            <i class="ri-file-download-line"></i>
+                            <i class="ri-check-line"></i>
                         </div>
                     </div>
+                    <%
+                    }
+                    %>
                 </div>
+                  -->
 
                 <!-- Progress Card pentru Proiecte -->
                 <div class="activity-card">
@@ -775,27 +1091,71 @@
                         <h3>Proiectele Tale</h3>
                     </div>
                     
+                    <%
+                    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                         PreparedStatement stmt = connection.prepareStatement(
+                             "SELECT DISTINCT p.nume, p.start, p.end, " +
+                             "COUNT(t.id) as total_tasks, " +
+                             "AVG(IFNULL(s.procent, 0)) as avg_progress " +
+                             "FROM proiecte p " +
+                             "JOIN echipe e ON p.id = e.id_prj " +
+                             "JOIN membrii_echipe me ON e.id = me.id_echipa " +
+                             "LEFT JOIN tasks t ON p.id = t.id_prj AND t.id_ang = ? " +
+                             "LEFT JOIN statusuri2 s ON t.status = s.id " +
+                             "WHERE me.id_ang = ? AND p.start <= CURDATE() AND p.end >= CURDATE() " +
+                             "GROUP BY p.id, p.nume, p.start, p.end " +
+                             "LIMIT 2")) {
+                        stmt.setInt(1, id);
+                        stmt.setInt(2, id);
+                        ResultSet rs7 = stmt.executeQuery();
+                        
+                        boolean hasProjects = false;
+                        while (rs7.next()) {
+                            hasProjects = true;
+                            String numeProiect = rs7.getString("nume");
+                            Date deadline = rs7.getDate("end");
+                            double progress = rs7.getDouble("avg_progress");
+                            
+                            String progressColor = "var(--success-color)";
+                            if (progress < 30) {
+                                progressColor = "var(--danger-color)";
+                            } else if (progress < 70) {
+                                progressColor = "var(--warning-color)";
+                            }
+                    %>
+                    
                     <div style="margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span style="font-weight: 600;">ERP Implementation</span>
-                            <span style="color: var(--success-color); font-weight: 600;">75%</span>
+                            <span style="font-weight: 600;"><%=numeProiect%></span>
+                            <span style="color: <%=progressColor%>; font-weight: 600;"><%=String.format("%.0f", progress)%>%</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: 75%;"></div>
+                            <div class="progress-fill" style="width: <%=progress%>%; background: linear-gradient(90deg, <%=progressColor%>, <%=accent%>;);"></div>
                         </div>
-                        <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Deadline: 31 Dec 2025</p>
+                        <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Deadline: <%=deadline%></p>
                     </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span style="font-weight: 600;">HR Management System</span>
-                            <span style="color: var(--warning-color); font-weight: 600;">45%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 45%; background: linear-gradient(90deg, var(--warning-color), var(--accent-color));"></div>
-                        </div>
-                        <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Deadline: 31 Jul 2025</p>
+                    
+                    <%
+                        }
+                        
+                        if (!hasProjects) {
+                    %>
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        <i class="ri-briefcase-line" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        <p>Nu ai proiecte active momentan</p>
                     </div>
+                    <%
+                        }
+                    } catch (SQLException e) {
+                        // Fallback content
+                    %>
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        <i class="ri-error-warning-line" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        <p>Eroare la încărcarea proiectelor</p>
+                    </div>
+                    <%
+                    }
+                    %>
                 </div>
             </div>
         </div>
@@ -808,76 +1168,69 @@
     </button>
 
     <script>
-        // Inițializare Dashboard
+        // Inițializare Dashboard cu date din JSP
         document.addEventListener('DOMContentLoaded', function() {
-            // Simulare date dinamice (în producție acestea vor veni din JSP/servletul Java)
+            // Date preluate din JSP
             const userData = {
-                nume: 'Vasile',
-                prenume: 'Fabian',
-                functie: 'Director HR',
-                ierarhie: 2,
-                concediiLuate: 2,
-                concediiRamase: 1,
-                zileLuate: 16,
-                zileRamase: 24,
-                salariuBrut: 13000,
-                salariuNet: 7605,
-                proiecteActive: 2
+                nume: '<%=rs.getString("nume")%>',
+                prenume: '<%=rs.getString("prenume")%>',
+                functie: '<%=functie%>',
+                ierarhie: <%=ierarhie%>,
+                id: <%=id%>
             };
 
-            // Update informații user
-            updateUserInfo(userData);
-            
-            // Inițializare grafice
+           
+            // Inițializare grafice cu date reale
             initializeCharts();
-            
-            // Setare dată curentă
-            updateCurrentDate();
             
             // Event listeners
             setupEventListeners();
         });
 
-        function updateUserInfo(data) {
-            document.getElementById('userName').textContent = `${data.nume} ${data.prenume}`;
-            document.getElementById('userRole').textContent = determineRole(data.ierarhie, data.functie);
-            document.getElementById('concediiLuate').textContent = data.concediiLuate;
-            document.getElementById('zileUsed').textContent = data.zileLuate;
-            document.getElementById('proiecteActive').textContent = data.proiecteActive;
-            document.getElementById('salariuNet').textContent = `${data.salariuNet.toLocaleString()} RON`;
-        }
-
-        function determineRole(ierarhie, functie) {
-            if (ierarhie < 3) return `Director ${functie}`;
-            if (ierarhie >= 4 && ierarhie <= 5) return `Șef ${functie}`;
-            if (ierarhie >= 10) return `Stagiar ${functie}`;
-            return functie;
-        }
-
-        function updateCurrentDate() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            document.getElementById('currentDate').textContent = 
-                now.toLocaleDateString('ro-RO', options);
-        }
-
         function initializeCharts() {
-            // Grafic evoluție concedii
+            // Grafic evoluție concedii cu date din JSP
             const concediiCtx = document.getElementById('concediiChart').getContext('2d');
+            const gradient = concediiCtx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, '<%=accent%>');       // Start color
+            gradient.addColorStop(1, '<%=clr%>');    // End color
+            
+            // Preluare date pentru grafic (ar trebui să vină din JSP cu un query separat)
+            <%
+            // Query pentru ultimele 6 luni de concedii
+            String concediiData = "[0, 0, 0, 0, 0, 0]"; // Default
+            String labelsData = "['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun']"; // Default
+            
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement stmt = connection.prepareStatement(
+                     "SELECT " +
+                     "SUM(CASE WHEN MONTH(start_c) = 1 THEN durata ELSE 0 END) as ian, " +
+                     "SUM(CASE WHEN MONTH(start_c) = 2 THEN durata ELSE 0 END) as feb, " +
+                     "SUM(CASE WHEN MONTH(start_c) = 3 THEN durata ELSE 0 END) as mar, " +
+                     "SUM(CASE WHEN MONTH(start_c) = 4 THEN durata ELSE 0 END) as apr, " +
+                     "SUM(CASE WHEN MONTH(start_c) = 5 THEN durata ELSE 0 END) as mai, " +
+                     "SUM(CASE WHEN MONTH(start_c) = 6 THEN durata ELSE 0 END) as iun " +
+                     "FROM concedii WHERE id_ang = ? AND YEAR(start_c) = YEAR(CURDATE()) AND status >= 0")) {
+                stmt.setInt(1, id);
+                ResultSet rs8 = stmt.executeQuery();
+                if (rs8.next()) {
+                    concediiData = String.format("[%d, %d, %d, %d, %d, %d]",
+                        rs8.getInt("ian"), rs8.getInt("feb"), rs8.getInt("mar"),
+                        rs8.getInt("apr"), rs8.getInt("mai"), rs8.getInt("iun"));
+                }
+            } catch (SQLException e) {
+                // Use default data
+            }
+            %>
+            
             new Chart(concediiCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun'],
+                    labels: <%=labelsData%>,
                     datasets: [{
                         label: 'Zile Concediu',
-                        data: [0, 5, 8, 12, 16, 16],
-                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-color'),
-                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-color') + '20',
+                        data: <%=concediiData%>,
+                        borderColor: '<%=accent%>',
+                        backgroundColor: gradient,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 6,
@@ -909,14 +1262,37 @@
                 }
             });
 
-            // Grafic status concedii - Donut Chart
+            // Grafic status concedii - Donut Chart cu date reale
             const statusCtx = document.getElementById('statusChart').getContext('2d');
+            
+            <%
+            // Query pentru statusurile concediilor
+            int[] statusCounts = {0, 0, 0, 0}; // [aprobate_director, aprobate_sef, in_asteptare, respinse]
+            
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                 PreparedStatement stmt = connection.prepareStatement("SELECT status, COUNT(*) as count FROM concedii WHERE id_ang = ? GROUP BY status")) {
+                stmt.setInt(1, id);
+                ResultSet rs9 = stmt.executeQuery();
+                while (rs9.next()) {
+                    int status = rs9.getInt("status");
+                    int count = rs9.getInt("count");
+                    
+                    if (status == 2) statusCounts[0] = count; // Aprobate director
+                    else if (status == 1) statusCounts[1] = count; // Aprobate sef
+                    else if (status == 0) statusCounts[2] = count; // In asteptare
+                    else if (status < 0) statusCounts[3] += count; // Respinse
+                }
+            } catch (SQLException e) {
+                // Use default data
+            }
+            %>
+            
             new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Aprobate Director', 'Aprobate Șef', 'În Așteptare', 'Respinse'],
                     datasets: [{
-                        data: [2, 4, 1, 0],
+                        data: [<%=statusCounts[0]%>, <%=statusCounts[1]%>, <%=statusCounts[2]%>, <%=statusCounts[3]%>],
                         backgroundColor: [
                             '#28a745',
                             '#17a2b8', 
@@ -944,41 +1320,70 @@
         }
 
         function setupEventListeners() {
-            // PDF generation
+            // PDF generation cu funcționalitatea existentă
             document.getElementById('generatePDF').addEventListener('click', function() {
-                // Simulare generare PDF
-                this.innerHTML = '<i class="ri-loader-line"></i> Generez...';
-                this.style.pointerEvents = 'none';
+                const element = document.querySelector('.dashboard-container');
                 
-                setTimeout(() => {
-                    this.innerHTML = '<i class="ri-check-line"></i> Gata!';
+                // Verificăm dacă html2pdf este disponibil (din JSP original)
+                if (typeof html2pdf !== 'undefined') {
+                    html2pdf().set({
+                        pagebreak: { mode: ['css', 'legacy'] },
+                        html2canvas: {
+                            scale: 1,
+                            logging: true,
+                            dpi: 192,
+                            letterRendering: true,
+                            useCORS: true
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'portrait'
+                        }
+                    }).from(element).save('Dashboard-<%=rs.getString("nume")%>-<%=rs.getString("prenume")%>.pdf');
+                } else {
+                    // Fallback pentru simulare
+                    this.innerHTML = '<i class="ri-loader-line"></i> Generez...';
+                    this.style.pointerEvents = 'none';
+                    
                     setTimeout(() => {
-                        this.innerHTML = '<i class="ri-download-line"></i> Descarcă PDF';
-                        this.style.pointerEvents = 'auto';
-                    }, 2000);
-                }, 3000);
+                        this.innerHTML = '<i class="ri-check-line"></i> Gata!';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="ri-download-line"></i> Descarcă PDF';
+                            this.style.pointerEvents = 'auto';
+                        }, 2000);
+                    }, 3000);
+                }
             });
 
             // Refresh button pentru activitate
-            document.querySelector('.activity-header button').addEventListener('click', function() {
-                this.style.transform = 'rotate(360deg)';
-                setTimeout(() => {
-                    this.style.transform = 'rotate(0deg)';
-                }, 500);
-            });
+            const refreshBtn = document.querySelector('.activity-header button');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    this.style.transform = 'rotate(360deg)';
+                    setTimeout(() => {
+                        this.style.transform = 'rotate(0deg)';
+                        // Refresh pagina pentru date noi
+                        location.reload();
+                    }, 500);
+                });
+            }
         }
 
-        // Simulare actualizări în timp real
-        setInterval(() => {
-            // Update random pentru demonstrație
-            const stats = document.querySelectorAll('.stat-value');
-            stats.forEach(stat => {
-                stat.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    stat.style.transform = 'scale(1)';
-                }, 200);
-            });
-        }, 30000);
+        // Animații pentru stats la încărcare
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const stats = document.querySelectorAll('.stat-value');
+                stats.forEach((stat, index) => {
+                    setTimeout(() => {
+                        stat.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            stat.style.transform = 'scale(1)';
+                        }, 300);
+                    }, index * 100);
+                });
+            }, 500);
+        });
     </script>
 </body>
 </html>
