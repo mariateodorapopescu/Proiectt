@@ -4,7 +4,12 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 <%
+SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+SimpleDateFormat dateFormatterRO = new SimpleDateFormat("dd MMMM yyyy", new java.util.Locale("ro", "RO"));
+
     HttpSession sesi = request.getSession(false);
     if (sesi != null) {
         MyUser currentUser = (MyUser) sesi.getAttribute("currentUser");
@@ -1024,85 +1029,95 @@ System.out.println("Tema finală pentru user " + id + ": accent=" + accent + ", 
                     </button>
                 </div>
                 
-                <%
-                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                     PreparedStatement stmt = connection.prepareStatement("SELECT c.id, c.start_c, c.end_c, c.motiv, s.nume_status, c.added, c.modified FROM concedii c JOIN statusuri s ON c.status = s.status WHERE c.id_ang = ? ORDER BY c.modified DESC, c.added DESC LIMIT 3")) {
-                    stmt.setInt(1, id);
-                    ResultSet rs3 = stmt.executeQuery();
-                    while (rs3.next()) {
-                        String status = rs3.getString("nume_status");
-                        String iconClass = "";
-                        // String accent = "";
-                        
-                        if (status.contains("Aprobat")) {
-                            iconClass = "ri-check-line";
-                            accent = "var(--success-color)";
-                        } else if (status.contains("Respins")) {
-                            iconClass = "ri-close-line";
-                            accent = "var(--danger-color)";
-                        } else {
-                            iconClass = "ri-time-line";
-                            accent = "var(--warning-color)";
-                        }
-                %>
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon" style="background: <%=accent%>;">
-                        <i class="<%=iconClass%>"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Concediu <%=status.toLowerCase()%></h4>
-                        <p><%=rs3.getString("motiv")%> pentru perioada <%=rs3.getDate("start_c")%> - <%=rs3.getDate("end_c")%></p>
-                        <div class="timeline-date"><%=rs3.getTimestamp("modified") != null ? rs3.getTimestamp("modified") : rs3.getTimestamp("added")%></div>
-                    </div>
-                </div>
-                
-                <%
-                    }
-                } catch (SQLException e) {
-                    // Fallback content
-                %>
-                <div class="timeline-item">
-                    <div class="timeline-icon" style="color:<%=accent%>;">
-                        <i style="color:<%=accent%>;" class="ri-information-line"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Bun venit!</h4>
-                        <p>Explorează dashboard-ul pentru a vedea statistici și activități recente.</p>
-                        <div class="timeline-date">Acum</div>
-                    </div>
-                </div>
-                <%
-                }
-                %>
+               <%
+try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+     PreparedStatement stmt = connection.prepareStatement(
+         "SELECT c.id, c.start_c, c.end_c, c.motiv, s.nume_status, " +
+         "DATE(c.added) as data_adaugare, " +
+         "DATE(c.modified) as data_modificare " +
+         "FROM concedii c " +
+         "JOIN statusuri s ON c.status = s.status " +
+         "WHERE c.id_ang = ? " +
+         "ORDER BY c.modified DESC, c.added DESC LIMIT 3")) {
+    
+    stmt.setInt(1, id);
+    ResultSet rs3 = stmt.executeQuery();
+    
+    while (rs3.next()) {
+        String status = rs3.getString("nume_status");
+        String iconClass = "";
+        String accentColor = "";
+        
+        if (status.contains("Aprobat")) {
+            iconClass = "ri-check-line";
+            accentColor = "var(--success-color)";
+        } else if (status.contains("Respins")) {
+            iconClass = "ri-close-line";
+            accentColor = "var(--danger-color)";
+        } else {
+            iconClass = "ri-time-line";
+            accentColor = "var(--warning-color)";
+        }
+        
+        // Folosește data_modificare pentru afișare (fără oră)
+        Date dataAfisare = rs3.getDate("data_modificare");
+        if (dataAfisare == null) {
+            dataAfisare = rs3.getDate("data_adaugare");
+        }
+%>
 
-                <%
-                // Task-uri recente
-                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                     PreparedStatement stmt = connection.prepareStatement("SELECT t.nume, t.start, t.end, s.procent FROM tasks t LEFT JOIN statusuri2 s ON t.status = s.id WHERE t.id_ang = ? ORDER BY t.start DESC LIMIT 2")) {
-                    stmt.setInt(1, id);
-                    ResultSet rs4 = stmt.executeQuery();
-                    while (rs4.next()) {
-                %>
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon" style="background: <%=accent%>;">
-                        <i class="ri-task-line"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h4>Task: <%=rs4.getString("nume")%></h4>
-                        <p>Progres: <%=rs4.getInt("procent")%>% - Deadline: <%=rs4.getDate("end")%></p>
-                        <div class="timeline-date"><%=rs4.getDate("start")%></div>
-                    </div>
-                </div>
-                
-                <%
-                    }
-                } catch (SQLException e) {
-                    // Handle error silently
-                }
-                %>
-            </div>
+<div class="timeline-item">
+    <div class="timeline-icon" style="background: <%=accentColor%>;">
+        <i class="<%=iconClass%>"></i>
+    </div>
+    <div class="timeline-content">
+        <h4>Concediu <%=status.toLowerCase()%></h4>
+        <p><%=rs3.getString("motiv")%> pentru perioada <%=dateFormatter.format(rs3.getDate("start_c"))%> - <%=dateFormatter.format(rs3.getDate("end_c"))%></p>
+        <div class="timeline-date"><%=dateFormatterRO.format(dataAfisare)%></div>
+    </div>
+</div>
+
+<%
+    }
+} catch (SQLException e) {
+    // Handle error
+}
+%>
+
+<%
+// Pentru tasks - modifică și această secțiune:
+try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+     PreparedStatement stmt = connection.prepareStatement(
+         "SELECT t.nume, t.start, t.end, s.procent " +
+         "FROM tasks t " +
+         "LEFT JOIN statusuri2 s ON t.status = s.id " +
+         "WHERE t.id_ang = ? " +
+         "ORDER BY t.start DESC LIMIT 2")) {
+    
+    stmt.setInt(1, id);
+    ResultSet rs4 = stmt.executeQuery();
+    
+    while (rs4.next()) {
+%>
+
+<div class="timeline-item">
+    <div class="timeline-icon" style="background: <%=accent%>;">
+        <i class="ri-task-line"></i>
+    </div>
+    <div class="timeline-content">
+        <h4>Task: <%=rs4.getString("nume")%></h4>
+        <p>Progres: <%=rs4.getInt("procent")%>% - Deadline: <%=dateFormatter.format(rs4.getDate("end"))%></p>
+        <div class="timeline-date"><%=dateFormatterRO.format(rs4.getDate("start"))%></div>
+    </div>
+</div>
+
+<%
+    }
+} catch (SQLException e) {
+    // Handle error silently
+}
+%>
+</div>
 
             <!-- Notificări și Alerte -->
             <!-- 
