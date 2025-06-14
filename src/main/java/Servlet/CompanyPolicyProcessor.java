@@ -270,7 +270,7 @@ public class CompanyPolicyProcessor {
     /**
      * Enum pentru rezultatele verificării politicilor
      */
-    public enum PolicyResult {
+    public enum PolicyResult() {
         YES,         // Permis
         NO,          // Interzis
         CONDITIONAL, // Condiționat

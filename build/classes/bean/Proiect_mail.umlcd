@@ -1,0 +1,934 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.yattasolutions.uml.diagrams.classifier:ClassDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.yattasolutions.diagrams="http://ns.yatta-solutions.com/umllab/diagrams/1.1.0" xmlns:com.yattasolutions.uml.diagrams.classifier="http://ns.yatta-solutions.com/umllab/diagrams/classifier/1.1.0" xmi:id="_gIOe8EVdEfCS7cth2SLu0w">
+  <modelElement href="Proiect.uml#_SsLwkEVdEfCS7cth2SLu0w"/>
+  <edges xsi:type="com.yattasolutions.uml.diagrams.classifier:AssociationVisual" xmi:id="_mBPgwEVdEfCS7cth2SLu0w" source="_mBQH0EVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_WAI0oUVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_mBZ40EVdEfCS7cth2SLu0w" position="150.0,150.0"/>
+    <stereotypes xmi:id="_mBPgwUVdEfCS7cth2SLu0w" name="Reference">
+      <modelElement href="Proiect.uml#_WAI0o0VdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <nameVisual xmi:id="_mBPgwkVdEfCS7cth2SLu0w" text=""/>
+    <sourceRole xmi:id="_mBPgw0VdEfCS7cth2SLu0w" aggregationKind="NONE" name="">
+      <modelElement href="Proiect.uml#_WAI0okVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBPgxEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBPgxUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </sourceRole>
+    <targetRole xmi:id="_mBPgxkVdEfCS7cth2SLu0w" aggregationKind="NONE" name="session" navigable="true">
+      <modelElement href="Proiect.uml#_V-dZoEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBPgx0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBPgyEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </targetRole>
+  </edges>
+  <edges xsi:type="com.yattasolutions.diagrams:ConnectionVisual" xmi:id="_mBYDoUVdEfCS7cth2SLu0w" targetItem="_mBYDokVdEfCS7cth2SLu0w" sourceItem="_mBYDoEVdEfCS7cth2SLu0w"/>
+  <nodes xsi:type="com.yattasolutions.diagrams:CommentVisual" xmi:id="_mBYDoEVdEfCS7cth2SLu0w" sourceConnectionVisual="_mBYDoUVdEfCS7cth2SLu0w" text="Servlet implementation class OTP" item="_mBYDokVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_V_kz8UVdEfCS7cth2SLu0w"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_mBKBMEVdEfCS7cth2SLu0w" name="MailAsincron">
+    <modelElement href="Proiect.uml#_T_BRcEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_mBKBMUVdEfCS7cth2SLu0w" position="50.0,50.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_mBKBMkVdEfCS7cth2SLu0w" label="+"/>
+    <operations xmi:id="_mBKBM0VdEfCS7cth2SLu0w" name="send3" staticOperation="true">
+      <modelElement href="Proiect.uml#_VpiSgEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBNEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBNUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </operations>
+    <operations xmi:id="_mBKBNkVdEfCS7cth2SLu0w" name="isValidEmail" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuwJsEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBN0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBKBOEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_mBKBOUVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VuwJskVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_mBKBOkVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_mBKBO0VdEfCS7cth2SLu0w" name="email">
+        <modelElement href="Proiect.uml#_VuwJsUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBPEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBPUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBPkVdEfCS7cth2SLu0w" name="trimitereNotificareAdeverintaNoua" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuwJs0VdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBP0VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBQEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBQUVdEfCS7cth2SLu0w" name="idAngajat">
+        <modelElement href="Proiect.uml#_VuwJtEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBQkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBQ0VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBREVdEfCS7cth2SLu0w" name="idSef">
+        <modelElement href="Proiect.uml#_VuwJtUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBRUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBRkVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBR0VdEfCS7cth2SLu0w" name="tip">
+        <modelElement href="Proiect.uml#_VuwJtkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBSEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBSUVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBSkVdEfCS7cth2SLu0w" name="motiv">
+        <modelElement href="Proiect.uml#_VuwJt0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBS0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBTEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBTUVdEfCS7cth2SLu0w" name="trimitereNotificareAdeverintaAprobataSef" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuwJuEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBTkVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBT0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBUEVdEfCS7cth2SLu0w" name="idAngajat">
+        <modelElement href="Proiect.uml#_VuwwwEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBUUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBUkVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBU0VdEfCS7cth2SLu0w" name="idAdeverinta">
+        <modelElement href="Proiect.uml#_VuwwwUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBVEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBVUVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBVkVdEfCS7cth2SLu0w" name="trimitereNotificareAdeverintaAprobataDirector" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuwwwkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBV0VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBWEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBWUVdEfCS7cth2SLu0w" name="idAngajat">
+        <modelElement href="Proiect.uml#_Vuwww0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBWkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBW0VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBXEVdEfCS7cth2SLu0w" name="idAdeverinta">
+        <modelElement href="Proiect.uml#_VuwwxEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBXUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBXkVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBX0VdEfCS7cth2SLu0w" name="trimitereNotificareAdeverintaRespinsa" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuwwxUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBYEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBYUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBYkVdEfCS7cth2SLu0w" name="idAngajat">
+        <modelElement href="Proiect.uml#_Vux-4EVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBY0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBZEVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBZUVdEfCS7cth2SLu0w" name="idAdeverinta">
+        <modelElement href="Proiect.uml#_Vux-4UVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBZkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBZ0VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBaEVdEfCS7cth2SLu0w" name="respinsaDe">
+        <modelElement href="Proiect.uml#_Vux-4kVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBaUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBakVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBa0VdEfCS7cth2SLu0w" name="motivRespingere">
+        <modelElement href="Proiect.uml#_Vux-40VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBbEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBbUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBbkVdEfCS7cth2SLu0w" name="send" staticOperation="true">
+      <modelElement href="Proiect.uml#_Vux-5EVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBb0VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBcEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBcUVdEfCS7cth2SLu0w" name="id">
+        <modelElement href="Proiect.uml#_Vux-5UVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBckVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBc0VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBdEVdEfCS7cth2SLu0w" name="tip">
+        <modelElement href="Proiect.uml#_Vux-5kVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBdUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBdkVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBd0VdEfCS7cth2SLu0w" name="inceput">
+        <modelElement href="Proiect.uml#_Vux-50VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBeEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBeUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBekVdEfCS7cth2SLu0w" name="sfarsit">
+        <modelElement href="Proiect.uml#_Vux-6EVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBe0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBfEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBfUVdEfCS7cth2SLu0w" name="motiv">
+        <modelElement href="Proiect.uml#_Vux-6UVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBfkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBf0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBgEVdEfCS7cth2SLu0w" name="locatie">
+        <modelElement href="Proiect.uml#_Vux-6kVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBgUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBgkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBg0VdEfCS7cth2SLu0w" name="durata">
+        <modelElement href="Proiect.uml#_Vux-60VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBhEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBhUVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBhkVdEfCS7cth2SLu0w" name="send2" staticOperation="true">
+      <modelElement href="Proiect.uml#_Vuyl8EVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBh0VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBiEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBiUVdEfCS7cth2SLu0w" name="uid">
+        <modelElement href="Proiect.uml#_Vuyl8UVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBikVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBi0VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBjEVdEfCS7cth2SLu0w" name="id">
+        <modelElement href="Proiect.uml#_Vuyl8kVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBjUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBjkVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBj0VdEfCS7cth2SLu0w" name="tip">
+        <modelElement href="Proiect.uml#_Vuyl80VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBkEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBkUVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBkkVdEfCS7cth2SLu0w" name="inceput">
+        <modelElement href="Proiect.uml#_Vuyl9EVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBk0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBlEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBlUVdEfCS7cth2SLu0w" name="sfarsit">
+        <modelElement href="Proiect.uml#_Vuyl9UVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBlkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBl0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBmEVdEfCS7cth2SLu0w" name="motiv">
+        <modelElement href="Proiect.uml#_Vuyl9kVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBmUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBmkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBm0VdEfCS7cth2SLu0w" name="locatie">
+        <modelElement href="Proiect.uml#_Vuyl90VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBnEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBnUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBnkVdEfCS7cth2SLu0w" name="durata">
+        <modelElement href="Proiect.uml#_Vuyl-EVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBn0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBoEVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBoUVdEfCS7cth2SLu0w" name="inceputold">
+        <modelElement href="Proiect.uml#_Vuyl-UVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBokVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBo0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBpEVdEfCS7cth2SLu0w" name="sfarsitold">
+        <modelElement href="Proiect.uml#_Vuyl-kVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBpUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBpkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBp0VdEfCS7cth2SLu0w" name="locatieold">
+        <modelElement href="Proiect.uml#_Vuyl-0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBqEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBqUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBqkVdEfCS7cth2SLu0w" name="motivold">
+        <modelElement href="Proiect.uml#_Vuyl_EVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBq0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBrEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBrUVdEfCS7cth2SLu0w" name="motivold2">
+        <modelElement href="Proiect.uml#_Vuyl_UVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBrkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBr0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBsEVdEfCS7cth2SLu0w" name="durataold2">
+        <modelElement href="Proiect.uml#_Vuyl_kVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBsUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBskVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBs0VdEfCS7cth2SLu0w" name="data">
+        <modelElement href="Proiect.uml#_Vuyl_0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBtEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBtUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBtkVdEfCS7cth2SLu0w" name="send4" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuymAEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBt0VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBuEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBuUVdEfCS7cth2SLu0w" name="old">
+        <modelElement href="Proiect.uml#_VuymAUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBukVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBu0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBvEVdEfCS7cth2SLu0w" name="departament">
+        <modelElement href="Proiect.uml#_VuzNAEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBvUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBvkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBv0VdEfCS7cth2SLu0w" name="send5" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuzNAUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBwEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBwUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKBwkVdEfCS7cth2SLu0w" name="departament">
+        <modelElement href="Proiect.uml#_VuzNAkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBw0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBxEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBxUVdEfCS7cth2SLu0w" name="send6" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuzNA0VdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBxkVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKBx0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKByEVdEfCS7cth2SLu0w" name="uid">
+        <modelElement href="Proiect.uml#_VuzNBEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKByUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBykVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKBy0VdEfCS7cth2SLu0w" name="idconcediu">
+        <modelElement href="Proiect.uml#_VuzNBUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKBzEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKBzUVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKBzkVdEfCS7cth2SLu0w" name="send7" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuzNBkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKBz0VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKB0EVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKB0UVdEfCS7cth2SLu0w" name="id">
+        <modelElement href="Proiect.uml#_VuzNB0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKB0kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKB00VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKB1EVdEfCS7cth2SLu0w" name="idconcediu">
+        <modelElement href="Proiect.uml#_VuzNCEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKB1UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKB1kVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKB10VdEfCS7cth2SLu0w" name="send8" staticOperation="true">
+      <modelElement href="Proiect.uml#_Vuz0EEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKB2EVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKB2UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKB2kVdEfCS7cth2SLu0w" name="id">
+        <modelElement href="Proiect.uml#_Vuz0EUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKB20VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKB3EVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKB3UVdEfCS7cth2SLu0w" name="idconcediu">
+        <modelElement href="Proiect.uml#_Vuz0EkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKB3kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKB30VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKB4EVdEfCS7cth2SLu0w" name="send9" staticOperation="true">
+      <modelElement href="Proiect.uml#_Vuz0E0VdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKB4UVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKB4kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKB40VdEfCS7cth2SLu0w" name="idconcediu">
+        <modelElement href="Proiect.uml#_Vuz0FEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKB5EVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKB5UVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBKB5kVdEfCS7cth2SLu0w" name="send10" staticOperation="true">
+      <modelElement href="Proiect.uml#_Vuz0FUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBKB50VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBKB6EVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBKB6UVdEfCS7cth2SLu0w" name="id">
+        <modelElement href="Proiect.uml#_Vuz0FkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKB6kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKB60VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBKB7EVdEfCS7cth2SLu0w" name="numeutilizator">
+        <modelElement href="Proiect.uml#_Vuz0F0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBKB7UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBKB7kVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_mBTyMEVdEfCS7cth2SLu0w" name="OTP">
+    <modelElement href="Proiect.uml#_Vu0bIEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_mBTyMUVdEfCS7cth2SLu0w" position="55.0,395.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_mBTyMkVdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_mBTyM0VdEfCS7cth2SLu0w" defaultValue="1L" name="serialVersionUID" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-enwEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyNEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyNUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBTyNkVdEfCS7cth2SLu0w" name="long">
+        <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#long"/>
+      </type>
+    </attributes>
+    <attributes xmi:id="_mBTyN0VdEfCS7cth2SLu0w" defaultValue="&quot;jdbc:mysql://localhost:3306/test?useSSL=false&quot;" name="DB_URL" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-enwkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyOEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyOUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBTyOkVdEfCS7cth2SLu0w" name="String">
+        <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </type>
+    </attributes>
+    <attributes xmi:id="_mBTyO0VdEfCS7cth2SLu0w" defaultValue="&quot;root&quot;" name="DB_USER" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-enxEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyPEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyPUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBTyPkVdEfCS7cth2SLu0w" name="String">
+        <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </type>
+    </attributes>
+    <attributes xmi:id="_mBTyP0VdEfCS7cth2SLu0w" defaultValue="&quot;student&quot;" name="DB_PASSWORD" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-enxkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyQEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyQUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBTyQkVdEfCS7cth2SLu0w" name="String">
+        <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_mBTyQ0VdEfCS7cth2SLu0w" name="processRequest">
+      <modelElement href="Proiect.uml#_Vu1CMEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyREVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyRUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBTyRkVdEfCS7cth2SLu0w" name="request">
+        <modelElement href="Proiect.uml#_Vu1CMUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyR0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTySEVdEfCS7cth2SLu0w" name="HttpServletRequest">
+          <modelElement href="Proiect.uml#_T97FQUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBTySUVdEfCS7cth2SLu0w" name="response">
+        <modelElement href="Proiect.uml#_Vu1CMkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTySkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTyS0VdEfCS7cth2SLu0w" name="HttpServletResponse">
+          <modelElement href="Proiect.uml#_T97sUUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBTyTEVdEfCS7cth2SLu0w" name="doGet">
+      <modelElement href="Proiect.uml#_Vu1CM0VdEfCS7cth2SLu0w"/>
+      <stereotypes xmi:id="_mBTyTUVdEfCS7cth2SLu0w" name="LegacyStyledElement">
+        <modelElement href="Proiect.uml#_Vu1CNkVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <stereotypes xmi:id="_mBTyTkVdEfCS7cth2SLu0w" name="Annotations">
+        <modelElement href="Proiect.uml#_Vu1pQEVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBTyT0VdEfCS7cth2SLu0w" label="#"/>
+      <cardinality xmi:id="_mBTyUEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBTyUUVdEfCS7cth2SLu0w" name="request">
+        <modelElement href="Proiect.uml#_Vu1CNEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyUkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTyU0VdEfCS7cth2SLu0w" name="HttpServletRequest">
+          <modelElement href="Proiect.uml#_T97FQUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBTyVEVdEfCS7cth2SLu0w" name="response">
+        <modelElement href="Proiect.uml#_Vu1CNUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyVUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTyVkVdEfCS7cth2SLu0w" name="HttpServletResponse">
+          <modelElement href="Proiect.uml#_T97sUUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBTyV0VdEfCS7cth2SLu0w" name="doPost">
+      <modelElement href="Proiect.uml#_Vu1pQkVdEfCS7cth2SLu0w"/>
+      <stereotypes xmi:id="_mBTyWEVdEfCS7cth2SLu0w" name="LegacyStyledElement">
+        <modelElement href="Proiect.uml#_Vu1pRUVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <stereotypes xmi:id="_mBTyWUVdEfCS7cth2SLu0w" name="Annotations">
+        <modelElement href="Proiect.uml#_Vu1pRkVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBTyWkVdEfCS7cth2SLu0w" label="#"/>
+      <cardinality xmi:id="_mBTyW0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBTyXEVdEfCS7cth2SLu0w" name="request">
+        <modelElement href="Proiect.uml#_Vu1pQ0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyXUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTyXkVdEfCS7cth2SLu0w" name="HttpServletRequest">
+          <modelElement href="Proiect.uml#_T97FQUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBTyX0VdEfCS7cth2SLu0w" name="response">
+        <modelElement href="Proiect.uml#_Vu1pREVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyYEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTyYUVdEfCS7cth2SLu0w" name="HttpServletResponse">
+          <modelElement href="Proiect.uml#_T97sUUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBTyYkVdEfCS7cth2SLu0w" name="generateOTP">
+      <modelElement href="Proiect.uml#_Vu1pSEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyY0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyZEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_mBTyZUVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_Vu1pSUVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_mBTyZkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </outParameters>
+    </operations>
+    <operations xmi:id="_mBTyZ0VdEfCS7cth2SLu0w" name="getUserEmail">
+      <modelElement href="Proiect.uml#_Vu1pSkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyaEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyaUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_mBTyakVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_Vu2QUEVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_mBTya0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_mBTybEVdEfCS7cth2SLu0w" name="username">
+        <modelElement href="Proiect.uml#_Vu1pS0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTybUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTybkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBTyb0VdEfCS7cth2SLu0w" name="redirectToOtpPage">
+      <modelElement href="Proiect.uml#_Vu2QUUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTycEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTycUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBTyckVdEfCS7cth2SLu0w" name="response">
+        <modelElement href="Proiect.uml#_Vu2QUkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyc0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTydEVdEfCS7cth2SLu0w" name="HttpServletResponse">
+          <modelElement href="Proiect.uml#_T97sUUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBTydUVdEfCS7cth2SLu0w" name="page">
+        <modelElement href="Proiect.uml#_Vu2QU0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTydkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTyd0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBTyeEVdEfCS7cth2SLu0w" name="sendEmail">
+      <modelElement href="Proiect.uml#_Vu2QVEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBTyeUVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBTyekVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBTye0VdEfCS7cth2SLu0w" name="email">
+        <modelElement href="Proiect.uml#_Vu2QVUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyfEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTyfUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBTyfkVdEfCS7cth2SLu0w" name="otp">
+        <modelElement href="Proiect.uml#_Vu2QVkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBTyf0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBTygEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_mBYDokVdEfCS7cth2SLu0w" comments="_mBYDoEVdEfCS7cth2SLu0w" targetConnectionVisual="_mBYDoUVdEfCS7cth2SLu0w" name="OTP2">
+    <modelElement href="Proiect.uml#_Vu23YEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_mBYDo0VdEfCS7cth2SLu0w" position="515.0,392.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_mBYDpEVdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_mBYDpUVdEfCS7cth2SLu0w" defaultValue="1L" name="serialVersionUID" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-fO0EVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBYDpkVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBYDp0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBYDqEVdEfCS7cth2SLu0w" name="long">
+        <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#long"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_mBYDqUVdEfCS7cth2SLu0w" name="OTP2">
+      <modelElement href="Proiect.uml#_Vu3ecEVdEfCS7cth2SLu0w"/>
+      <keywords xmi:id="_mBYDqkVdEfCS7cth2SLu0w" keyword="create"/>
+      <visibility xmi:id="_mBYDq0VdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBYDrEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_mBYDrUVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_Vu3ec0VdEfCS7cth2SLu0w"/>
+        <type xmi:id="_mBYDrkVdEfCS7cth2SLu0w" name="OTP2">
+          <modelElement href="Proiect.uml#_Vu23YEVdEfCS7cth2SLu0w"/>
+        </type>
+      </outParameters>
+    </operations>
+    <operations xmi:id="_mBYDr0VdEfCS7cth2SLu0w" name="doGet">
+      <modelElement href="Proiect.uml#_Vu3edEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBYDsEVdEfCS7cth2SLu0w" label="#"/>
+      <cardinality xmi:id="_mBYDsUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBYDskVdEfCS7cth2SLu0w" name="request">
+        <modelElement href="Proiect.uml#_Vu3edUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBYDs0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBYDtEVdEfCS7cth2SLu0w" name="HttpServletRequest">
+          <modelElement href="Proiect.uml#_T97FQUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBYDtUVdEfCS7cth2SLu0w" name="response">
+        <modelElement href="Proiect.uml#_Vu3edkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBYDtkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBYDt0VdEfCS7cth2SLu0w" name="HttpServletResponse">
+          <modelElement href="Proiect.uml#_T97sUUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBYDuEVdEfCS7cth2SLu0w" name="doPost">
+      <modelElement href="Proiect.uml#_Vu3ed0VdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBYDuUVdEfCS7cth2SLu0w" label="#"/>
+      <cardinality xmi:id="_mBYDukVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBYDu0VdEfCS7cth2SLu0w" name="request">
+        <modelElement href="Proiect.uml#_Vu4FgEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBYDvEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBYDvUVdEfCS7cth2SLu0w" name="HttpServletRequest">
+          <modelElement href="Proiect.uml#_T97FQUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBYDvkVdEfCS7cth2SLu0w" name="response">
+        <modelElement href="Proiect.uml#_Vu4FgUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBYDv0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBYDwEVdEfCS7cth2SLu0w" name="HttpServletResponse">
+          <modelElement href="Proiect.uml#_T97sUUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_mBQH0EVdEfCS7cth2SLu0w" name="GMailServer" associationsOut="_mBPgwEVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_VupcAUVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_mBQH0UVdEfCS7cth2SLu0w" position="929.0,391.0" size="-1.0,-1.0"/>
+    <stereotypes xmi:id="_mBQH0kVdEfCS7cth2SLu0w" name="LegacyStyledElement">
+      <modelElement href="Proiect.uml#_VupcAkVdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <stereotypes xmi:id="_mBQH00VdEfCS7cth2SLu0w" name="Annotations">
+      <modelElement href="Proiect.uml#_VuuUgEVdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <visibility xmi:id="_mBQH1EVdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_mBQH1UVdEfCS7cth2SLu0w" defaultValue="&quot;smtp.gmail.com&quot;" name="mailhost">
+      <modelElement href="Proiect.uml#_V-cykkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBQH1kVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBQH10VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBQH2EVdEfCS7cth2SLu0w" name="String">
+        <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </type>
+    </attributes>
+    <attributes xmi:id="_mBQH2UVdEfCS7cth2SLu0w" name="user">
+      <modelElement href="Proiect.uml#_V-cylEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBQH2kVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBQH20VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBQH3EVdEfCS7cth2SLu0w" name="String">
+        <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </type>
+    </attributes>
+    <attributes xmi:id="_mBQH3UVdEfCS7cth2SLu0w" name="password">
+      <modelElement href="Proiect.uml#_V-cylUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBQH3kVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBQH30VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBQH4EVdEfCS7cth2SLu0w" name="String">
+        <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </type>
+    </attributes>
+    <attributes xmi:id="_mBQH4UVdEfCS7cth2SLu0w" name="session">
+      <modelElement href="Proiect.uml#_V-dZoEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBQH4kVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBQH40VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBQH5EVdEfCS7cth2SLu0w" name="Session">
+        <modelElement href="Proiect.uml#_V82QEUVdEfCS7cth2SLu0w"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_mBQH5UVdEfCS7cth2SLu0w" name="GMailServer">
+      <modelElement href="Proiect.uml#_VuqDEEVdEfCS7cth2SLu0w"/>
+      <keywords xmi:id="_mBQH5kVdEfCS7cth2SLu0w" keyword="create"/>
+      <stereotypes xmi:id="_mBQH50VdEfCS7cth2SLu0w" name="StyledElement">
+        <modelElement href="Proiect.uml#_VuqDFkVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBQH6EVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBQH6UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_mBQH6kVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VuqDFUVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_mBQH60VdEfCS7cth2SLu0w" name="GMailServer">
+          <modelElement href="Proiect.uml#_VupcAUVdEfCS7cth2SLu0w"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_mBQH7EVdEfCS7cth2SLu0w" name="user">
+        <modelElement href="Proiect.uml#_VuqDEUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQH7UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQH7kVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQH70VdEfCS7cth2SLu0w" name="password">
+        <modelElement href="Proiect.uml#_VuqDEkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQH8EVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQH8UVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBQH8kVdEfCS7cth2SLu0w" name="getPasswordAuthentication">
+      <modelElement href="Proiect.uml#_VuqDF0VdEfCS7cth2SLu0w"/>
+      <stereotypes xmi:id="_mBQH80VdEfCS7cth2SLu0w" name="StyledElement">
+        <modelElement href="Proiect.uml#_VuqDGEVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBQH9EVdEfCS7cth2SLu0w" label="#"/>
+      <cardinality xmi:id="_mBQH9UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_mBQH9kVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_V9izoEVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_mBQH90VdEfCS7cth2SLu0w" name="PasswordAuthentication">
+          <modelElement href="Proiect.uml#_V81pA0VdEfCS7cth2SLu0w"/>
+        </type>
+      </outParameters>
+    </operations>
+    <operations xmi:id="_mBQH-EVdEfCS7cth2SLu0w" name="isValidEmail" staticOperation="true">
+      <modelElement href="Proiect.uml#_VuqDGUVdEfCS7cth2SLu0w"/>
+      <stereotypes xmi:id="_mBQH-UVdEfCS7cth2SLu0w" name="StyledElement">
+        <modelElement href="Proiect.uml#_VuqqIkVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBQH-kVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBQH-0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_mBQH_EVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VuqqIUVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_mBQH_UVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_mBQH_kVdEfCS7cth2SLu0w" name="email">
+        <modelElement href="Proiect.uml#_VuqqIEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQH_0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIAEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBQIAUVdEfCS7cth2SLu0w" name="sendattach">
+      <modelElement href="Proiect.uml#_VuqqI0VdEfCS7cth2SLu0w"/>
+      <keywords xmi:id="_mBQIAkVdEfCS7cth2SLu0w" keyword="synchronized"/>
+      <stereotypes xmi:id="_mBQIA0VdEfCS7cth2SLu0w" name="StyledElement">
+        <modelElement href="Proiect.uml#_VuqqK0VdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBQIBEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBQIBUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBQIBkVdEfCS7cth2SLu0w" name="subject">
+        <modelElement href="Proiect.uml#_VuqqJEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIB0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQICEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQICUVdEfCS7cth2SLu0w" name="body">
+        <modelElement href="Proiect.uml#_VuqqJUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQICkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIC0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQIDEVdEfCS7cth2SLu0w" name="sender">
+        <modelElement href="Proiect.uml#_VuqqJkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIDUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIDkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQID0VdEfCS7cth2SLu0w" name="recipients">
+        <modelElement href="Proiect.uml#_VuqqJ0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIEEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIEUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQIEkVdEfCS7cth2SLu0w" name="filepath">
+        <modelElement href="Proiect.uml#_VuqqKEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIE0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIFEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBQIFUVdEfCS7cth2SLu0w" name="send">
+      <modelElement href="Proiect.uml#_VurRMEVdEfCS7cth2SLu0w"/>
+      <keywords xmi:id="_mBQIFkVdEfCS7cth2SLu0w" keyword="synchronized"/>
+      <stereotypes xmi:id="_mBQIF0VdEfCS7cth2SLu0w" name="StyledElement">
+        <modelElement href="Proiect.uml#_VurRN0VdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBQIGEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBQIGUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBQIGkVdEfCS7cth2SLu0w" name="subject">
+        <modelElement href="Proiect.uml#_VurRMUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIG0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIHEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQIHUVdEfCS7cth2SLu0w" name="body">
+        <modelElement href="Proiect.uml#_VurRMkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIHkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIH0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQIIEVdEfCS7cth2SLu0w" name="sender">
+        <modelElement href="Proiect.uml#_VurRM0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIIUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIIkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQII0VdEfCS7cth2SLu0w" name="recipients">
+        <modelElement href="Proiect.uml#_VurRNEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIJEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIJUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_mBQIJkVdEfCS7cth2SLu0w" name="sendMail">
+      <modelElement href="Proiect.uml#_VurROEVdEfCS7cth2SLu0w"/>
+      <keywords xmi:id="_mBQIJ0VdEfCS7cth2SLu0w" keyword="synchronized"/>
+      <stereotypes xmi:id="_mBQIKEVdEfCS7cth2SLu0w" name="StyledElement">
+        <modelElement href="Proiect.uml#_VurRP0VdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_mBQIKUVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_mBQIKkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBQIK0VdEfCS7cth2SLu0w" name="subject">
+        <modelElement href="Proiect.uml#_VurROUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQILEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQILUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQILkVdEfCS7cth2SLu0w" name="body">
+        <modelElement href="Proiect.uml#_VurROkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIL0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIMEVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQIMUVdEfCS7cth2SLu0w" name="sender">
+        <modelElement href="Proiect.uml#_VurRO0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQIMkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQIM0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBQINEVdEfCS7cth2SLu0w" name="recipients">
+        <modelElement href="Proiect.uml#_VurRPEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBQINUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBQINkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_mBZRwEVdEfCS7cth2SLu0w" name="OTP3">
+    <modelElement href="Proiect.uml#_Vu4skEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_mBZRwUVdEfCS7cth2SLu0w" position="515.0,533.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_mBZRwkVdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_mBZRw0VdEfCS7cth2SLu0w" defaultValue="1L" name="serialVersionUID" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-fO0kVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBZRxEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_mBZRxUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_mBZRxkVdEfCS7cth2SLu0w" name="long">
+        <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#long"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_mBZRx0VdEfCS7cth2SLu0w" name="doPost">
+      <modelElement href="Proiect.uml#_Vu4skUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_mBZRyEVdEfCS7cth2SLu0w" label="#"/>
+      <cardinality xmi:id="_mBZRyUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <parameters xmi:id="_mBZRykVdEfCS7cth2SLu0w" name="request">
+        <modelElement href="Proiect.uml#_Vu4skkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBZRy0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBZRzEVdEfCS7cth2SLu0w" name="HttpServletRequest">
+          <modelElement href="Proiect.uml#_T97FQUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_mBZRzUVdEfCS7cth2SLu0w" name="response">
+        <modelElement href="Proiect.uml#_Vu4sk0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_mBZRzkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_mBZRz0VdEfCS7cth2SLu0w" name="HttpServletResponse">
+          <modelElement href="Proiect.uml#_T97sUUVdEfCS7cth2SLu0w"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+</com.yattasolutions.uml.diagrams.classifier:ClassDiagram>

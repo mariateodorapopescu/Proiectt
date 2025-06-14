@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.yattasolutions.uml.diagrams.classifier:ClassDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.yattasolutions.diagrams="http://ns.yatta-solutions.com/umllab/diagrams/1.1.0" xmlns:com.yattasolutions.uml.diagrams.classifier="http://ns.yatta-solutions.com/umllab/diagrams/classifier/1.1.0" xmi:id="_gITXcEVdEfCS7cth2SLu0w">
+  <modelElement href="Proiect.uml#_StafoEVdEfCS7cth2SLu0w"/>
+  <edges xsi:type="com.yattasolutions.uml.diagrams.classifier:AssociationVisual" xmi:id="_m4G3UEVdEfCS7cth2SLu0w" source="_m4G3WUVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_WAJbtkVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4QoUkVdEfCS7cth2SLu0w" position="210.0,210.0"/>
+    <stereotypes xmi:id="_m4G3UUVdEfCS7cth2SLu0w" name="Reference">
+      <modelElement href="Proiect.uml#_WAKCwEVdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <nameVisual xmi:id="_m4G3UkVdEfCS7cth2SLu0w" text=""/>
+    <sourceRole xmi:id="_m4G3U0VdEfCS7cth2SLu0w" aggregationKind="NONE" name="">
+      <modelElement href="Proiect.uml#_WAJbt0VdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4G3VEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4G3VUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </sourceRole>
+    <targetRole xmi:id="_m4G3VkVdEfCS7cth2SLu0w" aggregationKind="NONE" name="NAME_PATTERN" navigable="true">
+      <modelElement href="Proiect.uml#_V-nxtEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4G3V0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4G3WEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </targetRole>
+  </edges>
+  <edges xsi:type="com.yattasolutions.diagrams:ConnectionVisual" xmi:id="_m4LIwUVdEfCS7cth2SLu0w" targetItem="_m4Lv2UVdEfCS7cth2SLu0w" sourceItem="_m4LIwEVdEfCS7cth2SLu0w"/>
+  <edges xsi:type="com.yattasolutions.uml.diagrams.classifier:AssociationVisual" xmi:id="_m4Lv0EVdEfCS7cth2SLu0w" source="_m4Lv2UVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_WAJbsEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4QoUEVdEfCS7cth2SLu0w" position="170.0,170.0"/>
+    <stereotypes xmi:id="_m4Lv0UVdEfCS7cth2SLu0w" name="Reference">
+      <modelElement href="Proiect.uml#_WAJbskVdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <nameVisual xmi:id="_m4Lv0kVdEfCS7cth2SLu0w" text=""/>
+    <sourceRole xmi:id="_m4Lv00VdEfCS7cth2SLu0w" aggregationKind="NONE" name="">
+      <modelElement href="Proiect.uml#_WAJbsUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4Lv1EVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4Lv1UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </sourceRole>
+    <targetRole xmi:id="_m4Lv1kVdEfCS7cth2SLu0w" aggregationKind="NONE" name="FORMAT" navigable="true">
+      <modelElement href="Proiect.uml#_V-nxsEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4Lv10VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4Lv2EVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </targetRole>
+  </edges>
+  <edges xsi:type="com.yattasolutions.uml.diagrams.classifier:AssociationVisual" xmi:id="_m4M98EVdEfCS7cth2SLu0w" source="_m4M9-UVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_WAJbs0VdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4QoUUVdEfCS7cth2SLu0w" position="190.0,190.0"/>
+    <stereotypes xmi:id="_m4M99EVdEfCS7cth2SLu0w" name="Reference">
+      <modelElement href="Proiect.uml#_WAJbtUVdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <nameVisual xmi:id="_m4M98UVdEfCS7cth2SLu0w" text=""/>
+    <sourceRole xmi:id="_m4M98kVdEfCS7cth2SLu0w" aggregationKind="NONE" name="">
+      <modelElement href="Proiect.uml#_WAJbtEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4M99kVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4M99UVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </sourceRole>
+    <targetRole xmi:id="_m4M980VdEfCS7cth2SLu0w" aggregationKind="NONE" name="EMAIL_PATTERN" navigable="true">
+      <modelElement href="Proiect.uml#_V-nxskVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4M9-EVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4M990VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </targetRole>
+  </edges>
+  <edges xsi:type="com.yattasolutions.uml.diagrams.classifier:AssociationVisual" xmi:id="_m4NlAEVdEfCS7cth2SLu0w" source="_m4OMGEVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_WAKCwUVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4QoU0VdEfCS7cth2SLu0w" position="230.0,230.0"/>
+    <stereotypes xmi:id="_m4OME0VdEfCS7cth2SLu0w" name="Reference">
+      <modelElement href="Proiect.uml#_WAKCw0VdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <nameVisual xmi:id="_m4OMEEVdEfCS7cth2SLu0w" text=""/>
+    <sourceRole xmi:id="_m4OMEUVdEfCS7cth2SLu0w" aggregationKind="NONE" name="">
+      <modelElement href="Proiect.uml#_WAKCwkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4OMFUVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4OMFEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </sourceRole>
+    <targetRole xmi:id="_m4OMEkVdEfCS7cth2SLu0w" aggregationKind="NONE" name="pattern" navigable="true">
+      <modelElement href="Proiect.uml#_V-nxuEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4OMF0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4OMFkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </targetRole>
+  </edges>
+  <edges xsi:type="com.yattasolutions.uml.diagrams.classifier:AssociationVisual" xmi:id="_m4PaMEVdEfCS7cth2SLu0w" source="_m4QBSEVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_WAKCxEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4QoVEVdEfCS7cth2SLu0w" position="250.0,250.0"/>
+    <stereotypes xmi:id="_m4QBQ0VdEfCS7cth2SLu0w" name="Reference">
+      <modelElement href="Proiect.uml#_WAKp0EVdEfCS7cth2SLu0w"/>
+    </stereotypes>
+    <nameVisual xmi:id="_m4QBQEVdEfCS7cth2SLu0w" text=""/>
+    <sourceRole xmi:id="_m4QBQUVdEfCS7cth2SLu0w" aggregationKind="NONE" name="">
+      <modelElement href="Proiect.uml#_WAKCxUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4QBRUVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4QBREVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </sourceRole>
+    <targetRole xmi:id="_m4QBQkVdEfCS7cth2SLu0w" aggregationKind="NONE" name="PHONE_PATTERN" navigable="true">
+      <modelElement href="Proiect.uml#_V-nxukVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4QBR0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4QBRkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+    </targetRole>
+  </edges>
+  <nodes xsi:type="com.yattasolutions.diagrams:CommentVisual" xmi:id="_m4LIwEVdEfCS7cth2SLu0w" sourceConnectionVisual="_m4LIwUVdEfCS7cth2SLu0w" text="Clasa ce face un obicet verificator" item="_m4Lv2UVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_V_mpIEVdEfCS7cth2SLu0w"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_m4M9-UVdEfCS7cth2SLu0w" name="EmailValidator" associationsOut="_m4M98EVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_Vvd7YUVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4M9-kVdEfCS7cth2SLu0w" position="-755.0,50.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_m4M9-0VdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_m4M9_EVdEfCS7cth2SLu0w" defaultValue="Pattern.compile(&quot;^[a-zA-Z0-9_+&amp;*-]+(?:\\.[a-zA-Z0-9_+&amp;*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$&quot;)" name="EMAIL_PATTERN" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-nxskVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4M9_UVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4M9_kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_m4M9_0VdEfCS7cth2SLu0w" name="Pattern">
+        <modelElement href="Proiect.uml#_T-aNcUVdEfCS7cth2SLu0w"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_m4M-AEVdEfCS7cth2SLu0w" name="validare" staticOperation="true">
+      <modelElement href="Proiect.uml#_Vvd7YkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4M-AUVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4M-AkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4M-A0VdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_Vvd7ZEVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4M-BEVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4M-BUVdEfCS7cth2SLu0w" name="email">
+        <modelElement href="Proiect.uml#_Vvd7Y0VdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4M-BkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4M-B0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_m4QBSEVdEfCS7cth2SLu0w" name="PhoneNumberValidator" associationsOut="_m4PaMEVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_VvfJgEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4QBSUVdEfCS7cth2SLu0w" position="-1154.0,50.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_m4QBSkVdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_m4QBS0VdEfCS7cth2SLu0w" defaultValue="Pattern.compile(&quot;^\\+?(\\d{1,3})?[- .]?\\d{7,10}$&quot;)" name="PHONE_PATTERN" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-nxukVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4QBTEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4QBTUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_m4QBTkVdEfCS7cth2SLu0w" name="Pattern">
+        <modelElement href="Proiect.uml#_T-aNcUVdEfCS7cth2SLu0w"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_m4QBT0VdEfCS7cth2SLu0w" name="validatePhoneNumber" staticOperation="true">
+      <modelElement href="Proiect.uml#_VvfJgUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4QBUEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4QBUUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4QBUkVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VvfJg0VdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4QBU0VdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4QBVEVdEfCS7cth2SLu0w" name="phoneNumber">
+        <modelElement href="Proiect.uml#_VvfJgkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4QBVUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4QBVkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_m4IsgEVdEfCS7cth2SLu0w" name="CNPValidator">
+    <modelElement href="Proiect.uml#_VvcGMEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4IsgUVdEfCS7cth2SLu0w" position="-1151.0,146.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_m4IsgkVdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_m4Isg0VdEfCS7cth2SLu0w" defaultValue="{2, 7, 9, 1, 4, 6, 3, 5, 8, 2, 7, 9}" name="CONTROL_VALUES" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-nKoEVdEfCS7cth2SLu0w"/>
+      <stereotypes xmi:id="_m4IshEVdEfCS7cth2SLu0w" name="Array">
+        <modelElement href="Proiect.uml#_V-nKokVdEfCS7cth2SLu0w"/>
+      </stereotypes>
+      <visibility xmi:id="_m4IshUVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4IshkVdEfCS7cth2SLu0w" label="1..*" max="-1" min="1"/>
+      <type xmi:id="_m4Ish0VdEfCS7cth2SLu0w" name="int">
+        <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_m4IsiEVdEfCS7cth2SLu0w" name="isValidCNP" staticOperation="true">
+      <modelElement href="Proiect.uml#_VvctQEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4IsiUVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4IsikVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4Isi0VdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VvctQkVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4IsjEVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4IsjUVdEfCS7cth2SLu0w" name="cnp">
+        <modelElement href="Proiect.uml#_VvctQUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4IsjkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4Isj0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_m4IskEVdEfCS7cth2SLu0w" name="isValidDate" staticOperation="true">
+      <modelElement href="Proiect.uml#_VvctQ0VdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4IskUVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4IskkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4Isk0VdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VvctR0VdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4IslEVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4IslUVdEfCS7cth2SLu0w" name="year">
+        <modelElement href="Proiect.uml#_VvctREVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4IslkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4Isl0VdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_m4IsmEVdEfCS7cth2SLu0w" name="month">
+        <modelElement href="Proiect.uml#_VvctRUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4IsmUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4IsmkVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_m4Ism0VdEfCS7cth2SLu0w" name="day">
+        <modelElement href="Proiect.uml#_VvctRkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4IsnEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4IsnUVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_m4IsnkVdEfCS7cth2SLu0w" name="isValidCountyCode" staticOperation="true">
+      <modelElement href="Proiect.uml#_VvctSEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4Isn0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4IsoEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4IsoUVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VvctSkVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4IsokVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4Iso0VdEfCS7cth2SLu0w" name="code">
+        <modelElement href="Proiect.uml#_VvctSUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4IspEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4IspUVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_m4IspkVdEfCS7cth2SLu0w" name="isValidControlDigit" staticOperation="true">
+      <modelElement href="Proiect.uml#_VvdUUEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4Isp0VdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4IsqEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4IsqUVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VvdUU0VdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4IsqkVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4Isq0VdEfCS7cth2SLu0w" name="cnp">
+        <modelElement href="Proiect.uml#_VvdUUUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4IsrEVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4IsrUVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+      <parameters xmi:id="_m4IsrkVdEfCS7cth2SLu0w" name="expectedControlDigit">
+        <modelElement href="Proiect.uml#_VvdUUkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4Isr0VdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4IssEVdEfCS7cth2SLu0w" name="int">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_m4Lv2UVdEfCS7cth2SLu0w" comments="_m4LIwEVdEfCS7cth2SLu0w" targetConnectionVisual="_m4LIwUVdEfCS7cth2SLu0w" name="CheckerDataNasterii" associationsOut="_m4Lv0EVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_VvdUVEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4Lv2kVdEfCS7cth2SLu0w" position="-748.0,146.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_m4Lv20VdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_m4Lv3EVdEfCS7cth2SLu0w" defaultValue="DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&quot;)" name="FORMAT" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-nxsEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4Lv3UVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4Lv3kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_m4Lv30VdEfCS7cth2SLu0w" name="DateTimeFormatter">
+        <modelElement href="Proiect.uml#_V9AoIEVdEfCS7cth2SLu0w"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_m4Lv4EVdEfCS7cth2SLu0w" name="valideaza" staticOperation="true">
+      <modelElement href="Proiect.uml#_VvdUVUVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4Lv4UVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4Lv4kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4Lv40VdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_Vvd7YEVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4Lv5EVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4Lv5UVdEfCS7cth2SLu0w" name="zi">
+        <modelElement href="Proiect.uml#_VvdUVkVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4Lv5kVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4Lv50VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_m4G3WUVdEfCS7cth2SLu0w" name="NameValidator" associationsOut="_m4G3UEVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_T_GxAEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4G3WkVdEfCS7cth2SLu0w" position="-1147.0,290.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_m4G3W0VdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_m4G3XEVdEfCS7cth2SLu0w" defaultValue="Pattern.compile(&quot;^[A-Za-z\\s-]+$&quot;)" name="NAME_PATTERN" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-nxtEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4G3XUVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4G3XkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_m4G3X0VdEfCS7cth2SLu0w" name="Pattern">
+        <modelElement href="Proiect.uml#_T-aNcUVdEfCS7cth2SLu0w"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_m4G3YEVdEfCS7cth2SLu0w" name="validateName" staticOperation="true">
+      <modelElement href="Proiect.uml#_VveicEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4G3YUVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4G3YkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4G3Y0VdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VveickVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4G3ZEVdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4G3ZUVdEfCS7cth2SLu0w" name="name">
+        <modelElement href="Proiect.uml#_VveicUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4G3ZkVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4G3Z0VdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:ClassifierVisual" xmi:id="_m4OMGEVdEfCS7cth2SLu0w" name="PasswordValidator" associationsOut="_m4NlAEVdEfCS7cth2SLu0w">
+    <modelElement href="Proiect.uml#_Vveic0VdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_m4OMGUVdEfCS7cth2SLu0w" position="-749.0,235.0" size="-1.0,-1.0"/>
+    <visibility xmi:id="_m4OMGkVdEfCS7cth2SLu0w" label="+"/>
+    <attributes xmi:id="_m4OMG0VdEfCS7cth2SLu0w" defaultValue="&quot;^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!()?*\\[\\]{}:;_\\-\\\\/`~'&lt;>@#$%^&amp;+=]).{8,}$&quot;" name="PASSWORD_PATTERN" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-nxtkVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4OMHEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4OMHUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_m4OMHkVdEfCS7cth2SLu0w" name="String">
+        <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </type>
+    </attributes>
+    <attributes xmi:id="_m4OMH0VdEfCS7cth2SLu0w" defaultValue="Pattern.compile(PASSWORD_PATTERN)" name="pattern" staticAttribute="true">
+      <modelElement href="Proiect.uml#_V-nxuEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4OMIEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4OMIUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <type xmi:id="_m4OMIkVdEfCS7cth2SLu0w" name="Pattern">
+        <modelElement href="Proiect.uml#_T-aNcUVdEfCS7cth2SLu0w"/>
+      </type>
+    </attributes>
+    <operations xmi:id="_m4OMI0VdEfCS7cth2SLu0w" name="validatePassword" staticOperation="true">
+      <modelElement href="Proiect.uml#_VveidEVdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4OMJEVdEfCS7cth2SLu0w" label="+"/>
+      <cardinality xmi:id="_m4OMJUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4OMJkVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VveidkVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4OMJ0VdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4OMKEVdEfCS7cth2SLu0w" name="password">
+        <modelElement href="Proiect.uml#_VveidUVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4OMKUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4OMKkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+    <operations xmi:id="_m4OMK0VdEfCS7cth2SLu0w" name="hasValidSequences" staticOperation="true">
+      <modelElement href="Proiect.uml#_Vveid0VdEfCS7cth2SLu0w"/>
+      <visibility xmi:id="_m4OMLEVdEfCS7cth2SLu0w" label="-"/>
+      <cardinality xmi:id="_m4OMLUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+      <outParameters xmi:id="_m4OMLkVdEfCS7cth2SLu0w">
+        <modelElement href="Proiect.uml#_VveieUVdEfCS7cth2SLu0w"/>
+        <type xmi:id="_m4OML0VdEfCS7cth2SLu0w" name="boolean">
+          <modelElement href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#boolean"/>
+        </type>
+      </outParameters>
+      <parameters xmi:id="_m4OMMEVdEfCS7cth2SLu0w" name="password">
+        <modelElement href="Proiect.uml#_VveieEVdEfCS7cth2SLu0w"/>
+        <cardinality xmi:id="_m4OMMUVdEfCS7cth2SLu0w" label="1" max="1" min="1"/>
+        <type xmi:id="_m4OMMkVdEfCS7cth2SLu0w" name="String">
+          <modelElement href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </type>
+      </parameters>
+    </operations>
+  </nodes>
+</com.yattasolutions.uml.diagrams.classifier:ClassDiagram>

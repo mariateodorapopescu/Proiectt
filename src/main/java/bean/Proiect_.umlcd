@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.yattasolutions.uml.diagrams.classifier:ClassDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.yattasolutions.uml.diagrams.classifier="http://ns.yatta-solutions.com/umllab/diagrams/classifier/1.1.0" xmi:id="_gHdp8EVdEfCS7cth2SLu0w">
+  <modelElement href="Proiect.uml#_HLdfYEVdEfCS7cth2SLu0w"/>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gYRtIEVdEfCS7cth2SLu0w" name="java">
+    <modelElement href="Proiect.uml#_SnxKoEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gYRtIUVdEfCS7cth2SLu0w" position="50.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gYwOQEVdEfCS7cth2SLu0w" name="bean">
+    <modelElement href="Proiect.uml#_Sny_0EVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gYwOQUVdEfCS7cth2SLu0w" position="-115.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gYz4oEVdEfCS7cth2SLu0w" name="org">
+    <modelElement href="Proiect.uml#_SonfMEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gYz4oUVdEfCS7cth2SLu0w" position="350.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY0fsEVdEfCS7cth2SLu0w" name="jakarta">
+    <modelElement href="Proiect.uml#_SpKRwEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY0fsUVdEfCS7cth2SLu0w" position="-280.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY3jAEVdEfCS7cth2SLu0w" name="javax">
+    <modelElement href="Proiect.uml#_SpqBAEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY3jAUVdEfCS7cth2SLu0w" position="-445.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY8bgEVdEfCS7cth2SLu0w" name="services">
+    <modelElement href="Proiect.uml#_StafoEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY8bgUVdEfCS7cth2SLu0w" position="-775.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY_e0EVdEfCS7cth2SLu0w" name="mix">
+    <modelElement href="Proiect.uml#_VoGvIEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY_e0UVdEfCS7cth2SLu0w" position="1100.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY278EVdEfCS7cth2SLu0w" name="Servlet">
+    <modelElement href="Proiect.uml#_SpWfAEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY278UVdEfCS7cth2SLu0w" position="500.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY9poEVdEfCS7cth2SLu0w" name="com">
+    <modelElement href="Proiect.uml#_Sw1nEEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY9poUVdEfCS7cth2SLu0w" position="950.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gZAF4EVdEfCS7cth2SLu0w" name="csv">
+    <modelElement href="Proiect.uml#_VpZIkEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gZAF4UVdEfCS7cth2SLu0w" position="-1165.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gYyDcEVdEfCS7cth2SLu0w" name="DAO">
+    <modelElement href="Proiect.uml#_Sn8JwEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gYyDcUVdEfCS7cth2SLu0w" position="200.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY-3wEVdEfCS7cth2SLu0w" name="EnhancedNLPProcessor">
+    <modelElement href="Proiect.uml#_VnE0YEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY-3wUVdEfCS7cth2SLu0w" position="-997.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY4xIEVdEfCS7cth2SLu0w" name="Filters">
+    <modelElement href="Proiect.uml#_Sp5RkEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY4xIUVdEfCS7cth2SLu0w" position="650.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY5_QEVdEfCS7cth2SLu0w" name="io">
+    <modelElement href="Proiect.uml#_SqhjsEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY5_QUVdEfCS7cth2SLu0w" position="-610.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gY6mUEVdEfCS7cth2SLu0w" name="mail">
+    <modelElement href="Proiect.uml#_SsLwkEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gY6mUUVdEfCS7cth2SLu0w" position="800.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+  <nodes xsi:type="com.yattasolutions.uml.diagrams.classifier:PackageVisual" xmi:id="_gZBUAEVdEfCS7cth2SLu0w" name="scheduler">
+    <modelElement href="Proiect.uml#_VqGTMEVdEfCS7cth2SLu0w"/>
+    <visualProperties xmi:id="_gZBUAUVdEfCS7cth2SLu0w" position="1250.0,50.0" size="-1.0,-1.0"/>
+  </nodes>
+</com.yattasolutions.uml.diagrams.classifier:ClassDiagram>

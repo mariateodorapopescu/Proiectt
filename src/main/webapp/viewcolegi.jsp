@@ -70,7 +70,7 @@
         boolean isAdmin = (functie.compareTo("Administrator") == 0);
         
         // Redirect based on user type
-        if (!isAdmin) {  
+        if (!isAdmin && !isDirector) {  
                         
                         if (isDirector) {
                             response.sendRedirect("dashboard.jsp");
