@@ -1,45 +1,72 @@
-# Flask web framework
-Flask==3.0.0
+# =====================================================
+# 🤖 ENTERPRISE HR AI CHATBOT - REQUIREMENTS
+# Fine-tuned for Romanian NLP + Advanced AI Processing
+# =====================================================
 
-# HTTP requests library
+# === CORE WEB FRAMEWORK ===
+Flask==3.0.0
+Flask-CORS==4.0.0
+Flask-Session==0.5.0
 requests==2.31.0
 
-# === NLP și Machine Learning ===
-# Transformers pentru modele pre-antrenate (BERT, RoBERT)
+# === CORE AI/ML STACK ===
+# Primary ML frameworks (CPU optimized)
+torch==2.1.0
+torchvision==0.16.0
+torchaudio==2.1.0
+tensorflow==2.15.0
 transformers==4.36.0
 
-# PyTorch pentru backend neural networks
-torch==2.1.0
-
-# spaCy pentru procesarea limbajului natural în română
-spacy==3.7.2
-
-# scikit-learn pentru ML tradițional și feature extraction
+# Essential data processing
+numpy==1.24.3
+pandas==2.1.0
 scikit-learn==1.3.2
 
-# Pandas pentru manipularea datelor
-pandas==2.1.0
+# === ROMANIAN NLP STACK ===
+spacy==3.7.2
+nltk==3.8.1
 
-# NumPy pentru operații numerice
-numpy==1.24.3
+# Romanian GPT model dependencies
+sentencepiece==0.1.99
+protobuf==3.20.3
 
-# === Optional: OpenAI API ===
-openai==1.3.0
+# === TENSORFLOW ECOSYSTEM ===
+tensorflow-text==2.15.0
+tensorflow-hub==0.15.0
 
-# === Optional: Alte modele românești ===
-# Pentru instalarea modelului spaCy românesc:
-# python -m spacy download ro_core_news_sm
+# === TEXT PROCESSING & ANALYSIS ===
+textblob==0.17.1
+wordcloud==1.9.2
+langdetect==1.0.9
 
-# === Optional: Pentru caching și optimizare ===
+# === PERFORMANCE & OPTIMIZATION ===
 joblib==1.3.2
+psutil==5.9.6
 
-# === Optional: Pentru logging avansat ===
+# === LOGGING & MONITORING ===
 colorlog==6.8.0
+python-dotenv==1.0.0
 
-# === Pentru instalare rapidă ===
-# pip install Flask requests transformers torch spacy scikit-learn pandas numpy
+# === ADVANCED NLP FEATURES ===
+openai==1.3.0
+sentence-transformers==2.2.2
 
-# Note: Pentru modele românești specifice:
-# - ro_core_news_sm (spaCy model pentru română)
-# - dumitrescustefan/bert-base-romanian-cased-v1 (RoBERT)
-# - OpenAI GPT-3.5/4 prin API
+# === DEVELOPMENT & TESTING ===
+pytest==7.4.3
+black==23.11.0
+
+# === PRODUCTION DEPLOYMENT ===
+gunicorn==21.2.0
+
+# =====================================================
+# 📦 INSTALLATION COMMANDS:
+# =====================================================
+# 
+# 1. Install dependencies:
+#    pip install -r requirements.txt
+# 
+# 2. Install spaCy Romanian model:
+#    python -m spacy download ro_core_news_sm
+# 
+# 3. Download NLTK data:
+#    python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt')"
