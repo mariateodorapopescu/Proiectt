@@ -520,7 +520,7 @@ background-color: red;}
     </div>
     
     <script>
-    // Chat component initialization
+ // Chat component initialization
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Chat interface initialized');
         
@@ -674,17 +674,126 @@ background-color: red;}
         // The server has stored the previous query context and data
     }
     
-    // Send message to server
+ // Configuration for Flask connection
+    const FLASK_CONFIG = {
+        baseUrl: 'http://localhost:5000',  // Change this if Flask runs on different port
+        chatEndpoint: '/chat',
+        timeout: 30000,  // 30 seconds timeout
+        retryAttempts: 3
+    };
+
+    // Chat component initialization for Flask
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Chat interface initialized for Flask backend');
+        
+        // Check if Flask server is accessible
+        checkFlaskConnection();
+        
+        // Add default suggestions
+        addDefaultSuggestions();
+        
+        // Focus input field
+        document.getElementById('userInput').focus();
+        
+        // Set up event listeners
+        setupEventListeners();
+    });
+
+    // Check Flask server connection
+    function checkFlaskConnection() {
+        fetch(FLASK_CONFIG.baseUrl + '/health', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Flask server is accessible');
+                document.getElementById('statusText').textContent = 'Online';
+            } else {
+                console.warn('Flask server responded with error:', response.status);
+                document.getElementById('statusText').textContent = 'Server issue';
+            }
+        })
+        .catch(error => {
+            console.error('Cannot connect to Flask server:', error);
+            document.getElementById('statusText').textContent = 'Offline';
+            
+            // Show connection error message
+            addMessage('Nu pot să mă conectez la serverul Flask. Verificați dacă app.py rulează pe portul 5000.', 'bot', 'error');
+        });
+    }
+
+    // Enhanced error handling for Flask requests
+    function makeFlaskRequest(message, retryCount = 0) {
+        return new Promise((resolve, reject) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), FLASK_CONFIG.timeout);
+            
+            fetch(FLASK_CONFIG.baseUrl + FLASK_CONFIG.chatEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    user_id: getCurrentUserId(),
+                    session_id: getSessionId(),
+                    timestamp: Date.now()
+                }),
+                signal: controller.signal
+            })
+            .then(response => {
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                resolve(data);
+            })
+            .catch(error => {
+                clearTimeout(timeoutId);
+                
+                if (error.name === 'AbortError') {
+                    error.message = 'Request timeout - serverul Flask nu răspunde';
+                }
+                
+                // Retry logic
+                if (retryCount < FLASK_CONFIG.retryAttempts && 
+                    (error.name === 'AbortError' || error.message.includes('fetch'))) {
+                    
+                    console.log(`Retrying request (attempt ${retryCount + 1}/${FLASK_CONFIG.retryAttempts})`);
+                    setTimeout(() => {
+                        makeFlaskRequest(message, retryCount + 1)
+                            .then(resolve)
+                            .catch(reject);
+                    }, 1000 * (retryCount + 1)); // Exponential backoff
+                    
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+ // FIXED: JavaScript code for chat.jsp - Replace the sendMessage function
+
     function sendMessage() {
         const message = userInput.value.trim();
-        if (message === '') return;
         
-        console.log('Sending message:', message);
+        if (message === '') {
+            return;
+        }
         
         // Add user message to chat
         addMessage(message, 'user');
         
-        // Clear input and adjust height
+        // Clear input
         userInput.value = '';
         adjustTextareaHeight(userInput);
         
@@ -694,37 +803,36 @@ background-color: red;}
         // Disable input while processing
         setInputEnabled(false);
         
-        // Get the context path
-        const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
-        const servletUrl = contextPath + '/ChatServlet';
+        // **FIXED: Use the correct Flask endpoint**
+        const flaskUrl = 'http://localhost:5000/query';  // Changed from /chat to /query
         
-        console.log('Using servlet URL:', servletUrl);
+        console.log('Sending message to Flask backend:', flaskUrl);
+        console.log('Message content:', message);
         
-        // Send message to server
-        fetch(servletUrl, {
+        // **FIXED: Send JSON instead of form data**
+        fetch(flaskUrl, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',  // Changed to JSON
+                'Accept': 'application/json'
             },
-            body: 'query=' + encodeURIComponent(message)
+            body: JSON.stringify({
+                query: message,  // Flask expects 'query' in JSON
+                session_id: '<%= session.getId() %>',
+                timestamp: Date.now()
+            })
         })
         .then(response => {
-            console.log('Response status:', response.status);
+            console.log('Flask response status:', response.status);
+            console.log('Flask response headers:', Object.fromEntries(response.headers.entries()));
+            
             if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.status);
+                throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
             }
-            return response.text().then(text => {
-                console.log('Raw response:', text);
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('JSON parse error:', e);
-                    throw new Error('Invalid JSON response: ' + e.message);
-                }
-            });
+            return response.json();
         })
         .then(data => {
-            console.log('Parsed data:', data);
+            console.log('Flask parsed data:', data);
             
             // Hide typing indicator
             hideTypingIndicator();
@@ -732,54 +840,73 @@ background-color: red;}
             // Re-enable input
             setInputEnabled(true);
             
-            // Handle different response types
-            if (data.type === 'text') {
+            // **ENHANCED: Handle different Flask response types**
+            if (data.type === 'success' && data.result) {
+                // Enhanced Flask response format
+                const result = data.result;
+                
+                if (result.type === 'count_result') {
+                    // Count response
+                    addMessage(result.message, 'bot');
+                } else if (result.type === 'top_salaries') {
+                    // Top salaries with ranking
+                    addMessage(result.message, 'bot');
+                    
+                    if (result.data && result.data.length > 0) {
+                        setTimeout(() => {
+                            addTableMessage(result.data, 'bot');
+                        }, 500);
+                    }
+                } else if (result.type === 'active_leaves') {
+                    // Active leaves
+                    addMessage(result.message, 'bot');
+                    
+                    if (result.data && result.data.length > 0) {
+                        setTimeout(() => {
+                            addTableMessage(result.data, 'bot');
+                        }, 500);
+                    } else {
+                        addMessage('Nu există angajați în concediu astăzi.', 'bot');
+                    }
+                } else if (result.data && result.data.length > 0) {
+                    // General data response
+                    addMessage(result.message || 'Rezultate găsite:', 'bot');
+                    
+                    setTimeout(() => {
+                        addTableMessage(result.data, 'bot');
+                    }, 500);
+                } else {
+                    // No data found
+                    addMessage(result.message || 'Nu am găsit rezultate.', 'bot');
+                }
+                
+               
+                
+            } else if (data.type === 'text') {
                 // Simple text response
                 addMessage(data.message, 'bot');
                 
-                // Update suggestions based on message context
                 if (data.message && data.message.length > 10) {
                     addContextSuggestions(data.message);
                 }
-            } else if (data.type === 'table') {
-                // Table response with initial message
-                addMessage(data.message, 'bot');
-                
-                // If data is available and the message is asking for confirmation,
-                // show the confirmation buttons
-                if (data.data && data.data.length > 0 && 
-                    (data.message.includes('Doriți') || data.message.includes('doriti'))) {
-                    
-                    // Store data for possible confirmation
-                    window.lastQueryData = data.data;
-                    
-                    // Add confirmation buttons
-                    addConfirmationButtons();
-                    
-                    // Update suggestions based on data context
-                    let contextString = getContextFromData(data.data);
-                    addContextSuggestions(contextString);
-                    
-                } else if (data.data && data.data.length > 0) {
-                    // If the message is not asking for confirmation, show the data immediately
-                    setTimeout(() => {
-                        addTableMessage(data.data, 'bot');
-                        
-                        // Update suggestions based on data context
-                        let contextString = getContextFromData(data.data);
-                        addContextSuggestions(contextString);
-                    }, 500);
-                }
             } else if (data.type === 'error') {
                 // Error response
-                addMessage(data.message, 'bot', 'error');
+                addMessage(data.message || 'A apărut o eroare neașteptată.', 'bot', 'error');
                 
-                // Reset to default suggestions
+                // Show debug info if available
+                if (data.sql_query) {
+                    console.log('Failed SQL query:', data.sql_query);
+                }
+                
                 setTimeout(addDefaultSuggestions, 500);
+            } else {
+                // Fallback for unexpected response format
+                const message = data.message || data.response || JSON.stringify(data);
+                addMessage(message, 'bot');
             }
         })
         .catch(error => {
-            console.error('Fetch error:', error);
+            console.error('Flask fetch error:', error);
             
             // Hide typing indicator
             hideTypingIndicator();
@@ -787,33 +914,96 @@ background-color: red;}
             // Re-enable input
             setInputEnabled(true);
             
-            // Show error message
-            addMessage('Îmi pare rău, a apărut o eroare în comunicarea cu serverul: ' + error.message, 'bot', 'error');
+            // Show detailed error message
+            let errorMessage = '❌ Eroare de conexiune cu serverul Flask:\n\n';
+            
+            if (error.message.includes('Failed to fetch')) {
+                errorMessage += '🔍 Nu pot să mă conectez la Flask.\n';
+                errorMessage += '💡 Verifică că app.py rulează pe http://localhost:5000\n';
+                errorMessage += '🔧 Și că nu sunt probleme de CORS.';
+            } else if (error.message.includes('404')) {
+                errorMessage += '🔍 Endpoint-ul /query nu a fost găsit.\n';
+                errorMessage += '💡 Verifică că Flask-ul folosește endpoint-ul /query.';
+            } else if (error.message.includes('500')) {
+                errorMessage += '🔍 Eroare internă în Flask.\n';
+                errorMessage += '💡 Verifică logurile Flask pentru detalii.';
+            } else {
+                errorMessage += error.message;
+            }
+            
+            addMessage(errorMessage, 'bot', 'error');
             
             // Reset to default suggestions
             setTimeout(addDefaultSuggestions, 500);
         });
     }
+
+   
+
+    // **ENHANCED: Connection test on page load**
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Chat interface initialized - Enhanced Flask version');
+        console.log('🔗 Flask endpoint: http://localhost:5000/query');
+        console.log('📡 Request format: POST JSON with {query: "...", session_id: "..."}');
+        
+        // Add default suggestions
+        addDefaultSuggestions();
+        
+        // Focus input field
+        document.getElementById('userInput').focus();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Test Flask connection after page loads
+        setTimeout(() => {
+            testFlaskConnection();
+        }, 2000);
+        
+        console.log('✅ Enhanced Flask-JSP integration ready!');
+    });
+// Helper functions missing from your chat.jsp - ADD THESE!
     
-    // Try to determine context from data for suggestion generation
-    function getContextFromData(data) {
-        if (!data || data.length === 0) return '';
-        
-        // Get the first row as a sample
-        const sample = data[0];
-        let contextString = '';
-        
-        // Check for known column names to determine context
-        if (sample.departament) contextString += ' departamente';
-        if (sample.nume && sample.prenume) contextString += ' angajați';
-        if (sample.data_inceput || sample.start_c) contextString += ' concedii';
-        if (sample.functie || sample.denumire || sample.salariu) contextString += ' poziții salarii';
-        if (sample.nume_proiect || sample.nume_task) contextString += ' proiecte';
-        if (sample.tip_adeverinta) contextString += ' adeverințe';
-        
-        return contextString;
+    // Helper function to get current user ID
+    function getCurrentUserId() {
+        // Extract from JSP - modify based on your user object
+        return '<%= currentUser != null ? currentUser.getId() : "0" %>';
     }
     
+    // Helper function to get session ID
+    function getSessionId() {
+        // Extract from JSP session
+        return '<%= session.getId() %>';
+    }
+    
+
+ // **ENHANCED: Setup event listeners with connection tests**
+ function setupEventListeners() {
+     // Original event listeners
+     userInput.addEventListener('keydown', function(event) {
+         if (event.key === 'Enter' && !event.shiftKey) {
+             event.preventDefault();
+             sendMessage();
+         }
+     });
+     
+     sendButton.addEventListener('click', sendMessage);
+     
+     chatMessages.addEventListener('click', function(event) {
+         if (event.target && event.target.closest('.user-message')) {
+             const text = event.target.closest('.user-message').textContent.toLowerCase().trim();
+             if (isFollowUpResponse(text)) {
+                 handleFollowUp();
+             }
+         }
+     });
+     
+     // **NEW: Add test buttons to the interface**
+     setTimeout(() => {
+         addTestButtons();
+     }, 1000);
+ }
+
     // Add confirmation buttons after a table response that needs confirmation
     function addConfirmationButtons() {
         const confirmationDiv = document.createElement('div');
