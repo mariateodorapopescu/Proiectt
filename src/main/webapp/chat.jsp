@@ -1,32 +1,228 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
+      
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="bean.MyUser" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
+<%@ page import="java.text.DecimalFormat" %>
+<%
+
+    HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizator in sesiune aka daca e cineva logat
+        if (currentUser != null) {
+            String username = currentUser.getUsername(); // extrag usernameul, care e unic
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                            "dp.denumire_completa AS denumire FROM useri u " +
+                            "JOIN tipuri t ON u.tip = t.tip " +
+                            "JOIN departament d ON u.id_dep = d.id_dep " +
+                            "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                            "WHERE u.username = ?")) {
+                    preparedStatement.setString(1, username);
+                    ResultSet rs = preparedStatement.executeQuery();
+                    if (!rs.next()) {
+                        out.println("<script type='text/javascript'>");
+                        out.println("alert('Date introduse incorect sau nu exista date!');");
+                        out.println("</script>");
+                    } else {
+                        int userType = rs.getInt("tip");
+                        int id = rs.getInt("id");
+                        int userDep = rs.getInt("id_dep");
+                        int ierarhie = rs.getInt("ierarhie");
+                        String functie = rs.getString("functie");
+                        String nume_dep = rs.getString("nume_dep");
+                        int userSediuId = rs.getInt("id_sediu");
+                        
+                        // Funcție helper pentru a determina rolul utilizatorului
+                        boolean isDirector = (ierarhie < 3);
+                        boolean isSef = (ierarhie >= 4 && ierarhie <=5);
+                        boolean isIncepator = (ierarhie >= 10);
+                        boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
+                        boolean isAdmin = (functie.compareTo("Administrator") == 0);
+                        
+                        if (!isAdmin) {  
+                          // data curenta, tot ca o interogare bd =(
+                          String today = "";
+                          try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                              String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                              try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                      if (rs2.next()) {
+                                        today = rs2.getString("today");
+                                      }
+                                  }
+                              }
+                          } catch (SQLException e) {
+                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                              e.printStackTrace();
+                          }
+                         
+                         // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                         String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                         String clr = "#d8d9e1";
+                         String sidebar = "#ECEDFA";
+                         String text = "#333";
+                         String card = "#ECEDFA";
+                         String hover = "#ECEDFA";
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent = rs2.getString("accent");
+                                       clr = rs2.getString("clr");
+                                       sidebar = rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card = rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                        } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                         
+                         // Obținem informații despre sediul utilizatorului
+                         String userSediuNume = "";
+                         String userSediuTip = "";
+                         String userSediuAdresa = "";
+                         double userSediuLat = 0;
+                         double userSediuLong = 0;
+                         
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT s.id_sediu, s.nume_sediu, s.tip_sediu, s.strada, s.oras, s.judet, s.tara, s.latitudine, s.longitudine " +
+                                          "FROM sedii s " +
+                                          "JOIN useri u ON s.id_sediu = u.id_sediu " +
+                                          "WHERE u.id = ?";
+                             try (PreparedStatement stmt = con.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                         userSediuNume = rs2.getString("nume_sediu");
+                                         userSediuTip = rs2.getString("tip_sediu");
+                                         userSediuAdresa = rs2.getString("strada") + ", " + 
+                                                         rs2.getString("oras") + ", " + 
+                                                         rs2.getString("judet") + ", " + 
+                                                         rs2.getString("tara");
+                                         userSediuLat = rs2.getDouble("latitudine");
+                                         userSediuLong = rs2.getDouble("longitudine");
+                                     }
+                                 }
+                             }
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                         
+                         // Obținem informații despre sediul departamentului
+                         String depSediuNume = "";
+                         String depDepartament = "";
+                         String depSediuAdresa = "";
+                         double depSediuLat = 0;
+                         double depSediuLong = 0;
+                         double distantaKm = 0;
+                         
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT ld.id_dep, ld.strada, ld.oras, ld.judet, ld.tara, ld.latitudine, ld.longitudine, " +
+                                          "d.nume_dep " +
+                                          "FROM locatii_departamente ld " +
+                                          "JOIN departament d ON ld.id_dep = d.id_dep " +
+                                          "WHERE ld.id_dep = ?";
+                             try (PreparedStatement stmt = con.prepareStatement(query)) {
+                                 stmt.setInt(1, userDep);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                         depDepartament = rs2.getString("nume_dep");
+                                         depSediuNume = "Sediul " + depDepartament;
+                                         depSediuAdresa = rs2.getString("strada") + ", " + 
+                                                         rs2.getString("oras") + ", " + 
+                                                         rs2.getString("judet") + ", " + 
+                                                         rs2.getString("tara");
+                                         depSediuLat = rs2.getDouble("latitudine");
+                                         depSediuLong = rs2.getDouble("longitudine");
+                                         
+                                         // Calculăm distanța dintre cele două locații
+                                         if (userSediuLat != 0 && userSediuLong != 0 && depSediuLat != 0 && depSediuLong != 0) {
+                                             // Convertim din grade în radiani
+                                             double lat1 = Math.toRadians(userSediuLat);
+                                             double lon1 = Math.toRadians(userSediuLong);
+                                             double lat2 = Math.toRadians(depSediuLat);
+                                             double lon2 = Math.toRadians(depSediuLong);
+                                             
+                                             // Formula Haversine
+                                             double dlon = lon2 - lon1;
+                                             double dlat = lat2 - lat1;
+                                             double a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
+                                             double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                             
+                                             // Raza Pământului în kilometri
+                                             double R = 6371.0;
+                                             distantaKm = Math.round((R * c) * 100.0) / 100.0;
+                                         }
+                                     }
+                                 }
+                             }
+                         } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                         
+                         // Formatăm distanța pentru afișare 
+                         DecimalFormat df = new DecimalFormat("0.00");
+                         String distantaFormatata = df.format(distantaKm);
+%>
 <!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asistent Baza de Date</title>
-    <style>
+     <style>
+        :root {
+            --primary: <%=accent%>;
+            --background: <%=clr%>;
+            --surface: <%=sidebar%>;
+            --text-primary: <%=text%>;
+            --card: <%=card%>;
+            --hover: <%=hover%>;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         /* Enhanced styles for advanced features */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--background);
             min-height: 100vh;
+            color: var(--text-primary);
         }
 
         .chat-container {
             max-width: 1000px;
             margin: 20px auto;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--surface);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+           
             overflow: hidden;
             backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
         }
 
         .chat-header {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, var(--primary), var(--card));
             color: white;
             padding: 20px;
             text-align: center;
@@ -59,7 +255,7 @@
             height: 500px;
             overflow-y: auto;
             padding: 20px;
-            background: #f8f9fa;
+            background: var(--surface);
             scroll-behavior: smooth;
         }
 
@@ -81,23 +277,23 @@
             max-width: 80%;
             padding: 15px 20px;
             border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            
         }
 
         .message.user .message-content {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: var(--primary);
             color: white;
         }
 
         .message.bot .message-content {
-            background: white;
-            color: #333;
-            border: 1px solid #e0e0e0;
+            background: var(--background);
+            color: var(--primary-text);
+            border: 1px solid var(--primary);
         }
 
         .ai-analysis {
-            background: #f0f7ff;
-            border: 1px solid #b3d9ff;
+            background: var(--background);
+            border: 1px solid var(--primary);
             border-radius: 10px;
             padding: 10px;
             margin-top: 10px;
@@ -106,7 +302,7 @@
 
         .ai-analysis-header {
             font-weight: bold;
-            color: #0066cc;
+            color: white;
             margin-bottom: 5px;
             display: flex;
             align-items: center;
@@ -117,14 +313,14 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background: white;
+            background: var(--background);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            
         }
 
         .data-table th {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: var(--primary);
             color: white;
             padding: 12px;
             text-align: left;
@@ -133,17 +329,18 @@
 
         .data-table td {
             padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--primary);
+            color: var(--text-primary);
         }
 
         .data-table tr:hover {
-            background: #f8f9fa;
+            background: var(--hover);
         }
 
         .chat-input-container {
             padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
+            background: var(--surface);
+            border-top: 1px solid var(--primary);
         }
 
         .chat-input-wrapper {
@@ -155,21 +352,23 @@
         .chat-input {
             flex: 1;
             padding: 15px 20px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border);
             border-radius: 25px;
             font-size: 16px;
             outline: none;
             transition: all 0.3s ease;
+            background: var(--background);
+            color: var(--text-primary);
         }
 
         .chat-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+            
         }
 
         .send-button {
             padding: 15px 25px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: var(--primary);
             color: white;
             border: none;
             border-radius: 25px;
@@ -180,7 +379,8 @@
 
         .send-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            background: black;
+          
         }
 
         .send-button:disabled {
@@ -197,7 +397,7 @@
 
         .typing-indicator .message-content {
             background: white;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--primary);
             padding: 15px 20px;
         }
 
@@ -209,7 +409,7 @@
         .typing-dots span {
             width: 8px;
             height: 8px;
-            background: #667eea;
+            background: var(--primary);
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
@@ -240,8 +440,8 @@
 
         .conversation-tools {
             padding: 10px 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #e0e0e0;
+            background: var(--background);
+            border-top: 1px solid var(--border);
             display: flex;
             gap: 10px;
             justify-content: center;
@@ -249,18 +449,19 @@
 
         .tool-button {
             padding: 8px 16px;
-            background: white;
-            border: 1px solid #ddd;
+            background: var(--surface);
+            border: 1px solid var(--primary);
             border-radius: 15px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: all 0.3s ease;
+            color: var(--text-primary);
         }
 
         .tool-button:hover {
-            background: #667eea;
+            background: var(--primary);
             color: white;
-            border-color: #667eea;
+            border-color: var(--primary);
         }
 
         /* Suggestions styling */
@@ -273,19 +474,19 @@
         }
 
         .suggestion-button {
-            background-color: #f0f0f0;
-            border: 1px solid #667eea;
+            background-color: var(--card);
+            border: 1px solid var(--primary);
             border-radius: 18px;
             padding: 8px 16px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .suggestion-button:hover {
-            background-color: #667eea;
+            background-color: var(--primary);
             color: white;
             transform: translateY(-2px);
         }
@@ -979,5 +1180,41 @@
         // Check status periodically
         setInterval(checkFlaskConnection, 30000); // Every 30 seconds
     </script>
+
+    <%
+                    }
+                }
+            } catch (Exception e) {
+                out.println("<script type='text/javascript'>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("alert('" + e.getMessage() + "');");
+                out.println("</script>");
+                if (currentUser.getTip() == 1) {
+                    response.sendRedirect("tip1ok.jsp");
+                }
+                if (currentUser.getTip() == 2) {
+                    response.sendRedirect("tip2ok.jsp");
+                }
+                if (currentUser.getTip() == 3) {
+                    response.sendRedirect("sefok.jsp");
+                }
+                if (currentUser.getTip() == 0) {
+                    response.sendRedirect("dashboard.jsp");
+                }
+                e.printStackTrace();
+            }
+        } else {
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Utilizator neconectat!');");
+            out.println("</script>");
+            response.sendRedirect("login.jsp");
+        }
+    } else {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
+    }
+%>
 </body>
 </html>
