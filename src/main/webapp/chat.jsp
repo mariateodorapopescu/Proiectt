@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Advanced HR AI Assistant</title>
+    <title>Asistent Baza de Date</title>
     <style>
         /* Enhanced styles for advanced features */
         body {
@@ -350,12 +350,10 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>🤖 Advanced HR AI Assistant</h1>
+            <h1>🤖 Asistent Baza de Date</h1>
             <div class="ai-features">
-                <div class="feature-badge">🇷🇴 Romanian AI</div>
-                <div class="feature-badge">🧠 Smart Analysis</div>
-                <div class="feature-badge">🤖 Flask Backend</div>
-                <div class="feature-badge">💬 Memory</div>
+                <div class="feature-badge">🇷🇴 Romanian</div>
+                <div class="feature-badge">🧠 Data Base</div>
                 <div class="feature-badge">⚡ Real-time</div>
             </div>
             <div class="status-indicator" id="statusIndicator">
@@ -367,9 +365,9 @@
         <div class="chat-messages" id="chatMessages">
             <div class="message bot">
                 <div class="message-content">
-                    <strong>🤖 Bine ai venit!</strong><br>
-                    Sunt asistentul HR avansat cu inteligență artificială românească. 
-                    Pot să te ajut cu:
+                    <strong>🤖 Bine ați venit!</strong><br>
+                    Sunt asistentul HR ce face legatura cu baza de date a companiei. 
+                    Pot să vă ajut cu:
                     <ul style="margin: 10px 0; padding-left: 20px;">
                         <li>📊 Informații despre angajați și departamente</li>
                         <li>🏖️ Gestionarea concediilor și absențelor</li>
@@ -377,7 +375,7 @@
                         <li>📋 Proiecte și task-uri</li>
                         <li>📄 Adeverințe și documente HR</li>
                     </ul>
-                    <em>Întreabă-mă orice în română! Înțeleg contextul și țin minte conversația. 🧠</em>
+                    <em>Întrebați-mă orice în română! 🧠</em>
                 </div>
             </div>
         </div>
@@ -388,7 +386,7 @@
 
         <div class="typing-indicator" id="typingIndicator">
             <div class="message-content">
-                🤖 Procesez cu AI...
+                🤖 Caut...
                 <div class="typing-dots">
                     <span></span>
                     <span></span>
@@ -398,8 +396,8 @@
         </div>
 
         <div class="conversation-tools">
-            <button class="tool-button" onclick="clearConversation()">🗑️ Șterge conversația</button>
-            <button class="tool-button" onclick="exportConversation()">💾 Exportă</button>
+            <button class="tool-button" onclick="clearConversation()">🗑️ Ștergeți conversația</button>
+            <button class="tool-button" onclick="exportConversation()">💾 Exportați</button>
             <button class="tool-button" onclick="showSuggestions()">💡 Sugestii</button>
         </div>
 
@@ -417,7 +415,7 @@
                     class="send-button" 
                     onclick="sendMessage()"
                 >
-                    🚀 Trimite
+                    🚀 Trimiteți
                 </button>
             </div>
         </div>
@@ -458,19 +456,19 @@
             })
             .then(response => {
                 if (response.ok) {
-                    console.log('✅ Flask server is accessible');
+                    console.log('✅ The server is accessible');
                     updateStatus('Online', '#4CAF50');
                 } else {
-                    console.warn('⚠️ Flask server responded with error:', response.status);
+                    console.warn('⚠️ The server responded with error:', response.status);
                     updateStatus('Server issue', '#FF9800');
                 }
             })
             .catch(error => {
-                console.error('❌ Cannot connect to Flask server:', error);
+                console.error('❌ Cannot connect to the server:', error);
                 updateStatus('Offline', '#FF5722');
                 
                 // Show connection error message
-                addMessage('❌ Nu pot să mă conectez la serverul Flask. Verificați dacă app.py rulează pe portul 5000.', 'bot');
+                addMessage('❌ Nu pot să mă conectez la server. Verificați dacă aplicația rulează pe portul 5000.', 'bot');
             });
         }
 
@@ -537,7 +535,7 @@
             updateSendButton(false);
 
             try {
-                console.log('📤 Sending message to Flask:', message);
+                console.log('📤 Sending message to the server:', message);
                 
                 // FIXED: Use the correct Flask endpoint and format like chat.jsp
                 const response = await fetch(FLASK_CONFIG.baseUrl + FLASK_CONFIG.queryEndpoint, {
@@ -553,14 +551,14 @@
                     })
                 });
 
-                console.log('📨 Flask response status:', response.status);
+                console.log('📨 Server response status:', response.status);
                 
                 if (!response.ok) {
                     throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
                 }
 
                 const result = await response.json();
-                console.log('📊 Flask parsed data:', result);
+                console.log('📊 Server parsed data:', result);
                 
                 // Hide typing indicator
                 hideTypingIndicator();
@@ -615,22 +613,22 @@
                 }
                 
             } catch (error) {
-                console.error('❌ Flask fetch error:', error);
+                console.error('❌ Server fetch error:', error);
                 
                 hideTypingIndicator();
                 
                 let errorMessage = '❌ Eroare de conexiune cu serverul Flask:\n\n';
                 
                 if (error.message.includes('Failed to fetch')) {
-                    errorMessage += '🔍 Nu pot să mă conectez la Flask.\n';
+                    errorMessage += '🔍 Nu pot să mă conectez la server =(.\n';
                     errorMessage += '💡 Verifică că app.py rulează pe http://localhost:5000\n';
-                    errorMessage += '🔧 Și că nu sunt probleme de CORS.';
+                    errorMessage += '🔧 Și că nu sunt probleme de comunicare.';
                 } else if (error.message.includes('404')) {
                     errorMessage += '🔍 Endpoint-ul /query nu a fost găsit.\n';
-                    errorMessage += '💡 Verifică că Flask-ul folosește endpoint-ul /query.';
+                    errorMessage += '💡 Verificați faptul că serverul folosește endpoint-ul /query.';
                 } else if (error.message.includes('500')) {
-                    errorMessage += '🔍 Eroare internă în Flask.\n';
-                    errorMessage += '💡 Verifică logurile Flask pentru detalii.';
+                    errorMessage += '🔍 Eroare internă în server.\n';
+                    errorMessage += '💡 Verificațu logurile serverului pentru detalii.';
                 } else {
                     errorMessage += error.message;
                 }
@@ -908,11 +906,11 @@
         function updateSendButton(enabled) {
             const sendButton = document.getElementById('sendButton');
             sendButton.disabled = !enabled;
-            sendButton.innerHTML = enabled ? '🚀 Trimite' : '⏳ Procesez...';
+            sendButton.innerHTML = enabled ? '🚀 Trimiteți' : '⏳ Procesez...';
         }
 
         function clearConversation() {
-            if (confirm('Sigur vrei să ștergi conversația?')) {
+            if (confirm('Sigur doriți să ștergeți conversația?')) {
                 const chatMessages = document.getElementById('chatMessages');
                 const messages = chatMessages.querySelectorAll('.message');
                 for (let i = 1; i < messages.length; i++) {
@@ -930,13 +928,13 @@
 
         function exportConversation() {
             const messages = document.querySelectorAll('.message');
-            let conversation = 'Conversație HR AI Assistant\n';
+            let conversation = 'Conversație Asistent Baza de date\n';
             conversation += '================================\n\n';
             
             messages.forEach(message => {
                 const isUser = message.classList.contains('user');
                 const content = message.querySelector('.message-content').textContent;
-                conversation += (isUser ? 'Tu' : 'AI') + ': ' + content + '\n\n';
+                conversation += (isUser ? 'Tu' : 'BD') + ': ' + content + '\n\n';
             });
             
             const blob = new Blob([conversation], { type: 'text/plain' });
