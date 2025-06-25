@@ -3612,7 +3612,7 @@ public class NaturalLanguageToSQLTranslator {
     /**
      * Enumeration for query types
      */
-    public enum QueryType() {
+    public enum QueryType {
         COUNT,  // Count queries (câți/câte)
         MINMAX, // Min/max queries (cel mai mare/mic)
         LIST    // List queries (care, ce, lista)

@@ -394,17 +394,23 @@
                     conn2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
                     
                     // Date angajat
-                    String sql = "SELECT u.*, t.salariu as salariu_baza, t.denumire as functie, " +
-                               "d.nume_dep, s.procent as procent_spor, p.procent as procent_penalizare, " +
-                               "s.denumire as denumire_spor, p.denumire as denumire_penalizare " +
+                     String sql = "SELECT u.*, t.salariu as salariu_baza, t.denumire as functie, " +
+                               "d.nume_dep, " +
+                               "(SELECT procent FROM istoric_sporuri isp JOIN tipuri_sporuri ts ON isp.tip_spor = ts.id " +
+                               "WHERE isp.id_ang = u.id AND isp.data_start <= CURDATE() AND isp.data_final >= CURDATE() LIMIT 1) as procent_spor, " +
+                               "(SELECT procent FROM istoric_penalizari ipp JOIN tipuri_penalizari tp ON ipp.tip_penalizare = tp.id " +
+                               "WHERE ipp.id_ang = u.id AND ipp.data_start <= CURDATE() AND ipp.data_final >= CURDATE() LIMIT 1) as procent_penalizare, " +
+                               "(SELECT denumire FROM istoric_sporuri isp JOIN tipuri_sporuri ts ON isp.tip_spor = ts.id " +
+                               "WHERE isp.id_ang = u.id AND isp.data_start <= CURDATE() AND isp.data_final >= CURDATE() LIMIT 1) as denumire_spor, " +
+                               "(SELECT denumire FROM istoric_penalizari ipp JOIN tipuri_penalizari tp ON ipp.tip_penalizare = tp.id " +
+                               "WHERE ipp.id_ang = u.id AND ipp.data_start <= CURDATE() AND ipp.data_final >= CURDATE() LIMIT 1) as denumire_penalizare " +
                                "FROM useri u " +
                                "JOIN tipuri t ON u.tip = t.tip " +
                                "JOIN departament d ON u.id_dep = d.id_dep " +
-                               "LEFT JOIN tipuri_sporuri s ON u.sporuri = s.id " +
-                               "LEFT JOIN tipuri_penalizari p ON u.penalizari = p.id " +
-                               "";
-                    pstmt2 = conn2.prepareStatement(sql);
-                    // pstmt2.setInt(1, idAng);
+                               "WHERE u.id = ?";
+                    
+                   pstmt2 = conn2.prepareStatement(sql);
+                    pstmt2.setInt(1, idAng);
                     rs4 = pstmt2.executeQuery();
                     
                     if (rs4.next()) {
