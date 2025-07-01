@@ -61,7 +61,7 @@ if (sesi != null) {
                                          (isSef1 && viewedUserDep == userDep);
                         
                         if (!canView) {
-                            response.sendRedirect("Access.jsp?error=accessDenied");
+                            response.sendRedirect("login.jsp");
                             return;
                         }
                     } else {

@@ -1,6 +1,7 @@
 package Servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import bean.MyUser;
 
 public class CVServlet extends HttpServlet {
@@ -33,19 +36,343 @@ public class CVServlet extends HttpServlet {
         MyUser currentUser = (MyUser) session.getAttribute("currentUser");
         if (currentUser == null) {
             throw new SQLException("Utilizator neautentificat");
-            String username = currentUser.getUsername();
-            String sql = "SELECT id FROM useri WHERE username = ?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, username);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getInt("id");
-                    } else {
-                        throw new SQLException("Utilizator negăsit în baza de date");
+        } // ← LIPSEA ACEASTĂ ACOLADĂ!
+        
+        String username = currentUser.getUsername();
+        String sql = "SELECT id FROM useri WHERE username = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                } else {
+                    throw new SQLException("Utilizator negăsit în baza de date");
+                }
+            }
+        }
+    } 
+
+    private void updatePersonalInfo(Connection conn, int userId, HttpServletRequest request) throws SQLException {
+        String sql = "UPDATE useri SET nume = ?, prenume = ?, email = ?, telefon = ?, adresa = ?, data_nasterii = ? WHERE id = ?";
+        
+        System.out.println("DEBUG: Updating personal info for user ID: " + userId);
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, request.getParameter("nume"));
+            ps.setString(2, request.getParameter("prenume"));
+            ps.setString(3, request.getParameter("email"));
+            ps.setString(4, request.getParameter("telefon"));
+            ps.setString(5, request.getParameter("adresa"));
+            
+            String dataNasterii = request.getParameter("data_nasterii");
+            if (dataNasterii != null && !dataNasterii.isEmpty()) {
+                ps.setDate(6, java.sql.Date.valueOf(dataNasterii));
+            } else {
+                ps.setNull(6, java.sql.Types.DATE);
+            }
+            
+            ps.setInt(7, userId);
+            int rowsUpdated = ps.executeUpdate();
+            System.out.println("DEBUG: Personal info updated, rows affected: " + rowsUpdated);
+        }
+    }
+
+    
+    private void updateCVProfile(Connection conn, int userId, HttpServletRequest request) throws SQLException {
+        String calitati = request.getParameter("calitati");
+        String interese = request.getParameter("interese");
+        
+        // Check if CV record exists
+        String checkSql = "SELECT id FROM cv WHERE id_ang = ?";
+        try (PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+            checkPs.setInt(1, userId);
+            try (ResultSet rs = checkPs.executeQuery()) {
+                if (rs.next()) {
+                    // Update existing
+                    String updateSql = "UPDATE cv SET calitati = ?, interese = ? WHERE id_ang = ?";
+                    try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                        updatePs.setString(1, calitati);
+                        updatePs.setString(2, interese);
+                        updatePs.setInt(3, userId);
+                        updatePs.executeUpdate();
+                    }
+                } else {
+                    // Insert new
+                    String maxIdSql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM cv";
+                    try (PreparedStatement maxIdPs = conn.prepareStatement(maxIdSql);
+                         ResultSet maxIdRs = maxIdPs.executeQuery()) {
+                        maxIdRs.next();
+                        int nextId = maxIdRs.getInt("next_id");
+                        
+                        String insertSql = "INSERT INTO cv (id, id_ang, calitati, interese) VALUES (?, ?, ?, ?)";
+                        try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                            insertPs.setInt(1, nextId);
+                            insertPs.setInt(2, userId);
+                            insertPs.setString(3, calitati);
+                            insertPs.setString(4, interese);
+                            insertPs.executeUpdate();
+                        }
                     }
                 }
             }
         }
+    }
+
+    private void updateExperience(Connection conn, int userId, HttpServletRequest request) throws SQLException {
+        // Delete existing experience
+        String deleteSql = "DELETE FROM experienta WHERE id_ang = ?";
+        try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+            deletePs.setInt(1, userId);
+            deletePs.executeUpdate();
+        }
+        
+        // Insert new experience
+        String expCountStr = request.getParameter("experience_count");
+        if (expCountStr != null) {
+            int expCount = Integer.parseInt(expCountStr);
+            
+            for (int i = 1; i <= expCount; i++) {
+                String denJob = request.getParameter("exp_den_job_" + i);
+                String instit = request.getParameter("exp_instit_" + i);
+                String domeniu = request.getParameter("exp_domeniu_" + i);
+                String subdomeniu = request.getParameter("exp_subdomeniu_" + i);
+                String start = request.getParameter("exp_start_" + i);
+                String end = request.getParameter("exp_end_" + i);
+                String descriere = request.getParameter("exp_descriere_" + i);
+                
+                // Skip if essential fields are empty
+                if (denJob == null || denJob.trim().isEmpty()) continue;
+                
+                // Get next available ID
+                String maxIdSql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM experienta";
+                try (PreparedStatement maxIdPs = conn.prepareStatement(maxIdSql);
+                     ResultSet maxIdRs = maxIdPs.executeQuery()) {
+                    maxIdRs.next();
+                    int nextId = maxIdRs.getInt("next_id");
+                    
+                    String insertSql = "INSERT INTO experienta (id, den_job, instit, tip, id_dep, domeniu, subdomeniu, start, end, descriere, id_ang) " +
+                                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    
+                    try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                        insertPs.setInt(1, nextId);
+                        insertPs.setString(2, denJob);
+                        insertPs.setString(3, instit);
+                        insertPs.setInt(4, 1); // Default tip
+                        insertPs.setInt(5, 1); // Default id_dep
+                        insertPs.setString(6, domeniu);
+                        insertPs.setString(7, subdomeniu);
+                        
+                        if (start != null && !start.isEmpty()) {
+                            insertPs.setDate(8, java.sql.Date.valueOf(start));
+                        } else {
+                            insertPs.setNull(8, java.sql.Types.DATE);
+                        }
+                        
+                        if (end != null && !end.isEmpty()) {
+                            insertPs.setDate(9, java.sql.Date.valueOf(end));
+                        } else {
+                            insertPs.setNull(9, java.sql.Types.DATE);
+                        }
+                        
+                        insertPs.setString(10, descriere);
+                        insertPs.setInt(11, userId);
+                        insertPs.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateEducation(Connection conn, int userId, HttpServletRequest request) throws SQLException {
+        // Delete existing education
+        String deleteSql = "DELETE FROM studii WHERE id_ang = ?";
+        try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+            deletePs.setInt(1, userId);
+            deletePs.executeUpdate();
+        }
+        
+        // Insert new education
+        String eduCountStr = request.getParameter("education_count");
+        if (eduCountStr != null) {
+            int eduCount = Integer.parseInt(eduCountStr);
+            
+            for (int i = 1; i <= eduCount; i++) {
+                String facultate = request.getParameter("edu_facultate_" + i);
+                String universitate = request.getParameter("edu_universitate_" + i);
+                String ciclu = request.getParameter("edu_ciclu_" + i);
+                String start = request.getParameter("edu_start_" + i);
+                String end = request.getParameter("edu_end_" + i);
+                
+                // Skip if essential fields are empty
+                if (facultate == null || facultate.trim().isEmpty()) continue;
+                
+                // Get ciclu ID based on name
+                int cicluId = getCicluId(conn, ciclu);
+                
+                // Get next available ID
+                String maxIdSql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM studii";
+                try (PreparedStatement maxIdPs = conn.prepareStatement(maxIdSql);
+                     ResultSet maxIdRs = maxIdPs.executeQuery()) {
+                    maxIdRs.next();
+                    int nextId = maxIdRs.getInt("next_id");
+                    
+                    String insertSql = "INSERT INTO studii (id, facultate, universitate, ciclu, start, end, id_ang) " +
+                                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    
+                    try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                        insertPs.setInt(1, nextId);
+                        insertPs.setString(2, facultate);
+                        insertPs.setString(3, universitate);
+                        insertPs.setInt(4, cicluId);
+                        
+                        if (start != null && !start.isEmpty()) {
+                            insertPs.setDate(5, java.sql.Date.valueOf(start));
+                        } else {
+                            insertPs.setNull(5, java.sql.Types.DATE);
+                        }
+                        
+                        if (end != null && !end.isEmpty()) {
+                            insertPs.setDate(6, java.sql.Date.valueOf(end));
+                        } else {
+                            insertPs.setNull(6, java.sql.Types.DATE);
+                        }
+                        
+                        insertPs.setInt(7, userId);
+                        insertPs.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateLanguages(Connection conn, int userId, HttpServletRequest request) throws SQLException {
+        // Delete existing languages
+        String deleteSql = "DELETE FROM limbi_ang WHERE id_ang = ?";
+        try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+            deletePs.setInt(1, userId);
+            deletePs.executeUpdate();
+        }
+        
+        // Insert new languages
+        String langCountStr = request.getParameter("languages_count");
+        if (langCountStr != null) {
+            int langCount = Integer.parseInt(langCountStr);
+            
+            for (int i = 1; i <= langCount; i++) {
+                String limba = request.getParameter("lang_limba_" + i);
+                String nivel = request.getParameter("lang_nivel_" + i);
+                
+                // Skip if essential fields are empty
+                if (limba == null || limba.trim().isEmpty()) continue;
+                
+                // Get or create language ID
+                int limbaId = getOrCreateLimbaId(conn, limba);
+                int nivelId = getNivelId(conn, nivel);
+                
+                // Get next available ID
+                String maxIdSql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM limbi_ang";
+                try (PreparedStatement maxIdPs = conn.prepareStatement(maxIdSql);
+                     ResultSet maxIdRs = maxIdPs.executeQuery()) {
+                    maxIdRs.next();
+                    int nextId = maxIdRs.getInt("next_id");
+                    
+                    String insertSql = "INSERT INTO limbi_ang (id, id_limba, nivel, id_ang) VALUES (?, ?, ?, ?)";
+                    
+                    try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                        insertPs.setInt(1, nextId);
+                        insertPs.setInt(2, limbaId);
+                        insertPs.setInt(3, nivelId);
+                        insertPs.setInt(4, userId);
+                        insertPs.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateProjects(Connection conn, int userId, HttpServletRequest request) throws SQLException {
+        // Note: Since proiecte2 doesn't have id_ang, we'll skip this for now
+        // Or you can modify the database schema to add id_ang to proiecte2
+        
+        String projCountStr = request.getParameter("projects_count");
+        if (projCountStr != null) {
+            int projCount = Integer.parseInt(projCountStr);
+            
+            for (int i = 1; i <= projCount; i++) {
+                String nume = request.getParameter("proj_nume_" + i);
+                String descriere = request.getParameter("proj_descriere_" + i);
+                String start = request.getParameter("proj_start_" + i);
+                String end = request.getParameter("proj_end_" + i);
+                
+                // Skip if essential fields are empty
+                if (nume == null || nume.trim().isEmpty()) continue;
+                
+                // For now, just log that we received project data
+                System.out.println("Project data received: " + nume + " - " + descriere);
+                // TODO: Implement project saving when schema is updated
+            }
+        }
+    }
+
+    // Helper methods
+    private int getCicluId(Connection conn, String cicluName) throws SQLException {
+        if (cicluName == null || cicluName.isEmpty()) return 1; // Default
+        
+        String sql = "SELECT id FROM cicluri WHERE semnificatie = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, cicluName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        }
+        return 1; // Default to first cycle
+    }
+
+    private int getOrCreateLimbaId(Connection conn, String limba) throws SQLException {
+        // First try to find existing
+        String selectSql = "SELECT id FROM limbi WHERE limba = ?";
+        try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
+            ps.setString(1, limba);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        }
+        
+        // If not found, create new
+        String maxIdSql = "SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM limbi";
+        try (PreparedStatement maxIdPs = conn.prepareStatement(maxIdSql);
+             ResultSet maxIdRs = maxIdPs.executeQuery()) {
+            maxIdRs.next();
+            int nextId = maxIdRs.getInt("next_id");
+            
+            String insertSql = "INSERT INTO limbi (id, limba) VALUES (?, ?)";
+            try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                insertPs.setInt(1, nextId);
+                insertPs.setString(2, limba);
+                insertPs.executeUpdate();
+                return nextId;
+            }
+        }
+    }
+
+    private int getNivelId(Connection conn, String nivelName) throws SQLException {
+        if (nivelName == null || nivelName.isEmpty()) return 1; // Default
+        
+        String sql = "SELECT id FROM nivel WHERE semnificatie = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, nivelName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+        }
+        return 1; // Default to first level
+    }
             /**
      * Generează răspuns HTML direct - EVITĂ complet JSP-urile problematice
      */
@@ -412,26 +739,294 @@ public class CVServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("DEBUG: CVServlet doPost() called");
+        System.out.println("DEBUG: Request URI: " + request.getRequestURI());
+        System.out.println("DEBUG: Content Type: " + request.getContentType());
+        
+        // Verificare sesiune
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("currentUser") == null) {
+            System.out.println("DEBUG: No valid session, redirecting to login");
             response.sendRedirect("login.jsp");
             return;
         }
         
-        String action = request.getParameter("action");
+        // CRITICAL FIX: Handle multipart/form-data properly
+        String contentType = request.getContentType();
+        String action = null;
+        
+        if (contentType != null && contentType.startsWith("multipart/form-data")) {
+            System.out.println("DEBUG: Handling multipart/form-data request");
+            
+            try {
+                // For multipart requests, we need to parse parts
+                Collection<Part> parts = request.getParts();
+                System.out.println("DEBUG: Found " + parts.size() + " parts in multipart request");
+                
+                // Find the action parameter
+                for (Part part : parts) {
+                    if ("action".equals(part.getName())) {
+                        action = getPartValue(part);
+                        System.out.println("DEBUG: Found action parameter: " + action);
+                        break;
+                    }
+                }
+                
+                if (action == null) {
+                    // Fallback: try normal parameter extraction
+                    action = request.getParameter("action");
+                    System.out.println("DEBUG: Fallback action parameter: " + action);
+                }
+                
+            } catch (Exception e) {
+                System.out.println("DEBUG: Error parsing multipart request: " + e.getMessage());
+                e.printStackTrace();
+                
+                // Fallback to normal parameter extraction
+                action = request.getParameter("action");
+                System.out.println("DEBUG: Fallback action parameter: " + action);
+            }
+        } else {
+            // Normal form data
+            action = request.getParameter("action");
+            System.out.println("DEBUG: Normal form action parameter: " + action);
+        }
+        
+        System.out.println("DEBUG: Final action parameter: " + action);
+        
+        // Debug: afiseaza toti parametrii disponibili
+        System.out.println("DEBUG: All available parameters:");
+        if (contentType != null && contentType.startsWith("multipart/form-data")) {
+            try {
+                Collection<Part> parts = request.getParts();
+                for (Part part : parts) {
+                    String partName = part.getName();
+                    String partValue = getPartValue(part);
+                    System.out.println("  " + partName + ": " + (partValue != null ? partValue.substring(0, Math.min(50, partValue.length())) : "null"));
+                }
+            } catch (Exception e) {
+                System.out.println("  Error reading parts: " + e.getMessage());
+            }
+        } else {
+            request.getParameterMap().forEach((key, values) -> {
+                System.out.println("  " + key + ": " + String.join(", ", values));
+            });
+        }
+        
         if ("save".equals(action)) {
-            saveCV(request, response);
+            System.out.println("DEBUG: Processing save action");
+            
+            // Verificam daca avem parametrii pentru salvare completa
+            String experienceCount = getMultipartParameter(request, "experience_count");
+            String educationCount = getMultipartParameter(request, "education_count");
+            String languagesCount = getMultipartParameter(request, "languages_count");
+            String projectsCount = getMultipartParameter(request, "projects_count");
+            
+            System.out.println("DEBUG: Experience count: " + experienceCount);
+            System.out.println("DEBUG: Education count: " + educationCount);
+            System.out.println("DEBUG: Languages count: " + languagesCount);
+            System.out.println("DEBUG: Projects count: " + projectsCount);
+            
+            // Daca avem count parametrii, e salvare completa din cvmanagement.jsp
+            if (experienceCount != null || educationCount != null || 
+                languagesCount != null || projectsCount != null) {
+                System.out.println("DEBUG: Detected complete CV save request from cvmanagement.jsp");
+                saveCompleteCV(request, response);
+            } else {
+                System.out.println("DEBUG: Detected simple CV save request");
+                saveCV(request, response);
+            }
         } else if ("addExperience".equals(action)) {
+            System.out.println("DEBUG: Processing addExperience action");
             addExperience(request, response);
         } else if ("addEducation".equals(action)) {
+            System.out.println("DEBUG: Processing addEducation action");
             addEducation(request, response);
         } else if ("addLanguage".equals(action)) {
+            System.out.println("DEBUG: Processing addLanguage action");
             addLanguage(request, response);
         } else if ("addProject".equals(action)) {
+            System.out.println("DEBUG: Processing addProject action");
             addProject(request, response);
+        } else {
+            System.out.println("DEBUG: Unknown or null action: " + action);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"status\":\"error\",\"message\":\"Actiune necunoscuta: " + action + "\"}");
+        }
+        
+        System.out.println("DEBUG: CVServlet doPost() completed");
+    }
+
+    /**
+     * Helper method to extract parameter value from multipart request
+     */
+    private String getMultipartParameter(HttpServletRequest request, String paramName) {
+        String contentType = request.getContentType();
+        
+        if (contentType != null && contentType.startsWith("multipart/form-data")) {
+            try {
+                Collection<Part> parts = request.getParts();
+                for (Part part : parts) {
+                    if (paramName.equals(part.getName())) {
+                        return getPartValue(part);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("DEBUG: Error getting multipart parameter " + paramName + ": " + e.getMessage());
+            }
+        }
+        
+        // Fallback to normal parameter
+        return request.getParameter(paramName);
+    }
+
+    /**
+     * Helper method to extract value from a Part
+     */
+    private String getPartValue(Part part) throws IOException {
+        if (part == null) return null;
+        
+        try (InputStream inputStream = part.getInputStream()) {
+            return new String(inputStream.readAllBytes(), "UTF-8").trim();
         }
     }
-    
+
+    /**
+     * Updated saveCompleteCV method to handle multipart parameters
+     */
+    private void saveCompleteCV(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Connection conn = null;
+        PrintWriter out = null;
+        
+        try {
+            // Set response type BEFORE getting writer
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            out = response.getWriter();
+            
+            // Load the JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            
+            // Establish connection using DriverManager
+            conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+            conn.setAutoCommit(false); // Start transaction
+            
+            HttpSession session = request.getSession();
+            int userId = getUserIdFromSession(session, conn);
+            
+            System.out.println("DEBUG: Starting complete CV save for user ID: " + userId);
+            
+            // Debug: Print all received parameters (multipart-aware)
+            System.out.println("DEBUG: Received parameters:");
+            String contentType = request.getContentType();
+            if (contentType != null && contentType.startsWith("multipart/form-data")) {
+                try {
+                    Collection<Part> parts = request.getParts();
+                    for (Part part : parts) {
+                        String partName = part.getName();
+                        String partValue = getPartValue(part);
+                        System.out.println("  " + partName + ": " + (partValue != null ? partValue.substring(0, Math.min(100, partValue.length())) : "null"));
+                    }
+                } catch (Exception e) {
+                    System.out.println("  Error reading multipart parameters: " + e.getMessage());
+                }
+            } else {
+                request.getParameterMap().forEach((key, values) -> {
+                    System.out.println("  " + key + ": " + String.join(", ", values));
+                });
+            }
+            
+            // 1. Update personal info in useri table
+            System.out.println("DEBUG: Step 1 - Updating personal info");
+            updatePersonalInfo(conn, userId, request);
+            
+            // 2. Update or insert CV profile
+            System.out.println("DEBUG: Step 2 - Updating CV profile");
+            updateCVProfile(conn, userId, request);
+            
+            // 3. Update experience
+            System.out.println("DEBUG: Step 3 - Updating experience");
+            updateExperience(conn, userId, request);
+            
+            // 4. Update education
+            System.out.println("DEBUG: Step 4 - Updating education");
+            updateEducation(conn, userId, request);
+            
+            // 5. Update languages
+            System.out.println("DEBUG: Step 5 - Updating languages");
+            updateLanguages(conn, userId, request);
+            
+            // 6. Update projects
+            System.out.println("DEBUG: Step 6 - Updating projects");
+            updateProjects(conn, userId, request);
+            
+            conn.commit(); // Commit transaction
+            
+            System.out.println("DEBUG: All steps completed successfully, transaction committed");
+            
+            // Send success response
+            out.write("{\"status\":\"success\",\"message\":\"CV actualizat cu succes\"}");
+            out.flush();
+            
+        } catch (SQLException e) {
+            System.err.println("DEBUG: SQL Exception occurred: " + e.getMessage());
+            e.printStackTrace();
+            
+            if (conn != null) {
+                try { 
+                    conn.rollback(); 
+                    System.out.println("DEBUG: Transaction rolled back due to SQL error");
+                } catch (SQLException ex) { 
+                    System.err.println("DEBUG: Error during rollback: " + ex.getMessage());
+                    ex.printStackTrace(); 
+                }
+            }
+            
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            if (out != null) {
+                out.write("{\"status\":\"error\",\"message\":\"Eroare SQL: " + e.getMessage().replace("\"", "\\\"") + "\"}");
+                out.flush();
+            }
+            
+        } catch (Exception e) {
+            System.err.println("DEBUG: General Exception occurred: " + e.getMessage());
+            e.printStackTrace();
+            
+            if (conn != null) {
+                try { 
+                    conn.rollback(); 
+                    System.out.println("DEBUG: Transaction rolled back due to general error");
+                } catch (SQLException ex) { 
+                    System.err.println("DEBUG: Error during rollback: " + ex.getMessage());
+                    ex.printStackTrace(); 
+                }
+            }
+            
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            if (out != null) {
+                out.write("{\"status\":\"error\",\"message\":\"Eroare: " + e.getMessage().replace("\"", "\\\"") + "\"}");
+                out.flush();
+            }
+            
+        } finally {
+            if (conn != null) {
+                try { 
+                    conn.setAutoCommit(true);
+                    conn.close(); 
+                    System.out.println("DEBUG: Database connection closed");
+                } catch (SQLException e) { 
+                    System.err.println("DEBUG: Error closing connection: " + e.getMessage());
+                    e.printStackTrace(); 
+                }
+            }
+            
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
     private void viewCV(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Connection conn = null;
         try {
