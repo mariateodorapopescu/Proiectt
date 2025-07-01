@@ -93,8 +93,8 @@ public class ResSefServlet extends HttpServlet {
                 response.setContentType("text/html;charset=UTF-8");
                 PrintWriter out = response.getWriter();
     		    out.println("<script type='text/javascript'>");
-    		    out.println("alert('Aprobare cu succes!');");
-    		    out.println("window.location.href = 'vizualizareconcedii.jsp';");
+    		    out.println("alert('Respingere cu succes!');");
+    		    out.println("window.location.href = 'concediinoisef.jsp';");
     		    out.println("</script>");
     		    out.close();
             } catch (SQLException e) {
@@ -104,8 +104,8 @@ public class ResSefServlet extends HttpServlet {
                 response.setContentType("text/html;charset=UTF-8");
                 PrintWriter out = response.getWriter();
     		    out.println("<script type='text/javascript'>");
-    		    out.println("alert('Eroare la aprobare la baza de date!');");
-    		    out.println("window.location.href = 'concediinoidir.jsp';");
+    		    out.println("alert('Eroare la respingere la baza de date!');");
+    		    out.println("window.location.href = 'concediinoisef.jsp';");
     		    out.println("</script>");
     		    out.close();
             } catch (ClassNotFoundException e) {
@@ -114,8 +114,8 @@ public class ResSefServlet extends HttpServlet {
             	response.setContentType("text/html;charset=UTF-8");
                 PrintWriter out = response.getWriter();
     		    out.println("<script type='text/javascript'>");
-    		    out.println("alert('Eroare la aprobare - nu s-a gasit clasa, debug only!');");
-    		    out.println("window.location.href = 'concediinoidir.jsp';");
+    		    out.println("alert('Eroare la respingere - nu s-a gasit clasa, debug only!');");
+    		    out.println("window.location.href = 'concediinoisef.jsp';");
     		    out.println("</script>");
     		    out.close();
     		}

@@ -2,10 +2,8 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
 <%@ page import="javax.sql.DataSource" %>
-<%@ page import="bean.MyUser, bean.CVUserDetails" %>
+<%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
 
 // Verificare sesiune și obținere user curent
@@ -64,7 +62,7 @@ if (sesi != null) {
                                          (isSef && viewedUserDep == userDep);
                         
                         if (!canView) {
-                            response.sendRedirect("Access.jsp?error=accessDenied");
+                            response.sendRedirect("homedir.jsp");
                             return;
                         }
                     } else {
@@ -366,12 +364,12 @@ if (sesi != null) {
             out.println("<script type='text/javascript'>");
             out.println("alert('Utilizator neconectat!');");
             out.println("</script>");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("homedir.jsp");
         }
     } else {
         out.println("<script type='text/javascript'>");
         out.println("alert('Nu e nicio sesiune activa!');");
         out.println("</script>");
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("homedir.jsp");
     }
 %>

@@ -110,7 +110,8 @@ int pag = -1;
         .card {
             background-color: <%=sidebar%>;
             border-radius: 15px;
-            
+            position: fixed;
+            top: 0;
             padding: 30px;
             margin: 20px auto;
             max-width: 800px;
@@ -272,10 +273,15 @@ int pag = -1;
         }
         .text-muted {
         color: <%=text%> !important;}
+        .container {
+        position: fixed;
+        top: 0;
+        left: 10%;
+        }
     </style>
 </head>
 <body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>; --text:<%out.println(text);%>; --card:<%out.println(card);%>; --hover:<%out.println(hover);%>">
-    <div class="container py-5">
+    <div class="container">
         <div class="card">
             <div class="page-header">
               <!--   <h2><i class="ri-money-dollar-circle-line me-2"></i>Acordare Sporuri</h2> -->

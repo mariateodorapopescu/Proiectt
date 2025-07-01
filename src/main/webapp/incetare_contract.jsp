@@ -104,6 +104,8 @@
             background-color: <%=sidebar%>;
             border-radius: 15px;
             padding: 30px;
+            position: fixed;
+            top: 0;
             margin: 20px auto;
             max-width: 90%;
             transition: all 0.3s ease;

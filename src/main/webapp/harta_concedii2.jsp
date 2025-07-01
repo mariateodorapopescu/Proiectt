@@ -241,14 +241,7 @@
             <p id="locationCoords" style="font-size:12px; margin-top:0;"></p>
         </div>
         
-        <div class="location-details" id="locationDetails" style="background:<%=clr%>; color:<%=text%>; display:none;">
-            <h4 style="margin-top:0; color:<%=accent%>">Detalii adresă:</h4>
-            <p id="addressStreet" style="margin:5px 0;"></p>
-            <p id="addressCity" style="margin:5px 0;"></p>
-            <p id="addressRegion" style="margin:5px 0;"></p>
-            <p id="addressPostal" style="margin:5px 0;"></p>
-            <p id="addressCountry" style="margin:5px 0;"></p>
-        </div>
+      
         
         <div id="loadingIndicator" class="loading-indicator">
             <p style="color: <%=text%>">Se obțin informații despre locație...</p>

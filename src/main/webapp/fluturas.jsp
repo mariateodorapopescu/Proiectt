@@ -121,6 +121,8 @@
             border-radius: 15px;
             padding: 30px;
             margin: 20px auto;
+            position: fixed;
+            top: 0;
             max-width: 90%;
             transition: all 0.3s ease;
         }

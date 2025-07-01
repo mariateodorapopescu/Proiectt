@@ -106,39 +106,39 @@ public class ModifConServlet extends HttpServlet {
 	    // verificari concordanta date concediu -> majoritatea sunt cu try&catch pentru ca se bazeaza pe request, response, concediu
         // cum majoritatea metodelor implementate pentru verificarea concordantei concediului sunt similare, 
         // au acelasi tip de erori, functioneaza dupa acelasi principiu, difera numai interogarea in baza de date, alte cateva variabile
-	    try {
-        	// verificare daca are mai mult de 3 concedii pe an
-			if (maimulteconcedii(request)) {
-				response.setContentType("text/html;charset=UTF-8");
-				PrintWriter out = response.getWriter();
-				out.println("<script type='text/javascript'>");
-			    out.println("alert('Utilizatorul nu poate avea mai mult de 3 perioade diefrite de concediu!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-				return;
-			}
-		} catch (ClassNotFoundException e) {
-			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
-			response.setContentType("text/html;charset=UTF-8");
-		    PrintWriter out = response.getWriter();
-		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Nu a gasit clasa - debug only!');");
-		    out.println("window.location.href = 'actiuni.jsp';");
-		    out.println("</script>");
-		    out.close();
-		    e.printStackTrace();
-		} catch (IOException e) {
-			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
-			response.setContentType("text/html;charset=UTF-8");
-			PrintWriter out = response.getWriter();
-		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Eroare IO - debug only!');");
-		    out.println("window.location.href = 'actiuni.jsp';");
-		    out.println("</script>");
-		    out.close();
-		    e.printStackTrace();
-		}
+//	    try {
+//        	// verificare daca are mai mult de 3 concedii pe an
+//			if (maimulteconcedii(request)) {
+//				response.setContentType("text/html;charset=UTF-8");
+//				PrintWriter out = response.getWriter();
+//				out.println("<script type='text/javascript'>");
+//			    out.println("alert('Utilizatorul nu poate avea mai mult de 3 perioade diefrite de concediu!');");
+//			    out.println("window.location.href = 'actiuni.jsp';");
+//			    out.println("</script>");
+//			    out.close();
+//				return;
+//			}
+//		} catch (ClassNotFoundException e) {
+//			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+//			response.setContentType("text/html;charset=UTF-8");
+//		    PrintWriter out = response.getWriter();
+//		    out.println("<script type='text/javascript'>");
+//		    out.println("alert('Nu a gasit clasa - debug only!');");
+//		    out.println("window.location.href = 'actiuni.jsp';");
+//		    out.println("</script>");
+//		    out.close();
+//		    e.printStackTrace();
+//		} catch (IOException e) {
+//			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+//			response.setContentType("text/html;charset=UTF-8");
+//			PrintWriter out = response.getWriter();
+//		    out.println("<script type='text/javascript'>");
+//		    out.println("alert('Eroare IO - debug only!');");
+//		    out.println("window.location.href = 'actiuni.jsp';");
+//		    out.println("</script>");
+//		    out.close();
+//		    e.printStackTrace();
+//		}
         
         try {
 			if (!maimultezile(request)) {
@@ -174,39 +174,39 @@ public class ModifConServlet extends HttpServlet {
 		    e.printStackTrace();
 		}
         
-        try {
-			if (!odatavara(request, concediul) && (stringToDate(concediul.getInceput()).getLuna() >= 6 && stringToDate(concediul.getInceput()).getLuna() <= 8)) {
-				// verificare daca are deja un concediu pe perioada verii
-				response.setContentType("text/html;charset=UTF-8");
-				PrintWriter out = response.getWriter();
-				out.println("<script type='text/javascript'>");
-			    out.println("alert('Utilizatorul nu poate avea mai mult de un concediu pe timpul verii!');");
-			    out.println("window.location.href = 'actiuni.jsp';");
-			    out.println("</script>");
-			    out.close();
-				return;
-			}
-		} catch (ClassNotFoundException e) {
-			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
-			response.setContentType("text/html;charset=UTF-8");
-		    PrintWriter out = response.getWriter();
-		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Nu a gasit clasa - debug only!');");
-		    out.println("window.location.href = 'actiuni.jsp';");
-		    out.println("</script>");
-		    out.close();
-		    e.printStackTrace();
-		} catch (IOException e) {
-			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
-			response.setContentType("text/html;charset=UTF-8");
-			PrintWriter out = response.getWriter();
-		    out.println("<script type='text/javascript'>");
-		    out.println("alert('Eroare IO - debug only!');");
-		    out.println("window.location.href = 'actiuni.jsp';");
-		    out.println("</script>");
-		    out.close();
-		    e.printStackTrace();
-		}
+//        try {
+//			if (!odatavara(request, concediul) && (stringToDate(concediul.getInceput()).getLuna() >= 6 && stringToDate(concediul.getInceput()).getLuna() <= 8)) {
+//				// verificare daca are deja un concediu pe perioada verii
+//				response.setContentType("text/html;charset=UTF-8");
+//				PrintWriter out = response.getWriter();
+//				out.println("<script type='text/javascript'>");
+//			    out.println("alert('Utilizatorul nu poate avea mai mult de un concediu pe timpul verii!');");
+//			    out.println("window.location.href = 'actiuni.jsp';");
+//			    out.println("</script>");
+//			    out.close();
+//				return;
+//			}
+//		} catch (ClassNotFoundException e) {
+//			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+//			response.setContentType("text/html;charset=UTF-8");
+//		    PrintWriter out = response.getWriter();
+//		    out.println("<script type='text/javascript'>");
+//		    out.println("alert('Nu a gasit clasa - debug only!');");
+//		    out.println("window.location.href = 'actiuni.jsp';");
+//		    out.println("</script>");
+//		    out.close();
+//		    e.printStackTrace();
+//		} catch (IOException e) {
+//			// daca este eroare, apare alerta + se intoarce la pagina de actiuni, adaugare/modficiare/stergere concediu
+//			response.setContentType("text/html;charset=UTF-8");
+//			PrintWriter out = response.getWriter();
+//		    out.println("<script type='text/javascript'>");
+//		    out.println("alert('Eroare IO - debug only!');");
+//		    out.println("window.location.href = 'actiuni.jsp';");
+//		    out.println("</script>");
+//		    out.close();
+//		    e.printStackTrace();
+//		}
         
         if (!maimultezileodata(concediul)) {
         	// verificare daca are mai mult de 21 de concediu pe o perioada de concediu

@@ -1511,4 +1511,14 @@
     <servlet-name>QueryServlet</servlet-name>
     <url-pattern>/QueryServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetProjectTeamMembersServlet</display-name>
+    <servlet-name>GetProjectTeamMembersServlet</servlet-name>
+    <servlet-class>Servlet.GetProjectTeamMembersServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetProjectTeamMembersServlet</servlet-name>
+    <url-pattern>/GetProjectTeamMembersServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

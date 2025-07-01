@@ -564,7 +564,7 @@
         }
 
         .faq-answer {
-            background-color: white;
+            background-color: var(--card);
             padding: 0;
             max-height: 0;
             overflow: hidden;

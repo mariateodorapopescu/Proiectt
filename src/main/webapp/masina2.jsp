@@ -306,7 +306,7 @@
                     </div>
                     
                     <button id="generate">Descarcati PDF</button>
-                   <button id="inapoi" ><a href ="viewang4.jsp">Inapoi</a></button>
+                   <button id="inapoi" ><a href ="vizualizareconcedii.jsp">Inapoi</a></button>
                 
                 </div>
             </div>

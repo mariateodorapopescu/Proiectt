@@ -98,16 +98,32 @@
 
             // Construire query
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, ");
-            sql.append("d.nume_dep AS departament, u.nume, u.prenume, ");
-            sql.append("t.denumire AS functie, c.start_c, c.end_c, c.motiv, ");
-            sql.append("c.locatie, s.nume_status AS status, ct.motiv as tipcon ");
+            sql.append("SELECT ");
+            sql.append("c.acc_res, ");
+            sql.append("c.added, ");
+            sql.append("c.modified, ");
+            sql.append("c.id AS nr_crt, ");
+            sql.append("d.nume_dep AS departament, ");
+            sql.append("u.nume, ");
+            sql.append("u.prenume, ");
+            sql.append("t.denumire AS functie, ");
+            sql.append("c.start_c, ");
+            sql.append("c.end_c, ");
+            sql.append("c.motiv, ");
+            sql.append("CASE ");
+            sql.append("WHEN lc.strada IS NOT NULL THEN ");
+            sql.append("CONCAT('Str.', lc.strada, ', loc. ', lc.oras, ', jud. ', lc.judet, ', ', lc.tara) ");
+            sql.append("ELSE 'Locație nespecificată' ");
+            sql.append("END AS locatie, ");
+            sql.append("s.nume_status AS status, ");
+            sql.append("ct.motiv AS tipcon ");
             sql.append("FROM useri u ");
             sql.append("JOIN tipuri t ON u.tip = t.tip ");
             sql.append("JOIN departament d ON u.id_dep = d.id_dep ");
             sql.append("JOIN concedii c ON c.id_ang = u.id ");
             sql.append("JOIN statusuri s ON c.status = s.status ");
             sql.append("JOIN tipcon ct ON c.tip = ct.tip ");
+            sql.append("LEFT JOIN locatii_concedii lc ON c.id = lc.id_concediu ");        
 
             List<Object> params = new ArrayList<>();
 
@@ -152,7 +168,7 @@
                 stmt.setObject(i + 1, params.get(i));
             }
 
-            System.out.println("Executing query: " + sql.toString());
+            System.out.println("Executing query: " + stmt.toString());
             System.out.println("With parameters: " + params);
 
             ResultSet rs = stmt.executeQuery();
@@ -188,19 +204,19 @@
                  pageTitle = "Vizualizare concedii personale";
                  break;
              case 4: 
-                 pageTitle = "Vizualizare concedii ale unui angajat";
+                 pageTitle = "Vizualizare concedii ale unui angajat (fara concedii personale!)";
                  break;
              case 5: 
-                 pageTitle = "Vizualizare concedii ale unui coleg din departament";
+                 pageTitle = "Vizualizare concedii ale unui coleg din departament (fara concedii personale!)";
                  break;
              case 6: 
-                 pageTitle = "Vizualizare concedii din departamentul meu";
+                 pageTitle = "Vizualizare concedii din departamentul meu (fara concedii personale!)";
                  break;
              case 7: 
-                 pageTitle = "Vizualizare concedii dintr-un departament";
+                 pageTitle = "Vizualizare concedii dintr-un departament (fara concedii personale!)";
                  break;
              case 8: 
-                 pageTitle = "Vizualizare concedii din toată instituția";
+                 pageTitle = "Vizualizare concedii din toată instituția (fara concedii personale!)";
                  break;
              default: 
                  pageTitle = "Vizualizare concedii";

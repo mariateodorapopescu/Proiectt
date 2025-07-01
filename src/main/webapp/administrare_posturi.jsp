@@ -1344,5 +1344,327 @@
         `;
         document.head.appendChild(style);
     </script>
+    <script>
+        // ================ FUNCȚII PENTRU LOCAȚII ================
+        
+        // Încărcare județe și localități cu păstrarea datelor în edit
+        $(document).ready(function() {
+            loadJudete();
+            
+            // Debug pentru modul edit
+            const currentJudet = document.getElementById('currentJudet');
+            const currentLocalitate = document.getElementById('currentLocalitate');
+            
+            if (currentJudet && currentLocalitate) {
+                console.log('🏠 Edit mode detected - Location data:');
+                console.log('   Județ salvat:', currentJudet.value);
+                console.log('   Localitate salvată:', currentLocalitate.value);
+            }
+        });
+
+        function loadJudete() {
+            console.log('🌍 Loading județe...');
+            
+            $.ajax({
+                url: 'JudeteProxyServlet',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    const judetSelect = document.getElementById('judet');
+                    
+                    if (!judetSelect) {
+                        console.error('❌ Element #judet not found');
+                        return;
+                    }
+                    
+                    // Clear și adaugă opțiunea default
+                    judetSelect.innerHTML = '<option value="">-- Selectați județul --</option>';
+                    
+                    // Sortare județe alfabetic
+                    data.sort(function(a, b) {
+                        return a.nume.localeCompare(b.nume);
+                    });
+                    
+                    // Adăugare opțiuni județe
+                    $.each(data, function(index, judet) {
+                        const option = document.createElement('option');
+                        option.value = judet.auto;
+                        option.textContent = judet.nume;
+                        judetSelect.appendChild(option);
+                    });
+                    
+                    console.log('✅ Județe încărcate:', data.length);
+                    
+                    // Pentru modul edit - selectează județul salvat
+                    const currentJudet = document.getElementById('currentJudet');
+                    if (currentJudet && currentJudet.value.trim()) {
+                        console.log('🔍 Searching for saved județ:', currentJudet.value);
+                        
+                        // Caută județul în lista de opțiuni
+                        const judetOptions = Array.from(judetSelect.options);
+                        let found = false;
+                        
+                        for (let i = 0; i < judetOptions.length; i++) {
+                            const opt = judetOptions[i];
+                            const optText = opt.textContent.toLowerCase().trim();
+                            const savedText = currentJudet.value.toLowerCase().trim();
+                            
+                            if (optText === savedText || 
+                                optText.includes(savedText) || 
+                                savedText.includes(optText)) {
+                                opt.selected = true;
+                                found = true;
+                                console.log('✅ Județ găsit și selectat:', opt.textContent);
+                                
+                                // Încarcă localitățile pentru acest județ
+                                setTimeout(() => {
+                                    loadLocalitati(true);
+                                }, 100);
+                                break;
+                            }
+                        }
+                        
+                        if (!found) {
+                            console.warn('⚠️ Județ salvat nu a fost găsit:', currentJudet.value);
+                            // Încercăm să adăugăm manual județul
+                            const option = document.createElement('option');
+                            option.value = 'MANUAL';
+                            option.textContent = currentJudet.value;
+                            option.selected = true;
+                            judetSelect.appendChild(option);
+                            console.log('📝 Județ adăugat manual:', currentJudet.value);
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('❌ Error loading județe:', textStatus, errorThrown);
+                    showErrorMessage('Eroare la încărcarea județelor! ' + errorThrown);
+                }
+            });
+        }
+
+        function loadLocalitati(isEditMode = false) {
+            const judetSelect = document.getElementById('judet');
+            const localitateSelect = document.getElementById('localitate');
+            
+            if (!judetSelect || !localitateSelect) {
+                console.error('❌ Select elements not found');
+                return;
+            }
+            
+            console.log('🏘️ Loading localități for județ:', judetSelect.value);
+            
+            // Reset localități
+            localitateSelect.innerHTML = '<option value="">-- Selectați localitatea --</option>';
+            
+            if (judetSelect.value === '') {
+                localitateSelect.disabled = true;
+                console.log('ℹ️ No județ selected, disabling localități');
+                return;
+            }
+            
+            localitateSelect.disabled = false;
+            localitateSelect.innerHTML = '<option value="">-- Se încarcă localitățile... --</option>';
+            
+            $.ajax({
+                url: 'LocalitatiProxyServlet',
+                type: 'GET',
+                data: { judet: judetSelect.value },
+                dataType: 'json',
+                success: function(data) {
+                    console.log('✅ Localități încărcate:', data.length);
+                    
+                    // Clear loading message
+                    localitateSelect.innerHTML = '<option value="">-- Selectați localitatea --</option>';
+                    
+                    // Sortare alfabetică
+                    data.sort(function(a, b) {
+                        return a.nume.localeCompare(b.nume);
+                    });
+                    
+                    // Adăugare opțiuni localități
+                    $.each(data, function(index, localitate) {
+                        const option = document.createElement('option');
+                        option.value = localitate.nume;
+                        option.textContent = localitate.nume;
+                        localitateSelect.appendChild(option);
+                    });
+                    
+                    // Pentru modul edit - selectează localitatea salvată
+                    if (isEditMode) {
+                        const currentLocalitate = document.getElementById('currentLocalitate');
+                        if (currentLocalitate && currentLocalitate.value.trim()) {
+                            console.log('🔍 Searching for saved localitate:', currentLocalitate.value);
+                            
+                            const localitateOptions = Array.from(localitateSelect.options);
+                            let found = false;
+                            
+                            for (let i = 0; i < localitateOptions.length; i++) {
+                                const opt = localitateOptions[i];
+                                const optText = opt.textContent.toLowerCase().trim();
+                                const savedText = currentLocalitate.value.toLowerCase().trim();
+                                
+                                if (optText === savedText || 
+                                    optText.includes(savedText) || 
+                                    savedText.includes(optText)) {
+                                    opt.selected = true;
+                                    found = true;
+                                    console.log('✅ Localitate găsită și selectată:', opt.textContent);
+                                    break;
+                                }
+                            }
+                            
+                            if (!found) {
+                                console.warn('⚠️ Localitate salvată nu a fost găsită:', currentLocalitate.value);
+                                // Adăugăm manual localitatea
+                                const option = document.createElement('option');
+                                option.value = currentLocalitate.value;
+                                option.textContent = currentLocalitate.value;
+                                option.selected = true;
+                                localitateSelect.appendChild(option);
+                                console.log('📝 Localitate adăugată manual:', currentLocalitate.value);
+                            }
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('❌ Error loading localități:', textStatus, errorThrown);
+                    localitateSelect.disabled = true;
+                    localitateSelect.innerHTML = '<option value="">-- Eroare la încărcare --</option>';
+                    showErrorMessage('Eroare la încărcarea localităților! ' + errorThrown);
+                }
+            });
+        }
+
+        // ================ FUNCȚII PENTRU ȘTERGERE ================
+        
+        function deletePost(id) {
+            if (confirm('⚠️ Sigur doriți să ștergeți acest post?\n\nAceastă acțiune nu poate fi anulată!')) {
+                console.log('🗑️ Deleting post with ID:', id);
+                
+                $.ajax({
+                    url: 'DeletePostServlet',
+                    type: 'POST',
+                    data: { id: id },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            showSuccessMessage('Postul a fost șters cu succes!');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            showErrorMessage(response.message || 'Eroare la ștergerea postului!');
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('❌ Error deleting post:', textStatus, errorThrown);
+                        showErrorMessage('Eroare la conectarea cu serverul: ' + textStatus);
+                    }
+                });
+            }
+        }
+
+        // ================ FUNCȚII PENTRU MESAJE ================
+        
+        function showSuccessMessage(message) {
+            const alert = document.createElement('div');
+            alert.innerHTML = `
+                <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; 
+                           background: var(--success-color); color: white; padding: 1rem 1.5rem; 
+                           border-radius: 0.5rem; box-shadow: var(--shadow);
+                           display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="ri-checkbox-circle-line"></i>
+                    ${message}
+                </div>
+            `;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+        
+        function showErrorMessage(message) {
+            const alert = document.createElement('div');
+            alert.innerHTML = `
+                <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; 
+                           background: var(--error-color); color: white; padding: 1rem 1.5rem; 
+                           border-radius: 0.5rem; box-shadow: var(--shadow);
+                           display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="ri-error-warning-line"></i>
+                    ${message}
+                </div>
+            `;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 4000);
+        }
+
+        // ================ VALIDĂRI ȘI EFECTE ================
+        
+        // Validare formular
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Document ready - initializing form validations');
+            
+            // Validare date
+            const startDate = document.getElementById('start');
+            const endDate = document.getElementById('end');
+            
+            if (startDate && endDate) {
+                function validateDates() {
+                    if (startDate.value && endDate.value) {
+                        if (new Date(startDate.value) >= new Date(endDate.value)) {
+                            endDate.setCustomValidity('Data de sfârșit trebuie să fie după data de început');
+                        } else {
+                            endDate.setCustomValidity('');
+                        }
+                    }
+                }
+                
+                startDate.addEventListener('change', validateDates);
+                endDate.addEventListener('change', validateDates);
+            }
+            
+            // Efecte ripple pentru carduri și butoane
+            document.querySelectorAll('.action-card, .btn').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    const ripple = document.createElement('div');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+                    ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.pointerEvents = 'none';
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+        
+        // CSS pentru efectul ripple
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>

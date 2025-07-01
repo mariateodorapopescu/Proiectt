@@ -108,7 +108,8 @@ int pag = -1;
         .card {
             background-color: <%=sidebar%>;
             border-radius: 15px;
-            
+            position: fixed;
+            top: 0;
             padding: 30px;
             margin: 20px auto;
             max-width: 800px;

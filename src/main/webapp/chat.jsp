@@ -1,228 +1,32 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8"%>
-      
-<%@ page import="java.sql.*" %>
-<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
-<%@ page import="javax.sql.DataSource" %>
-<%@ page import="bean.MyUser" %>
-<%@ page import="jakarta.servlet.http.HttpSession" %>
-<%@ page import="java.text.DecimalFormat" %>
-<%
-
-    HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
-    if (sesi != null) {
-        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizator in sesiune aka daca e cineva logat
-        if (currentUser != null) {
-            String username = currentUser.getUsername(); // extrag usernameul, care e unic
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); // driver bd
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student");
-                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
-                            "dp.denumire_completa AS denumire FROM useri u " +
-                            "JOIN tipuri t ON u.tip = t.tip " +
-                            "JOIN departament d ON u.id_dep = d.id_dep " +
-                            "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
-                            "WHERE u.username = ?")) {
-                    preparedStatement.setString(1, username);
-                    ResultSet rs = preparedStatement.executeQuery();
-                    if (!rs.next()) {
-                        out.println("<script type='text/javascript'>");
-                        out.println("alert('Date introduse incorect sau nu exista date!');");
-                        out.println("</script>");
-                    } else {
-                        int userType = rs.getInt("tip");
-                        int id = rs.getInt("id");
-                        int userDep = rs.getInt("id_dep");
-                        int ierarhie = rs.getInt("ierarhie");
-                        String functie = rs.getString("functie");
-                        String nume_dep = rs.getString("nume_dep");
-                        int userSediuId = rs.getInt("id_sediu");
-                        
-                        // Funcție helper pentru a determina rolul utilizatorului
-                        boolean isDirector = (ierarhie < 3);
-                        boolean isSef = (ierarhie >= 4 && ierarhie <=5);
-                        boolean isIncepator = (ierarhie >= 10);
-                        boolean isUtilizatorNormal = !isDirector && !isSef && !isIncepator; // tipuri 1, 2, 5-9
-                        boolean isAdmin = (functie.compareTo("Administrator") == 0);
-                        
-                        if (!isAdmin) {  
-                          // data curenta, tot ca o interogare bd =(
-                          String today = "";
-                          try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                              String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
-                              try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                 try (ResultSet rs2 = stmt.executeQuery()) {
-                                      if (rs2.next()) {
-                                        today = rs2.getString("today");
-                                      }
-                                  }
-                              }
-                          } catch (SQLException e) {
-                              out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                              e.printStackTrace();
-                          }
-                         
-                         // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
-                         String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
-                         String clr = "#d8d9e1";
-                         String sidebar = "#ECEDFA";
-                         String text = "#333";
-                         String card = "#ECEDFA";
-                         String hover = "#ECEDFA";
-                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             String query = "SELECT * from teme where id_usr = ?";
-                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                                 stmt.setInt(1, id);
-                                 try (ResultSet rs2 = stmt.executeQuery()) {
-                                     if (rs2.next()) {
-                                       accent = rs2.getString("accent");
-                                       clr = rs2.getString("clr");
-                                       sidebar = rs2.getString("sidebar");
-                                       text = rs2.getString("text");
-                                       card = rs2.getString("card");
-                                       hover = rs2.getString("hover");
-                                     }
-                                 }
-                             }
-                        } catch (SQLException e) {
-                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                             e.printStackTrace();
-                         }
-                         
-                         // Obținem informații despre sediul utilizatorului
-                         String userSediuNume = "";
-                         String userSediuTip = "";
-                         String userSediuAdresa = "";
-                         double userSediuLat = 0;
-                         double userSediuLong = 0;
-                         
-                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             String query = "SELECT s.id_sediu, s.nume_sediu, s.tip_sediu, s.strada, s.oras, s.judet, s.tara, s.latitudine, s.longitudine " +
-                                          "FROM sedii s " +
-                                          "JOIN useri u ON s.id_sediu = u.id_sediu " +
-                                          "WHERE u.id = ?";
-                             try (PreparedStatement stmt = con.prepareStatement(query)) {
-                                 stmt.setInt(1, id);
-                                 try (ResultSet rs2 = stmt.executeQuery()) {
-                                     if (rs2.next()) {
-                                         userSediuNume = rs2.getString("nume_sediu");
-                                         userSediuTip = rs2.getString("tip_sediu");
-                                         userSediuAdresa = rs2.getString("strada") + ", " + 
-                                                         rs2.getString("oras") + ", " + 
-                                                         rs2.getString("judet") + ", " + 
-                                                         rs2.getString("tara");
-                                         userSediuLat = rs2.getDouble("latitudine");
-                                         userSediuLong = rs2.getDouble("longitudine");
-                                     }
-                                 }
-                             }
-                         } catch (SQLException e) {
-                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                             e.printStackTrace();
-                         }
-                         
-                         // Obținem informații despre sediul departamentului
-                         String depSediuNume = "";
-                         String depDepartament = "";
-                         String depSediuAdresa = "";
-                         double depSediuLat = 0;
-                         double depSediuLong = 0;
-                         double distantaKm = 0;
-                         
-                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
-                             String query = "SELECT ld.id_dep, ld.strada, ld.oras, ld.judet, ld.tara, ld.latitudine, ld.longitudine, " +
-                                          "d.nume_dep " +
-                                          "FROM locatii_departamente ld " +
-                                          "JOIN departament d ON ld.id_dep = d.id_dep " +
-                                          "WHERE ld.id_dep = ?";
-                             try (PreparedStatement stmt = con.prepareStatement(query)) {
-                                 stmt.setInt(1, userDep);
-                                 try (ResultSet rs2 = stmt.executeQuery()) {
-                                     if (rs2.next()) {
-                                         depDepartament = rs2.getString("nume_dep");
-                                         depSediuNume = "Sediul " + depDepartament;
-                                         depSediuAdresa = rs2.getString("strada") + ", " + 
-                                                         rs2.getString("oras") + ", " + 
-                                                         rs2.getString("judet") + ", " + 
-                                                         rs2.getString("tara");
-                                         depSediuLat = rs2.getDouble("latitudine");
-                                         depSediuLong = rs2.getDouble("longitudine");
-                                         
-                                         // Calculăm distanța dintre cele două locații
-                                         if (userSediuLat != 0 && userSediuLong != 0 && depSediuLat != 0 && depSediuLong != 0) {
-                                             // Convertim din grade în radiani
-                                             double lat1 = Math.toRadians(userSediuLat);
-                                             double lon1 = Math.toRadians(userSediuLong);
-                                             double lat2 = Math.toRadians(depSediuLat);
-                                             double lon2 = Math.toRadians(depSediuLong);
-                                             
-                                             // Formula Haversine
-                                             double dlon = lon2 - lon1;
-                                             double dlat = lat2 - lat1;
-                                             double a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
-                                             double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                                             
-                                             // Raza Pământului în kilometri
-                                             double R = 6371.0;
-                                             distantaKm = Math.round((R * c) * 100.0) / 100.0;
-                                         }
-                                     }
-                                 }
-                             }
-                         } catch (SQLException e) {
-                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
-                             e.printStackTrace();
-                         }
-                         
-                         // Formatăm distanța pentru afișare 
-                         DecimalFormat df = new DecimalFormat("0.00");
-                         String distantaFormatata = df.format(distantaKm);
-%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistent Baza de Date</title>
-     <style>
-        :root {
-            --primary: <%=accent%>;
-            --background: <%=clr%>;
-            --surface: <%=sidebar%>;
-            --text-primary: <%=text%>;
-            --card: <%=card%>;
-            --hover: <%=hover%>;
-            --text-secondary: #64748B;
-            --border: #E2E8F0;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --error: #EF4444;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
+    <title>🤖 Advanced HR AI Assistant</title>
+    <style>
         /* Enhanced styles for advanced features */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background: var(--background);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: var(--text-primary);
         }
 
         .chat-container {
             max-width: 1000px;
             margin: 20px auto;
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-           
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
             backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
         }
 
         .chat-header {
-            background: linear-gradient(45deg, var(--primary), var(--card));
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             padding: 20px;
             text-align: center;
@@ -255,8 +59,7 @@
             height: 500px;
             overflow-y: auto;
             padding: 20px;
-            background: var(--surface);
-            scroll-behavior: smooth;
+            background: #f8f9fa;
         }
 
         .message {
@@ -277,23 +80,23 @@
             max-width: 80%;
             padding: 15px 20px;
             border-radius: 20px;
-            
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .message.user .message-content {
-            background: var(--primary);
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
         }
 
         .message.bot .message-content {
-            background: var(--background);
-            color: var(--primary-text);
-            border: 1px solid var(--primary);
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
         }
 
         .ai-analysis {
-            background: var(--background);
-            border: 1px solid var(--primary);
+            background: #f0f7ff;
+            border: 1px solid #b3d9ff;
             border-radius: 10px;
             padding: 10px;
             margin-top: 10px;
@@ -302,7 +105,7 @@
 
         .ai-analysis-header {
             font-weight: bold;
-            color: white;
+            color: #0066cc;
             margin-bottom: 5px;
             display: flex;
             align-items: center;
@@ -313,14 +116,14 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            background: var(--background);
+            background: white;
             border-radius: 8px;
             overflow: hidden;
-            
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .data-table th {
-            background: var(--primary);
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             padding: 12px;
             text-align: left;
@@ -329,18 +132,17 @@
 
         .data-table td {
             padding: 12px;
-            border-bottom: 1px solid var(--primary);
-            color: var(--text-primary);
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .data-table tr:hover {
-            background: var(--hover);
+            background: #f8f9fa;
         }
 
         .chat-input-container {
             padding: 20px;
-            background: var(--surface);
-            border-top: 1px solid var(--primary);
+            background: white;
+            border-top: 1px solid #e0e0e0;
         }
 
         .chat-input-wrapper {
@@ -352,23 +154,21 @@
         .chat-input {
             flex: 1;
             padding: 15px 20px;
-            border: 2px solid var(--border);
+            border: 2px solid #e0e0e0;
             border-radius: 25px;
             font-size: 16px;
             outline: none;
             transition: all 0.3s ease;
-            background: var(--background);
-            color: var(--text-primary);
         }
 
         .chat-input:focus {
-            border-color: var(--primary);
-            
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .send-button {
             padding: 15px 25px;
-            background: var(--primary);
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
             border: none;
             border-radius: 25px;
@@ -379,8 +179,7 @@
 
         .send-button:hover {
             transform: translateY(-2px);
-            background: black;
-          
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
         .send-button:disabled {
@@ -397,7 +196,7 @@
 
         .typing-indicator .message-content {
             background: white;
-            border: 1px solid var(--primary);
+            border: 1px solid #e0e0e0;
             padding: 15px 20px;
         }
 
@@ -409,7 +208,7 @@
         .typing-dots span {
             width: 8px;
             height: 8px;
-            background: var(--primary);
+            background: #667eea;
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
@@ -440,8 +239,8 @@
 
         .conversation-tools {
             padding: 10px 20px;
-            background: var(--background);
-            border-top: 1px solid var(--border);
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
             display: flex;
             gap: 10px;
             justify-content: center;
@@ -449,55 +248,18 @@
 
         .tool-button {
             padding: 8px 16px;
-            background: var(--surface);
-            border: 1px solid var(--primary);
+            background: white;
+            border: 1px solid #ddd;
             border-radius: 15px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: all 0.3s ease;
-            color: var(--text-primary);
         }
 
         .tool-button:hover {
-            background: var(--primary);
+            background: #667eea;
             color: white;
-            border-color: var(--primary);
-        }
-
-        /* Suggestions styling */
-        .suggestions-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 10px 20px;
-            animation: fadeIn 0.5s;
-        }
-
-        .suggestion-button {
-            background-color: var(--card);
-            border: 1px solid var(--primary);
-            border-radius: 18px;
-            padding: 8px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            color: var(--text-primary);
-        }
-
-        .suggestion-button:hover {
-            background-color: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .suggestion-button:active {
-            transform: translateY(0);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            border-color: #667eea;
         }
 
         @keyframes fadeInUp {
@@ -541,34 +303,32 @@
                 font-size: 0.7rem;
                 padding: 3px 8px;
             }
-
-            .message-content {
-                max-width: 90%;
-            }
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>🤖 Asistent Baza de Date</h1>
+            <h1>🤖 Advanced HR AI Assistant</h1>
             <div class="ai-features">
-                <div class="feature-badge">🇷🇴 Romanian</div>
-                <div class="feature-badge">🧠 Data Base</div>
+                <div class="feature-badge">🇷🇴 RoGPT2</div>
+                <div class="feature-badge">🧠 Romanian BERT</div>
+                <div class="feature-badge">🤖 TensorFlow</div>
+                <div class="feature-badge">💬 Memory</div>
                 <div class="feature-badge">⚡ Real-time</div>
             </div>
             <div class="status-indicator" id="statusIndicator">
                 <div class="status-dot"></div>
-                <span id="statusText">Connecting...</span>
+                <span id="statusText">Online</span>
             </div>
         </div>
 
         <div class="chat-messages" id="chatMessages">
             <div class="message bot">
                 <div class="message-content">
-                    <strong>🤖 Bine ați venit!</strong><br>
-                    Sunt asistentul HR ce face legatura cu baza de date a companiei. 
-                    Pot să vă ajut cu:
+                    <strong>🤖 Bine ai venit!</strong><br>
+                    Sunt asistentul HR avansat cu inteligență artificială românească. 
+                    Pot să te ajut cu:
                     <ul style="margin: 10px 0; padding-left: 20px;">
                         <li>📊 Informații despre angajați și departamente</li>
                         <li>🏖️ Gestionarea concediilor și absențelor</li>
@@ -576,18 +336,14 @@
                         <li>📋 Proiecte și task-uri</li>
                         <li>📄 Adeverințe și documente HR</li>
                     </ul>
-                    <em>Întrebați-mă orice în română! 🧠</em>
+                    <em>Întreabă-mă orice în română! Înțeleg contextul și țin minte conversația. 🧠</em>
                 </div>
             </div>
         </div>
 
-        <div class="suggestions-container" id="suggestionsContainer">
-            <!-- Suggestions will be added here dynamically -->
-        </div>
-
         <div class="typing-indicator" id="typingIndicator">
             <div class="message-content">
-                🤖 Caut...
+                🤖 Procesez cu AI...
                 <div class="typing-dots">
                     <span></span>
                     <span></span>
@@ -597,8 +353,8 @@
         </div>
 
         <div class="conversation-tools">
-            <button class="tool-button" onclick="clearConversation()">🗑️ Ștergeți conversația</button>
-            <button class="tool-button" onclick="exportConversation()">💾 Exportați</button>
+            <button class="tool-button" onclick="clearConversation()">🗑️ Șterge conversația</button>
+            <button class="tool-button" onclick="exportConversation()">💾 Exportă</button>
             <button class="tool-button" onclick="showSuggestions()">💡 Sugestii</button>
         </div>
 
@@ -616,7 +372,7 @@
                     class="send-button" 
                     onclick="sendMessage()"
                 >
-                    🚀 Trimiteți
+                    🚀 Trimite
                 </button>
             </div>
         </div>
@@ -627,88 +383,12 @@
         let conversationHistory = [];
         let isProcessing = false;
 
-        // Flask configuration - FIXED to match chat.jsp
-        const FLASK_CONFIG = {
-            baseUrl: 'http://localhost:5000',
-            queryEndpoint: '/query',  // Changed from /api/chat to /query like chat.jsp
-            healthEndpoint: '/health',
-            timeout: 30000,
-            retryAttempts: 3
-        };
-
-        // Initialize chat - ENHANCED
+        // Initialize chat
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Advanced HR Assistant initialized');
-            console.log('🔗 Flask endpoint:', FLASK_CONFIG.baseUrl + FLASK_CONFIG.queryEndpoint);
-            
             document.getElementById('messageInput').focus();
-            checkFlaskConnection();
-            addDefaultSuggestions();
+            checkSystemStatus();
             loadConversationHistory();
         });
-
-        // FIXED: Flask connection check like chat.jsp
-        function checkFlaskConnection() {
-            fetch(FLASK_CONFIG.baseUrl + FLASK_CONFIG.healthEndpoint, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log('✅ The server is accessible');
-                    updateStatus('Online', '#4CAF50');
-                } else {
-                    console.warn('⚠️ The server responded with error:', response.status);
-                    updateStatus('Server issue', '#FF9800');
-                }
-            })
-            .catch(error => {
-                console.error('❌ Cannot connect to the server:', error);
-                updateStatus('Offline', '#FF5722');
-                
-                // Show connection error message
-                addMessage('❌ Nu pot să mă conectez la server. Verificați dacă aplicația rulează pe portul 5000.', 'bot');
-            });
-        }
-
-        // Helper function to update status
-        function updateStatus(text, color) {
-            const statusText = document.getElementById('statusText');
-            const statusDot = document.querySelector('.status-dot');
-            statusText.textContent = text;
-            statusText.style.color = color;
-            statusDot.style.background = color;
-        }
-
-        // Add default suggestions like chat.jsp
-        function addDefaultSuggestions() {
-            const suggestions = [
-                'Câți angajați sunt în departamentul HR?',
-                'Cine este în concediu astăzi?',
-                'Arată-mi departamentele din firmă',
-                'Care sunt salariile pozițiilor din IT?',
-                'Ce tipuri de poziții există în departamentul HR?',
-                'Proiecte active în prezent',
-                'Adeverințe în așteptare'
-            ];
-            
-            const suggestionsContainer = document.getElementById('suggestionsContainer');
-            suggestionsContainer.innerHTML = '';
-            
-            suggestions.forEach(suggestion => {
-                const button = document.createElement('button');
-                button.className = 'suggestion-button';
-                button.textContent = suggestion;
-                button.addEventListener('click', function() {
-                    document.getElementById('messageInput').value = suggestion;
-                    sendMessage();
-                });
-                
-                suggestionsContainer.appendChild(button);
-            });
-        }
 
         function handleKeyPress(event) {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -717,7 +397,6 @@
             }
         }
 
-        // FIXED: sendMessage function based on chat.jsp
         async function sendMessage() {
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
@@ -736,178 +415,31 @@
             updateSendButton(false);
 
             try {
-                console.log('📤 Sending message to the server:', message);
-                
-                // FIXED: Use the correct Flask endpoint and format like chat.jsp
-                const response = await fetch(FLASK_CONFIG.baseUrl + FLASK_CONFIG.queryEndpoint, {
+                const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        query: message,  // Flask expects 'query' in JSON like chat.jsp
-                        session_id: 'web_session_' + Date.now(),
-                        timestamp: Date.now()
-                    })
+                    body: JSON.stringify({ message: message })
                 });
 
-                console.log('📨 Server response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
-                }
-
                 const result = await response.json();
-                console.log('📊 Server parsed data:', result);
                 
                 // Hide typing indicator
                 hideTypingIndicator();
                 
-                // ENHANCED: Handle different Flask response types like chat.jsp
-                if (result.type === 'success' && result.result) {
-                    const res = result.result;
-                    
-                    if (res.type === 'count_result') {
-                        addMessage(res.message, 'bot');
-                    } else if (res.type === 'top_salaries') {
-                        addMessage(res.message, 'bot');
-                        if (res.data && res.data.length > 0) {
-                            setTimeout(() => {
-                                addTableMessage(res.data, 'bot');
-                            }, 500);
-                        }
-                    } else if (res.type === 'active_leaves') {
-                        addMessage(res.message, 'bot');
-                        if (res.data && res.data.length > 0) {
-                            setTimeout(() => {
-                                addTableMessage(res.data, 'bot');
-                            }, 500);
-                        } else {
-                            addMessage('Nu există angajați în concediu astăzi.', 'bot');
-                        }
-                    } else if (res.data && res.data.length > 0) {
-                        addMessage(res.message || 'Rezultate găsite:', 'bot');
-                        setTimeout(() => {
-                            addTableMessage(res.data, 'bot');
-                        }, 500);
-                    } else {
-                        addMessage(res.message || 'Nu am găsit rezultate.', 'bot');
-                    }
-                    
-                    // Add context suggestions
-                    if (res.message && res.message.length > 10) {
-                        addContextSuggestions(res.message);
-                    }
-                    
-                } else if (result.type === 'text') {
-                    addMessage(result.message, 'bot');
-                    if (result.message && result.message.length > 10) {
-                        addContextSuggestions(result.message);
-                    }
-                } else if (result.type === 'error') {
-                    addMessage(result.message || 'A apărut o eroare neașteptată.', 'bot');
-                    setTimeout(addDefaultSuggestions, 500);
-                } else {
-                    const message = result.message || result.response || JSON.stringify(result);
-                    addMessage(message, 'bot');
-                }
+                // Add bot response
+                addBotResponse(result);
                 
             } catch (error) {
-                console.error('❌ Server fetch error:', error);
-                
+                console.error('Error:', error);
                 hideTypingIndicator();
-                
-                let errorMessage = '❌ Eroare de conexiune cu serverul Flask:\n\n';
-                
-                if (error.message.includes('Failed to fetch')) {
-                    errorMessage += '🔍 Nu pot să mă conectez la server =(.\n';
-                    errorMessage += '💡 Verifică că app.py rulează pe http://localhost:5000\n';
-                    errorMessage += '🔧 Și că nu sunt probleme de comunicare.';
-                } else if (error.message.includes('404')) {
-                    errorMessage += '🔍 Endpoint-ul /query nu a fost găsit.\n';
-                    errorMessage += '💡 Verificați faptul că serverul folosește endpoint-ul /query.';
-                } else if (error.message.includes('500')) {
-                    errorMessage += '🔍 Eroare internă în server.\n';
-                    errorMessage += '💡 Verificațu logurile serverului pentru detalii.';
-                } else {
-                    errorMessage += error.message;
-                }
-                
-                addMessage(errorMessage, 'bot');
-                setTimeout(addDefaultSuggestions, 500);
-                
+                addMessage('❌ Eroare de conexiune. Te rog încearcă din nou.', 'bot');
             } finally {
                 isProcessing = false;
                 updateSendButton(true);
                 messageInput.focus();
             }
-        }
-
-        // Add context-aware suggestions based on previous interactions
-        function addContextSuggestions(context) {
-            const contextSuggestions = {
-                'angajați': [
-                    'Câți angajați sunt în total?',
-                    'Care sunt angajații din departamentul IT?',
-                    'Angajații cu cele mai mari salarii'
-                ],
-                'departamente': [
-                    'Care departament are cei mai mulți angajați?',
-                    'Câte departamente avem în firmă?',
-                    'Locațiile departamentelor'
-                ],
-                'concedii': [
-                    'Cine este în concediu astăzi?',
-                    'Concedii planificate pentru luna aceasta',
-                    'Concedii de Crăciun'
-                ],
-                'poziții': [
-                    'Ce tipuri de poziții există?',
-                    'Care sunt pozițiile din IT?',
-                    'Pozițiile cu cele mai mari salarii'
-                ],
-                'salarii': [
-                    'Care este salariul mediu în firmă?',
-                    'Top 5 cele mai mari salarii',
-                    'Salarii pe departamente'
-                ],
-                'proiecte': [
-                    'Câte proiecte active avem?',
-                    'Cine lucrează la proiectele active?',
-                    'Status-ul taskurilor din proiecte'
-                ]
-            };
-            
-            // Find the appropriate context
-            let suggestions = [];
-            for (const [key, value] of Object.entries(contextSuggestions)) {
-                if (context.toLowerCase().includes(key)) {
-                    suggestions = value;
-                    break;
-                }
-            }
-            
-            // If no specific context found, use default suggestions
-            if (suggestions.length === 0) {
-                return;
-            }
-            
-            // Update suggestions
-            const suggestionsContainer = document.getElementById('suggestionsContainer');
-            suggestionsContainer.innerHTML = '';
-            
-            suggestions.forEach(suggestion => {
-                const button = document.createElement('button');
-                button.className = 'suggestion-button';
-                button.textContent = suggestion;
-                button.addEventListener('click', function() {
-                    document.getElementById('messageInput').value = suggestion;
-                    sendMessage();
-                });
-                
-                suggestionsContainer.appendChild(button);
-            });
         }
 
         function addMessage(content, sender) {
@@ -917,181 +449,94 @@
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            contentDiv.innerHTML = formatMessage(content);
+            contentDiv.innerHTML = content;
             
             messageDiv.appendChild(contentDiv);
             chatMessages.appendChild(messageDiv);
-            
-            // Add timestamp
-            const timeElement = document.createElement('div');
-            timeElement.style.fontSize = '12px';
-            timeElement.style.color = sender === 'user' ? 'rgba(255,255,255,0.7)' : '#666';
-            timeElement.style.marginTop = '5px';
-            timeElement.style.textAlign = sender === 'user' ? 'right' : 'left';
-            const now = new Date();
-            timeElement.textContent = now.getHours().toString().padStart(2, '0') + ':' + 
-                                     now.getMinutes().toString().padStart(2, '0');
-            messageDiv.appendChild(timeElement);
-            
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // FIXED: addTableMessage function like chat.jsp
-        function addTableMessage(data, sender) {
-            if (!data || data.length === 0) {
-                addMessage('Nu există date disponibile.', sender);
-                return;
+        function addBotResponse(result) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            
+            let content = `<strong>🤖 ${result.message || 'Răspuns primit'}</strong>`;
+            
+            // Add data table if present
+            if (result.type === 'table' && result.data && result.data.length > 0) {
+                content += createDataTable(result.data);
             }
             
-            console.log('Rendering table with data:', data);
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
+            // Add AI analysis if present
+            if (result.ai_analysis) {
+                content += createAIAnalysis(result.ai_analysis);
+            }
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            contentDiv.style.maxWidth = "95%";
-            contentDiv.style.width = "auto";
-            contentDiv.style.overflowX = "auto";
+            contentDiv.innerHTML = content;
             
-            // Get column names from first row
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function createDataTable(data) {
+            if (!data || data.length === 0) return '';
+            
             const columns = Object.keys(data[0]);
             
-            // Build table HTML
-            let tableHTML = '';
-            tableHTML += '<div style="overflow-x:auto; margin:10px 0;">';
-            tableHTML += '<table class="data-table" style="width:100%; border-collapse:collapse; color:#000; background-color:#fff; border:1px solid #ddd;">';
-            
-            // Create header row
-            tableHTML += '<thead><tr>';
-            columns.forEach(column => {
-                const friendlyName = formatColumnName(column);
-                tableHTML += '<th style="padding:8px; text-align:left; background-color:#667eea; color:white; border:1px solid #ddd;">' + friendlyName + '</th>';
+            let tableHTML = '<table class="data-table"><thead><tr>';
+            columns.forEach(col => {
+                tableHTML += `<th>${col.charAt(0).toUpperCase() + col.slice(1)}</th>`;
             });
-            tableHTML += '</tr></thead>';
+            tableHTML += '</tr></thead><tbody>';
             
-            // Create data rows
-            tableHTML += '<tbody>';
-            data.forEach((row, index) => {
-                const bgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
-                tableHTML += '<tr style="background-color:' + bgColor + ';">';
-                columns.forEach(column => {
-                    let cellValue = row[column] != null ? row[column] : '';
-                    
-                    // Format dates if they look like dates
-                    if (typeof cellValue === 'string' && 
-                        (cellValue.match(/^\d{4}-\d{2}-\d{2}$/) || 
-                         cellValue.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/))) {
-                        cellValue = formatDateString(cellValue);
-                    }
-                    
-                    // Format boolean values
-                    if (cellValue === true) cellValue = 'Da';
-                    if (cellValue === false) cellValue = 'Nu';
-                    
-                    tableHTML += '<td style="padding:8px; border:1px solid #ddd; color:#333;">' + cellValue + '</td>';
+            data.forEach(row => {
+                tableHTML += '<tr>';
+                columns.forEach(col => {
+                    const value = row[col] || '-';
+                    tableHTML += `<td>${value}</td>`;
                 });
                 tableHTML += '</tr>';
             });
-            tableHTML += '</tbody></table></div>';
             
-            contentDiv.innerHTML = tableHTML;
-            
-            // Export button
-            const exportButton = document.createElement('button');
-            exportButton.textContent = 'Export CSV';
-            exportButton.style.backgroundColor = '#667eea';
-            exportButton.style.color = 'white';
-            exportButton.style.border = 'none';
-            exportButton.style.borderRadius = '4px';
-            exportButton.style.padding = '5px 10px';
-            exportButton.style.fontSize = '12px';
-            exportButton.style.cursor = 'pointer';
-            exportButton.style.margin = '5px 0';
-            exportButton.addEventListener('click', function() {
-                exportTableToCSV(data);
-            });
-            
-            contentDiv.appendChild(exportButton);
-            messageDiv.appendChild(contentDiv);
-            
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 100);
+            tableHTML += '</tbody></table>';
+            return tableHTML;
         }
 
-        // Helper functions from chat.jsp
-        function formatColumnName(columnName) {
-            let result = columnName.replace(/_/g, ' ');
-            result = result.replace(/\b\w/g, l => l.toUpperCase());
-            return result;
-        }
-        
-        function formatDateString(dateString) {
-            if (!dateString) return '';
+        function createAIAnalysis(analysis) {
+            let analysisHTML = '<div class="ai-analysis">';
+            analysisHTML += '<div class="ai-analysis-header">🧠 Analiza AI</div>';
             
-            try {
-                const date = new Date(dateString);
-                if (isNaN(date.getTime())) return dateString;
-                
-                return date.toLocaleDateString('ro-RO', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-            } catch (e) {
-                return dateString;
-            }
-        }
-
-        function exportTableToCSV(data) {
-            if (!data || data.length === 0) return;
-            
-            const columns = Object.keys(data[0]);
-            let csvContent = columns.map(formatColumnName).join(',') + '\n';
-            
-            data.forEach(row => {
-                let rowContent = columns.map(column => {
-                    let value = row[column] != null ? row[column] : '';
-                    if (typeof value === 'string' && value.includes(',')) {
-                        return `"${value}"`;
-                    }
-                    return value;
-                }).join(',');
-                
-                csvContent += rowContent + '\n';
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'export_' + new Date().toISOString().slice(0, 10) + '.csv');
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function formatMessage(message) {
-            if (typeof message !== 'string') {
-                return message;
+            if (analysis.category) {
+                analysisHTML += `<div><strong>Categorie:</strong> ${analysis.category}</div>`;
             }
             
-            // Convert URLs to links
-            message = message.replace(
-                /(https?:\/\/[^\s]+)/g,
-                '<a href="$1" target="_blank" style="color: #667eea; text-decoration: underline;">$1</a>'
-            );
+            if (analysis.confidence) {
+                const confidence = Math.round(analysis.confidence * 100);
+                analysisHTML += `<div><strong>Încredere:</strong> ${confidence}%</div>`;
+            }
             
-            // Convert newlines to <br>
-            message = message.replace(/\n/g, '<br>');
+            if (analysis.rogpt2_enhanced) {
+                analysisHTML += '<div><strong>🇷🇴 RoGPT2:</strong> Răspuns îmbunătățit în română</div>';
+            }
             
-            return message;
+            if (analysis.conversation_aware) {
+                analysisHTML += '<div><strong>💬 Context:</strong> Conversație continuă</div>';
+            }
+            
+            if (analysis.sql_explanation) {
+                analysisHTML += `<div><strong>SQL:</strong> ${analysis.sql_explanation}</div>`;
+            }
+            
+            if (analysis.execution_time) {
+                analysisHTML += `<div><strong>Timp execuție:</strong> ${analysis.execution_time}</div>`;
+            }
+            
+            analysisHTML += '</div>';
+            return analysisHTML;
         }
 
         function showTypingIndicator() {
@@ -1107,35 +552,190 @@
         function updateSendButton(enabled) {
             const sendButton = document.getElementById('sendButton');
             sendButton.disabled = !enabled;
-            sendButton.innerHTML = enabled ? '🚀 Trimiteți' : '⏳ Procesez...';
+            sendButton.innerHTML = enabled ? '🚀 Trimite' : '⏳ Procesez...';
         }
 
-        function clearConversation() {
-            if (confirm('Sigur doriți să ștergeți conversația?')) {
-                const chatMessages = document.getElementById('chatMessages');
-                const messages = chatMessages.querySelectorAll('.message');
-                for (let i = 1; i < messages.length; i++) {
-                    messages[i].remove();
+     // 🔧 FIXED: Funcția checkSystemStatus
+        async function checkSystemStatus() {
+            try {
+                console.log('🔍 Checking system status...');
+                
+                // Încearcă mai multe URL-uri
+                const possibleUrls = [
+                    '/health',
+                    'http://localhost:5000/health',
+                    'http://127.0.0.1:5000/health'
+                ];
+                
+                let response = null;
+                let lastError = null;
+                
+                for (const url of possibleUrls) {
+                    try {
+                        console.log(`🔗 Trying: ${url}`);
+                        response = await fetch(url);
+                        if (response.ok) {
+                            console.log(`✅ Success with: ${url}`);
+                            break;
+                        }
+                    } catch (error) {
+                        console.log(`❌ Failed with ${url}:`, error);
+                        lastError = error;
+                        continue;
+                    }
                 }
-                conversationHistory = [];
-                addDefaultSuggestions();
+                
+                if (!response || !response.ok) {
+                    throw lastError || new Error('All URLs failed');
+                }
+                
+                const status = await response.json();
+                console.log('📊 Status received:', status);
+                
+                const statusText = document.getElementById('statusText');
+                const statusDot = document.querySelector('.status-dot');
+                
+                if (status.nlp_processor === 'ready' && status.queryservlet_connected) {
+                    statusText.textContent = 'Online';
+                    statusText.style.color = '#4CAF50';
+                    statusDot.style.background = '#4CAF50';
+                } else if (status.queryservlet_connected) {
+                    statusText.textContent = 'Parțial';
+                    statusText.style.color = '#FF9800';
+                    statusDot.style.background = '#FF9800';
+                } else {
+                    statusText.textContent = 'Parțial';
+                    statusText.style.color = '#FF9800';
+                    statusDot.style.background = '#FF9800';
+                }
+                
+            } catch (error) {
+                console.error('❌ Status check failed:', error);
+                const statusText = document.getElementById('statusText');
+                const statusDot = document.querySelector('.status-dot');
+                statusText.textContent = 'Conectând...';
+                statusText.style.color = '#FF5722';
+                statusDot.style.background = '#FF5722';
             }
         }
 
-        function loadConversationHistory() {
-            // This would load from backend if implemented
-            conversationHistory = [];
+        // 🔧 FIXED: Funcția sendMessage
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+
+            if (!message || isProcessing) {
+                return;
+            }
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            messageInput.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            isProcessing = true;
+            updateSendButton(false);
+
+            try {
+                console.log('📤 Sending message:', message);
+                
+                // Încearcă mai multe URL-uri pentru chat
+                const possibleUrls = [
+                    '/api/chat',
+                    'http://localhost:5000/api/chat',
+                    'http://127.0.0.1:5000/api/chat'
+                ];
+                
+                let response = null;
+                let lastError = null;
+                
+                for (const url of possibleUrls) {
+                    try {
+                        console.log(`🔗 Trying chat URL: ${url}`);
+                        response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ message: message })
+                        });
+                        
+                        if (response.ok) {
+                            console.log(`✅ Chat success with: ${url}`);
+                            break;
+                        }
+                    } catch (error) {
+                        console.log(`❌ Chat failed with ${url}:`, error);
+                        lastError = error;
+                        continue;
+                    }
+                }
+                
+                if (!response || !response.ok) {
+                    throw lastError || new Error('All chat URLs failed');
+                }
+
+                const result = await response.json();
+                console.log('📨 Response received:', result);
+                
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                // Add bot response
+                addBotResponse(result);
+                
+            } catch (error) {
+                console.error('❌ Send message error:', error);
+                hideTypingIndicator();
+                addMessage(`❌ Eroare de conexiune: ${error.message}. Flask rulează pe localhost:5000?`, 'bot');
+            } finally {
+                isProcessing = false;
+                updateSendButton(true);
+                messageInput.focus();
+            }
         }
 
+        async function clearConversation() {
+            if (confirm('Sigur vrei să ștergi conversația?')) {
+                try {
+                    await fetch('/clear-conversation', { method: 'POST' });
+                    
+                    // Clear chat messages except welcome message
+                    const chatMessages = document.getElementById('chatMessages');
+                    const messages = chatMessages.querySelectorAll('.message');
+                    for (let i = 1; i < messages.length; i++) {
+                        messages[i].remove();
+                    }
+                    
+                    conversationHistory = [];
+                    
+                } catch (error) {
+                    console.error('Error clearing conversation:', error);
+                }
+            }
+        }
+
+        async function loadConversationHistory() {
+            try {
+                const response = await fetch('/conversation-history');
+                const data = await response.json();
+                conversationHistory = data.conversation_history || [];
+            } catch (error) {
+                console.error('Error loading conversation history:', error);
+            }
+        }
+
+     // 🔧 FIXED: Escape JavaScript pentru JSP
         function exportConversation() {
             const messages = document.querySelectorAll('.message');
-            let conversation = 'Conversație Asistent Baza de date\n';
+            let conversation = 'Conversație HR AI Assistant\n';
             conversation += '================================\n\n';
             
             messages.forEach(message => {
                 const isUser = message.classList.contains('user');
                 const content = message.querySelector('.message-content').textContent;
-                conversation += (isUser ? 'Tu' : 'BD') + ': ' + content + '\n\n';
+                conversation += (isUser ? 'Tu' : 'AI') + ': ' + content + '\n\n';
             });
             
             const blob = new Blob([conversation], { type: 'text/plain' });
@@ -1143,6 +743,7 @@
             
             const a = document.createElement('a');
             a.href = url;
+            // 🔧 FIXED: Evită EL expression în JavaScript
             const today = new Date();
             const dateStr = today.getFullYear() + '-' + 
                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
@@ -1153,6 +754,7 @@
             URL.revokeObjectURL(url);
         }
         
+        // 🔧 FIXED: Toate funcțiile JavaScript corectate
         function showSuggestions() {
             const suggestions = [
                 "Câți angajați sunt în departamentul IT?",
@@ -1165,56 +767,21 @@
             
             let suggestionsHTML = '<div style="margin-top: 10px;"><strong>💡 Sugestii de întrebări:</strong><br>';
             suggestions.forEach(function(suggestion) {
-                suggestionsHTML += '<div style="margin: 5px 0; padding: 8px; background: #f0f7ff; border: 1px solid #b3d9ff; border-radius: 5px; cursor: pointer;" onclick="setSuggestion(\'' + suggestion.replace(/'/g, "\\'") + '\')">' + suggestion + '</div>';
+                // 🔧 FIXED: Escape single quotes
+                const escapedSuggestion = suggestion.replace(/'/g, "\\'");
+                suggestionsHTML += '<div style="margin: 5px 0; padding: 5px; background: #f0f0f0; border-radius: 5px; cursor: pointer;" onclick="setSuggestion(\'' + escapedSuggestion + '\')">' + suggestion + '</div>';
             });
             suggestionsHTML += '</div>';
             
             addMessage(suggestionsHTML, 'bot');
         }
         
+        // 🔧 NEW: Helper function pentru suggestions
         function setSuggestion(suggestion) {
             document.getElementById('messageInput').value = suggestion;
-            document.getElementById('messageInput').focus();
         }
-
         // Check status periodically
-        setInterval(checkFlaskConnection, 30000); // Every 30 seconds
+        setInterval(checkSystemStatus, 30000); // Every 30 seconds
     </script>
-
-    <%
-                    }
-                }
-            } catch (Exception e) {
-                out.println("<script type='text/javascript'>");
-                out.println("alert('Eroare la baza de date!');");
-                out.println("alert('" + e.getMessage() + "');");
-                out.println("</script>");
-                if (currentUser.getTip() == 1) {
-                    response.sendRedirect("tip1ok.jsp");
-                }
-                if (currentUser.getTip() == 2) {
-                    response.sendRedirect("tip2ok.jsp");
-                }
-                if (currentUser.getTip() == 3) {
-                    response.sendRedirect("sefok.jsp");
-                }
-                if (currentUser.getTip() == 0) {
-                    response.sendRedirect("dashboard.jsp");
-                }
-                e.printStackTrace();
-            }
-        } else {
-            out.println("<script type='text/javascript'>");
-            out.println("alert('Utilizator neconectat!');");
-            out.println("</script>");
-            response.sendRedirect("login.jsp");
-        }
-    } else {
-        out.println("<script type='text/javascript'>");
-        out.println("alert('Nu e nicio sesiune activa!');");
-        out.println("</script>");
-        response.sendRedirect("login.jsp");
-    }
-%>
 </body>
 </html>
