@@ -4,9 +4,77 @@
 <%@ page import="javax.sql.DataSource" %>
 <%@ page import="bean.MyUser" %>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.Date" %>
+<%
 
+//Structura unei pagini este astfel
+//Verificare daca exista sesiune activa, utilizator conectat, 
+//Extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
+//Se mai extrag temele de culoare ale fiecarui utilizator
+//Apoi se incarca pagina in sine
+
+    HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
+        if (currentUser != null) {
+            String username = currentUser.getUsername();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                            "dp.denumire_completa AS denumire FROM useri u " +
+                            "JOIN tipuri t ON u.tip = t.tip " +
+                            "JOIN departament d ON u.id_dep = d.id_dep " +
+                            "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                            "WHERE u.username = ?")) {
+                    preparedStatement.setString(1, username);
+                    ResultSet rs = preparedStatement.executeQuery();
+                    if (rs.next()) {
+                        // extrag date despre userul curent
+                        int id = rs.getInt("id");
+                        int userType = rs.getInt("tip");
+                        int userdep = rs.getInt("id_dep");
+                        String functie = rs.getString("functie");
+                          
+                        // aflu data curenta, tot ca o interogare bd =(
+                        String today = "";
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                               try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      today =  rs2.getString("today");
+                                    }
+                                }
+                            }
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
+                        // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                        String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                        String clr = "#d8d9e1";
+                        String sidebar = "#ECEDFA";
+                        String text = "#333";
+                        String card = "#ECEDFA";
+                        String hover = "#ECEDFA";
+                        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                        } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                        %>
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -22,9 +90,9 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, <%=clr%> 0%, <%=clr%> 100%);
             min-height: 100vh;
-            color: #333;
+            color: <%=text%>;
         }
         
         .container {
@@ -34,31 +102,31 @@
         }
         
         .header {
-            background: rgba(255, 255, 255, 0.95);
+            background: <%=sidebar%>;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+           
             margin-bottom: 30px;
             text-align: center;
         }
         
         .header h1 {
-            color: #667eea;
+            color: <%=accent%>;
             font-size: 2.5em;
             margin-bottom: 10px;
             font-weight: 700;
         }
         
         .header p {
-            color: #666;
+            color: white;
             font-size: 1.1em;
         }
         
         .search-section {
-            background: rgba(255, 255, 255, 0.95);
+            background: <%=sidebar%>;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            
             margin-bottom: 30px;
         }
         
@@ -77,12 +145,12 @@
         .form-group label {
             font-weight: 600;
             margin-bottom: 8px;
-            color: #555;
+            color: <%=text%>;
         }
         
         .form-group input, .form-group select {
             padding: 12px;
-            border: 2px solid #e1e5e9;
+            border: 2px solid <%=clr%>;
             border-radius: 8px;
             font-size: 14px;
             transition: all 0.3s ease;
@@ -90,12 +158,12 @@
         
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: <%=clr%>;
+            
         }
         
         .btn-search {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, <%=accent%> 0%, <%=accent%> 100%);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -108,13 +176,13 @@
         
         .btn-search:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+           
         }
         
         .results-section {
-            background: rgba(255, 255, 255, 0.95);
+            background: <%=clr%>;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            
             overflow: hidden;
         }
         
@@ -126,19 +194,19 @@
         }
         
         .employee-card {
-            background: white;
+            background: <%=sidebar%>;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border: 1px solid #f0f0f0;
+           
+            border: 1px solid <%=sidebar%>;
             transition: all 0.3s ease;
             cursor: pointer;
         }
         
         .employee-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
-            border-color: #667eea;
+           
+            border-color: <%=accent%>;
         }
         
         .employee-header {
@@ -146,14 +214,14 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 2px solid #f8f9fa;
+            border-bottom: 2px solid <%=accent%>;
         }
         
         .employee-avatar {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, <%=accent%> 0%, <%=sidebar%> 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,13 +232,13 @@
         }
         
         .employee-info h3 {
-            color: #333;
+            color: <%=text%>;
             font-size: 1.3em;
             margin-bottom: 5px;
         }
         
         .employee-info .position {
-            color: #667eea;
+            color: <%=accent%>;
             font-weight: 600;
             font-size: 0.9em;
         }
@@ -189,7 +257,7 @@
         
         .detail-label {
             font-size: 0.8em;
-            color: #888;
+            color: white;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -197,7 +265,7 @@
         
         .detail-value {
             font-weight: 600;
-            color: #333;
+            color: <%=text%>;
             margin-top: 2px;
         }
         
@@ -251,7 +319,7 @@
         }
         
         .modal-content {
-            background-color: white;
+            background-color: <%=sidebar%>;
             margin: 2% auto;
             padding: 0;
             border-radius: 15px;
@@ -259,11 +327,11 @@
             max-width: 1200px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+           
         }
         
         .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, <%=accent%> 0%, <%=sidebar%> 100%);
             color: white;
             padding: 25px;
             border-radius: 15px 15px 0 0;
@@ -298,7 +366,7 @@
         
         .tabs {
             display: flex;
-            border-bottom: 2px solid #f0f0f0;
+            border-bottom: 2px solid <%=sidebar%>;
             margin-bottom: 25px;
         }
         
@@ -308,14 +376,14 @@
             border: none;
             cursor: pointer;
             font-weight: 600;
-            color: #666;
+            color: <%=text%>;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
         }
         
         .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            color: <%=accent%>;
+            border-bottom-color: <%=accent%>;
         }
         
         .tab-content {
@@ -334,14 +402,14 @@
         }
         
         .info-card {
-            background: #f8f9fa;
+            background: <%=sidebar%>;
             padding: 20px;
             border-radius: 10px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid <%=accent%>;
         }
         
         .info-card h4 {
-            color: #667eea;
+            color: <%=accent%>;
             margin-bottom: 15px;
             font-size: 1.1em;
         }
@@ -353,11 +421,11 @@
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+           
         }
         
         .history-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, <%=accent%> 0%, <%=sidebar%> 100%);
             color: white;
             padding: 15px;
             text-align: left;
@@ -366,15 +434,15 @@
         
         .history-table td {
             padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid <%=sidebar%>;
         }
         
         .history-table tr:nth-child(even) {
-            background-color: #f8f9fa;
+            background-color: <%=sidebar%>;
         }
         
         .history-table tr:hover {
-            background-color: #e8f0fe;
+            background-color: <%=clr%>;
         }
         
         .timeline {
@@ -389,13 +457,13 @@
             top: 0;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, <%=accent%> 0%, <%=sidebar%> 100%);
         }
         
         .timeline-item {
             position: relative;
             margin-bottom: 20px;
-            background: white;
+            background: <%=sidebar%>;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -408,13 +476,13 @@
             top: 20px;
             width: 12px;
             height: 12px;
-            background: #667eea;
+            background: <%=accent%>;
             border-radius: 50%;
             border: 3px solid white;
         }
         
         .timeline-date {
-            color: #667eea;
+            color: <%=accent%>;
             font-weight: 600;
             font-size: 0.9em;
         }
@@ -426,18 +494,18 @@
         .no-results {
             text-align: center;
             padding: 60px 20px;
-            color: #666;
+            color: <%=text%>;
         }
         
         .no-results h3 {
             margin-bottom: 10px;
-            color: #667eea;
+            color: <%=accent%>;
         }
         
         .loading {
             text-align: center;
             padding: 40px;
-            color: #667eea;
+            color: <%=accent%>;
         }
         
         .error {
@@ -1185,5 +1253,29 @@
 
         console.log(' Sistemul de dosare angajati a fost initializat cu succes!');
     </script>
+      <%
+                    }
+                
+            } catch (Exception e) {
+                out.println("<script type='text/javascript'>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("alert('" + e.getMessage() + "');");
+                out.println("</script>");
+                
+                e.printStackTrace();
+            }
+        } else {
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Utilizator neconectat!');");
+            out.println("</script>");
+            response.sendRedirect("login.jsp");
+        }
+    } else {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
+    }
+%>
 </body>
 </html>
