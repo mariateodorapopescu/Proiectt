@@ -1521,4 +1521,24 @@
     <servlet-name>GetProjectTeamMembersServlet</servlet-name>
     <url-pattern>/GetProjectTeamMembersServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>EmployeeFileServlet</display-name>
+    <servlet-name>EmployeeFileServlet</servlet-name>
+    <servlet-class>Servlet.EmployeeFileServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EmployeeFileServlet</servlet-name>
+    <url-pattern>/EmployeeFileServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>EmployeeDataServlet</display-name>
+    <servlet-name>EmployeeDataServlet</servlet-name>
+    <servlet-class>Servlet.EmployeeDataServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EmployeeDataServlet</servlet-name>
+    <url-pattern>/EmployeeDataServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

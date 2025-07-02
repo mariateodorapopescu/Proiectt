@@ -771,10 +771,10 @@ System.out.println("Tema finală pentru user " + id + ": accent=" + accent + ", 
                        <a style="text-decoration:none; color: white;" href="despr.jsp"> <i class="ri-user-line"></i> </a>
                        
                     </button>
-                     <!-- <button class="quick-btn" title="Profil">
-                       <a style="text-decoration:none; color: white;" href="cvmanagement.jsp"> <i class="ri-user-line"></i> </a>
+                      <button class="quick-btn" title="Profil">
+                       <a style="text-decoration:none; color: white;" href="dosar.jsp"> <i class="ri-user-line"></i> </a>
                        
-                    </button> -->
+                    </button>
                 </div>
             </div>
         </div>

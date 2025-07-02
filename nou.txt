@@ -137,38 +137,6 @@ CREATE TABLE IF NOT EXISTS statusuri2 (
 );
 
 -- -----------------------------------------------------
--- Tabel cicluri
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS cicluri (
-    id INT PRIMARY KEY,
-    semnificatie VARCHAR(12)
-);
-
--- -----------------------------------------------------
--- Tabel limbi
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS limbi (
-    id INT PRIMARY KEY,
-    limba VARCHAR(50)
-);
-
--- -----------------------------------------------------
--- Tabel nivel
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS nivel (
-    id INT PRIMARY KEY,
-    semnificatie VARCHAR(12)
-);
-
--- -----------------------------------------------------
--- Tabel tip_job
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS tip_job (
-    id INT PRIMARY KEY,
-    semnificatie VARCHAR(12)
-);
-
--- -----------------------------------------------------
 -- Tabel tip_adev
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS tip_adev (
@@ -329,18 +297,6 @@ CREATE TABLE IF NOT EXISTS istoric_promovari (
 );
 
 -- -----------------------------------------------------
--- Tabel istoric_concedii_suplimentare
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS istoric_concedii_suplimentare (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_ang INT NOT NULL,
-    zile_acordate INT NOT NULL,
-    motiv VARCHAR(255),
-    data_acordare DATE NOT NULL,
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
-
--- -----------------------------------------------------
 -- Tabel istoric_fluture
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS istoric_fluture (
@@ -351,26 +307,6 @@ CREATE TABLE IF NOT EXISTS istoric_fluture (
     salariu_brut DECIMAL(10,2) NOT NULL,
     salariu_net DECIMAL(10,2) NOT NULL,
     data_generare DATE NOT NULL,
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
-
--- -----------------------------------------------------
--- Tabel experienta
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS experienta (
-    id INT PRIMARY KEY,
-    den_job VARCHAR(50),
-    instit VARCHAR(50),
-    tip INT,
-    id_dep INT,
-    domeniu VARCHAR(50),
-    subdomeniu VARCHAR(50),
-    start DATE,
-    end DATE,
-    descriere VARCHAR(1000),
-    id_ang INT,
-    FOREIGN KEY (tip) REFERENCES tipuri(tip),
-    FOREIGN KEY (id_dep) REFERENCES departament(id_dep),
     FOREIGN KEY (id_ang) REFERENCES useri(id)
 );
 
@@ -390,34 +326,6 @@ CREATE TABLE IF NOT EXISTS tasks (
     FOREIGN KEY (id_prj) REFERENCES proiecte(id),
     FOREIGN KEY (id_ang) REFERENCES useri(id),
     FOREIGN KEY (status) REFERENCES statusuri2(id)
-);
-
--- -----------------------------------------------------
--- Tabel studii
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS studii (
-    id INT PRIMARY KEY,
-    facultate VARCHAR(50),
-    universitate VARCHAR(50),
-    ciclu INT,
-    start DATE,
-    end DATE,
-    id_ang INT,
-    FOREIGN KEY (ciclu) REFERENCES cicluri(id),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
-
--- -----------------------------------------------------
--- Tabel limbi_ang
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS limbi_ang (
-    id INT PRIMARY KEY,
-    id_limba INT,
-    nivel INT,
-    id_ang INT,
-    FOREIGN KEY (id_limba) REFERENCES limbi(id),
-    FOREIGN KEY (nivel) REFERENCES nivel(id),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
 );
 
 -- -----------------------------------------------------
@@ -465,18 +373,6 @@ CREATE TABLE IF NOT EXISTS joburi (
 );
 
 -- -----------------------------------------------------
--- Tabel aplicari
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS aplicari (
-    id INT PRIMARY KEY,
-    job_id INT,
-    data_apl DATE,
-    id_ang INT,
-    FOREIGN KEY (job_id) REFERENCES joburi(id),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
-);
-
--- -----------------------------------------------------
 -- Tabel adeverinte
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS adeverinte (
@@ -491,28 +387,6 @@ CREATE TABLE IF NOT EXISTS adeverinte (
     FOREIGN KEY (tip) REFERENCES tip_adev(id),
     FOREIGN KEY (id_ang) REFERENCES useri(id),
     FOREIGN KEY (status) REFERENCES statusuri(status)
-);
-
--- -----------------------------------------------------
--- Tabel proiecte2
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS proiecte2 (
-    id INT PRIMARY KEY,
-    nume VARCHAR(50),
-    descriere VARCHAR(255),
-    start DATE,
-    end DATE
-);
-
--- -----------------------------------------------------
--- Tabel cv
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS cv (
-    id INT PRIMARY KEY,
-    id_ang INT,
-    calitati VARCHAR(255),
-    interese VARCHAR(255),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
 );
 
 -- -----------------------------------------------------
@@ -637,36 +511,6 @@ CREATE TABLE IF NOT EXISTS denumiri_pozitii (
 );
 
 -- -----------------------------------------------------
--- Tabel restrictii
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS restrictii (
-  tip INT NOT NULL,
-  decl_dep INT NULL DEFAULT NULL,
-  modif_d INT NULL DEFAULT NULL,
-  del_d INT NULL DEFAULT NULL,
-  decl_usr INT NULL DEFAULT NULL,
-  modif_u INT NULL DEFAULT NULL,
-  del_u INT NULL DEFAULT NULL,
-  auth INT NULL DEFAULT NULL,
-  viz_d INT NULL DEFAULT NULL,
-  introd_c INT NULL DEFAULT NULL,
-  modif_c INT NULL DEFAULT NULL,
-  del_c INT NULL DEFAULT NULL,
-  viz_c_t_an INT NULL DEFAULT NULL,
-  viz_c_t_per INT NULL DEFAULT NULL,
-  viz_c_d_an INT NULL DEFAULT NULL,
-  viz_c_d_per INT NULL DEFAULT NULL,
-  viz_c_a_an INT NULL DEFAULT NULL,
-  viz_c_a_per INT NULL DEFAULT NULL,
-  viz_a_t INT NULL DEFAULT NULL,
-  viz_a_d INT NULL DEFAULT NULL,
-  raport INT NULL DEFAULT NULL,
-  asoc_tip INT NULL DEFAULT NULL,
-  asoc_dep INT NULL DEFAULT NULL,
-  PRIMARY KEY (tip)
-);
-
--- -----------------------------------------------------
 -- Tabel membrii_echipe
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS membrii_echipe (
@@ -695,41 +539,6 @@ CREATE TABLE IF NOT EXISTS libere (
 );
 
 -- -----------------------------------------------------
--- Tabel angajati
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS angajati (
-  id INT NOT NULL,
-  age INT NOT NULL,
-  first VARCHAR(255) NULL DEFAULT NULL,
-  last VARCHAR(255) NULL DEFAULT NULL
-);
-
--- -----------------------------------------------------
--- Tabel colors
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS colors (
-  culoare VARCHAR(25) NOT NULL,
-  cod VARCHAR(25) NOT NULL,
-  PRIMARY KEY (culoare)
-);
-
--- -----------------------------------------------------
--- Tabel data
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS data (
-  id INT NOT NULL AUTO_INCREMENT,
-  image LONGBLOB NOT NULL,
-  PRIMARY KEY (id)
-);
-
--- -----------------------------------------------------
--- Tabel date_logs
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS date_logs (
-  date_checked DATE NULL DEFAULT NULL
-);
-
--- -----------------------------------------------------
 -- Tabel cereri_demisie
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS cereri_demisie (
@@ -742,123 +551,532 @@ CREATE TABLE IF NOT EXISTS cereri_demisie (
     data_procesare DATE,
     FOREIGN KEY (id_ang) REFERENCES useri(id)
 );
-
--- -----------------------------------------------------
--- Tabel notificari_general
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS notificari_general (
+CREATE TABLE IF NOT EXISTS log_activitati_simple (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    id_destinatar INT NOT NULL,
-    tip VARCHAR(50) NOT NULL,
-    mesaj TEXT NOT NULL,
-    citit BOOLEAN DEFAULT FALSE,
-    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_destinatar) REFERENCES useri(id)
-);
-
-CREATE TABLE interviuri (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aplicare_id INT NOT NULL,
-    data_interviu DATE NOT NULL,
-    ora_interviu TIME NOT NULL,
-    locatie VARCHAR(255),
-    comentarii TEXT,
-    status VARCHAR(50) DEFAULT 'PROGRAMAT',
-    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (aplicare_id) REFERENCES aplicari(id)
-);
-
--- Tabel prezență
-CREATE TABLE prezenta (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_ang INT NOT NULL,
-    data DATE NOT NULL,
-    ora TIME NOT NULL,
-    comentariu VARCHAR(500),
-    FOREIGN KEY (id_ang) REFERENCES useri(id),
-    UNIQUE KEY uq_ang_data (id_ang, data)
-);
-
--- Tabel tipuri evenimente
-CREATE TABLE tipuri_evenimente (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    denumire VARCHAR(50) NOT NULL
-);
-
--- Tabel evenimente
-CREATE TABLE evenimente (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nume VARCHAR(255) NOT NULL,
-    tip INT NOT NULL,
-    data_start DATE NOT NULL,
-    ora_start TIME NOT NULL,
-    data_end DATE,
-    ora_end TIME,
-    locuri_max INT NOT NULL DEFAULT 30,
-    descriere TEXT,
-    locatie VARCHAR(255),
-    FOREIGN KEY (tip) REFERENCES tipuri_evenimente(id)
-);
-
--- Tabel participanți evenimente
-CREATE TABLE participanti_evenimente (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_event INT NOT NULL,
-    id_ang INT NOT NULL,
-    data_inscriere TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    prezent BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (id_event) REFERENCES evenimente(id),
-    FOREIGN KEY (id_ang) REFERENCES useri(id),
-    UNIQUE KEY uq_event_ang (id_event, id_ang)
-);
-
--- Tabel notificări task
-CREATE TABLE notificari_task (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_task INT NOT NULL,
-    id_ang INT NOT NULL,
-    tip_notificare VARCHAR(50) NOT NULL,
-    mesaj TEXT,
-    citit BOOLEAN DEFAULT FALSE,
-    data_creare TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_task) REFERENCES tasks(id),
-    FOREIGN KEY (id_ang) REFERENCES useri(id)
+    id_user INT,                               -- Cine a făcut acțiunea (din useri.id)
+    id_target INT,                             -- Asupra cui s-a făcut (din useri.id) 
+    actiune VARCHAR(50) NOT NULL,              -- Tip acțiune: 'VIEW', 'EDIT', 'PROMOTE', etc.
+    descriere TEXT,                            -- Descriere liberă
+    tabel_afectat VARCHAR(50),                 -- Ce tabel a fost afectat
+    data_actiune TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45),                    -- IP-ul utilizatorului
+    
+    -- Foreign keys către tabelul existent
+    FOREIGN KEY (id_user) REFERENCES useri(id) ON DELETE SET NULL,
+    FOREIGN KEY (id_target) REFERENCES useri(id) ON DELETE SET NULL,
+    
+    -- Indexuri pentru performanță
+    INDEX idx_user (id_user),
+    INDEX idx_target (id_target),
+    INDEX idx_actiune (actiune),
+    INDEX idx_data (data_actiune)
 );
 
 -- -----------------------------------------------------
--- Tabel testt
+-- VIEW-URI PENTRU DOSARUL COMPLET (folosind tabelele existente)
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS testt (
-  id INT NOT NULL,
-  first_name VARCHAR(25) NULL DEFAULT NULL,
-  last_name VARCHAR(25) NULL DEFAULT NULL,
-  username VARCHAR(25) NULL DEFAULT NULL,
-  password VARCHAR(25) NULL DEFAULT NULL,
-  address VARCHAR(45) NULL DEFAULT NULL,
-  contact VARCHAR(25) NULL DEFAULT NULL,
-  PRIMARY KEY (id)
-);
+
+-- View pentru dosarul complet al angajatului
+CREATE OR REPLACE VIEW v_dosar_angajat_complet AS
+SELECT 
+    u.id,
+    u.nume,
+    u.prenume,
+    CONCAT(u.nume, ' ', u.prenume) as nume_complet,
+    u.email,
+    u.telefon,
+    u.cnp,
+    u.data_nasterii,
+    u.data_ang,
+    u.data_modif,
+    u.activ,
+    u.zilecons,
+    u.conluate,
+    u.zileramase,
+    u.conramase,
+    
+    -- Informații departament și poziție
+    d.nume_dep as departament,
+    t.denumire as pozitie,
+    t.salariu as salariu_baza,
+    t.ierarhie,
+    t.descriere as descriere_pozitie,
+    
+    -- Sporuri active (folosind tabelul existent istoric_sporuri)
+    (SELECT GROUP_CONCAT(DISTINCT CONCAT(ts.denumire, ' (', ts.procent, '%)') SEPARATOR ', ')
+     FROM istoric_sporuri isp 
+     JOIN tipuri_sporuri ts ON isp.tip_spor = ts.id
+     WHERE isp.id_ang = u.id 
+     AND isp.data_start <= CURDATE() 
+     AND isp.data_final >= CURDATE()) as sporuri_active,
+    
+    -- Penalizări active (folosind tabelul existent istoric_penalizari)
+    (SELECT GROUP_CONCAT(DISTINCT CONCAT(tp.denumire, ' (', tp.procent, '%)') SEPARATOR ', ')
+     FROM istoric_penalizari ipe 
+     JOIN tipuri_penalizari tp ON ipe.tip_penalizare = tp.id
+     WHERE ipe.id_ang = u.id 
+     AND ipe.data_start <= CURDATE() 
+     AND ipe.data_final >= CURDATE()) as penalizari_active,
+    
+    -- Total sporuri și penalizări (pentru calcul salariu)
+    COALESCE((SELECT SUM(ts.procent * t.salariu / 100)
+              FROM istoric_sporuri isp 
+              JOIN tipuri_sporuri ts ON isp.tip_spor = ts.id
+              WHERE isp.id_ang = u.id 
+              AND isp.data_start <= CURDATE() 
+              AND isp.data_final >= CURDATE()), 0) as total_sporuri,
+              
+    COALESCE((SELECT SUM(tp.procent * t.salariu / 100)
+              FROM istoric_penalizari ipe 
+              JOIN tipuri_penalizari tp ON ipe.tip_penalizare = tp.id
+              WHERE ipe.id_ang = u.id 
+              AND ipe.data_start <= CURDATE() 
+              AND ipe.data_final >= CURDATE()), 0) as total_penalizari,
+    
+    -- Numărul de promovări (folosind tabelul existent istoric_promovari)
+    (SELECT COUNT(*) 
+     FROM istoric_promovari ip 
+     WHERE ip.id_ang = u.id) as numar_promovari,
+    
+    -- Ultima promovare
+    (SELECT DATE_FORMAT(MAX(ip.data_promovare), '%d.%m.%Y')
+     FROM istoric_promovari ip 
+     WHERE ip.id_ang = u.id) as ultima_promovare,
+    
+    -- Experiența în companie (ani)
+    TIMESTAMPDIFF(YEAR, u.data_ang, CURDATE()) as experienta_ani,
+    
+    -- Zile de concediu consumate anul curent (folosind tabelul existent concedii)
+    (SELECT COALESCE(SUM(DATEDIFF(c.end_c, c.start_c) + 1), 0)
+     FROM concedii c 
+     WHERE c.id_ang = u.id 
+     AND YEAR(c.start_c) = YEAR(CURDATE())
+     AND c.status >= 1) as zile_concediu_consumate_anul_curent,
+     
+    -- Proiecte active (folosind tabelele existente)
+    (SELECT GROUP_CONCAT(DISTINCT p.nume SEPARATOR ', ')
+     FROM proiecte p
+     JOIN echipe e ON p.id = e.id_prj
+     JOIN membrii_echipe me ON e.id = me.id_echipa
+     WHERE me.id_ang = u.id
+     AND p.start <= CURDATE() 
+     AND p.end >= CURDATE()) as proiecte_active,
+     
+    -- Task-uri active (folosind tabelul existent tasks)
+    (SELECT COUNT(*)
+     FROM tasks t
+     WHERE t.id_ang = u.id
+     AND (t.end IS NULL OR t.end >= CURDATE())) as tasks_active,
+     
+    -- Locația (folosind tabelul existent locatii_useri)
+    (SELECT CONCAT(l.strada, ', ', l.oras, ', ', l.judet, ', ', l.tara)
+     FROM locatii_useri l 
+     WHERE l.id_user = u.id 
+     LIMIT 1) as adresa
+
+FROM useri u
+JOIN departament d ON u.id_dep = d.id_dep
+JOIN tipuri t ON u.tip = t.tip
+WHERE u.username != 'test';
 
 -- -----------------------------------------------------
--- Tabel tichete
+-- VIEW pentru statistici departament
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS tichete (
-  id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  subiect VARCHAR(255) NULL DEFAULT NULL,
-  continut VARCHAR(512) NULL DEFAULT NULL,
-  PRIMARY KEY (id)
-) AUTO_INCREMENT = 2;
+CREATE OR REPLACE VIEW v_statistici_departament AS
+SELECT 
+    d.id_dep,
+    d.nume_dep,
+    COUNT(u.id) as total_angajati,
+    COUNT(CASE WHEN u.activ = 1 THEN 1 END) as angajati_activi,
+    AVG(t.salariu) as salariu_mediu,
+    MIN(t.salariu) as salariu_minim,
+    MAX(t.salariu) as salariu_maxim,
+    AVG(TIMESTAMPDIFF(YEAR, u.data_ang, CURDATE())) as vechime_medie,
+    
+    -- Concedii în curs
+    (SELECT COUNT(*)
+     FROM concedii c
+     JOIN useri u2 ON c.id_ang = u2.id
+     WHERE u2.id_dep = d.id_dep
+     AND c.start_c <= CURDATE()
+     AND c.end_c >= CURDATE()
+     AND c.status >= 1) as angajati_in_concediu,
+     
+    -- Promovări anul acesta
+    (SELECT COUNT(*)
+     FROM istoric_promovari ip
+     JOIN useri u3 ON ip.id_ang = u3.id
+     WHERE u3.id_dep = d.id_dep
+     AND YEAR(ip.data_promovare) = YEAR(CURDATE())) as promovari_anul_curent
+     
+FROM departament d
+LEFT JOIN useri u ON d.id_dep = u.id_dep AND u.username != 'test'
+LEFT JOIN tipuri t ON u.tip = t.tip
+GROUP BY d.id_dep, d.nume_dep;
 
 -- -----------------------------------------------------
--- Tabel users
+-- PROCEDURĂ pentru audit trail simplu
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS users (
-  id INT NOT NULL AUTO_INCREMENT,
-  first_name VARCHAR(45) NULL DEFAULT NULL,
-  last_name VARCHAR(45) NULL DEFAULT NULL,
-  photo MEDIUMBLOB NULL DEFAULT NULL,
-  PRIMARY KEY (id)
-);
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_log_activitate$$
+CREATE PROCEDURE sp_log_activitate(
+    IN p_id_user INT,
+    IN p_id_target INT,
+    IN p_actiune VARCHAR(50),
+    IN p_descriere TEXT,
+    IN p_tabel VARCHAR(50),
+    IN p_ip VARCHAR(45)
+)
+BEGIN
+    INSERT INTO log_activitati_simple (
+        id_user, id_target, actiune, descriere, tabel_afectat, ip_address
+    ) VALUES (
+        p_id_user, p_id_target, p_actiune, p_descriere, p_tabel, p_ip
+    );
+END$$
+
+-- -----------------------------------------------------
+-- PROCEDURĂ pentru generarea raportului complet al angajatului
+-- -----------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_genereaza_dosar_angajat_complet$$
+CREATE PROCEDURE sp_genereaza_dosar_angajat_complet(
+    IN p_id_angajat INT
+)
+BEGIN
+    -- Declaram handlerul pentru erori
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- Log activitatea de vizualizare dosar
+    CALL sp_log_activitate(
+        COALESCE(@current_user_id, 1), 
+        p_id_angajat, 
+        'VIEW_DOSSIER',
+        CONCAT('Vizualizare dosar complet angajat ID: ', p_id_angajat),
+        'useri',
+        COALESCE(@current_user_ip, '127.0.0.1')
+    );
+    
+    -- 1. Informații generale din view-ul principal
+    SELECT 'INFORMATII_GENERALE' as sectiune;
+    SELECT * FROM v_dosar_angajat_complet WHERE id = p_id_angajat;
+    
+    -- 2. Istoric promovări (din tabelul existent)
+    SELECT 'ISTORIC_PROMOVARI' as sectiune;
+    SELECT 
+        ip.data_promovare,
+        t1.denumire as pozitie_veche,
+        t1.salariu as salariu_vechi,
+        t2.denumire as pozitie_noua,
+        t2.salariu as salariu_nou,
+        ip.tip_promovare,
+        (t2.salariu - t1.salariu) as diferenta_salariu
+    FROM istoric_promovari ip
+    JOIN tipuri t1 ON ip.tip_vechi = t1.tip
+    JOIN tipuri t2 ON ip.tip_nou = t2.tip
+    WHERE ip.id_ang = p_id_angajat
+    ORDER BY ip.data_promovare DESC;
+    
+    -- 3. Istoric sporuri (din tabelul existent)
+    SELECT 'ISTORIC_SPORURI' as sectiune;
+    SELECT 
+        ts.denumire as tip_spor,
+        ts.procent,
+        isp.data_start,
+        isp.data_final,
+        isp.motiv,
+        isp.data_creare,
+        CASE 
+            WHEN isp.data_start <= CURDATE() AND isp.data_final >= CURDATE() 
+            THEN 'ACTIV' 
+            ELSE 'EXPIRAT' 
+        END as status
+    FROM istoric_sporuri isp
+    JOIN tipuri_sporuri ts ON isp.tip_spor = ts.id
+    WHERE isp.id_ang = p_id_angajat
+    ORDER BY isp.data_start DESC;
+    
+    -- 4. Istoric penalizări (din tabelul existent)
+    SELECT 'ISTORIC_PENALIZARI' as sectiune;
+    SELECT 
+        tp.denumire as tip_penalizare,
+        tp.procent,
+        ipe.data_start,
+        ipe.data_final,
+        ipe.motiv,
+        ipe.data_creare,
+        CASE 
+            WHEN ipe.data_start <= CURDATE() AND ipe.data_final >= CURDATE() 
+            THEN 'ACTIV' 
+            ELSE 'EXPIRAT' 
+        END as status
+    FROM istoric_penalizari ipe
+    JOIN tipuri_penalizari tp ON ipe.tip_penalizare = tp.id
+    WHERE ipe.id_ang = p_id_angajat
+    ORDER BY ipe.data_start DESC;
+    
+    -- 5. Istoric concedii (din tabelul existent)
+    SELECT 'ISTORIC_CONCEDII' as sectiune;
+    SELECT 
+        tc.motiv as tip_concediu,
+        tc.nr_zile as zile_standard,
+        c.start_c,
+        c.end_c,
+        DATEDIFF(c.end_c, c.start_c) + 1 as zile_efective,
+        s.nume_status as status,
+        c.motiv as motiv_specific,
+        c.locatie,
+        c.added as data_cerere,
+        c.modified as data_ultima_modificare
+    FROM concedii c
+    JOIN tipcon tc ON c.tip = tc.tip
+    JOIN statusuri s ON c.status = s.status
+    WHERE c.id_ang = p_id_angajat
+    ORDER BY c.start_c DESC;
+    
+    -- 6. Proiecte și echipe (din tabelele existente)
+    SELECT 'PROIECTE_ECHIPE' as sectiune;
+    SELECT 
+        p.nume as nume_proiect,
+        p.descriere as descriere_proiect,
+        p.start as data_start_proiect,
+        p.end as data_end_proiect,
+        e.nume as nume_echipa,
+        CONCAT(supervizor.nume, ' ', supervizor.prenume) as supervizor_echipa,
+        CASE 
+            WHEN p.start <= CURDATE() AND p.end >= CURDATE() 
+            THEN 'ACTIV' 
+            WHEN p.end < CURDATE() 
+            THEN 'FINALIZAT'
+            ELSE 'VIITOR'
+        END as status_proiect
+    FROM membrii_echipe me
+    JOIN echipe e ON me.id_echipa = e.id
+    JOIN proiecte p ON e.id_prj = p.id
+    LEFT JOIN useri supervizor ON e.supervizor = supervizor.id
+    WHERE me.id_ang = p_id_angajat
+    ORDER BY p.start DESC;
+    
+    -- 7. Task-uri asignate (din tabelul existent)
+    SELECT 'TASKS_ASIGNATE' as sectiune;
+    SELECT 
+        t.nume as nume_task,
+        t.start as data_start,
+        t.end as data_deadline,
+        s2.procent as progres,
+        p.nume as nume_proiect,
+        CONCAT(supervizor.nume, ' ', supervizor.prenume) as supervizor,
+        CASE 
+            WHEN t.end IS NULL THEN 'FARA_DEADLINE'
+            WHEN t.end < CURDATE() AND s2.procent < 100 THEN 'INTARZIAT'
+            WHEN s2.procent = 100 THEN 'COMPLETAT'
+            ELSE 'IN_PROGRES'
+        END as status_task
+    FROM tasks t
+    LEFT JOIN statusuri2 s2 ON t.status = s2.id
+    LEFT JOIN proiecte p ON t.id_prj = p.id
+    LEFT JOIN useri supervizor ON t.supervizor = supervizor.id
+    WHERE t.id_ang = p_id_angajat
+    ORDER BY t.start DESC;
+    
+    -- 8. Studii și calificări (din tabelul existent)
+    SELECT 'STUDII_CALIFICARI' as sectiune;
+    SELECT 
+        s.facultate,
+        s.universitate,
+        c.semnificatie as nivel_studii,
+        s.start as data_start,
+        s.end as data_absolvire,
+        TIMESTAMPDIFF(YEAR, s.start, s.end) as durata_ani
+    FROM studii s
+    JOIN cicluri c ON s.ciclu = c.id
+    WHERE s.id_ang = p_id_angajat
+    ORDER BY s.start DESC;
+    
+    -- 9. Competențe lingvistice (din tabelele existente)
+    SELECT 'COMPETENTE_LINGVISTICE' as sectiune;
+    SELECT 
+        l.limba,
+        n.semnificatie as nivel
+    FROM limbi_ang la
+    JOIN limbi l ON la.id_limba = l.id
+    JOIN nivel n ON la.id_nivel = n.id
+    WHERE la.id_ang = p_id_angajat
+    ORDER BY l.limba;
+    
+    -- 10. Istoric fluture salarial (din tabelul existent)
+    SELECT 'ISTORIC_SALARIAL' as sectiune;
+    SELECT 
+        hf.luna,
+        hf.an,
+        hf.salariu_brut,
+        hf.salariu_net,
+        hf.data_generare,
+        CONCAT(hf.luna, '/', hf.an) as perioada
+    FROM istoric_fluture hf
+    WHERE hf.id_ang = p_id_angajat
+    ORDER BY hf.an DESC, hf.luna DESC
+    LIMIT 24; -- Ultimele 24 luni
+    
+    -- 11. Log activități recente (din noua tabelă minimală)
+    SELECT 'LOG_ACTIVITATI' as sectiune;
+    SELECT 
+        las.actiune,
+        las.descriere,
+        las.tabel_afectat,
+        las.data_actiune,
+        CONCAT(u.nume, ' ', u.prenume) as executat_de,
+        las.ip_address
+    FROM log_activitati_simple las
+    LEFT JOIN useri u ON las.id_user = u.id
+    WHERE las.id_target = p_id_angajat OR las.id_user = p_id_angajat
+    ORDER BY las.data_actiune DESC
+    LIMIT 50;
+    
+    COMMIT;
+    
+    -- Returnează și un mesaj de succes
+    SELECT CONCAT('Dosar generat cu succes pentru angajatul cu ID: ', p_id_angajat) as mesaj_succes;
+END$
+
+-- -----------------------------------------------------
+-- PROCEDURĂ pentru promovarea unui angajat (folosește tabelele existente)
+-- -----------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_promoveaza_angajat_complet$
+CREATE PROCEDURE sp_promoveaza_angajat_complet(
+    IN p_id_angajat INT,
+    IN p_tip_nou INT,
+    IN p_tip_promovare VARCHAR(50),
+    IN p_data_promovare DATE,
+    IN p_user_id INT,
+    IN p_motiv TEXT
+)
+BEGIN
+    DECLARE v_tip_vechi INT;
+    DECLARE v_nume_angajat VARCHAR(91);
+    DECLARE v_salariu_vechi INT;
+    DECLARE v_salariu_nou INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- Obține tipul actual și numele angajatului
+    SELECT u.tip, CONCAT(u.nume, ' ', u.prenume), t.salariu
+    INTO v_tip_vechi, v_nume_angajat, v_salariu_vechi
+    FROM useri u
+    JOIN tipuri t ON u.tip = t.tip
+    WHERE u.id = p_id_angajat;
+    
+    -- Obține salariul pentru noua poziție
+    SELECT salariu INTO v_salariu_nou FROM tipuri WHERE tip = p_tip_nou;
+    
+    -- Setează utilizatorul curent pentru logging
+    SET @current_user_id = p_user_id;
+    
+    -- Actualizează tipul angajatului în tabelul existent
+    UPDATE useri 
+    SET tip = p_tip_nou, data_modif = CURDATE()
+    WHERE id = p_id_angajat;
+    
+    -- Adaugă înregistrarea în tabelul existent istoric_promovari
+    INSERT INTO istoric_promovari (
+        id_ang, tip_vechi, tip_nou, tip_promovare, data_promovare
+    ) VALUES (
+        p_id_angajat, v_tip_vechi, p_tip_nou, p_tip_promovare, p_data_promovare
+    );
+    
+    -- Log în noua tabelă de audit
+    CALL sp_log_activitate(
+        p_user_id,
+        p_id_angajat,
+        'PROMOTE',
+        CONCAT('Promovare: ', v_nume_angajat, ' de la ', 
+               (SELECT denumire FROM tipuri WHERE tip = v_tip_vechi),
+               ' (', v_salariu_vechi, ' RON) la ',
+               (SELECT denumire FROM tipuri WHERE tip = p_tip_nou),
+               ' (', v_salariu_nou, ' RON). Motiv: ', COALESCE(p_motiv, 'N/A')),
+        'useri,istoric_promovari',
+        COALESCE(@current_user_ip, '127.0.0.1')
+    );
+    
+    COMMIT;
+    
+    SELECT CONCAT('Angajatul ', v_nume_angajat, ' a fost promovat cu succes de la ', 
+                  (SELECT denumire FROM tipuri WHERE tip = v_tip_vechi), ' la ',
+                  (SELECT denumire FROM tipuri WHERE tip = p_tip_nou), '!') as mesaj;
+END$
+
+-- -----------------------------------------------------
+-- PROCEDURĂ pentru calculul salariului cu sporuri/penalizări
+-- -----------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_calculeaza_salariu_net$
+CREATE PROCEDURE sp_calculeaza_salariu_net(
+    IN p_id_angajat INT,
+    IN p_data_calcul DATE
+)
+BEGIN
+    DECLARE v_salariu_baza DECIMAL(10,2);
+    DECLARE v_total_sporuri DECIMAL(10,2) DEFAULT 0;
+    DECLARE v_total_penalizari DECIMAL(10,2) DEFAULT 0;
+    DECLARE v_salariu_brut DECIMAL(10,2);
+    DECLARE v_salariu_net DECIMAL(10,2);
+    
+    -- Obține salariul de bază din tabelul existent
+    SELECT t.salariu INTO v_salariu_baza
+    FROM useri u
+    JOIN tipuri t ON u.tip = t.tip
+    WHERE u.id = p_id_angajat;
+    
+    -- Calculează sporurile active pentru data specificată
+    SELECT COALESCE(SUM(ts.procent * v_salariu_baza / 100), 0) INTO v_total_sporuri
+    FROM istoric_sporuri isp
+    JOIN tipuri_sporuri ts ON isp.tip_spor = ts.id
+    WHERE isp.id_ang = p_id_angajat
+    AND p_data_calcul BETWEEN isp.data_start AND isp.data_final;
+    
+    -- Calculează penalizările active pentru data specificată
+    SELECT COALESCE(SUM(tp.procent * v_salariu_baza / 100), 0) INTO v_total_penalizari
+    FROM istoric_penalizari ipe
+    JOIN tipuri_penalizari tp ON ipe.tip_penalizare = tp.id
+    WHERE ipe.id_ang = p_id_angajat
+    AND p_data_calcul BETWEEN ipe.data_start AND ipe.data_final;
+    
+    -- Calculează salariul brut și net
+    SET v_salariu_brut = v_salariu_baza + v_total_sporuri - v_total_penalizari;
+    SET v_salariu_net = v_salariu_brut * 0.585; -- Aproximativ după taxe (simplificat)
+    
+    -- Returnează rezultatul
+    SELECT 
+        p_id_angajat as id_angajat,
+        p_data_calcul as data_calcul,
+        v_salariu_baza as salariu_baza,
+        v_total_sporuri as total_sporuri,
+        v_total_penalizari as total_penalizari,
+        v_salariu_brut as salariu_brut,
+        v_salariu_net as salariu_net,
+        ROUND((v_total_sporuri / v_salariu_baza) * 100, 2) as procent_sporuri,
+        ROUND((v_total_penalizari / v_salariu_baza) * 100, 2) as procent_penalizari;
+END$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- INSERARE DATE TEST în tabelul de log (opțional)
+-- -----------------------------------------------------
+INSERT INTO log_activitati_simple (id_user, id_target, actiune, descriere, tabel_afectat, ip_address) VALUES
+(1, NULL, 'SYSTEM_START', 'Sistem de dosare angajați inițializat', 'sistem', '127.0.0.1'),
+(1, 1, 'VIEW_DOSSIER', 'Vizualizare dosar angajat Vasile Fabian', 'useri', '192.168.1.100'),
+(1, 6, 'VIEW_DOSSIER', 'Vizualizare dosar angajat Cosmina Capra', 'useri', '192.168.1.100');
 
 -- Reactivează constrângerile FOREIGN KEY
 SET FOREIGN_KEY_CHECKS = 1;
@@ -1664,60 +1882,6 @@ INSERT INTO tasks (id, nume, supervizor, id_ang, start, end, status, id_prj) VAL
 (9, 'Design portal de suport', 15, 5, '2023-05-05', '2023-06-15', 4, 5),
 (10, 'Implementare sistem de tichete', 15, 10, '2023-06-16', '2023-08-31', 2, 5);
 
--- Adăugăm studii pentru angajați
-INSERT INTO studii (id, facultate, universitate, ciclu, start, end, id_ang) VALUES
-(1, 'Facultatea de Management', 'ASE București', 3, '2015-09-01', '2019-07-01', 1),
-(2, 'Facultatea de Resurse Umane', 'Universitatea București', 3, '2019-09-01', '2022-07-01', 2),
-(3, 'Facultatea de Psihologie', 'Universitatea București', 3, '2020-09-01', '2023-07-01', 3),
-(4, 'Facultatea de Drept', 'Universitatea București', 3, '2021-09-01', NULL, 4),
-(5, 'Facultatea de Comunicare', 'SNSPA', 3, '2020-09-01', '2023-07-01', 5),
-(6, 'Facultatea de Finanțe', 'ASE București', 3, '2019-09-01', '2022-07-01', 6),
-(7, 'Facultatea de Contabilitate', 'ASE București', 3, '2014-09-01', '2018-07-01', 7),
-(8, 'Facultatea de Management', 'ASE București', 3, '2021-09-01', NULL, 8),
-(9, 'Facultatea de Finanțe', 'ASE București', 4, '2012-09-01', '2014-07-01', 9),
-(10, 'Facultatea de Marketing', 'ASE București', 3, '2020-09-01', '2023-07-01', 10);
-
--- Adăugăm experiență pentru angajați
-INSERT INTO experienta (id, den_job, instit, tip, id_dep, domeniu, subdomeniu, start, end, descriere, id_ang) VALUES
-(1, 'Manager HR', 'Company ABC', 10, 1, 'HR', 'Management', '2018-01-01', '2019-12-31', 'Coordonarea departamentului de resurse umane', 1),
-(2, 'Asistent HR', 'Company XYZ', 35, 1, 'HR', 'Recrutare', '2022-01-01', '2022-12-31', 'Asistență în procesul de recrutare', 2),
-(3, 'Intern HR', 'Company DEF', 2, 1, 'HR', 'Administrare', '2022-06-01', '2022-09-30', 'Stagiu în departamentul HR', 3),
-(4, 'Asistent Juridic', 'Cabinet Avocatură', 35, 4, 'Juridic', 'Consultanță', '2022-07-01', '2022-12-31', 'Asistență juridică', 4),
-(5, 'Social Media Manager', 'Agency GHI', 26, 5, 'Marketing', 'Social Media', '2021-01-01', '2021-12-31', 'Gestionarea prezenței pe rețelele sociale', 5),
-(6, 'Director Financiar', 'Company JKL', 23, 2, 'Financiar', 'Management', '2018-01-01', '2020-03-31', 'Coordonarea departamentului financiar', 6),
-(7, 'Contabil', 'Company MNO', 33, 2, 'Financiar', 'Contabilitate', '2018-01-01', '2019-10-31', 'Contabilitate primară și avansată', 7),
-(8, 'Intern Finanțe', 'Company PQR', 2, 2, 'Financiar', 'Analiză', '2022-07-01', '2022-09-30', 'Stagiu în departamentul financiar', 8),
-(9, 'Manager Financiar', 'Company STU', 10, 2, 'Financiar', 'Management', '2015-01-01', '2018-05-31', 'Coordonarea echipei financiare', 9),
-(10, 'Specialist Marketing', 'Company VWX', 29, 5, 'Marketing', 'Digital', '2021-01-01', '2021-12-31', 'Marketing digital și analiză', 10);
-
--- Adăugăm limbi pentru angajați
-INSERT INTO limbi_ang (id, id_limba, nivel, id_ang) VALUES
-(1, 1, 6, 1),  -- Română C2 pentru Vasile Fabian
-(2, 2, 5, 1),  -- Engleză C1 pentru Vasile Fabian
-(3, 3, 3, 1),  -- Franceză B1 pentru Vasile Fabian
-(4, 1, 6, 2),  -- Română C2 pentru Popescu Maria
-(5, 2, 4, 2),  -- Engleză B2 pentru Popescu Maria
-(6, 1, 6, 3),  -- Română C2 pentru Girnita Claudia
-(7, 2, 5, 3),  -- Engleză C1 pentru Girnita Claudia
-(8, 4, 2, 3),  -- Germană A2 pentru Girnita Claudia
-(9, 1, 6, 4),  -- Română C2 pentru Costache Irina
-(10, 2, 5, 4), -- Engleză C1 pentru Costache Irina
-(11, 1, 6, 5), -- Română C2 pentru Moise Monica
-(12, 2, 4, 5), -- Engleză B2 pentru Moise Monica
-(13, 5, 3, 5), -- Spaniolă B1 pentru Moise Monica
-(14, 1, 6, 6), -- Română C2 pentru Capra Cosmina
-(15, 2, 5, 6), -- Engleză C1 pentru Capra Cosmina
-(16, 1, 6, 7), -- Română C2 pentru Muedin Emin
-(17, 2, 5, 7), -- Engleză C1 pentru Muedin Emin
-(18, 6, 4, 7), -- Italiană B2 pentru Muedin Emin
-(19, 1, 6, 8), -- Română C2 pentru Rebreanu Andrei
-(20, 2, 3, 8), -- Engleză B1 pentru Rebreanu Andrei
-(21, 1, 6, 9), -- Română C2 pentru Ionescu Lucian
-(22, 2, 6, 9), -- Engleză C2 pentru Ionescu Lucian
-(23, 4, 5, 9), -- Germană C1 pentru Ionescu Lucian
-(24, 1, 6, 10), -- Română C2 pentru Ciucioiu Elena
-(25, 2, 4, 10); -- Engleză B2 pentru Ciucioiu Elena
-
 -- Adăugăm locații pentru joburi
 INSERT INTO locatii_joburi (id_locatie, id_job, strada, longitudine, latitudine, cod, oras, judet, tara) VALUES
 (1, 1, 'Strada Principală nr. 1', 26.1025, 44.4268, '010101', 'București', 'București', 'România'),
@@ -1734,14 +1898,6 @@ INSERT INTO joburi (id, titlu, req, resp, dom, subdom, pozitie, departament, sta
 (4, 'Contabil Junior', 'Studii economice, cunoștințe contabilitate primară', 'Înregistrări contabile, raportări', 'Financiar', 'Contabilitate', 5, 2, '2023-05-01', '2023-06-30', 4, 1, 'contabilitate, financiar, junior', 1, 1, 40, 1),
 (5, 'Tehnician IT', 'Cunoștințe hardware și software, troubleshooting', 'Suport tehnic, mentenanță echipamente', 'IT', 'Suport', 37, 3, '2023-05-01', '2023-06-30', 5, 1, 'IT, suport, hardware, software', 5, 5, 40, 1);
 
--- Adăugăm aplicări pentru joburi
-INSERT INTO aplicari (id, job_id, data_apl, id_ang) VALUES
-(1, 1, '2023-05-10', 2),
-(2, 2, '2023-05-12', 3),
-(3, 3, '2023-05-15', 8),
-(4, 4, '2023-05-18', 10),
-(5, 5, '2023-05-20', 4);
-
 -- Adăugăm adeverințe
 INSERT INTO adeverinte (id, tip, motiv, status, creare, modif, id_ang, pentru_servi) VALUES
 (1, 1, 'Adeverință angajat pentru bancă', 2, '2023-04-01', '2023-04-02', 1, 'Banca Transilvania'),
@@ -1750,21 +1906,13 @@ INSERT INTO adeverinte (id, tip, motiv, status, creare, modif, id_ang, pentru_se
 (4, 15, 'Adeverință venit pentru credit ipotecar', 0, '2023-04-15', NULL, 9, 'ING Bank'),
 (5, 8, 'Adeverință vechime în muncă', 1, '2023-04-20', '2023-04-21', 7, 'Casa de Pensii');
 
--- Adăugăm CV-uri
-INSERT INTO cv (id, id_ang, calitati, interese) VALUES
-(1, 1, 'Leadership, comunicare, organizare', 'Management, dezvoltare personală, călătorii'),
-(2, 2, 'Comunicare, empatie, organizare', 'HR, psihologie, dezvoltare personală'),
-(3, 3, 'Adaptabilitate, lucru în echipă, învățare rapidă', 'Psihologie, arte, voluntariat'),
-(4, 6, 'Analiză, decizie, leadership', 'Investiții, economie, tehnologie'),
-(5, 9, 'Planificare financiară, analiză, comunicare', 'Economie, finanțe, investiții');
-
 -- Adăugăm concedii
 INSERT INTO concedii (id_ang, start_c, end_c, motiv, locatie, status, tip, added, modified, acc_res, mentiuni) VALUES
-(1, '2023-07-01', '2023-07-10', 'Concediu de odihnă', 'Grecia', 2, 1, '2023-04-01', '2023-04-05', '2023-04-05', NULL),
-(2, '2023-07-15', '2023-07-25', 'Concediu de odihnă', 'Italia', 1, 1, '2023-04-05', '2023-04-08', '2023-04-08', NULL),
-(3, '2023-06-01', '2023-06-05', 'Concediu medical', 'Acasă', 2, 3, '2023-05-30', '2023-05-31', '2023-05-31', 'Recomandare medicală'),
-(6, '2023-08-01', '2023-08-15', 'Concediu de odihnă', 'Spania', 0, 1, '2023-05-01', NULL, NULL, NULL),
-(9, '2023-09-01', '2023-09-07', 'Concediu de odihnă', 'Franța', 1, 1, '2023-05-15', '2023-05-20', '2023-05-20', NULL);
+(1, '2025-07-01', '2025-07-10', 'Concediu de odihnă', 'Grecia', 2, 1, '2025-04-01', '2025-04-05', '2025-04-05', NULL),
+(2, '2025-07-15', '2025-07-25', 'Concediu de odihnă', 'Italia', 1, 1, '2025-04-05', '2025-04-08', '2025-04-08', NULL),
+(3, '2025-06-01', '2025-06-05', 'Concediu medical', 'Acasă', 2, 3, '2025-05-30', '2025-05-31', '2025-05-31', 'Recomandare medicală'),
+(6, '2025-08-01', '2025-08-15', 'Concediu de odihnă', 'Spania', 0, 1, '2025-05-01', NULL, NULL, NULL),
+(9, '2025-09-01', '2025-09-07', 'Concediu de odihnă', 'Franța', 1, 1, '2025-05-15', '2025-05-20', '2025-05-20', NULL);
 
 -- Adăugăm locații pentru concedii
 INSERT INTO locatii_concedii (id_concediu, strada, longitudine, latitudine, cod, oras, judet, tara) VALUES
@@ -1797,9 +1945,9 @@ INSERT INTO locatii_useri (id_user, strada, longitudine, latitudine, cod, oras, 
 
 -- Adăugăm istorice de penalizări
 INSERT INTO istoric_penalizari (id_ang, tip_penalizare, data_start, data_final, motiv) VALUES
-(8, 1, '2023-03-01', '2023-05-31', 'Întârzieri repetate la program'),
-(3, 3, '2023-04-01', '2023-06-30', 'Nerespectarea procedurilor interne'),
-(10, 2, '2023-05-15', '2023-08-14', 'Absență nemotivată în data de 15.05.2023');
+(8, 1, '2025-03-01', '2025-05-31', 'Întârzieri repetate la program'),
+(3, 3, '2025-04-01', '2025-06-30', 'Nerespectarea procedurilor interne'),
+(10, 2, '2025-05-15', '2025-08-14', 'Absență nemotivată în data de 15.05.2023');
 
 -- Adăugăm istorice de sporuri
 INSERT INTO istoric_sporuri (id_ang, tip_spor, data_start, data_final, motiv) VALUES
@@ -1819,42 +1967,29 @@ INSERT INTO istoric_promovari (id_ang, tip_vechi, tip_nou, tip_promovare, data_p
 
 -- Adăugăm istoric de concedii suplimentare
 INSERT INTO istoric_concedii_suplimentare (id_ang, zile_acordate, motiv, data_acordare) VALUES
-(1, 5, 'Performanță deosebită în Q1 2023', '2025-04-01'),
+(1, 5, 'Performanță deosebită în Q1 2025', '2025-04-01'),
 (6, 3, 'Finalizare proiect important', '2025-03-15'),
 (9, 4, 'Vechime în companie peste 5 ani', '2025-01-01');
 
 -- Adăugăm istoric fluture (salariu)
 INSERT INTO istoric_fluture (id_ang, luna, an, salariu_brut, salariu_net, data_generare) VALUES
-(1, 1, 2023, 13000.00, 7605.00, '2025-02-01'),
-(1, 2, 2023, 13000.00, 7605.00, '2025-03-01'),
-(1, 3, 2023, 13000.00, 7605.00, '2025-04-01'),
-(1, 4, 2023, 13000.00, 7605.00, '2025-05-01'),
-(6, 1, 2023, 13000.00, 7605.00, '2025-02-01'),
-(6, 2, 2023, 13000.00, 7605.00, '2025-03-01'),
-(6, 3, 2023, 13000.00, 7605.00, '2025-04-01'),
-(6, 4, 2023, 13000.00, 7605.00, '2025-05-01'),
-(9, 1, 2023, 11600.00, 6786.00, '2025-02-01'),
-(9, 2, 2023, 11600.00, 6786.00, '2025-03-01'),
-(9, 3, 2023, 11600.00, 6786.00, '2025-04-01'),
-(9, 4, 2023, 11600.00, 6786.00, '2025-05-01');
+(1, 1, 2025, 13000.00, 7605.00, '2025-02-01'),
+(1, 2, 2025, 13000.00, 7605.00, '2025-03-01'),
+(1, 3, 2025, 13000.00, 7605.00, '2025-04-01'),
+(1, 4, 2025, 13000.00, 7605.00, '2025-05-01'),
+(6, 1, 2025, 13000.00, 7605.00, '2025-02-01'),
+(6, 2, 2025, 13000.00, 7605.00, '2025-03-01'),
+(6, 3, 2025, 13000.00, 7605.00, '2025-04-01'),
+(6, 4, 2025, 13000.00, 7605.00, '2025-05-01'),
+(9, 1, 2025, 11600.00, 6786.00, '2025-02-01'),
+(9, 2, 2025, 11600.00, 6786.00, '2025-03-01'),
+(9, 3, 2025, 11600.00, 6786.00, '2025-04-01'),
+(9, 4, 2025, 11600.00, 6786.00, '2025-05-01');
 
 -- Adăugăm cereri de demisie
 INSERT INTO cereri_demisie (id_ang, motiv, data_cerere, data_ultima_zi, status) VALUES
 (5, 'Ofertă mai bună de la altă companie', '2025-04-15', '2025-05-10', 'IN_ASTEPTARE'),
 (8, 'Relocare în altă țară', '2025-05-01', '2025-04-30', 'APROBATA');
-
--- Adăugăm notificări generale
-INSERT INTO notificari_general (id_destinatar, tip, mesaj, citit) VALUES
-(1, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 0),
-(2, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 1),
-(3, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 0),
-(4, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 1),
-(5, 'INFORMARE', 'Ședință departament HR mâine la ora 10:00', 0),
-(6, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 0),
-(7, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 1),
-(8, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 0),
-(9, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 1),
-(10, 'INFORMARE', 'Raportarea lunară pentru departamentul Financiar este scadentă pe 30.05.2023', 0);
 
 -- Șterge toate datele din denumiri_pozitii
 TRUNCATE TABLE denumiri_pozitii;
@@ -2257,6 +2392,13 @@ select * from useri;
 SELECT id, nume FROM echipe WHERE id_prj = 1;
 SELECT status, COUNT(*) as count FROM concedii join useri on concedii.id_ang = useri.id GROUP by status;
 SELECT SUM(CASE WHEN MONTH(start_c) = 1 THEN durata ELSE 0 END) as ian, SUM(CASE WHEN MONTH(start_c) = 2 THEN durata ELSE 0 END) as feb, SUM(CASE WHEN MONTH(start_c) = 3 THEN durata ELSE 0 END) as mar, SUM(CASE WHEN MONTH(start_c) = 4 THEN durata ELSE 0 END) as apr, SUM(CASE WHEN MONTH(start_c) = 5 THEN durata ELSE 0 END) as mai, SUM(CASE WHEN MONTH(start_c) = 6 THEN durata ELSE 0 END) as iun, SUM(CASE WHEN MONTH(start_c) = 7 THEN durata ELSE 0 END) as iul, SUM(CASE WHEN MONTH(start_c) = 8 THEN durata ELSE 0 END) as aug, SUM(CASE WHEN MONTH(start_c) = 9 THEN durata ELSE 0 END) as sept, SUM(CASE WHEN MONTH(start_c) = 10 THEN durata ELSE 0 END) as oct, SUM(CASE WHEN MONTH(start_c) = 11 THEN durata ELSE 0 END) as nov, SUM(CASE WHEN MONTH(start_c) = 12 THEN durata ELSE 0 END) as decm FROM concedii join useri on concedii.id_ang = useri.id WHERE YEAR(start_c) = YEAR(CURDATE()) AND status >= 0 GROUP BY status;
+SELECT status, COUNT(*) as count FROM concedii join useri on concedii.id_ang = useri.id GROUP BY status;
+SELECT SUM(CASE WHEN MONTH(start_c) = 1 THEN durata ELSE 0 END) as ian, SUM(CASE WHEN MONTH(start_c) = 2 THEN durata ELSE 0 END) as feb, SUM(CASE WHEN MONTH(start_c) = 3 THEN durata ELSE 0 END) as mar, SUM(CASE WHEN MONTH(start_c) = 4 THEN durata ELSE 0 END) as apr, SUM(CASE WHEN MONTH(start_c) = 5 THEN durata ELSE 0 END) as mai, SUM(CASE WHEN MONTH(start_c) = 6 THEN durata ELSE 0 END) as iun FROM concedii JOIN useri ON concedii.id_ang = useri.id WHERE YEAR(start_c) = YEAR(CURDATE()) AND status >= 0 AND useri.id_dep = 1
+;
+select count(*) from concedii c join useri u on u.id = c.id_ang join departament d on d.id_dep = u.id_dep where upper(d.nume_dep) like "%IT%" and (month(c.start_c) = 7 or month(c.end_c) = 7); 
+
 SELECT DISTINCT u.id, u.nume, u.prenume FROM useri u JOIN membrii_echipe me ON u.id = me.id_ang WHERE me.id_echipa IN (" 1 ") ORDER BY u.nume, u.prenume;
 update useri set id_sediu = 1 where id = 1;
 select * from penalizari;
+select * from tipcon;
+SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, CASE WHEN lc.strada IS NOT NULL THEN CONCAT('Str.', lc.strada, ', loc. ', lc.oras, ', jud. ', lc.judet, ', ', lc.tara) ELSE 'Locație nespecificată' END AS locatie, s.nume_status AS status, ct.motiv AS tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip LEFT JOIN locatii_concedii lc ON c.id = lc.id_concediu  WHERE u.id <> 1 AND YEAR(c.start_c) = YEAR(CURDATE())
