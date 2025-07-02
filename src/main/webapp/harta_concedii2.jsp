@@ -248,11 +248,15 @@
             <div></div>
         </div>
         
-        <button id="saveBtn" style="margin-top:15px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" disabled>
+        <button id="saveBtn" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" disabled>
             Salvează această locație
         </button>
         
-        <button style="margin-top:10px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
             <a style="color: white !important;" href="concediinoisef.jsp?pag=1">Înapoi la concedii</a>
         </button>
         

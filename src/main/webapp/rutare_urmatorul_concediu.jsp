@@ -235,19 +235,27 @@
             <div id="nextLeaveInfo"></div>
         </div>
         
-        <button style="display: block; margin-top: 15px; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="locateMeBtn">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" style="display: block; margin-top: 15px; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="locateMeBtn">
             <i class="ri-map-pin-user-line"></i> Localizează-mă
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="generateRouteBtn" disabled>
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="generateRouteBtn" disabled>
             <i class="ri-route-line"></i> Generează rută
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="resetBtn">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button" id="resetBtn">
             <i class="ri-refresh-line"></i> Resetează harta
         </button>
         
-        <button style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" style="display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px; box-shadow: 0 6px 24px <%=accent%>; background:<%=accent%>; color:white;" class="login__button">
             <a style="color: white !important; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">
                 <i class="ri-arrow-left-line"></i> Înapoi
             </a>

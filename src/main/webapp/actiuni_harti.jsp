@@ -396,33 +396,8 @@
                             Un anumit concediu
                         </a>
                     </button>
-                    <button class="action-button">
-                        <a href="ruta_sediu_next_concediu.jsp">
-                            <i class="fa-solid fa-person-walking-luggage"></i>
-                            Cel mai apropiat concediu
-                        </a>
-                    </button>
-                    <button class="action-button">
-                        <a href="sediu_acasa.jsp">
-                            <i class="fa-solid fa-house"></i>
-                           Acasa
-                        </a>
-                    </button>
-                    <% if (isDirector) { %>
-                    <button class="action-button">
-                        <a href="rutare_sediu_dep.jsp">
-                            <i class="fa-solid fa-sitemap"></i>
-                            Sediul unui anumit departament
-                        </a>
-                    </button>
-                    <button class="action-button">
-                         <a href="sediu_sediu.jsp">
-                            <i class="fa-solid fa-building-user"></i>
-                            Un anumit sediu
-                        </a>
-                    </button>
-                    <% } %>
-                </div>
+                   
+                    
             </div>
         </div>
         

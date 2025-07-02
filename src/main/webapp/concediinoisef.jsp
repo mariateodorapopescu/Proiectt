@@ -495,6 +495,18 @@ try {
  	        default: return 'ri-focus-line';
  	    }
  	}
+ 	
+ 	function confirmDelete(concediuId) {
+ 	    if (confirm('Sunteți sigur că doriți să ștergeți această cerere de concediu?')) {
+ 	        // Option 1: Direct redirect to servlet
+ 	        window.location.href = 'delcon?idcon=' + concediuId;
+ 	        
+ 	        // Option 2: Use modal system (uncomment if you prefer modal)
+ 	        // showModal('delcon?idcon=' + concediuId);
+ 	    }
+ 	}
+
+ 	
         document.addEventListener("DOMContentLoaded", function () {
             console.log("🚀 Pagina încărcată, începe request-ul AJAX...");
             const currentUrl = window.location.pathname;
@@ -596,40 +608,59 @@ try {
                             }
                         }
 
-                        // Butoane de modificare/ștergere
-                        if (<%=request.getParameter("pag") != null%>) {
-                            if ((row.Status === "Neaprobat" && (<%=!isSef%> || <%=!isDirector%>)) || 
-                                (row.Status === "Aprobat sef" && (<%=isSef%> || <%=isDirector%> ))) {
-                            	cellsHtml += "<td data-label='Status'>" +
-                                "<span class='status-icon status-neaprobat'>" +
-                                "<a href='NewFile2.jsp?idcon=" + row.id + "' title='Adaugă adresă manuală'>" +
-                                "<i class='ri-edit-circle-line'></i>" +
-                                "</a>" +
-                                "</span>" +
-                                " " + // Spațiu între butoane
-                                "<span class='status-icon status-aprobat-sef'>" +
-                                "<a href='harta_concedii2.jsp?idcon=" + row.id + "' title='Selectează atracție turistică'>" +
-                                "<i class='ri-map-pin-line'></i>" +
-                                "</a>" +
-                                "</span>" +
-                                "</td>";
-                                cellsHtml += "<td data-label='Status'>" +
-                                            "<span class='status-icon status-neaprobat'>" +
-                                            "<a href='modifc2.jsp?idcon=" + row.id + "'>" +
-                                            "<i class='ri-edit-circle-line'></i>" +
-                                            "</a>" +
-                                            "</span>" +
-                                            "</td>";
-                                cellsHtml += "<td data-label='Status'>" +
-                                            "<span class='status-icon status-dezaprobat-director'>" +
-                                            "<a href='delcon?idcon=" + row.id + "'>" +
-                                            "<i class='ri-close-line'></i>" +
-                                            "</a>" +
-                                            "</span>" +
-                                            "</td>";
+                        
+                     // Convert JSP boolean values to JavaScript booleans properly
+                        const isSef = <%= isSef ? "true" : "false" %>;
+                        const isDirector = <%= isDirector ? "true" : "false" %>;
+                        const userType = <%= userType %>;
+
+                        // Fixed conditional logic for showing action buttons
+                        if (<%= request.getParameter("pag") != null ? "true" : "false" %>) {
+                            // Only show action buttons on personal leave page (pag=1)
+                            
+                            // Check if user can modify/delete this leave request
+                            const canModify = (row.Status === "Neaprobat" && (!isSef && !isDirector)) || 
+                                             (row.Status === "Aprobat sef" && (isSef || isDirector));
+                            
+                            if (canModify) {
+                                // Location buttons (manual address and tourist attraction)
+                                cellsHtml += "<td data-label='Localiz'>" +
+                                    "<span class='status-icon status-neaprobat'>" +
+                                    "<a href='NewFile2.jsp?idcon=" + row.id + "' title='Adaugă adresă manuală'>" +
+                                    "<i class='ri-edit-circle-line'></i>" +
+                                    "</a>" +
+                                    "</span>" +
+                                    " " + // Space between buttons
+                                    "<span class='status-icon status-aprobat-sef'>" +
+                                    "<a href='harta_concedii2.jsp?idcon=" + row.id + "' title='Selectează atracție turistică'>" +
+                                    "<i class='ri-map-pin-line'></i>" +
+                                    "</a>" +
+                                    "</span>" +
+                                    "</td>";
+                                    
+                                // Modify button
+                                cellsHtml += "<td data-label='Modif'>" +
+                                    "<span class='status-icon status-neaprobat'>" +
+                                    "<a href='modifc2.jsp?idcon=" + row.id + "'>" +
+                                    "<i class='ri-edit-circle-line'></i>" +
+                                    "</a>" +
+                                    "</span>" +
+                                    "</td>";
+                                    
+                                // Delete button - Use modal for confirmation
+                                cellsHtml += "<td data-label='Stergeti'>" +
+                                    "<span class='status-icon status-dezaprobat-director'>" +
+                                    "<a href='javascript:void(0);' onclick='confirmDelete(" + row.id + ")'>" +
+                                    "<i class='ri-close-line'></i>" +
+                                    "</a>" +
+                                    "</span>" +
+                                    "</td>";
+                            } else {
+                                // Add empty cells if user cannot modify
+                                cellsHtml += "<td>-</td><td>-</td><td>-</td>";
                             }
                         }
-
+                        
                         tr.innerHTML = cellsHtml;
                         tableBody.appendChild(tr);
                     });

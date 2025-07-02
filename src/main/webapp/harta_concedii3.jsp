@@ -109,7 +109,7 @@
             background-color: #3366cc;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            
             color: white;
             font-family: Arial, sans-serif;
         }
@@ -124,7 +124,7 @@
             font-size: 14px;
         }
         .sidebar button {
-            background-color: #0044cc;
+           
             color: white;
             cursor: pointer;
         }
@@ -145,10 +145,16 @@
        
         <label for="locationSelect">Localitatea</label>
         <select id="locationSelect"></select>
-		<button id="locateMeBtn">Localizează-mă</button>
+		<button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="locateMeBtn">Localizează-mă</button>
 		
-		<button id="toggleLayerBtn">Activează layer-ul de atractii turistice</button>
-        <button id="generateRouteBtn">Generează rută</button>
+		<button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="toggleLayerBtn">Activează layer-ul de atractii turistice</button>
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="generateRouteBtn">Generează rută</button>
         
     </div>
 

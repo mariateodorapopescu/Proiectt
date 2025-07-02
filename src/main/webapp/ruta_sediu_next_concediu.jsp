@@ -153,7 +153,7 @@
             color: <%=clr%>;
             border-color: <%=clr%>;
             border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            
             width: 300px;
         }
         
@@ -270,43 +270,46 @@
             </p>
         </div>
         
-        <div id="userSediuDetails" class="details-panel" style="display: none;">
-            <h4>Sediul meu de lucru</h4>
-            <div id="userSediuInfo"></div>
-        </div>
         
-        <div id="depSediuDetails" class="details-panel" style="display: none;">
-            <h4>Sediul departamentului</h4>
-            <div id="distanceBadge" class="badge badge-distance" style="display: none;"></div>
-            <div id="depSediuInfo"></div>
-        </div>
         
         <div class="details-panel">
             <h4>Control Zoom</h4>
             <div style="display: flex; gap: 10px;">
-                <button id="zoomInBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <button id="zoomInBtn" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
                     <i class="ri-zoom-in-line"></i> Zoom In
                 </button>
-                <button id="zoomOutBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <button id="zoomOutBtn" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
                     <i class="ri-zoom-out-line"></i> Zoom Out
                 </button>
             </div>
             <p style="font-size: 12px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
         </div>
         
-        <button id="loadLocationsBtn" class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="loadLocationsBtn" class="login__button">
             <i class="ri-map-pin-2-line"></i> Încarcă locațiile
         </button>
         
-        <button id="generateRouteBtn" class="login__button" disabled>
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="generateRouteBtn" class="login__button" disabled>
             <i class="ri-route-line"></i> Generează rută
         </button>
         
-        <button id="resetBtn" class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="resetBtn" class="login__button">
             <i class="ri-refresh-line"></i> Resetează harta
         </button>
         
-        <button class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button">
             <a style="color: white !important; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">
                 <i class="ri-arrow-left-line"></i> Înapoi
             </a>

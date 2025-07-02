@@ -294,23 +294,33 @@
             <p style="font-size: 12px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
         </div>
         
-        <button id="locateMeBtn" class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"  id="locateMeBtn" class="login__button">
             <i class="ri-map-pin-user-line"></i> Localizează-mă
         </button>
         
-        <button id="findNearestSediuBtn" class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"  id="findNearestSediuBtn" class="login__button">
             <i class="ri-building-2-line"></i> Găsește cel mai apropiat sediu
         </button>
         
-        <button id="generateRouteBtn" class="login__button" disabled>
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"  id="generateRouteBtn" class="login__button" disabled>
             <i class="ri-route-line"></i> Generează rută
         </button>
         
-        <button id="resetBtn" class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"  id="resetBtn" class="login__button">
             <i class="ri-refresh-line"></i> Resetează harta
         </button>
         
-        <button class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>"  class="login__button">
             <a style="color: white !important; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">
                 <i class="ri-arrow-left-line"></i> Înapoi
             </a>
@@ -1026,6 +1036,7 @@
                     });
             }
         });
+        
     </script>
     
     <%

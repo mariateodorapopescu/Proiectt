@@ -441,7 +441,7 @@ public class AddConServlet extends HttpServlet {
 	            PrintWriter out = response.getWriter();
 	            out.println("<script type='text/javascript'>");
 	            out.println("alert('Adaugare cu succes!');");
-	            out.println("window.location.href = 'concediinoisef.jsp?pag=1';");
+	            out.println("window.location.href = 'concediinoisef.jsp?pag=1'");
 	            out.println("</script>");
 	            out.close();
 	            
@@ -475,7 +475,7 @@ public class AddConServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
             out.println("<script type='text/javascript'>");
             out.println("alert('Eroare la adăugarea adeverinței: " + e.getMessage() + "');");
-            out.println("window.location.href = 'addadev.jsp';");
+            out.println("window.location.href = 'actiuni.jsp';");
             out.println("</script>");
             out.close();
         }

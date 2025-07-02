@@ -1,787 +1,1235 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.naming.InitialContext, javax.naming.NamingException" %>
+<%@ page import="javax.sql.DataSource" %>
+<%@ page import="bean.MyUser" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
+<%
+
+//Structura unei pagini este astfel
+//Verificare daca exista sesiune activa, utilizator conectat, 
+//Extragere date despre user, cum ar fi tipul, ca sa se stie ce pagina sa deschida, 
+//Se mai extrag temele de culoare ale fiecarui utilizator
+//Apoi se incarca pagina in sine
+
+    HttpSession sesi = request.getSession(false); // aflu sa vad daca exista o sesiune activa
+    if (sesi != null) {
+        MyUser currentUser = (MyUser) sesi.getAttribute("currentUser"); // daca exista un utilizatoir in sesiune aka daca e cineva logat
+        if (currentUser != null) {
+            String username = currentUser.getUsername();
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student"); // conexiune bd
+                    PreparedStatement preparedStatement = connection.prepareStatement("SELECT DISTINCT u.*, t.denumire AS functie, d.nume_dep, t.ierarhie as ierarhie," +
+                            "dp.denumire_completa AS denumire FROM useri u " +
+                            "JOIN tipuri t ON u.tip = t.tip " +
+                            "JOIN departament d ON u.id_dep = d.id_dep " +
+                            "LEFT JOIN denumiri_pozitii dp ON t.tip = dp.tip_pozitie AND d.id_dep = dp.id_dep " +
+                            "WHERE u.username = ?")) {
+                    preparedStatement.setString(1, username);
+                    ResultSet rs = preparedStatement.executeQuery();
+                    if (rs.next()) {
+                        // extrag date despre userul curent
+                        int id = rs.getInt("id");
+                        int userType = rs.getInt("tip");
+                        int userdep = rs.getInt("id_dep");
+                        String functie = rs.getString("functie");
+                          
+                        // aflu data curenta, tot ca o interogare bd =(
+                        String today = "";
+                         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                            String query = "SELECT DATE_FORMAT(NOW(), '%d/%m/%Y') as today";
+                            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                               try (ResultSet rs2 = stmt.executeQuery()) {
+                                    if (rs2.next()) {
+                                      today =  rs2.getString("today");
+                                    }
+                                }
+                            }
+                        } catch (SQLException e) {
+                            out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                            e.printStackTrace();
+                        }
+                        // acum aflu tematica de culoare ce variaza de la un utilizator la celalalt
+                        String accent = "#10439F"; // mai intai le initializez cu cele implicite/de baza, asta in cazul in care sa zicem ca e o eroare la baza de date
+                        String clr = "#d8d9e1";
+                        String sidebar = "#ECEDFA";
+                        String text = "#333";
+                        String card = "#ECEDFA";
+                        String hover = "#ECEDFA";
+                        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
+                             String query = "SELECT * from teme where id_usr = ?";
+                             try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                                 stmt.setInt(1, id);
+                                 try (ResultSet rs2 = stmt.executeQuery()) {
+                                     if (rs2.next()) {
+                                       accent =  rs2.getString("accent");
+                                       clr =  rs2.getString("clr");
+                                       sidebar =  rs2.getString("sidebar");
+                                       text = rs2.getString("text");
+                                       card =  rs2.getString("card");
+                                       hover = rs2.getString("hover");
+                                     }
+                                 }
+                             }
+                        } catch (SQLException e) {
+                             out.println("<script>alert('Database error: " + e.getMessage() + "');</script>");
+                             e.printStackTrace();
+                         }
+                        %>
 <!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Advanced HR AI Assistant</title>
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="./responsive-login-form-main/assets/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="./responsive-login-form-main/assets/css/stylesheet.css">
+    
+    <!-- =============== JQUERY =============== -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- =============== ANIMATIONS =============== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <style>
-        /* Enhanced styles for advanced features */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .chat-container {
-            max-width: 1000px;
-            margin: 20px auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .chat-header {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        .chat-header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .ai-features {
+        a, a:visited, a:hover, a:active{color:white !important}
+        
+        /* Suggestions styling */
+        .suggestions-container {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
             flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 20px;
+            animation: fadeIn 0.5s;
         }
 
-        .feature-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            backdrop-filter: blur(5px);
+        .suggestion-button {
+            background-color: <%=clr%>;
+            border: 1px solid <%=accent%>;
+            border-radius: 18px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+           color: <%=text%>;
         }
 
+        .suggestion-button:hover {
+            background-color: black;
+            color: white;
+            transform: translateY(-2px);
+           
+        }
+
+        .suggestion-button:active {
+            transform: translateY(0);
+            
+        }
+
+        .input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* Chat container and messages */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        
+        .chat-container {
+            background-color: <%=sidebar%>;
+            border-radius: 10px;
+            
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+        
+        .chat-header {
+            background-color: <%=accent%>;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 22px;
+            border-bottom: 1px solid <%=clr%>;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-status {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
         .chat-messages {
-            height: 500px;
+            flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: #f8f9fa;
+            scroll-behavior: smooth;
         }
-
+        
         .message {
-            margin-bottom: 20px;
-            animation: fadeInUp 0.3s ease;
+            margin-bottom: 15px;
+            max-width: 80%;
+            animation: fadeInUp 0.3s;
+            position: relative;
+        }
+        
+        .user-message {
+            margin-left: auto;
+            background-color: <%=accent%>;
+            color: white;
+            border-radius: 18px 18px 3px 18px;
+            padding: 12px 18px;
+        }
+        
+        .bot-message {
+            margin-right: auto;
+            background-color: <%=clr%>;
+            color: <%=text%>;
+            border-radius: 18px 18px 18px 3px;
+            padding: 12px 18px;        
         }
 
-        .message.user {
+        .message-time {
+            font-size: 12px;
+            color: white;
+            margin-top: 5px;
             text-align: right;
         }
-
-        .message.bot {
-            text-align: left;
+        
+        .bot-typing {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            opacity: 0.8;
         }
-
-        .message-content {
-            display: inline-block;
-            max-width: 80%;
-            padding: 15px 20px;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: <%=accent%>;
+            border-radius: 18px;
         }
-
-        .message.user .message-content {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+        
+        .typing-dot {
+            height: 8px;
+            width: 8px;
+            background-color: <%=accent%>;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.5s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        
+        /* Input area */
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid <%=accent%>;
+            background-color: <%=accent%>;
+            position: relative;
+           
+        }
+        
+        .chat-input textarea {
+            flex: 1;
+            border: 1px solid <%=accent%>;
+            border-radius: 22px;
+            padding: 12px 45px 12px 15px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            max-height: 120px;
+            min-height: 24px;
+            transition: all 0.3s;
+            background-color: <%=clr%>;
+             color: <%=text%>;
+        }
+        
+        .chat-input textarea:focus, .chat-input textarea:active, .chat-input textarea:hover {
+            background-color: <%=sidebar%>;
+        }
+        
+        .chat-input button {
+            background-color: <%=sidebar%>;
+            color: <%=accent%>;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .chat-input button:hover {
+            background-color: black;
             color: white;
+            transform: translateY(-2px);
+            
         }
-
-        .message.bot .message-content {
-            background: white;
+        
+        .chat-input button:active {
+            transform: translateY(0);
+        }
+        
+        .chat-input button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 14px;
+            border-radius: 8px;
+            overflow: hidden;
+            
+        }
+        
+        table th {
+            background-color: <%=clr%>;
             color: #333;
-            border: 1px solid #e0e0e0;
-        }
-
-        .ai-analysis {
-            background: #f0f7ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-
-        .ai-analysis-header {
             font-weight: bold;
-            color: #0066cc;
-            margin-bottom: 5px;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid <%=clr%>;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-top: 1px solid <%=accent%>;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: <%=sidebar%>;
+        }
+        
+        table tr:hover {
+            background-color: <%=accent%>;
+        }
+        
+        /* Scrollable table container for larger datasets */
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid <%=accent%>;
+        }
+        
+        /* Action buttons near tables for export, etc. */
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin: 5px 0 15px;
+        }
+        
+        .table-action-button {
+            background-color: <%=accent%>;
+            color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 5px;
         }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        
+        .table-action-button:hover {
+            background-color: black;
         }
-
-        .data-table th {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-
-        .data-table td {
-            padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .chat-input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .chat-input-wrapper {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .chat-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .send-button {
-            padding: 15px 25px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .send-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .send-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .typing-indicator {
-            display: none;
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        .typing-indicator .message-content {
-            background: white;
-            border: 1px solid #e0e0e0;
-            padding: 15px 20px;
-        }
-
-        .typing-dots {
-            display: inline-flex;
-            gap: 4px;
-        }
-
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: #667eea;
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        .status-indicator {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.2);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #4CAF50;
-            animation: pulse 2s infinite;
-        }
-
-        .conversation-tools {
-            padding: 10px 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .tool-button {
-            padding: 8px 16px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .tool-button:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
+        
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        
+        /* Help tooltip */
+        .help-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+            cursor: pointer;
+            z-index: 200;
         }
-
-        /* Responsive design */
+        
+        .help-icon {
+            width: 22px;
+            height: 22px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .tooltip-content {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: white;
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+           
+            width: 250px;
+            z-index: 100;
+            display: none;
+            font-weight: normal;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.4;
+            
+        }
+        
+        .help-tooltip:hover .tooltip-content {
+            display: block;
+            animation: fadeIn 0.3s;
+           
+        }
+        
+        .help-tooltip.tooltip-content {
+            display: block;
+            animation: fadeIn 0.3s;
+            
+        }
+                
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .chat-container {
-                margin: 10px;
-                border-radius: 15px;
+            .container {
+                padding: 10px;
             }
             
-            .chat-messages {
-                height: 400px;
-                padding: 15px;
+            .message {
+                max-width: 90%;
             }
             
-            .ai-features {
-                gap: 8px;
+            .suggestions-container {
+                justify-content: center;
             }
             
-            .feature-badge {
-                font-size: 0.7rem;
-                padding: 3px 8px;
+            .suggestion-button {
+                font-size: 12px;
+                padding: 6px 12px;
             }
-        }
+            
+            .chat-header {
+                padding: 12px 15px;
+                font-size: 18px;
+            }
+            
+            .message.bot-message.div.div.table.thread.tr {
+background-color: red;}
+       
     </style>
+    
+    <!--=============== icon ===============-->
+    <link rel="icon" href="https://www.freeiconspng.com/thumbs/logo-design/blank-logo-design-for-brand-13.png" type="image/icon type">
+    
+    <!--=============== titlu ===============-->
+    <title>Asistent HR</title>
 </head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>🤖 Advanced HR AI Assistant</h1>
-            <div class="ai-features">
-                <div class="feature-badge">🇷🇴 RoGPT2</div>
-                <div class="feature-badge">🧠 Romanian BERT</div>
-                <div class="feature-badge">🤖 TensorFlow</div>
-                <div class="feature-badge">💬 Memory</div>
-                <div class="feature-badge">⚡ Real-time</div>
-            </div>
-            <div class="status-indicator" id="statusIndicator">
-                <div class="status-dot"></div>
-                <span id="statusText">Online</span>
-            </div>
-        </div>
+<body style="--bg:<%out.println(accent);%>; --clr:<%out.println(clr);%>; --sd:<%out.println(sidebar);%>">
 
-        <div class="chat-messages" id="chatMessages">
-            <div class="message bot">
-                <div class="message-content">
-                    <strong>🤖 Bine ai venit!</strong><br>
-                    Sunt asistentul HR avansat cu inteligență artificială românească. 
-                    Pot să te ajut cu:
-                    <ul style="margin: 10px 0; padding-left: 20px;">
-                        <li>📊 Informații despre angajați și departamente</li>
-                        <li>🏖️ Gestionarea concediilor și absențelor</li>
-                        <li>💰 Întrebări despre salarii și beneficii</li>
-                        <li>📋 Proiecte și task-uri</li>
-                        <li>📄 Adeverințe și documente HR</li>
-                    </ul>
-                    <em>Întreabă-mă orice în română! Înțeleg contextul și țin minte conversația. 🧠</em>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div>Asistent HR</div>
+                <div class="chat-status">
+                    <span id="statusText">Online</span>
+                    
                 </div>
             </div>
-        </div>
-
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="message-content">
-                🤖 Procesez cu AI...
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                <strong>Cum să folositi asistentul:</strong><br>
+                            - Întrebati despre angajați, departamente, concedii<br>
+                            - Solicitati informații specifice sau statistici<br>
+                            - Folositi limbaj natural în întrebări<br>
+                            - Spuneti "Da" pentru continut detaliat<br>
+                            - Încercati sugestiile de mai jos v
+                    
                 </div>
+                 <div class="message bot-message">
+                <p>Bine ați venit! Sunt asistentul HR virtual. Vă pot oferi informații despre: <br>
+                    
+                        - Angajați și departamente<br>
+                        - Concedii și adeverințe<br>
+                        - Poziții, roluri și salarii<br>
+                        -Proiecte și echipe<br> </p>
+                    </div>
+                     <div class="message bot-message">
+                <p>Cu ce va pot ajuta? </p>
+                    </div>               
             </div>
-        </div>
-
-        <div class="conversation-tools">
-            <button class="tool-button" onclick="clearConversation()">🗑️ Șterge conversația</button>
-            <button class="tool-button" onclick="exportConversation()">💾 Exportă</button>
-            <button class="tool-button" onclick="showSuggestions()">💡 Sugestii</button>
-        </div>
-
-        <div class="chat-input-container">
-            <div class="chat-input-wrapper">
-                <input 
-                    type="text" 
-                    id="messageInput" 
-                    class="chat-input" 
-                    placeholder="Scrie mesajul tău aici... (ex: 'Câți angajați sunt în departamentul IT?')"
-                    onkeypress="handleKeyPress(event)"
-                />
-                <button 
-                    id="sendButton" 
-                    class="send-button" 
-                    onclick="sendMessage()"
-                >
-                    🚀 Trimite
+            <div class="suggestions-container" id="suggestionsContainer">
+                <!-- Suggestions will be added here dynamically -->
+            </div>
+            <div class="chat-input">
+                <textarea id="userInput" placeholder="Scrieți un mesaj..." rows="1" oninput="adjustTextareaHeight(this)"></textarea>
+                <button id="sendButton" onclick="sendMessage()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
                 </button>
             </div>
         </div>
     </div>
-
+    
     <script>
-        // Global variables
-        let conversationHistory = [];
-        let isProcessing = false;
-
-        // Initialize chat
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('messageInput').focus();
-            checkSystemStatus();
-            loadConversationHistory();
-        });
-
-        function handleKeyPress(event) {
+    // Chat component initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Chat interface initialized');
+        
+        // Add default suggestions
+        addDefaultSuggestions();
+        
+        // Focus input field
+        document.getElementById('userInput').focus();
+        
+        // Set up event listeners
+        setupEventListeners();
+    });
+    
+    // DOM elements
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const suggestionsContainer = document.getElementById('suggestionsContainer');
+    
+    // Setup event listeners
+    function setupEventListeners() {
+        // Enter key to send message
+        userInput.addEventListener('keydown', function(event) {
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 sendMessage();
             }
-        }
-
-        async function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
-
-            if (!message || isProcessing) {
-                return;
+        });
+        
+        // Click event for send button
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Click event for chat messages (for handling follow-ups)
+        chatMessages.addEventListener('click', function(event) {
+            if (event.target && event.target.closest('.user-message')) {
+                const text = event.target.closest('.user-message').textContent.toLowerCase().trim();
+                if (isFollowUpResponse(text)) {
+                    handleFollowUp();
+                }
             }
+        });
+    }
 
-            // Add user message to chat
-            addMessage(message, 'user');
-            messageInput.value = '';
-            
-            // Show typing indicator
-            showTypingIndicator();
-            isProcessing = true;
-            updateSendButton(false);
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message: message })
-                });
-
-                const result = await response.json();
-                
-                // Hide typing indicator
-                hideTypingIndicator();
-                
-                // Add bot response
-                addBotResponse(result);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                hideTypingIndicator();
-                addMessage('❌ Eroare de conexiune. Te rog încearcă din nou.', 'bot');
-            } finally {
-                isProcessing = false;
-                updateSendButton(true);
-                messageInput.focus();
-            }
-        }
-
-        function addMessage(content, sender) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = content;
-            
-            messageDiv.appendChild(contentDiv);
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function addBotResponse(result) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot';
-            
-            let content = `<strong>🤖 ${result.message || 'Răspuns primit'}</strong>`;
-            
-            // Add data table if present
-            if (result.type === 'table' && result.data && result.data.length > 0) {
-                content += createDataTable(result.data);
-            }
-            
-            // Add AI analysis if present
-            if (result.ai_analysis) {
-                content += createAIAnalysis(result.ai_analysis);
-            }
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = content;
-            
-            messageDiv.appendChild(contentDiv);
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function createDataTable(data) {
-            if (!data || data.length === 0) return '';
-            
-            const columns = Object.keys(data[0]);
-            
-            let tableHTML = '<table class="data-table"><thead><tr>';
-            columns.forEach(col => {
-                tableHTML += `<th>${col.charAt(0).toUpperCase() + col.slice(1)}</th>`;
-            });
-            tableHTML += '</tr></thead><tbody>';
-            
-            data.forEach(row => {
-                tableHTML += '<tr>';
-                columns.forEach(col => {
-                    const value = row[col] || '-';
-                    tableHTML += `<td>${value}</td>`;
-                });
-                tableHTML += '</tr>';
+    // Add default suggestions
+    function addDefaultSuggestions() {
+        const suggestions = [
+            'Câți angajați sunt în departamentul HR?',
+            'Cine este în concediu astăzi?',
+            'Arată-mi departamentele din firmă',
+            'Care sunt salariile pozițiilor din IT?',
+            'Ce tipuri de poziții există în departamentul HR?',
+            'Proiecte active în prezent',
+            'Adeverințe în așteptare'
+        ];
+        
+        suggestionsContainer.innerHTML = '';
+        
+        suggestions.forEach(suggestion => {
+            const button = document.createElement('button');
+            button.className = 'suggestion-button';
+            button.textContent = suggestion;
+            button.addEventListener('click', function() {
+                userInput.value = suggestion;
+                adjustTextareaHeight(userInput);
+                sendMessage();
             });
             
-            tableHTML += '</tbody></table>';
-            return tableHTML;
-        }
-
-        function createAIAnalysis(analysis) {
-            let analysisHTML = '<div class="ai-analysis">';
-            analysisHTML += '<div class="ai-analysis-header">🧠 Analiza AI</div>';
-            
-            if (analysis.category) {
-                analysisHTML += `<div><strong>Categorie:</strong> ${analysis.category}</div>`;
-            }
-            
-            if (analysis.confidence) {
-                const confidence = Math.round(analysis.confidence * 100);
-                analysisHTML += `<div><strong>Încredere:</strong> ${confidence}%</div>`;
-            }
-            
-            if (analysis.rogpt2_enhanced) {
-                analysisHTML += '<div><strong>🇷🇴 RoGPT2:</strong> Răspuns îmbunătățit în română</div>';
-            }
-            
-            if (analysis.conversation_aware) {
-                analysisHTML += '<div><strong>💬 Context:</strong> Conversație continuă</div>';
-            }
-            
-            if (analysis.sql_explanation) {
-                analysisHTML += `<div><strong>SQL:</strong> ${analysis.sql_explanation}</div>`;
-            }
-            
-            if (analysis.execution_time) {
-                analysisHTML += `<div><strong>Timp execuție:</strong> ${analysis.execution_time}</div>`;
-            }
-            
-            analysisHTML += '</div>';
-            return analysisHTML;
-        }
-
-        function showTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'block';
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function hideTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'none';
-        }
-
-        function updateSendButton(enabled) {
-            const sendButton = document.getElementById('sendButton');
-            sendButton.disabled = !enabled;
-            sendButton.innerHTML = enabled ? '🚀 Trimite' : '⏳ Procesez...';
-        }
-
-     // 🔧 FIXED: Funcția checkSystemStatus
-        async function checkSystemStatus() {
-            try {
-                console.log('🔍 Checking system status...');
-                
-                // Încearcă mai multe URL-uri
-                const possibleUrls = [
-                    '/health',
-                    'http://localhost:5000/health',
-                    'http://127.0.0.1:5000/health'
-                ];
-                
-                let response = null;
-                let lastError = null;
-                
-                for (const url of possibleUrls) {
-                    try {
-                        console.log(`🔗 Trying: ${url}`);
-                        response = await fetch(url);
-                        if (response.ok) {
-                            console.log(`✅ Success with: ${url}`);
-                            break;
-                        }
-                    } catch (error) {
-                        console.log(`❌ Failed with ${url}:`, error);
-                        lastError = error;
-                        continue;
-                    }
-                }
-                
-                if (!response || !response.ok) {
-                    throw lastError || new Error('All URLs failed');
-                }
-                
-                const status = await response.json();
-                console.log('📊 Status received:', status);
-                
-                const statusText = document.getElementById('statusText');
-                const statusDot = document.querySelector('.status-dot');
-                
-                if (status.nlp_processor === 'ready' && status.queryservlet_connected) {
-                    statusText.textContent = 'Online';
-                    statusText.style.color = '#4CAF50';
-                    statusDot.style.background = '#4CAF50';
-                } else if (status.queryservlet_connected) {
-                    statusText.textContent = 'Parțial';
-                    statusText.style.color = '#FF9800';
-                    statusDot.style.background = '#FF9800';
-                } else {
-                    statusText.textContent = 'Parțial';
-                    statusText.style.color = '#FF9800';
-                    statusDot.style.background = '#FF9800';
-                }
-                
-            } catch (error) {
-                console.error('❌ Status check failed:', error);
-                const statusText = document.getElementById('statusText');
-                const statusDot = document.querySelector('.status-dot');
-                statusText.textContent = 'Conectând...';
-                statusText.style.color = '#FF5722';
-                statusDot.style.background = '#FF5722';
+            suggestionsContainer.appendChild(button);
+        });
+    }
+    
+    // Add context-aware suggestions based on previous interactions
+    function addContextSuggestions(context) {
+        const contextSuggestions = {
+            'angajați': [
+                'Câți angajați sunt în total?',
+                'Care sunt angajații din departamentul IT?',
+                'Angajații cu cele mai mari salarii'
+            ],
+            'departamente': [
+                'Care departament are cei mai mulți angajați?',
+                'Câte departamente avem în firmă?',
+                'Locațiile departamentelor'
+            ],
+            'concedii': [
+                'Cine este în concediu astăzi?',
+                'Concedii planificate pentru luna aceasta',
+                'Concedii de Crăciun'
+            ],
+            'poziții': [
+                'Ce tipuri de poziții există?',
+                'Care sunt pozițiile din IT?',
+                'Pozițiile cu cele mai mari salarii'
+            ],
+            'salarii': [
+                'Care este salariul mediu în firmă?',
+                'Top 5 cele mai mari salarii',
+                'Salarii pe departamente'
+            ],
+            'proiecte': [
+                'Câte proiecte active avem?',
+                'Cine lucrează la proiectele active?',
+                'Status-ul taskurilor din proiecte'
+            ]
+        };
+        
+        // Find the appropriate context
+        let suggestions = [];
+        for (const [key, value] of Object.entries(contextSuggestions)) {
+            if (context.toLowerCase().includes(key)) {
+                suggestions = value;
+                break;
             }
         }
-
-        // 🔧 FIXED: Funcția sendMessage
-        async function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
-
-            if (!message || isProcessing) {
-                return;
-            }
-
-            // Add user message to chat
-            addMessage(message, 'user');
-            messageInput.value = '';
-            
-            // Show typing indicator
-            showTypingIndicator();
-            isProcessing = true;
-            updateSendButton(false);
-
-            try {
-                console.log('📤 Sending message:', message);
-                
-                // Încearcă mai multe URL-uri pentru chat
-                const possibleUrls = [
-                    '/api/chat',
-                    'http://localhost:5000/api/chat',
-                    'http://127.0.0.1:5000/api/chat'
-                ];
-                
-                let response = null;
-                let lastError = null;
-                
-                for (const url of possibleUrls) {
-                    try {
-                        console.log(`🔗 Trying chat URL: ${url}`);
-                        response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ message: message })
-                        });
-                        
-                        if (response.ok) {
-                            console.log(`✅ Chat success with: ${url}`);
-                            break;
-                        }
-                    } catch (error) {
-                        console.log(`❌ Chat failed with ${url}:`, error);
-                        lastError = error;
-                        continue;
-                    }
-                }
-                
-                if (!response || !response.ok) {
-                    throw lastError || new Error('All chat URLs failed');
-                }
-
-                const result = await response.json();
-                console.log('📨 Response received:', result);
-                
-                // Hide typing indicator
-                hideTypingIndicator();
-                
-                // Add bot response
-                addBotResponse(result);
-                
-            } catch (error) {
-                console.error('❌ Send message error:', error);
-                hideTypingIndicator();
-                addMessage(`❌ Eroare de conexiune: ${error.message}. Flask rulează pe localhost:5000?`, 'bot');
-            } finally {
-                isProcessing = false;
-                updateSendButton(true);
-                messageInput.focus();
-            }
+        
+        // If no specific context found, use default suggestions
+        if (suggestions.length === 0) {
+            return;
         }
-
-        async function clearConversation() {
-            if (confirm('Sigur vrei să ștergi conversația?')) {
+        
+        // Update suggestions
+        suggestionsContainer.innerHTML = '';
+        
+        suggestions.forEach(suggestion => {
+            const button = document.createElement('button');
+            button.className = 'suggestion-button';
+            button.textContent = suggestion;
+            button.addEventListener('click', function() {
+                userInput.value = suggestion;
+                adjustTextareaHeight(userInput);
+                sendMessage();
+            });
+            
+            suggestionsContainer.appendChild(button);
+        });
+    }
+    
+    // Check if text is a follow-up response
+    function isFollowUpResponse(text) {
+        const followUpPhrases = [
+            'da', 'te rog', 'sigur', 'bineințeles', 'bineinteles', 'vreau', 
+            'arata-mi mai multe', 'arată-mi mai multe', 'detalii'
+        ];
+        
+        return followUpPhrases.some(phrase => text.includes(phrase));
+    }
+    
+    // Handle follow-up responses
+    function handleFollowUp() {
+        // This will be handled by the server when the message is sent
+        // The server has stored the previous query context and data
+    }
+    
+    // Send message to server
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (message === '') return;
+        
+        console.log('Sending message:', message);
+        
+        // Add user message to chat
+        addMessage(message, 'user');
+        
+        // Clear input and adjust height
+        userInput.value = '';
+        adjustTextareaHeight(userInput);
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Disable input while processing
+        setInputEnabled(false);
+        
+        // Get the context path
+        const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
+        const servletUrl = contextPath + '/ChatServlet';
+        
+        console.log('Using servlet URL:', servletUrl);
+        
+        // Send message to server
+        fetch(servletUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'query=' + encodeURIComponent(message)
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            return response.text().then(text => {
+                console.log('Raw response:', text);
                 try {
-                    await fetch('/clear-conversation', { method: 'POST' });
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    throw new Error('Invalid JSON response: ' + e.message);
+                }
+            });
+        })
+        .then(data => {
+            console.log('Parsed data:', data);
+            
+            // Hide typing indicator
+            hideTypingIndicator();
+            
+            // Re-enable input
+            setInputEnabled(true);
+            
+            // Handle different response types
+            if (data.type === 'text') {
+                // Simple text response
+                addMessage(data.message, 'bot');
+                
+                // Update suggestions based on message context
+                if (data.message && data.message.length > 10) {
+                    addContextSuggestions(data.message);
+                }
+            } else if (data.type === 'table') {
+                // Table response with initial message
+                addMessage(data.message, 'bot');
+                
+                // If data is available and the message is asking for confirmation,
+                // show the confirmation buttons
+                if (data.data && data.data.length > 0 && 
+                    (data.message.includes('Doriți') || data.message.includes('doriti'))) {
                     
-                    // Clear chat messages except welcome message
-                    const chatMessages = document.getElementById('chatMessages');
-                    const messages = chatMessages.querySelectorAll('.message');
-                    for (let i = 1; i < messages.length; i++) {
-                        messages[i].remove();
+                    // Store data for possible confirmation
+                    window.lastQueryData = data.data;
+                    
+                    // Add confirmation buttons
+                    addConfirmationButtons();
+                    
+                    // Update suggestions based on data context
+                    let contextString = getContextFromData(data.data);
+                    addContextSuggestions(contextString);
+                    
+                } else if (data.data && data.data.length > 0) {
+                    // If the message is not asking for confirmation, show the data immediately
+                    setTimeout(() => {
+                        addTableMessage(data.data, 'bot');
+                        
+                        // Update suggestions based on data context
+                        let contextString = getContextFromData(data.data);
+                        addContextSuggestions(contextString);
+                    }, 500);
+                }
+            } else if (data.type === 'error') {
+                // Error response
+                addMessage(data.message, 'bot', 'error');
+                
+                // Reset to default suggestions
+                setTimeout(addDefaultSuggestions, 500);
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            
+            // Hide typing indicator
+            hideTypingIndicator();
+            
+            // Re-enable input
+            setInputEnabled(true);
+            
+            // Show error message
+            addMessage('Îmi pare rău, a apărut o eroare în comunicarea cu serverul: ' + error.message, 'bot', 'error');
+            
+            // Reset to default suggestions
+            setTimeout(addDefaultSuggestions, 500);
+        });
+    }
+    
+    // Try to determine context from data for suggestion generation
+    function getContextFromData(data) {
+        if (!data || data.length === 0) return '';
+        
+        // Get the first row as a sample
+        const sample = data[0];
+        let contextString = '';
+        
+        // Check for known column names to determine context
+        if (sample.departament) contextString += ' departamente';
+        if (sample.nume && sample.prenume) contextString += ' angajați';
+        if (sample.data_inceput || sample.start_c) contextString += ' concedii';
+        if (sample.functie || sample.denumire || sample.salariu) contextString += ' poziții salarii';
+        if (sample.nume_proiect || sample.nume_task) contextString += ' proiecte';
+        if (sample.tip_adeverinta) contextString += ' adeverințe';
+        
+        return contextString;
+    }
+    
+    // Add confirmation buttons after a table response that needs confirmation
+    function addConfirmationButtons() {
+        const confirmationDiv = document.createElement('div');
+        confirmationDiv.className = 'confirmation-buttons';
+        confirmationDiv.style.display = 'flex';
+        confirmationDiv.style.gap = '10px';
+        confirmationDiv.style.marginTop = '10px';
+        
+        const yesButton = document.createElement('button');
+        yesButton.className = 'suggestion-button';
+        yesButton.textContent = 'Da, vreau să văd detaliile';
+        yesButton.style.backgroundColor = '#4CAF50';
+        yesButton.style.color = 'white';
+        yesButton.addEventListener('click', function() {
+            // Remove confirmation buttons
+            confirmationDiv.remove();
+            
+            // Show the table
+            if (window.lastQueryData && window.lastQueryData.length > 0) {
+                addTableMessage(window.lastQueryData, 'bot');
+                window.lastQueryData = null;
+            }
+        });
+        
+        const noButton = document.createElement('button');
+        noButton.className = 'suggestion-button';
+        noButton.textContent = 'Nu, mulțumesc';
+        noButton.addEventListener('click', function() {
+            // Remove confirmation buttons
+            confirmationDiv.remove();
+            
+            // Clear stored data
+            window.lastQueryData = null;
+            
+            // Add a confirmation message
+            addMessage('În regulă. Cu ce altceva vă pot ajuta?', 'bot');
+        });
+        
+        confirmationDiv.appendChild(yesButton);
+        confirmationDiv.appendChild(noButton);
+        
+        // Add to the last bot message
+        const lastBotMessage = Array.from(chatMessages.querySelectorAll('.bot-message'))
+            .filter(el => !el.classList.contains('bot-typing'))
+            .pop();
+            
+        if (lastBotMessage) {
+            lastBotMessage.appendChild(confirmationDiv);
+        }
+    }
+
+    // Add a text message to chat
+    function addMessage(message, sender, type) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        
+        if (type === 'error') {
+            messageElement.style.backgroundColor = '#ffebee';
+            messageElement.style.color = '#c62828';
+            messageElement.style.borderLeft = '3px solid #c62828';
+        }
+        
+        messageElement.innerHTML = formatMessage(message);
+        
+        chatMessages.appendChild(messageElement);
+        
+        // Add timestamp
+        const timeElement = document.createElement('div');
+        timeElement.classList.add('message-time');
+        const now = new Date();
+        timeElement.textContent = now.getHours().toString().padStart(2, '0') + ':' + 
+                                 now.getMinutes().toString().padStart(2, '0');
+        messageElement.appendChild(timeElement);
+        
+        // Scroll to bottom
+        scrollToBottom();
+    }
+    
+    function addTableMessage(data, sender) {
+        if (!data || data.length === 0) {
+            addMessage('Nu există date disponibile.', sender);
+            return;
+        }
+        
+        console.log('Rendering table with data:', data);
+        
+        // Creăm containerul pentru mesaj
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        messageElement.style.maxWidth = "95%";
+        messageElement.style.width = "auto";
+        messageElement.style.overflowX = "auto";
+        
+        // Get column names from first row
+        const columns = Object.keys(data[0]);
+        
+        // Build table HTML directly using StringBuilder pattern
+        let tableHTML = '';
+        tableHTML += '<div style="overflow-x:auto; margin:10px 0;">';
+        tableHTML += '<table style="width:100%; border-collapse:collapse; color:#000; background-color:#fff; border:1px solid #ddd;">';
+        
+        // Create header row
+        tableHTML += '<thead>';
+        tableHTML += '<tr>';
+        columns.forEach(column => {
+            // Convert column names to friendly format
+            const friendlyName = formatColumnName(column);
+            tableHTML += '<th style="padding:8px; text-align:left; background-color:#f5f5f5; color:#333; border:1px solid #ddd;">' + friendlyName + '</th>';
+        });
+        tableHTML += '</tr>';
+        tableHTML += '</thead>';
+        
+        // Create data rows
+        tableHTML += '<tbody>';
+        data.forEach((row, index) => {
+            const bgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+            tableHTML += '<tr style="background-color:' + bgColor + ';">';
+            columns.forEach(column => {
+                let cellValue = row[column] != null ? row[column] : '';
+                
+                // Format dates if they look like dates
+                if (typeof cellValue === 'string' && 
+                    (cellValue.match(/^\d{4}-\d{2}-\d{2}$/) || 
+                     cellValue.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/))) {
+                    cellValue = formatDateString(cellValue);
+                }
+                
+                // Format boolean values
+                if (cellValue === true) cellValue = 'Da';
+                if (cellValue === false) cellValue = 'Nu';
+                
+                tableHTML += '<td style="padding:8px; border:1px solid #ddd; color:#333;">' + cellValue + '</td>';
+            });
+            tableHTML += '</tr>';
+        });
+        tableHTML += '</tbody>';
+        tableHTML += '</table>';
+        tableHTML += '</div>';
+        
+        // Create the table element and add it to the message
+        const tableContainer = document.createElement('div');
+        tableContainer.innerHTML = tableHTML;
+        messageElement.appendChild(tableContainer);
+        
+        // Export button
+        const exportButton = document.createElement('button');
+        exportButton.textContent = 'Export CSV';
+        exportButton.style.backgroundColor = '#f1f1f1';
+        exportButton.style.border = '1px solid #ddd';
+        exportButton.style.borderRadius = '4px';
+        exportButton.style.padding = '5px 10px';
+        exportButton.style.fontSize = '12px';
+        exportButton.style.cursor = 'pointer';
+        exportButton.style.margin = '5px 0';
+        exportButton.addEventListener('click', function() {
+            exportTableToCSV(data);
+        });
+        
+        messageElement.appendChild(exportButton);
+        
+        // Add to chat
+        chatMessages.appendChild(messageElement);
+        
+        // Add timestamp
+        const timeElement = document.createElement('div');
+        timeElement.classList.add('message-time');
+        const now = new Date();
+        timeElement.textContent = now.getHours().toString().padStart(2, '0') + ':' + 
+                                  now.getMinutes().toString().padStart(2, '0');
+        messageElement.appendChild(timeElement);
+        
+        // Ensure good scrolling
+        setTimeout(scrollToBottom, 100);
+    }
+    
+    // Show typing indicator
+    function showTypingIndicator() {
+        const typingElement = document.createElement('div');
+        typingElement.classList.add('message', 'bot-message', 'bot-typing');
+        typingElement.id = 'typingIndicator';
+        
+        const typingIndicator = document.createElement('div');
+        typingIndicator.classList.add('typing-indicator');
+        
+        for (let i = 0; i < 3; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('typing-dot');
+            typingIndicator.appendChild(dot);
+        }
+        
+        typingElement.appendChild(typingIndicator);
+        chatMessages.appendChild(typingElement);
+        
+        // Scroll to bottom
+        scrollToBottom();
+    }
+    
+    // Hide typing indicator
+    function hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+    
+    // Format message with links, lists, etc.
+    function formatMessage(message) {
+        if (typeof message !== 'string') {
+            return message;
+        }
+        
+        // Convert URLs to links
+        message = message.replace(
+            /(https?:\/\/[^\s]+)/g,
+            '<a href="$1" target="_blank" style="color: #0078d4; text-decoration: underline;">$1</a>'
+        );
+        
+        // Convert bullet points (* or -) to HTML lists
+        if ((message.includes('* ') || message.includes('- ')) && message.includes('\n')) {
+            let lines = message.split('\n');
+            let inList = false;
+            let formattedLines = [];
+            
+            for (let line of lines) {
+                if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
+                    if (!inList) {
+                        formattedLines.push('<ul style="margin: 5px 0; padding-left: 20px;">');
+                        inList = true;
                     }
-                    
-                    conversationHistory = [];
-                    
-                } catch (error) {
-                    console.error('Error clearing conversation:', error);
+                    formattedLines.push('<li>' + line.trim().substring(2) + '</li>');
+                } else {
+                    if (inList) {
+                        formattedLines.push('</ul>');
+                        inList = false;
+                    }
+                    formattedLines.push(line);
                 }
             }
-        }
-
-        async function loadConversationHistory() {
-            try {
-                const response = await fetch('/conversation-history');
-                const data = await response.json();
-                conversationHistory = data.conversation_history || [];
-            } catch (error) {
-                console.error('Error loading conversation history:', error);
+            
+            if (inList) {
+                formattedLines.push('</ul>');
             }
-        }
-
-     // 🔧 FIXED: Escape JavaScript pentru JSP
-        function exportConversation() {
-            const messages = document.querySelectorAll('.message');
-            let conversation = 'Conversație HR AI Assistant\n';
-            conversation += '================================\n\n';
             
-            messages.forEach(message => {
-                const isUser = message.classList.contains('user');
-                const content = message.querySelector('.message-content').textContent;
-                conversation += (isUser ? 'Tu' : 'AI') + ': ' + content + '\n\n';
-            });
-            
-            const blob = new Blob([conversation], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            // 🔧 FIXED: Evită EL expression în JavaScript
-            const today = new Date();
-            const dateStr = today.getFullYear() + '-' + 
-                          String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                          String(today.getDate()).padStart(2, '0');
-            a.download = 'conversatie-hr-' + dateStr + '.txt';
-            a.click();
-            
-            URL.revokeObjectURL(url);
+            message = formattedLines.join('\n');
         }
         
-        // 🔧 FIXED: Toate funcțiile JavaScript corectate
-        function showSuggestions() {
-            const suggestions = [
-                "Câți angajați sunt în departamentul IT?",
-                "Care sunt pozițiile disponibile în HR?",
-                "Cine este în concediu săptămâna aceasta?",
-                "Ce salarii sunt în departamentul financiar?",
-                "Lista managerilor din toate departamentele",
-                "Proiectele active pentru anul acesta"
-            ];
-            
-            let suggestionsHTML = '<div style="margin-top: 10px;"><strong>💡 Sugestii de întrebări:</strong><br>';
-            suggestions.forEach(function(suggestion) {
-                // 🔧 FIXED: Escape single quotes
-                const escapedSuggestion = suggestion.replace(/'/g, "\\'");
-                suggestionsHTML += '<div style="margin: 5px 0; padding: 5px; background: #f0f0f0; border-radius: 5px; cursor: pointer;" onclick="setSuggestion(\'' + escapedSuggestion + '\')">' + suggestion + '</div>';
-            });
-            suggestionsHTML += '</div>';
-            
-            addMessage(suggestionsHTML, 'bot');
-        }
+        // Convert newlines to <br>
+        message = message.replace(/\n/g, '<br>');
         
-        // 🔧 NEW: Helper function pentru suggestions
-        function setSuggestion(suggestion) {
-            document.getElementById('messageInput').value = suggestion;
+        return message;
+    }
+    
+    function createTableFromData(data) {
+        if (!data || data.length === 0) return '<p>Nu există date disponibile.</p>';
+        
+        // Log datele pentru debugging
+        console.log("Date pentru tabel:", data);
+        
+        // Get column names from first row
+        const columns = Object.keys(data[0]);
+        
+        let tableHTML = '<table class="result-table" style="width:100%; border-collapse:collapse; margin:10px 0; color:#333; background-color:#fff;">';
+        
+        // Create header row
+        tableHTML += '<tr>';
+        columns.forEach(column => {
+            // Convert column names to friendly format
+            const friendlyName = formatColumnName(column);
+            tableHTML += `<th style="background-color:#f5f5f5; color:#333; text-align:left; padding:10px; border:1px solid #ddd;">${friendlyName}</th>`;
+        });
+        tableHTML += '</tr>';
+        
+        // Create data rows
+        data.forEach((row, rowIndex) => {
+            const bgColor = rowIndex % 2 === 0 ? '#fff' : '#f9f9f9';
+            tableHTML += `<tr style="background-color:${bgColor};">`;
+            columns.forEach(column => {
+                let cellValue = row[column] != null ? row[column] : '';
+                
+                // Format dates if they look like dates
+                if (typeof cellValue === 'string' && 
+                    (cellValue.match(/^\d{4}-\d{2}-\d{2}$/) || 
+                     cellValue.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/))) {
+                    cellValue = formatDateString(cellValue);
+                }
+                
+                // Format boolean values
+                if (cellValue === true) cellValue = 'Da';
+                if (cellValue === false) cellValue = 'Nu';
+                
+                tableHTML += `<td style="padding:8px; border:1px solid #ddd; color:#333;">${cellValue}</td>`;
+            });
+            tableHTML += '</tr>';
+        });
+        
+        tableHTML += '</table>';
+        
+        return tableHTML;
+    }
+    
+    // Format column names for display
+    function formatColumnName(columnName) {
+        // Replace underscores with spaces
+        let result = columnName.replace(/_/g, ' ');
+        
+        // Capitalize first letter of each word
+        result = result.replace(/\b\w/g, l => l.toUpperCase());
+        
+        return result;
+    }
+    
+    // Format date strings to Romanian format
+    function formatDateString(dateString) {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            
+            return date.toLocaleDateString('ro-RO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return dateString;
         }
-        // Check status periodically
-        setInterval(checkSystemStatus, 30000); // Every 30 seconds
+    }
+    
+    // Export table data to CSV
+    function exportTableToCSV(data) {
+        if (!data || data.length === 0) return;
+        
+        // Get column names
+        const columns = Object.keys(data[0]);
+        
+        // Create CSV content
+        let csvContent = columns.map(formatColumnName).join(',') + '\n';
+        
+        data.forEach(row => {
+            let rowContent = columns.map(column => {
+                let value = row[column] != null ? row[column] : '';
+                
+                // Quote values with commas
+                if (typeof value === 'string' && value.includes(',')) {
+                    return `"${value}"`;
+                }
+                
+                return value;
+            }).join(',');
+            
+            csvContent += rowContent + '\n';
+        });
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'export_' + new Date().toISOString().slice(0, 10) + '.csv');
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    // Enable/disable input while processing
+    function setInputEnabled(enabled) {
+        userInput.disabled = !enabled;
+        sendButton.disabled = !enabled;
+        
+        if (enabled) {
+            userInput.focus();
+            document.getElementById('statusText').textContent = 'Online';
+        } else {
+            document.getElementById('statusText').textContent = 'Procesează...';
+        }
+    }
+    
+    // Adjust textarea height based on content
+    function adjustTextareaHeight(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    }
+    
+    // Scroll chat to bottom
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
     </script>
+         <%
+                    }
+                
+            } catch (Exception e) {
+                out.println("<script type='text/javascript'>");
+                out.println("alert('Eroare la baza de date!');");
+                out.println("alert('" + e.getMessage() + "');");
+                out.println("</script>");
+                
+                e.printStackTrace();
+            }
+        } else {
+            out.println("<script type='text/javascript'>");
+            out.println("alert('Utilizator neconectat!');");
+            out.println("</script>");
+            response.sendRedirect("login.jsp");
+        }
+    } else {
+        out.println("<script type='text/javascript'>");
+        out.println("alert('Nu e nicio sesiune activa!');");
+        out.println("</script>");
+        response.sendRedirect("login.jsp");
+    }
+%>
 </body>
 </html>

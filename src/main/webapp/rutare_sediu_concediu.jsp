@@ -136,7 +136,7 @@
             background-color: <%=sidebar%>;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+          
             color: <%=text%>;
             font-family: Arial, sans-serif;
         }
@@ -153,7 +153,7 @@
             color: <%=clr%>;
             border-color: <%=clr%>;
             border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+          
             width: 300px;
         }
         
@@ -269,7 +269,7 @@
             padding: 8px;
             border-radius: 5px;
             border: 1px solid <%=clr%>;
-            background-color: white;
+            background-color: <%=sidebar%>;
             color: <%=text%>;
             font-size: 14px;
         }
@@ -302,7 +302,7 @@
         
         <div class="select-container">
             <label for="concediuSelect">Selectează concediul:</label>
-            <div style="max-height: 200px; overflow-y: auto; border: 1px solid <%=clr%>; border-radius: 5px; background-color: white;">
+            <div style="max-height: 200px; overflow-y: auto; border: 1px solid <%=clr%>; border-radius: 5px; background-color: <%=clr%>; color: <%=text%>">
                 <%
                     // Obținem lista de concedii ale utilizatorului
                     try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "student")) {
@@ -351,43 +351,44 @@
             </div>
         </div>
         
-        <div id="sediuDetails" class="details-panel" style="display: none;">
-            <h4>Locația sediului tău</h4>
-            <div id="sediuInfo"></div>
-        </div>
-        
-        <div id="concediuDetails" class="details-panel" style="display: none;">
-            <h4>Locația concediului</h4>
-            <div id="distanceBadge" class="badge badge-distance" style="display: none;"></div>
-            <div id="concediuInfo"></div>
-        </div>
-        
         <div class="details-panel">
             <h4>Control Zoom</h4>
             <div style="display: flex; gap: 10px;">
-                <button id="zoomInBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <button id="zoomInBtn" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
                     <i class="ri-zoom-in-line"></i> Zoom In
                 </button>
-                <button id="zoomOutBtn" style="flex: 1; padding: 8px; background-color: <%=accent%>; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <button id="zoomOutBtn" style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>">
                     <i class="ri-zoom-out-line"></i> Zoom Out
                 </button>
             </div>
             <p style="font-size: 12px; margin-top: 5px; color: <%=text%>;">Notă: Scroll-ul pe hartă este dezactivat pentru o navigare mai ușoară pe pagină.</p>
         </div>
         
-        <button id="loadLocationsBtn" class="login__button" disabled>
-            <i class="ri-map-pin-2-line"></i> Încarcă locațiile
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="loadLocationsBtn" class="login__button" disabled>
+            <i class="ri-map-pin-2-line"></i> Încarcati locațiile
         </button>
         
-        <button id="generateRouteBtn" class="login__button" disabled>
-            <i class="ri-route-line"></i> Generează rută
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="generateRouteBtn" class="login__button" disabled>
+            <i class="ri-route-line"></i> Generati rută
         </button>
         
-        <button id="resetBtn" class="login__button">
-            <i class="ri-refresh-line"></i> Resetează harta
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" id="resetBtn" class="login__button">
+            <i class="ri-refresh-line"></i> Resetati harta
         </button>
         
-        <button class="login__button">
+        <button style="
+display: block; margin-bottom: 10px; padding: 10px; width: 100%; border: none; font-size: 14px;
+         box-shadow: 0 6px 24px <%out.println(accent); %>; background:<%out.println(accent); %>" class="login__button">
             <a style="color: white !important; text-decoration: none; font-size: 14px;" href="actiuni_harti.jsp">
                 <i class="ri-arrow-left-line"></i> Înapoi
             </a>
