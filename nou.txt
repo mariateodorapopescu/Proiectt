@@ -1719,6 +1719,26 @@ INSERT INTO statusuri2 (id, procent) VALUES
 (3, 75),
 (4, 100);
 
+CREATE TABLE IF NOT EXISTS cicluri (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    semnificatie VARCHAR(255) NULL DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS limbi (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    limba VARCHAR(255) NULL DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS nivel (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    semnificatie VARCHAR(255) NULL DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tip_job (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    semnificatie VARCHAR(255) NULL DEFAULT NULL
+);
+
 -- Tabel cicluri
 INSERT INTO cicluri (id, semnificatie) VALUES
 (1, 'liceal'),
@@ -1964,6 +1984,26 @@ INSERT INTO istoric_promovari (id_ang, tip_vechi, tip_nou, tip_promovare, data_p
 (6, 10, 0, 'Promovare internă', '2025-04-01'),
 (9, 8, 3, 'Promovare internă', '2025-01-15'),
 (7, 5, 1, 'Promovare performanță', '2024-10-01');
+
+CREATE TABLE IF NOT EXISTS istoric_concedii_suplimentare (
+	id_ang INT NULL DEFAULT NULL,
+    zile_acordate INT NULL DEFAULT NULL, 
+    motiv VARCHAR(255) NULL DEFAULT NULL, 
+    data_acordare DATE NULL DEFAULT NULL,
+	FOREIGN KEY (id_ang) REFERENCES useri(id)
+);
+
+CREATE TABLE IF NOT EXISTS colors (
+    culoare VARCHAR(255) NULL DEFAULT NULL, 
+    cod VARCHAR(255) NOT NULL DEFAULT "#000000",
+    primary key (cod)
+);
+
+CREATE TABLE IF NOT EXISTS tipuri_evenimente (
+    denumire VARCHAR(255) NULL DEFAULT NULL, 
+    id INT NOT NULL DEFAULT 1,
+    primary key (id)
+);
 
 -- Adăugăm istoric de concedii suplimentare
 INSERT INTO istoric_concedii_suplimentare (id_ang, zile_acordate, motiv, data_acordare) VALUES
@@ -2399,6 +2439,6 @@ select count(*) from concedii c join useri u on u.id = c.id_ang join departament
 
 SELECT DISTINCT u.id, u.nume, u.prenume FROM useri u JOIN membrii_echipe me ON u.id = me.id_ang WHERE me.id_echipa IN (" 1 ") ORDER BY u.nume, u.prenume;
 update useri set id_sediu = 1 where id = 1;
-select * from penalizari;
+-- select * from penalizari;
 select * from tipcon;
 SELECT c.acc_res, c.added, c.modified, c.id AS nr_crt, d.nume_dep AS departament, u.nume, u.prenume, t.denumire AS functie, c.start_c, c.end_c, c.motiv, CASE WHEN lc.strada IS NOT NULL THEN CONCAT('Str.', lc.strada, ', loc. ', lc.oras, ', jud. ', lc.judet, ', ', lc.tara) ELSE 'Locație nespecificată' END AS locatie, s.nume_status AS status, ct.motiv AS tipcon FROM useri u JOIN tipuri t ON u.tip = t.tip JOIN departament d ON u.id_dep = d.id_dep JOIN concedii c ON c.id_ang = u.id JOIN statusuri s ON c.status = s.status JOIN tipcon ct ON c.tip = ct.tip LEFT JOIN locatii_concedii lc ON c.id = lc.id_concediu  WHERE u.id <> 1 AND YEAR(c.start_c) = YEAR(CURDATE())
