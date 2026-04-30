@@ -74,10 +74,10 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("currentUser", validatedUser);
                 
                 // Generate JWT token using JwtUtil
-                String jwtToken = jwtUtil.generateToken(username);
+//                String jwtToken = jwtUtil.generateToken(username);
                 System.out.println("JWT Token generated"); // Debug log
                 
-                session.setAttribute("token", "Bearer " + jwtToken);
+//                session.setAttribute("token", "Bearer " + jwtToken);
                 
                 // Redirect to OTP
                 response.sendRedirect(request.getContextPath() + "/OTP?username=" + username);

@@ -539,6 +539,7 @@ background-color: red;}
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
     const suggestionsContainer = document.getElementById('suggestionsContainer');
+    const currentUserId = <%= id %>;
     
     // Setup event listeners
     function setupEventListeners() {
@@ -696,7 +697,7 @@ background-color: red;}
         
         // Get the context path
         const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
-        const servletUrl = contextPath + '/ChatServlet';
+   /*      const servletUrl = contextPath + '/ChatServlet';
         
         console.log('Using servlet URL:', servletUrl);
         
@@ -707,6 +708,16 @@ background-color: red;}
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: 'query=' + encodeURIComponent(message)
+        }) */
+        const flaskUrl = 'http://localhost:5001/chat';
+
+        fetch(flaskUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: message,
+                user_id: currentUserId
+            })
         })
         .then(response => {
             console.log('Response status:', response.status);

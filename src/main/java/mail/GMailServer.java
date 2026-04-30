@@ -19,8 +19,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
-
+//import org.apache.tomcat.jakartaee.commons.lang3.StringEscapeUtils;
+//import org.apache.commons.lang3.StringEscapeUtils;
 import com.email.durgesh.Email;
 
 @SuppressWarnings("deprecation")
@@ -39,16 +39,28 @@ public class GMailServer extends javax.mail.Authenticator
 
         Properties props = new Properties();
         // Setari pentru protocolul SMTP si porturile specifice pentru SSL si TLS
+//        props.setProperty("mail.transport.protocol", "smtp");
+//        props.setProperty("mail.smtp.host", mailhost);
+//        props.put("mail.smtp.auth", "true");
+//        props.put("mail.smtp.port", "465");
+//        props.put("mail.smtp.socketFactory.port", "465");
+//        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+//        props.put("mail.smtp.starttls.enable","true");
+//        props.put("mail.smtp.debug", "true");
+//        props.put("mail.smtp.socketFactory.fallback", "false");
+//        props.setProperty("mail.smtp.quitwait", "false");  
         props.setProperty("mail.transport.protocol", "smtp");
         props.setProperty("mail.smtp.host", mailhost);
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "465");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.starttls.enable","true");
+        
+        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+        props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.debug", "true");
-        props.put("mail.smtp.socketFactory.fallback", "false");
-        props.setProperty("mail.smtp.quitwait", "false");  
+        props.setProperty("mail.smtp.quitwait", "false");
 
         session = Session.getDefaultInstance(props, this);
         session.setDebug(true);
@@ -118,22 +130,40 @@ public class GMailServer extends javax.mail.Authenticator
 }
     
     // Metoda pentru trimiterea unui email simplu
-	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
-		if (!isValidEmail(recipients)) {
-		    throw new AddressException("Adresa de e-mail este invalidă: " + recipients);
-		}
+//	public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
+//		if (!isValidEmail(recipients)) {
+//		    throw new AddressException("Adresa de e-mail este invalidă: " + recipients);
+//		}
+//
+//		  try {
+//	          Email email = new Email(user, password);
+//	          email.setFrom("liviaaamp@gmail.com", "Firma XYZ");
+//	          email.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+////	          email.setContent(StringEscapeUtils.unescapeJava(body), "text/html; charset=UTF-8");
+//	          email.setContent(body, "text/html; charset=UTF-8");
+//	          email.addRecipient(recipients);
+//	          email.send();
+//	      } catch (Exception e) {
+//	          e.printStackTrace();    
+//	      }
+//	}
+    
+    public synchronized void send(String subject, String body, String sender, String recipients) throws Exception {
+        if (!isValidEmail(recipients)) {
+            throw new AddressException("Adresa de e-mail este invalidă: " + recipients);
+        }
 
-		  try {
-	          Email email = new Email(user, password);
-	          email.setFrom("liviaaamp@gmail.com", "Firma XYZ");
-	          email.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
-	          email.setContent(StringEscapeUtils.unescapeJava(body), "text/html; charset=UTF-8");
-	          email.addRecipient(recipients);
-	          email.send();
-	      } catch (Exception e) {
-	          e.printStackTrace();    
-	      }
-	}
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("liviaaamp@gmail.com", "Firma XYZ"));
+            message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+            message.setContent(body, "text/html; charset=UTF-8");
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
+            Transport.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 	
     // Metoda pentru trimiterea unui email cu mai multi destinatari
     public synchronized void sendMail(String subject, String body, String sender, String recipients) throws Exception
